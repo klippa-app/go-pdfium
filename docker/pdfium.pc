@@ -1,0 +1,11 @@
+prefix=/opt/pdfium
+libdir=/opt/pdfium/lib
+includedir=/opt/pdfium/include
+
+Name: pdfium
+Description: pdfium
+Version: 4320
+Requires:
+
+Libs: -L${libdir} -lpdfium
+Cflags: -I${includedir}
