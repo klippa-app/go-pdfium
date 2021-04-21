@@ -29,6 +29,10 @@ Replace `{path}` with the path you extracted pdfium in.
 
 Make sure you extend your library path when running:
 
-`LD_LIBRARY_PATH={path}/lib:$LD_LIBRARY_PATH`
+`export LD_LIBRARY_PATH={path}/lib:$LD_LIBRARY_PATH`
 
 You can do this globally or just in your editor.
+
+this can globally be done on ubuntu by editing `~/.profile`
+and adding the line in this file.
+reloading for bash can be done by relogging or running `source ~/.profile` can be used to test the change for a terminal
