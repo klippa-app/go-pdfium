@@ -17,11 +17,12 @@ jobs:
       with:
         go-version: 1.15
     - name: Test
-      run: curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
-      run: rm pdfium-linux.tgz
-      run: cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
-      run: export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-      run: go test -v ./... -coverprofile=coverage.out
+      run: |
+      curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
+      rm pdfium-linux.tgz
+      cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
+      go test -v ./... -coverprofile=coverage.out
       
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
@@ -40,11 +41,12 @@ jobs:
         go-version: 1.15
 
     - name: Build
-      run: curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
-      run: rm pdfium-linux.tgz
-      run: cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
-      run: export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-      run: go build -v ./...
+      run: |
+      curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
+      rm pdfium-linux.tgz
+      cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
+      go build -v ./...
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
