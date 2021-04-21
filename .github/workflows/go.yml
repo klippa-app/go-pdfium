@@ -16,25 +16,20 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
-      - name: Test
+      - name: Set up pdfium library
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux.tgz
           sudo rm pdfium-linux.tgz
           sudo cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-          go test -v ./... -coverprofile=coverage.out -covermode=atomic
+      - name: Test
+        run: go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
           path: ./coverage.out
-      - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.6
-      - name: Coveralls
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          path-to-lcov: coverage.lcov
 
   build:
     needs: [test]
