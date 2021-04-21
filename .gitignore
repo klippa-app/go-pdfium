@@ -13,3 +13,6 @@
 !/maven/.gitkeep
 /podspecs
 !/podspecs/.gitkeep
+
+
+coverage.out
