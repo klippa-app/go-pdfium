@@ -18,7 +18,7 @@ jobs:
           go-version: 1.15
       - name: Test
         run: |
-          curl https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
+          curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
           rm pdfium-linux.tgz
           cp ./pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build
         run: |
-          curl https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
+          curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-linux.tgz
           rm pdfium-linux.tgz
           cp ./pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
