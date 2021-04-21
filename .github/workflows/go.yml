@@ -1,0 +1,46 @@
+name: Go
+
+on:
+  pull_request:
+    branches: 
+    - main 
+    - development
+
+jobs:
+  test:
+   runs-on: ubuntu-latest
+   steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+    - name: Test
+      run: go test -v ./... -coverprofile=coverage.out
+      
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report
+        path: ./coverage.out
+        
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Build
+      run: go build -v ./... 
+			
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: binary
+        path: ./bin
+
