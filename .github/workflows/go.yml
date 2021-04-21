@@ -22,15 +22,22 @@ jobs:
           sudo rm pdfium-linux.tgz
           sudo cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-          go test -v ./... -coverprofile=coverage.out
+          go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
           path: ./coverage.out
+      - name: Convert coverage.out to coverage.lcov
+        uses: jandelgado/gcov2lcov-action@v1.0.6
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          path-to-lcov: coverage.lcov
 
   build:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -46,10 +53,13 @@ jobs:
           sudo rm pdfium-linux.tgz
           sudo cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-          go build -v ./...
+          go build -o ./bin/pdfium.exe ./package/pdfium.go
+          go build -o ./bin/subprocess.exe ./package/subprocess/main.go
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
           name: binary
-          path: ./bin
+          path: |
+            ./bin/pdfium.exe
+            ./bin/subprocess.exe
