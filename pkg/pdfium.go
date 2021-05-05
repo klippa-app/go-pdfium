@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/klippa-app/go-pdfium/package/commons"
+	"github.com/klippa-app/go-pdfium/pkg/commons"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/hashicorp/go-hclog"
@@ -56,7 +56,7 @@ func InitLibrary() { // serve one thread that is "native" through cgo
 			newWorker := &worker{}
 
 			binPath := "go"
-			args := []string{"run", "./package/subprocess"}
+			args := []string{"run", "./pkg/subprocess"}
 
 			client := plugin.NewClient(&plugin.ClientConfig{
 				HandshakeConfig: handshakeConfig,
