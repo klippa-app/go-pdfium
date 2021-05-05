@@ -12,6 +12,8 @@ look like this:
         {internal files/directories}
     /pkg
         {public files/directories}
+    /vendor
+        {external packages}
 .gitignore
 go.mod
 README.md
@@ -36,3 +38,7 @@ accessible and importable by outside users.
 
 If necessary, this package can also have an internal directory 
 (`/pkg/internal`).
+
+### `/vendor`
+This directory contains all external packages imported by the project and is 
+generated automatically by the command `go mod vendor`.
