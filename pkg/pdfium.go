@@ -56,7 +56,7 @@ func InitLibrary() { // serve one thread that is "native" through cgo
 			newWorker := &worker{}
 
 			binPath := "go"
-			args := []string{"run", "./pkg/subprocess"}
+			args := []string{"run", "./pkg/internal/subprocess"}
 
 			client := plugin.NewClient(&plugin.ClientConfig{
 				HandshakeConfig: handshakeConfig,
