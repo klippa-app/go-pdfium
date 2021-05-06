@@ -9,12 +9,12 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/klippa-app/go-pdfium/pkg/commons"
+	pool "github.com/jolestar/go-commons-pool/v2"
+	"github.com/klippa-app/go-pdfium/pkg/internal/commons"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/jolestar/go-commons-pool/v2"
 	log "github.com/sirupsen/logrus"
 )
 

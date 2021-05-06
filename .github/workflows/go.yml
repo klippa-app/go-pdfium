@@ -48,8 +48,8 @@ jobs:
           sudo rm pdfium-linux.tgz
           sudo cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/pdfium/lib"
-          go build -o ./bin/pdfium.exe ./package/pdfium.go
-          go build -o ./bin/subprocess.exe ./package/subprocess/main.go
+          go build -o ./bin/pdfium.exe ./pkg/pdfium.go
+          go build -o ./bin/subprocess.exe ./pkg/internal/subprocess/main.go
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
