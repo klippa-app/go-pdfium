@@ -16,16 +16,15 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
-        env:
-          LD_LIBRARY_PATH: /opt/pdfium/lib
       - name: Set up pdfium library
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux.tgz
           sudo rm pdfium-linux.tgz
           sudo cp ./docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+
       - name: Test
         run: |
-          ls /opt/pdfium/lib
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
@@ -44,14 +43,15 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
-        env:
-          LD_LIBRARY_PATH: /opt/pdfium/lib
-
-      - name: Build
+      - name: Set up pdfium library
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4320/pdfium-linux.tgz -o pdfium-linux.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux.tgz
           sudo rm pdfium-linux.tgz
-          sudo cp docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+          sudo cp ./docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+
+      - name: Build
+        run: |
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go build -o ./bin/pdfium.exe ./pkg/pdfium.go
           go build -o ./bin/subprocess.exe ./pkg/internal/subprocess/main.go
 
