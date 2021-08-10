@@ -24,6 +24,7 @@ jobs:
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
       - name: Test
         run: |
+          echo ${LD_LIBRARY_PATH}
           ls /opt/pdfium/lib
           go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
