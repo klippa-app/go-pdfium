@@ -29,7 +29,7 @@ Replace `{path}` with the path you extracted pdfium in.
 
 Make sure you extend your library path when running:
 
-`export LD_LIBRARY_PATH={path}/lib:$LD_LIBRARY_PATH`
+`export LD_LIBRARY_PATH={path}/lib`
 
 You can do this globally or just in your editor.
 
