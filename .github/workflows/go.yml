@@ -23,7 +23,9 @@ jobs:
           sudo cp ./docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
       - name: Test
-        run: go test -v ./... -coverprofile=coverage.out -covermode=atomic
+        run: |
+          ls /opt/pdfium/lib
+          go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
