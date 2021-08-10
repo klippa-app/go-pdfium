@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	goctx "context"
@@ -17,16 +17,6 @@ import (
 	"github.com/hashicorp/go-plugin"
 	log "github.com/sirupsen/logrus"
 )
-
-func main() {
-	InitLibrary(
-		Config{
-			MinIdle:  1,
-			MaxIdle:  1,
-			MaxTotal: 1,
-		},
-	)
-}
 
 type worker struct {
 	plugin       commons.Pdfium
