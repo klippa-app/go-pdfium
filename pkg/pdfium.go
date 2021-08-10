@@ -19,7 +19,13 @@ import (
 )
 
 func main() {
-	InitLibrary()
+	InitLibrary(
+		Config{
+			MinIdle:  1,
+			MaxIdle:  1,
+			MaxTotal: 1,
+		},
+	)
 }
 
 type worker struct {
@@ -29,9 +35,14 @@ type worker struct {
 }
 
 var workerPool *pool.ObjectPool
-var workerCount int = 1
 
-func InitLibrary() { // serve one thread that is "native" through cgo
+type Config struct {
+	MinIdle  int
+	MaxIdle  int
+	MaxTotal int
+}
+
+func InitLibrary(config Config) { // serve one thread that is "native" through cgo
 
 	// Create an hclog.Logger
 	logger := hclog.New(&hclog.LoggerOptions{
@@ -123,13 +134,16 @@ func InitLibrary() { // serve one thread that is "native" through cgo
 			return true
 		}, nil, nil)
 	p := pool.NewObjectPoolWithDefaultConfig(goctx.Background(), factory)
-	p.Config.BlockWhenExhausted = true
-	p.Config.MinIdle = workerCount
-	p.Config.MaxIdle = workerCount
-	p.Config.MaxTotal = workerCount
-	p.Config.TestOnBorrow = true
-	p.Config.TestOnReturn = true
-	p.Config.TestOnCreate = true
+	p.Config = &pool.ObjectPoolConfig{
+		BlockWhenExhausted: true,
+		MinIdle:            config.MinIdle,
+		MaxIdle:            config.MaxIdle,
+		MaxTotal:           config.MaxTotal,
+		TestOnBorrow:       true,
+		TestOnReturn:       true,
+		TestOnCreate:       true,
+	}
+
 	workerPool = p
 	workerPool.PreparePool(goctx.Background())
 }
@@ -145,16 +159,16 @@ func getWorker() (*worker, error) {
 	return workerObject.(*worker), nil
 }
 
-func NewDocument(file *[]byte) (*Document, error) {
+func NewDocument(file []byte) (Document, error) {
 	selectedWorker, err := getWorker()
 	if err != nil {
 		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
 	}
 
-	newDocument := Document{}
+	newDocument := pdfiumDocument{}
 	newDocument.worker = selectedWorker
 
-	err = newDocument.worker.plugin.OpenDocument(&commons.OpenDocumentRequest{File: file})
+	err = newDocument.worker.plugin.OpenDocument(&commons.OpenDocumentRequest{File: &file})
 	if err != nil {
 		newDocument.Close()
 		return nil, err
@@ -163,19 +177,27 @@ func NewDocument(file *[]byte) (*Document, error) {
 	return &newDocument, nil
 }
 
-type Document struct {
+type Document interface {
+	GetPageCount() (int, error)
+	GetText(i int) string
+	RenderPage(i int, dpi int) (*image.RGBA, error)
+	GetPageSize(i int, dpi int) (int, int, error)
+	Close()
+}
+
+type pdfiumDocument struct {
 	worker *worker
 }
 
-func (d *Document) GetPageCount() (int, error) {
+func (d *pdfiumDocument) GetPageCount() (int, error) {
 	return d.worker.plugin.GetPageCount()
 }
 
-func (d *Document) GetText(i int) string {
+func (d *pdfiumDocument) GetText(i int) string {
 	return ""
 }
 
-func (d *Document) RenderPage(i int, dpi int) (*image.RGBA, error) {
+func (d *pdfiumDocument) RenderPage(i int, dpi int) (*image.RGBA, error) {
 	renderedPage, err := d.worker.plugin.RenderPage(&commons.RenderPageRequest{Page: i, DPI: dpi})
 	if renderedPage.Image == nil {
 		return nil, errors.New("Did not receive an image")
@@ -183,7 +205,7 @@ func (d *Document) RenderPage(i int, dpi int) (*image.RGBA, error) {
 	return renderedPage.Image, err
 }
 
-func (d *Document) GetPageSize(i int, dpi int) (int, int, error) {
+func (d *pdfiumDocument) GetPageSize(i int, dpi int) (int, int, error) {
 	pageSize, err := d.worker.plugin.GetPageSize(&commons.GetPageSizeRequest{Page: i, DPI: dpi})
 	if err != nil {
 		return 0, 0, err
@@ -192,7 +214,7 @@ func (d *Document) GetPageSize(i int, dpi int) (int, int, error) {
 	return pageSize.Width, pageSize.Height, nil
 }
 
-func (d *Document) Close() {
+func (d *pdfiumDocument) Close() {
 	defer func() {
 		workerPool.ReturnObject(goctx.Background(), d.worker)
 		d.worker = nil
