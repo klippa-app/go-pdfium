@@ -1,4 +1,4 @@
-package pkg_test
+package pdfium_test
 
 import (
 	"testing"
