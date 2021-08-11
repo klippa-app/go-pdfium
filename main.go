@@ -14,5 +14,6 @@ func main() {
 		LogCallback: func(s string) {
 			fmt.Println("[PDFIUM ERROR]: " + s)
 		},
+		SubprocessMain: "./subprocess",
 	})
 }

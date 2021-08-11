@@ -25,10 +25,11 @@ type worker struct {
 var workerPool *pool.ObjectPool
 
 type Config struct {
-	MinIdle     int
-	MaxIdle     int
-	MaxTotal    int
-	LogCallback func(string)
+	MinIdle        int
+	MaxIdle        int
+	MaxTotal       int
+	LogCallback    func(string)
+	SubprocessMain string
 }
 
 func InitLibrary(config Config) { // serve one thread that is "native" through cgo
@@ -56,7 +57,7 @@ func InitLibrary(config Config) { // serve one thread that is "native" through c
 			newWorker := &worker{}
 
 			binPath := "go"
-			args := []string{"run", "./pkg/internal/subprocess"}
+			args := []string{"run", config.SubprocessMain}
 
 			client := plugin.NewClient(&plugin.ClientConfig{
 				HandshakeConfig: handshakeConfig,
