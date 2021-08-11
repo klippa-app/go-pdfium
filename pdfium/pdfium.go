@@ -12,10 +12,8 @@ import (
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	log "github.com/sirupsen/logrus"
 )
 
 type worker struct {
@@ -27,9 +25,10 @@ type worker struct {
 var workerPool *pool.ObjectPool
 
 type Config struct {
-	MinIdle  int
-	MaxIdle  int
-	MaxTotal int
+	MinIdle     int
+	MaxIdle     int
+	MaxTotal    int
+	LogCallback func(string)
 }
 
 func InitLibrary(config Config) { // serve one thread that is "native" through cgo
@@ -95,29 +94,25 @@ func InitLibrary(config Config) { // serve one thread that is "native" through c
 		}, nil, func(ctx goctx.Context, object *pool.PooledObject) bool {
 			worker := object.Object.(*worker)
 			if worker.pluginClient.Exited() {
-				log.Println("[pdfium error] Worker exited")
-				sentry.CaptureException(fmt.Errorf("[pdfium error] Worker exited"))
+				config.LogCallback("Worker exited")
 				return false
 			}
 
 			err := worker.rpcClient.Ping()
 			if err != nil {
-				log.Printf("[pdfium error] Error on RPC ping: %s", err.Error())
-				sentry.CaptureException(fmt.Errorf("[pdfium error] Error on RPC ping: %s", err.Error()))
+				config.LogCallback(fmt.Sprintf("Error on RPC ping: %s", err.Error()))
 				return false
 			}
 
 			pong, err := worker.plugin.Ping()
 			if err != nil {
-				log.Printf("[pdfium error] Error on plugin ping: %s", err.Error())
-				sentry.CaptureException(fmt.Errorf("[pdfium error] Error on plugin ping: %s", err.Error()))
+				config.LogCallback(fmt.Sprintf("Error on plugin ping:: %s", err.Error()))
 				return false
 			}
 
 			if pong != "Pong" {
 				err = errors.New("Wrong ping/pong result")
-				log.Printf("[pdfium error] Error on plugin ping: %s", err.Error())
-				sentry.CaptureException(fmt.Errorf("[pdfium error] Error on plugin ping: %s", err.Error()))
+				config.LogCallback(fmt.Sprintf("Error on plugin ping:: %s", err.Error()))
 				return false
 			}
 
