@@ -1,4 +1,4 @@
-package main
+package subprocess
 
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"
@@ -86,7 +86,7 @@ func (p *Pdfium) Close() error {
 	return nil
 }
 
-func main() {
+func Main() {
 	logger := hclog.New(&hclog.LoggerOptions{
 		Level:      hclog.Trace,
 		Output:     os.Stderr,

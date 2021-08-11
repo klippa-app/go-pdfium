@@ -52,8 +52,8 @@ jobs:
       - name: Build
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go build -o ./bin/pdfium.exe ./pkg/pdfium.go
-          go build -o ./bin/subprocess.exe ./pkg/internal/subprocess/main.go
+          go build -o ./bin/pdfium.exe ./main.go
+          go build -o ./bin/subprocess.exe ./subprocess/main.go
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
