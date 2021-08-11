@@ -25,11 +25,16 @@ type worker struct {
 var workerPool *pool.ObjectPool
 
 type Config struct {
-	MinIdle        int
-	MaxIdle        int
-	MaxTotal       int
-	LogCallback    func(string)
-	SubprocessMain string
+	MinIdle     int
+	MaxIdle     int
+	MaxTotal    int
+	LogCallback func(string)
+	Command     Command
+}
+
+type Command struct {
+	BinPath string
+	Args    []string
 }
 
 func InitLibrary(config Config) { // serve one thread that is "native" through cgo
@@ -56,13 +61,10 @@ func InitLibrary(config Config) { // serve one thread that is "native" through c
 		func(goctx.Context) (interface{}, error) {
 			newWorker := &worker{}
 
-			binPath := "go"
-			args := []string{"run", config.SubprocessMain}
-
 			client := plugin.NewClient(&plugin.ClientConfig{
 				HandshakeConfig: handshakeConfig,
 				Plugins:         pluginMap,
-				Cmd:             exec.Command(binPath, args...),
+				Cmd:             exec.Command(config.Command.BinPath, config.Command.Args...),
 				Logger:          logger,
 			})
 
