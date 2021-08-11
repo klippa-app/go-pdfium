@@ -1,4 +1,4 @@
-package pkg
+package pdfium
 
 import (
 	goctx "context"
@@ -10,7 +10,7 @@ import (
 	"time"
 
 	pool "github.com/jolestar/go-commons-pool/v2"
-	"github.com/klippa-app/go-pdfium/pkg/internal/commons"
+	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/hashicorp/go-hclog"
