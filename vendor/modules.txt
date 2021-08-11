@@ -2,9 +2,6 @@
 github.com/davecgh/go-spew/spew
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
-# github.com/getsentry/sentry-go v0.5.1
-## explicit
-github.com/getsentry/sentry-go
 # github.com/golang/protobuf v1.4.2
 ## explicit
 github.com/golang/protobuf/proto
@@ -30,8 +27,8 @@ github.com/hashicorp/yamux
 github.com/jolestar/go-commons-pool/v2
 github.com/jolestar/go-commons-pool/v2/collections
 github.com/jolestar/go-commons-pool/v2/concurrent
-# github.com/konsorten/go-windows-terminal-sequences v1.0.3
-github.com/konsorten/go-windows-terminal-sequences
+# github.com/kr/pretty v0.1.0
+## explicit
 # github.com/mattn/go-colorable v0.1.6
 ## explicit
 github.com/mattn/go-colorable
@@ -42,13 +39,8 @@ github.com/mattn/go-isatty
 github.com/mitchellh/go-testing-interface
 # github.com/oklog/run v1.0.0
 github.com/oklog/run
-# github.com/pkg/errors v0.9.1
-## explicit
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
-# github.com/sirupsen/logrus v1.6.0
-## explicit
-github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.7.0
 ## explicit
 github.com/stretchr/testify/assert

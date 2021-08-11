@@ -52,13 +52,13 @@ jobs:
       - name: Build
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go build -o ./bin/pdfium.exe ./main.go
-          go build -o ./bin/subprocess.exe ./subprocess/main.go
+          go build -o ./bin/pdfium ./main.go
+          go build -o ./bin/subprocess ./subprocess/main.go
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
           name: binary
           path: |
-            ./bin/pdfium.exe
-            ./bin/subprocess.exe
+            ./bin/pdfium
+            ./bin/subprocess
