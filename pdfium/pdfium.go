@@ -147,7 +147,7 @@ func getWorker() (*worker, error) {
 	return workerObject.(*worker), nil
 }
 
-func NewDocument(file []byte) (Document, error) {
+func NewDocument(file *[]byte) (Document, error) {
 	selectedWorker, err := getWorker()
 	if err != nil {
 		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
@@ -156,7 +156,7 @@ func NewDocument(file []byte) (Document, error) {
 	newDocument := pdfiumDocument{}
 	newDocument.worker = selectedWorker
 
-	err = newDocument.worker.plugin.OpenDocument(&commons.OpenDocumentRequest{File: &file})
+	err = newDocument.worker.plugin.OpenDocument(&commons.OpenDocumentRequest{File: file})
 	if err != nil {
 		newDocument.Close()
 		return nil, err
