@@ -53,11 +53,47 @@ type GetPageTextResponse struct {
 	Text *string
 }
 
+type GetPageTextStructuredRequest struct {
+	Page int
+	Mode GetPageTextStructuredRequestMode
+}
+
+type GetPageTextStructuredRequestMode string
+
+const (
+	GetPageTextStructuredRequestModeChars GetPageTextStructuredRequestMode = "char"
+	GetPageTextStructuredRequestModeRects GetPageTextStructuredRequestMode = "rect"
+	GetPageTextStructuredRequestModeBoth  GetPageTextStructuredRequestMode = "both"
+)
+
+type GetPageTextStructuredResponseChar struct {
+	Text   string
+	Left   float64
+	Top    float64
+	Right  float64
+	Bottom float64
+	Angle  float64
+}
+
+type GetPageTextStructuredResponseRect struct {
+	Text   string
+	Left   float64
+	Top    float64
+	Right  float64
+	Bottom float64
+}
+
+type GetPageTextStructuredResponse struct {
+	Chars []*GetPageTextStructuredResponseChar
+	Rects []*GetPageTextStructuredResponseRect
+}
+
 type Pdfium interface {
 	Ping() (string, error)
 	OpenDocument(*OpenDocumentRequest) error
 	GetPageCount() (int, error)
 	GetPageText(*GetPageTextRequest) (GetPageTextResponse, error)
+	GetPageTextStructured(*GetPageTextStructuredRequest) (GetPageTextStructuredResponse, error)
 	RenderPageInDPI(*RenderPageInDPIRequest) (RenderPageResponse, error)
 	RenderPageInPixels(*RenderPageInPixelsRequest) (RenderPageResponse, error)
 	GetPageSize(*GetPageSizeRequest) (GetPageSizeResponse, error)
@@ -99,6 +135,16 @@ func (g *PdfiumRPC) GetPageCount() (int, error) {
 func (g *PdfiumRPC) GetPageText(request *GetPageTextRequest) (GetPageTextResponse, error) {
 	var resp GetPageTextResponse
 	err := g.client.Call("Plugin.GetPageText", request, &resp)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetPageTextStructured(request *GetPageTextStructuredRequest) (GetPageTextStructuredResponse, error) {
+	var resp GetPageTextStructuredResponse
+	err := g.client.Call("Plugin.GetPageTextStructured", request, &resp)
 	if err != nil {
 		return resp, err
 	}
@@ -183,6 +229,26 @@ func (s *PdfiumRPCServer) GetPageCount(args interface{}, resp *int) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageText(request *GetPageTextRequest, resp *GetPageTextResponse) error {
+	var err error
+	*resp, err = s.Impl.GetPageText(request)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageTextStructured(request *GetPageTextStructuredRequest, resp *GetPageTextStructuredResponse) error {
+	var err error
+	*resp, err = s.Impl.GetPageTextStructured(request)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

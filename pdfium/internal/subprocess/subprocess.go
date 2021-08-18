@@ -59,6 +59,14 @@ func (p *Pdfium) GetPageText(request *commons.GetPageTextRequest) (commons.GetPa
 	}, nil
 }
 
+func (p *Pdfium) GetPageTextStructured(request *commons.GetPageTextStructuredRequest) (commons.GetPageTextStructuredResponse, error) {
+	if currentDoc == nil {
+		return commons.GetPageTextStructuredResponse{}, errors.New("no current document")
+	}
+	structuredText := currentDoc.GetPageTextStructured(request.Page, request.Mode)
+	return *structuredText, nil
+}
+
 func (p *Pdfium) GetPageSize(request *commons.GetPageSizeRequest) (commons.GetPageSizeResponse, error) {
 	if currentDoc == nil {
 		return commons.GetPageSizeResponse{}, errors.New("no current document")
