@@ -19,10 +19,7 @@ func (d *Document) getPageSize() (float64, float64) {
 	imgHeight := C.FPDF_GetPageHeight(d.page)
 	mutex.Unlock()
 
-	width := C.double(imgWidth)
-	height := C.double(imgHeight)
-
-	return float64(width), float64(height)
+	return float64(imgWidth), float64(imgHeight)
 }
 
 // GetPageSize returns the page size in points
