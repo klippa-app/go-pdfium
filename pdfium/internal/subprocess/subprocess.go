@@ -6,18 +6,19 @@ import "C"
 
 import (
 	"errors"
-	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-plugin"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
+
+	"github.com/hashicorp/go-hclog"
+	"github.com/hashicorp/go-plugin"
 )
 
 func init() {
 	InitLibrary()
 }
 
-// Here is a real implementation of Greeter
+// Here is the real implementation of Pdfium
 type Pdfium struct {
 	logger hclog.Logger
 }
@@ -85,7 +86,7 @@ func (p *Pdfium) RenderPageInDPI(request *commons.RenderPageInDPIRequest) (commo
 		return commons.RenderPageResponse{}, errors.New("no current document")
 	}
 
-	if request.DPI== 0 {
+	if request.DPI == 0 {
 		return commons.RenderPageResponse{}, errors.New("DPI should be given")
 	}
 
