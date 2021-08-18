@@ -11,9 +11,15 @@ type OpenDocumentRequest struct {
 	File *[]byte
 }
 
-type RenderPageRequest struct {
+type RenderPageInDPIRequest struct {
 	Page int
 	DPI  int
+}
+
+type RenderPageInPixelsRequest struct {
+	Page   int
+	Width  int
+	Height int
 }
 
 type RenderPageResponse struct {
@@ -22,20 +28,40 @@ type RenderPageResponse struct {
 
 type GetPageSizeRequest struct {
 	Page int
+}
+
+type GetPageSizeInPixelsRequest struct {
+	Page int
 	DPI  int
 }
 
 type GetPageSizeResponse struct {
+	Width  float64
+	Height float64
+}
+
+type GetPageSizeInPixelsResponse struct {
 	Width  int
 	Height int
+}
+
+type GetPageTextRequest struct {
+	Page int
+}
+
+type GetPageTextResponse struct {
+	Text *string
 }
 
 type Pdfium interface {
 	Ping() (string, error)
 	OpenDocument(*OpenDocumentRequest) error
 	GetPageCount() (int, error)
-	RenderPage(*RenderPageRequest) (RenderPageResponse, error)
+	GetPageText(*GetPageTextRequest) (GetPageTextResponse, error)
+	RenderPageInDPI(*RenderPageInDPIRequest) (RenderPageResponse, error)
+	RenderPageInPixels(*RenderPageInPixelsRequest) (RenderPageResponse, error)
 	GetPageSize(*GetPageSizeRequest) (GetPageSizeResponse, error)
+	GetPageSizeInPixels(*GetPageSizeInPixelsRequest) (GetPageSizeInPixelsResponse, error)
 	Close() error
 }
 
@@ -70,9 +96,29 @@ func (g *PdfiumRPC) GetPageCount() (int, error) {
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPage(request *RenderPageRequest) (RenderPageResponse, error) {
+func (g *PdfiumRPC) GetPageText(request *GetPageTextRequest) (GetPageTextResponse, error) {
+	var resp GetPageTextResponse
+	err := g.client.Call("Plugin.GetPageText", request, &resp)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) RenderPageInDPI(request *RenderPageInDPIRequest) (RenderPageResponse, error) {
 	var resp RenderPageResponse
-	err := g.client.Call("Plugin.RenderPage", request, &resp)
+	err := g.client.Call("Plugin.RenderPageInDPI", request, &resp)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) RenderPageInPixels(request *RenderPageInPixelsRequest) (RenderPageResponse, error) {
+	var resp RenderPageResponse
+	err := g.client.Call("Plugin.RenderPageInPixels", request, &resp)
 	if err != nil {
 		return resp, err
 	}
@@ -83,6 +129,16 @@ func (g *PdfiumRPC) RenderPage(request *RenderPageRequest) (RenderPageResponse, 
 func (g *PdfiumRPC) GetPageSize(request *GetPageSizeRequest) (GetPageSizeResponse, error) {
 	var resp GetPageSizeResponse
 	err := g.client.Call("Plugin.GetPageSize", request, &resp)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetPageSizeInPixels(request *GetPageSizeInPixelsRequest) (GetPageSizeInPixelsResponse, error) {
+	var resp GetPageSizeInPixelsResponse
+	err := g.client.Call("Plugin.GetPageSizeInPixels", request, &resp)
 	if err != nil {
 		return resp, err
 	}
@@ -130,9 +186,19 @@ func (s *PdfiumRPCServer) GetPageCount(args interface{}, resp *int) error {
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPage(request *RenderPageRequest, resp *RenderPageResponse) error {
+func (s *PdfiumRPCServer) RenderPageInDPI(request *RenderPageInDPIRequest, resp *RenderPageResponse) error {
 	var err error
-	*resp, err = s.Impl.RenderPage(request)
+	*resp, err = s.Impl.RenderPageInDPI(request)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) RenderPageInPixels(request *RenderPageInPixelsRequest, resp *RenderPageResponse) error {
+	var err error
+	*resp, err = s.Impl.RenderPageInPixels(request)
 	if err != nil {
 		return err
 	}
@@ -143,6 +209,16 @@ func (s *PdfiumRPCServer) RenderPage(request *RenderPageRequest, resp *RenderPag
 func (s *PdfiumRPCServer) GetPageSize(request *GetPageSizeRequest, resp *GetPageSizeResponse) error {
 	var err error
 	*resp, err = s.Impl.GetPageSize(request)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageSizeInPixels(request *GetPageSizeInPixelsRequest, resp *GetPageSizeInPixelsResponse) error {
+	var err error
+	*resp, err = s.Impl.GetPageSizeInPixels(request)
 	if err != nil {
 		return err
 	}
