@@ -168,6 +168,7 @@ func NewDocument(file *[]byte) (Document, error) {
 type Document interface {
 	GetPageCount() (int, error)
 	GetPageText(page int) (*string, error)
+	GetPageTextStructured(page int) (*commons.GetPageTextStructuredResponse, error)
 	RenderPageInDPI(page, dpi int) (*image.RGBA, error)
 	RenderPageInPixels(page, width, height int) (*image.RGBA, error)
 	GetPageSize(page int) (float64, float64, error)
@@ -192,6 +193,21 @@ func (d *pdfiumDocument) GetPageText(page int) (*string, error) {
 		return nil, errors.New("did not receive text")
 	}
 	return pageText.Text, err
+}
+
+func (d *pdfiumDocument) GetPageTextStructured(page int) (*commons.GetPageTextStructuredResponse, error) {
+	pageText, err := d.worker.plugin.GetPageTextStructured(&commons.GetPageTextStructuredRequest{Page: page})
+	if err != nil {
+		return nil, err
+	}
+
+	if pageText.Chars == nil && pageText.Rects == nil {
+		return nil, errors.New("did not receive structured text")
+	}
+	return &commons.GetPageTextStructuredResponse{
+		Chars: pageText.Chars,
+		Rects: pageText.Rects,
+	}, err
 }
 
 func (d *pdfiumDocument) RenderPageInDPI(page, dpi int) (*image.RGBA, error) {
