@@ -167,9 +167,11 @@ func NewDocument(file *[]byte) (Document, error) {
 
 type Document interface {
 	GetPageCount() (int, error)
-	GetText(i int) string
-	RenderPage(i int, dpi int) (*image.RGBA, error)
-	GetPageSize(i int, dpi int) (int, int, error)
+	GetPageText(page int) (*string, error)
+	RenderPageInDPI(page, dpi int) (*image.RGBA, error)
+	RenderPageInPixels(page, width, height int) (*image.RGBA, error)
+	GetPageSize(page int) (float64, float64, error)
+	GetPageSizeInPixels(page, dpi int) (int, int, error)
 	Close()
 }
 
@@ -181,20 +183,50 @@ func (d *pdfiumDocument) GetPageCount() (int, error) {
 	return d.worker.plugin.GetPageCount()
 }
 
-func (d *pdfiumDocument) GetText(i int) string {
-	return ""
+func (d *pdfiumDocument) GetPageText(page int) (*string, error) {
+	pageText, err := d.worker.plugin.GetPageText(&commons.GetPageTextRequest{Page: page})
+	if err != nil {
+		return nil, err
+	}
+	if pageText.Text == nil {
+		return nil, errors.New("did not receive text")
+	}
+	return pageText.Text, err
 }
 
-func (d *pdfiumDocument) RenderPage(i int, dpi int) (*image.RGBA, error) {
-	renderedPage, err := d.worker.plugin.RenderPage(&commons.RenderPageRequest{Page: i, DPI: dpi})
+func (d *pdfiumDocument) RenderPageInDPI(page, dpi int) (*image.RGBA, error) {
+	renderedPage, err := d.worker.plugin.RenderPageInDPI(&commons.RenderPageInDPIRequest{Page: page, DPI: dpi})
+	if err != nil {
+		return nil, err
+	}
 	if renderedPage.Image == nil {
-		return nil, errors.New("Did not receive an image")
+		return nil, errors.New("did not receive an image")
 	}
 	return renderedPage.Image, err
 }
 
-func (d *pdfiumDocument) GetPageSize(i int, dpi int) (int, int, error) {
-	pageSize, err := d.worker.plugin.GetPageSize(&commons.GetPageSizeRequest{Page: i, DPI: dpi})
+func (d *pdfiumDocument) RenderPageInPixels(page, width, height int) (*image.RGBA, error) {
+	renderedPage, err := d.worker.plugin.RenderPageInPixels(&commons.RenderPageInPixelsRequest{Page: page, Width: width, Height: height})
+	if err != nil {
+		return nil, err
+	}
+	if renderedPage.Image == nil {
+		return nil, errors.New("did not receive an image")
+	}
+	return renderedPage.Image, err
+}
+
+func (d *pdfiumDocument) GetPageSize(page int) (float64, float64, error) {
+	pageSize, err := d.worker.plugin.GetPageSize(&commons.GetPageSizeRequest{Page: page})
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return pageSize.Width, pageSize.Height, nil
+}
+
+func (d *pdfiumDocument) GetPageSizeInPixels(page, dpi int) (int, int, error) {
+	pageSize, err := d.worker.plugin.GetPageSizeInPixels(&commons.GetPageSizeInPixelsRequest{Page: page, DPI: dpi})
 	if err != nil {
 		return 0, 0, err
 	}
