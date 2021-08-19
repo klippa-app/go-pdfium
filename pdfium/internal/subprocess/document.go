@@ -18,8 +18,8 @@ type Document struct {
 	doc  C.FPDF_DOCUMENT
 	page C.FPDF_PAGE
 
-	currentPage *int // Remember which page is currently loaded in the page variable.
-	data *[]byte // Keep a reference to the data otherwise weird stuff happens
+	currentPage *int    // Remember which page is currently loaded in the page variable.
+	data        *[]byte // Keep a reference to the data otherwise weird stuff happens
 }
 
 var mutex = &sync.Mutex{}
