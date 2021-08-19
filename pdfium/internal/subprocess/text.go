@@ -24,7 +24,7 @@ func (d *Document) GetPageText(page int) string {
 	C.FPDFText_ClosePage(textPage)
 	mutex.Unlock()
 
-	return string(bytes.ReplaceAll(charData[0 : charsWritten*4], []byte("\x00"), []byte{}))
+	return string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{}))
 }
 
 // GetPageText returns the text of a page in a structured way
@@ -51,7 +51,7 @@ func (d *Document) GetPageTextStructured(page int, mode commons.GetPageTextStruc
 			charData := make([]byte, 8) // UTF-8 = Max 4 bytes per char, room for 2 chars.
 			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
 			resp.Chars = append(resp.Chars, &commons.GetPageTextStructuredResponseChar{
-				Text:   string(bytes.ReplaceAll(charData[0 : charsWritten*4], []byte("\x00"), []byte{})),
+				Text:   string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
 				Left:   float64(left),
 				Top:    float64(top),
 				Right:  float64(right),
@@ -77,7 +77,7 @@ func (d *Document) GetPageTextStructured(page int, mode commons.GetPageTextStruc
 
 			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
 			resp.Rects = append(resp.Rects, &commons.GetPageTextStructuredResponseRect{
-				Text:   string(bytes.ReplaceAll(charData[0 : charsWritten*4], []byte("\x00"), []byte{})),
+				Text:   string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
 				Left:   float64(left),
 				Top:    float64(top),
 				Right:  float64(right),
