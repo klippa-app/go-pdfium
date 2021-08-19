@@ -5,6 +5,5 @@ import (
 )
 
 func StartWorker() {
-
 	process.Main()
 }
