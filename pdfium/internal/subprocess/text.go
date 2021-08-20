@@ -103,7 +103,8 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
 
 				if char.FontInformation != nil {
-					char.FontInformation.SizeInPixels = int(math.Round(char.FontInformation.Size * pointToPixelRatio))
+					sizeInPixels := int(math.Round(char.FontInformation.Size * pointToPixelRatio))
+					char.FontInformation.SizeInPixels = &sizeInPixels
 				}
 			}
 
@@ -147,7 +148,8 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 			if request.PixelPositions.Calculate {
 				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
 				if char.FontInformation != nil {
-					char.FontInformation.SizeInPixels = int(math.Round(char.FontInformation.Size * pointToPixelRatio))
+					sizeInPixels := int(math.Round(char.FontInformation.Size * pointToPixelRatio))
+					char.FontInformation.SizeInPixels = &sizeInPixels
 				}
 			}
 
