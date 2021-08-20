@@ -20,7 +20,7 @@ func (p *Pdfium) GetPageCount(request *requests.GetPageCount) (*responses.GetPag
 	p.Lock()
 	defer p.Unlock()
 	return &responses.GetPageCount{
-		PageCount: int(C.FPDF_GetPageCount(p.currentDoc.doc)),
+		PageCount: int(C.FPDF_GetPageCount(p.currentDoc)),
 	}, nil
 }
 
@@ -31,13 +31,12 @@ func (p *Pdfium) Close() error {
 	}
 
 	p.Lock()
-	if p.currentDoc.currentPage != nil {
-		C.FPDF_ClosePage(p.currentDoc.page)
-		p.currentDoc.page = nil
-		p.currentDoc.currentPage = nil
+	if p.currentPageNumber != nil {
+		C.FPDF_ClosePage(p.currentPage)
+		p.currentPage = nil
+		p.currentPageNumber = nil
 	}
-	C.FPDF_CloseDocument(p.currentDoc.doc)
-	p.currentDoc.doc = nil
+	C.FPDF_CloseDocument(p.currentDoc)
 	p.currentDoc = nil
 	p.Unlock()
 	return nil

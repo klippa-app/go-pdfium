@@ -19,8 +19,8 @@ import (
 // getPageSize returns the pixel size of a page given the pdfium page object DPI.
 func (p *Pdfium) getPageSize() (float64, float64) {
 	p.Lock()
-	imgWidth := C.FPDF_GetPageWidth(p.currentDoc.page)
-	imgHeight := C.FPDF_GetPageHeight(p.currentDoc.page)
+	imgWidth := C.FPDF_GetPageWidth(p.currentPage)
+	imgHeight := C.FPDF_GetPageHeight(p.currentPage)
 	p.Unlock()
 
 	return float64(imgWidth), float64(imgHeight)
@@ -132,7 +132,7 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 func (p *Pdfium) renderPage(page, width, height int) *image.RGBA {
 	p.loadPage(page)
 	p.Lock()
-	alpha := C.FPDFPage_HasTransparency(p.currentDoc.page)
+	alpha := C.FPDFPage_HasTransparency(p.currentPage)
 	bitmap := C.FPDFBitmap_Create(C.int(width), C.int(height), alpha)
 
 	fillColor := 4294967295
@@ -141,7 +141,7 @@ func (p *Pdfium) renderPage(page, width, height int) *image.RGBA {
 	}
 
 	C.FPDFBitmap_FillRect(bitmap, 0, 0, C.int(width), C.int(height), C.ulong(fillColor))
-	C.FPDF_RenderPageBitmap(bitmap, p.currentDoc.page, 0, 0, C.int(width), C.int(height), 0, C.FPDF_ANNOT)
+	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, 0, C.int(width), C.int(height), 0, C.FPDF_ANNOT)
 
 	b := C.FPDFBitmap_GetBuffer(bitmap)
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
