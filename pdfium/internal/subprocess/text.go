@@ -8,6 +8,7 @@ import "C"
 import (
 	"bytes"
 	"errors"
+	"math"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
@@ -42,9 +43,30 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	}
 	p.loadPage(request.Page)
 
+	pointToPixelRatio := float64(0)
+	if request.PixelPositions.Calculate {
+		if request.PixelPositions.DPI > 0 {
+			pagePixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+				Page: request.Page,
+				DPI:  request.PixelPositions.DPI,
+			})
+			if err != nil {
+				return nil, err
+			}
+			pointToPixelRatio = pagePixelSize.PointToPixelRatio
+		} else {
+			_, _, ratio, err := p.calculateRenderImageSize(request.Page, request.PixelPositions.Width, request.PixelPositions.Height)
+			if err != nil {
+				return nil, err
+			}
+			pointToPixelRatio = ratio
+		}
+	}
+
 	resp := &responses.GetPageTextStructured{
-		Chars: []*responses.GetPageTextStructuredChar{},
-		Rects: []*responses.GetPageTextStructuredRect{},
+		Chars:             []*responses.GetPageTextStructuredChar{},
+		Rects:             []*responses.GetPageTextStructuredRect{},
+		PointToPixelRatio: pointToPixelRatio,
 	}
 
 	p.Lock()
@@ -71,7 +93,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 				Text:          string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
 				Angle:         float64(angle),
 				PointPosition: pointPosition,
-				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, 0),
+				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, pointToPixelRatio),
 			})
 		}
 	}
@@ -100,7 +122,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 			resp.Rects = append(resp.Rects, &responses.GetPageTextStructuredRect{
 				Text:          string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
 				PointPosition: pointPosition,
-				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, 0),
+				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, pointToPixelRatio),
 			})
 		}
 	}
@@ -111,10 +133,15 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	return resp, nil
 }
 
-func convertPointPositions(pixelPositions requests.GetPageTextStructuredPixelPositions, pointPositions responses.CharPosition, scale float64) *responses.CharPosition {
+func convertPointPositions(pixelPositions requests.GetPageTextStructuredPixelPositions, pointPositions responses.CharPosition, ratio float64) *responses.CharPosition {
 	if !pixelPositions.Calculate {
 		return nil
 	}
 
-	return &responses.CharPosition{}
+	return &responses.CharPosition{
+		Left:   math.Round(pointPositions.Left * ratio),
+		Top:    math.Round(pointPositions.Top * ratio),
+		Right:  math.Round(pointPositions.Right * ratio),
+		Bottom: math.Round(pointPositions.Bottom * ratio),
+	}
 }
