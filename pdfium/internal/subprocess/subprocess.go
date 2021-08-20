@@ -28,7 +28,7 @@ func (p *Pdfium) Ping() (string, error) {
 }
 
 func (p *Pdfium) OpenDocument(request *commons.OpenDocumentRequest) error {
-	newDocument, err := NewDocument(request.File)
+	newDocument, err := NewDocument(request.File, request.Password)
 	if err != nil {
 		return err
 	}

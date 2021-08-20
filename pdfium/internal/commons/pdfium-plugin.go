@@ -8,7 +8,8 @@ import (
 )
 
 type OpenDocumentRequest struct {
-	File *[]byte
+	File     *[]byte
+	Password *string
 }
 
 type RenderPageInDPIRequest struct {
