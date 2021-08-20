@@ -7,8 +7,11 @@ import "C"
 import (
 	"errors"
 	"os"
+	"sync"
+	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
@@ -20,111 +23,64 @@ func init() {
 
 // Here is the real implementation of Pdfium
 type Pdfium struct {
-	logger hclog.Logger
+	// C data
+	currentDoc  C.FPDF_DOCUMENT
+	currentPage C.FPDF_PAGE
+
+	logger            hclog.Logger
+	mutex             sync.Mutex
+	currentPageNumber *int    // Remember which page is currently loaded in the page variable.
+	data              *[]byte // Keep a reference to the data otherwise weird stuff happens
 }
 
 func (p *Pdfium) Ping() (string, error) {
 	return "Pong", nil
 }
 
-func (p *Pdfium) OpenDocument(request *commons.OpenDocumentRequest) error {
-	newDocument, err := NewDocument(request.File)
-	if err != nil {
-		return err
+func (p *Pdfium) Lock() {
+	p.mutex.Lock()
+}
+
+func (p *Pdfium) Unlock() {
+	p.mutex.Unlock()
+}
+
+func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
+	p.Lock()
+	defer p.Unlock()
+	doc := C.FPDF_LoadMemDocument(
+		unsafe.Pointer(&((*request.File)[0])),
+		C.int(len(*request.File)),
+		nil)
+
+	if doc == nil {
+		var errMsg string
+
+		errorCode := C.FPDF_GetLastError()
+		switch errorCode {
+		case C.FPDF_ERR_SUCCESS:
+			errMsg = "Success"
+		case C.FPDF_ERR_UNKNOWN:
+			errMsg = "Unknown error"
+		case C.FPDF_ERR_FILE:
+			errMsg = "Unable to read file"
+		case C.FPDF_ERR_FORMAT:
+			errMsg = "Incorrect format"
+		case C.FPDF_ERR_PASSWORD:
+			errMsg = "Invalid password"
+		case C.FPDF_ERR_SECURITY:
+			errMsg = "Invalid encryption"
+		case C.FPDF_ERR_PAGE:
+			errMsg = "Incorrect page"
+		default:
+			errMsg = "Unexpected error"
+		}
+		return errors.New(errMsg)
 	}
 
-	currentDoc = newDocument
-
+	p.currentDoc = doc
+	p.data = request.File
 	return nil
-}
-
-func (p *Pdfium) Close() error {
-	if currentDoc == nil {
-		return errors.New("no current document")
-	}
-
-	currentDoc.Close()
-	currentDoc = nil
-
-	return nil
-}
-
-func (p *Pdfium) GetPageText(request *commons.GetPageTextRequest) (commons.GetPageTextResponse, error) {
-	if currentDoc == nil {
-		return commons.GetPageTextResponse{}, errors.New("no current document")
-	}
-	text := currentDoc.GetPageText(request.Page)
-	return commons.GetPageTextResponse{
-		Text: &text,
-	}, nil
-}
-
-func (p *Pdfium) GetPageTextStructured(request *commons.GetPageTextStructuredRequest) (commons.GetPageTextStructuredResponse, error) {
-	if currentDoc == nil {
-		return commons.GetPageTextStructuredResponse{}, errors.New("no current document")
-	}
-	structuredText := currentDoc.GetPageTextStructured(request.Page, request.Mode)
-	return *structuredText, nil
-}
-
-func (p *Pdfium) GetPageSize(request *commons.GetPageSizeRequest) (commons.GetPageSizeResponse, error) {
-	if currentDoc == nil {
-		return commons.GetPageSizeResponse{}, errors.New("no current document")
-	}
-	width, height := currentDoc.GetPageSize(request.Page)
-	return commons.GetPageSizeResponse{
-		Width:  width,
-		Height: height,
-	}, nil
-}
-
-func (p *Pdfium) GetPageSizeInPixels(request *commons.GetPageSizeInPixelsRequest) (commons.GetPageSizeInPixelsResponse, error) {
-	if currentDoc == nil {
-		return commons.GetPageSizeInPixelsResponse{}, errors.New("no current document")
-	}
-	width, height := currentDoc.GetPageSizeInPixels(request.Page, request.DPI)
-	return commons.GetPageSizeInPixelsResponse{
-		Width:  width,
-		Height: height,
-	}, nil
-}
-
-func (p *Pdfium) RenderPageInDPI(request *commons.RenderPageInDPIRequest) (commons.RenderPageResponse, error) {
-	if currentDoc == nil {
-		return commons.RenderPageResponse{}, errors.New("no current document")
-	}
-
-	if request.DPI == 0 {
-		return commons.RenderPageResponse{}, errors.New("DPI should be given")
-	}
-
-	renderedPage := currentDoc.renderPageInDPI(request.Page, request.DPI)
-	return commons.RenderPageResponse{
-		Image: renderedPage,
-	}, nil
-}
-
-func (p *Pdfium) RenderPageInPixels(request *commons.RenderPageInPixelsRequest) (commons.RenderPageResponse, error) {
-	if currentDoc == nil {
-		return commons.RenderPageResponse{}, errors.New("no current document")
-	}
-
-	if request.Width == 0 && request.Height == 0 {
-		return commons.RenderPageResponse{}, errors.New("either width or height should be given")
-	}
-
-	renderedPage := currentDoc.renderPageInPixels(request.Page, request.Width, request.Height)
-	return commons.RenderPageResponse{
-		Image: renderedPage,
-	}, nil
-}
-
-func (p *Pdfium) GetPageCount() (int, error) {
-	if currentDoc == nil {
-		return 0, errors.New("no current document")
-	}
-	pageCount := currentDoc.GetPageCount()
-	return pageCount, nil
 }
 
 func Main() {
@@ -161,14 +117,16 @@ var handshakeConfig = plugin.HandshakeConfig{
 	MagicCookieValue: "hello",
 }
 
+var globalMutex = &sync.Mutex{}
+
 func InitLibrary() {
-	mutex.Lock()
+	globalMutex.Lock()
 	C.FPDF_InitLibrary()
-	mutex.Unlock()
+	globalMutex.Unlock()
 }
 
 func DestroyLibrary() {
-	mutex.Lock()
+	globalMutex.Lock()
 	C.FPDF_DestroyLibrary()
-	mutex.Unlock()
+	globalMutex.Unlock()
 }
