@@ -7,12 +7,13 @@ import "C"
 
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/pdfium/requests"
-	"github.com/klippa-app/go-pdfium/pdfium/responses"
 	"image"
 	"image/color"
 	"math"
 	"unsafe"
+
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
 )
 
 // getPageSize returns the pixel size of a page given the pdfium page object DPI.
@@ -35,7 +36,7 @@ func (p *Pdfium) GetPageSize(request *requests.GetPageSize) (*responses.GetPageS
 	p.loadPage(request.Page)
 	widthInPoints, heightInPoints := p.getPageSize()
 	return &responses.GetPageSize{
-		Width: widthInPoints,
+		Width:  widthInPoints,
 		Height: heightInPoints,
 	}, nil
 }
@@ -51,12 +52,12 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 		Page: request.Page,
 	})
 
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	return &responses.GetPageSizeInPixels{
-		Width: int(math.Ceil(pageSize.Width * scale)),
+		Width:  int(math.Ceil(pageSize.Width * scale)),
 		Height: int(math.Ceil(pageSize.Height * scale)),
 	}, nil
 }
@@ -69,7 +70,7 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 
 	pixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
 		Page: request.Page,
-		DPI: request.DPI,
+		DPI:  request.DPI,
 	})
 	if err != nil {
 		return nil, err

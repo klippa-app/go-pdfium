@@ -123,6 +123,7 @@ var handshakeConfig = plugin.HandshakeConfig{
 }
 
 var globalMutex = &sync.Mutex{}
+
 func InitLibrary() {
 	globalMutex.Lock()
 	C.FPDF_InitLibrary()
