@@ -25,13 +25,18 @@ type Document struct {
 var mutex = &sync.Mutex{}
 
 // NewDocument creates a new pdfium doc from a byte array
-func NewDocument(data *[]byte) (*Document, error) {
+func NewDocument(data *[]byte, password *string) (*Document, error) {
+	var cPassword *C.char
+	if password != nil {
+		cPassword = C.CString(*password)
+	}
+
 	mutex.Lock()
 	defer mutex.Unlock()
 	doc := C.FPDF_LoadMemDocument(
 		unsafe.Pointer(&((*data)[0])),
 		C.int(len(*data)),
-		nil)
+		cPassword)
 
 	if doc == nil {
 		var errMsg string
