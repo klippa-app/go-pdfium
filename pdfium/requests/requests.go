@@ -32,9 +32,10 @@ type GetPageText struct {
 }
 
 type GetPageTextStructured struct {
-	Page           int                                 // The page number (0-index based).
-	Mode           GetPageTextStructuredMode           // The mode to get structured text for.
-	PixelPositions GetPageTextStructuredPixelPositions // Pixel position calculation settings.
+	Page                   int                                 // The page number (0-index based).
+	Mode                   GetPageTextStructuredMode           // The mode to get structured text for.
+	CollectFontInformation bool                                // Whether to collect font information like name/size/weight.
+	PixelPositions         GetPageTextStructuredPixelPositions // Pixel position calculation settings.
 }
 
 type GetPageTextStructuredMode string
