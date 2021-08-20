@@ -8,6 +8,7 @@ import "C"
 import (
 	"bytes"
 	"errors"
+	"math"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
@@ -138,9 +139,9 @@ func convertPointPositions(pixelPositions requests.GetPageTextStructuredPixelPos
 	}
 
 	return &responses.CharPosition{
-		Left:   pointPositions.Left * ratio,
-		Top:    pointPositions.Top * ratio,
-		Right:  pointPositions.Right * ratio,
-		Bottom: pointPositions.Bottom * ratio,
+		Left:   math.Round(pointPositions.Left * ratio),
+		Top:    math.Round(pointPositions.Top * ratio),
+		Right:  math.Round(pointPositions.Right * ratio),
+		Bottom: math.Round(pointPositions.Bottom * ratio),
 	}
 }
