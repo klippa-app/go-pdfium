@@ -4,7 +4,7 @@ type OpenDocument struct {
 	File *[]byte // A reference to the file data.
 }
 
-type GetPageCount struct {}
+type GetPageCount struct{}
 
 type RenderPageInDPI struct {
 	Page int // The page number (0-index based).
