@@ -1,7 +1,8 @@
 package requests
 
 type OpenDocument struct {
-	File *[]byte // A reference to the file data.
+	File     *[]byte // A reference to the file data.
+	Password *string // The password of the document.
 }
 
 type GetPageCount struct{}

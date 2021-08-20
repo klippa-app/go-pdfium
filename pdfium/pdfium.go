@@ -148,7 +148,23 @@ func getWorker() (*worker, error) {
 	return workerObject.(*worker), nil
 }
 
-func NewDocument(file *[]byte) (Document, error) {
+type NewDocumentOption interface {
+	AlterOpenDocumentRequest(*requests.OpenDocument)
+}
+
+type openDocumentWithPassword struct{ password string }
+
+func (p openDocumentWithPassword) AlterOpenDocumentRequest(r *requests.OpenDocument) {
+	r.Password = &p.password
+}
+
+func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
+	return openDocumentWithPassword{
+		password: password,
+	}
+}
+
+func NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error) {
 	selectedWorker, err := getWorker()
 	if err != nil {
 		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
@@ -157,7 +173,12 @@ func NewDocument(file *[]byte) (Document, error) {
 	newDocument := pdfiumDocument{}
 	newDocument.worker = selectedWorker
 
-	err = newDocument.worker.plugin.OpenDocument(&requests.OpenDocument{File: file})
+	openDocRequest := &requests.OpenDocument{File: file}
+	for _, opt := range opts {
+		opt.AlterOpenDocumentRequest(openDocRequest)
+	}
+
+	err = newDocument.worker.plugin.OpenDocument(openDocRequest)
 	if err != nil {
 		newDocument.Close()
 		return nil, err

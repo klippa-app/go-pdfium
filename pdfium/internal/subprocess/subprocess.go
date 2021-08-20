@@ -48,10 +48,16 @@ func (p *Pdfium) Unlock() {
 func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 	p.Lock()
 	defer p.Unlock()
+
+	var cPassword *C.char
+	if request.Password != nil {
+		cPassword = C.CString(*request.Password)
+	}
+
 	doc := C.FPDF_LoadMemDocument(
 		unsafe.Pointer(&((*request.File)[0])),
 		C.int(len(*request.File)),
-		nil)
+		cPassword)
 
 	if doc == nil {
 		var pdfiumError error
