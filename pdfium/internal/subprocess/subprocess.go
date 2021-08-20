@@ -21,21 +21,16 @@ func init() {
 	InitLibrary()
 }
 
-// Document is good
-type Document struct {
-	// C data
-	doc  C.FPDF_DOCUMENT
-	page C.FPDF_PAGE
-
-	currentPage *int    // Remember which page is currently loaded in the page variable.
-	data        *[]byte // Keep a reference to the data otherwise weird stuff happens
-}
-
 // Here is the real implementation of Pdfium
 type Pdfium struct {
-	logger     hclog.Logger
-	currentDoc *Document
-	mutex      sync.Mutex
+	// C data
+	currentDoc  C.FPDF_DOCUMENT
+	currentPage C.FPDF_PAGE
+
+	logger            hclog.Logger
+	mutex             sync.Mutex
+	currentPageNumber *int    // Remember which page is currently loaded in the page variable.
+	data              *[]byte // Keep a reference to the data otherwise weird stuff happens
 }
 
 func (p *Pdfium) Ping() (string, error) {
@@ -83,8 +78,8 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		return errors.New(errMsg)
 	}
 
-	p.currentDoc = &Document{doc: doc, data: request.File}
-
+	p.currentDoc = doc
+	p.data = request.File
 	return nil
 }
 

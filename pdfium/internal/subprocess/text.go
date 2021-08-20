@@ -23,7 +23,7 @@ func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageT
 	p.loadPage(request.Page)
 
 	p.Lock()
-	textPage := C.FPDFText_LoadPage(p.currentDoc.page)
+	textPage := C.FPDFText_LoadPage(p.currentPage)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
 	charData := make([]byte, (charsInPage+1)*4) // UTF-8 = Max 4 bytes per char, add 1 for terminator.
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
@@ -48,7 +48,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	}
 
 	p.Lock()
-	textPage := C.FPDFText_LoadPage(p.currentDoc.page)
+	textPage := C.FPDFText_LoadPage(p.currentPage)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
