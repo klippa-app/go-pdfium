@@ -5,12 +5,12 @@ package subprocess
 import "C"
 
 import (
-	"errors"
 	"os"
 	"sync"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
+	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 
 	"github.com/hashicorp/go-hclog"
@@ -54,28 +54,28 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		nil)
 
 	if doc == nil {
-		var errMsg string
+		var pdfiumError error
 
 		errorCode := C.FPDF_GetLastError()
 		switch errorCode {
 		case C.FPDF_ERR_SUCCESS:
-			errMsg = "Success"
+			pdfiumError = pdfium_errors.ErrSuccess
 		case C.FPDF_ERR_UNKNOWN:
-			errMsg = "Unknown error"
+			pdfiumError = pdfium_errors.ErrUnknown
 		case C.FPDF_ERR_FILE:
-			errMsg = "Unable to read file"
+			pdfiumError = pdfium_errors.ErrFile
 		case C.FPDF_ERR_FORMAT:
-			errMsg = "Incorrect format"
+			pdfiumError = pdfium_errors.ErrFormat
 		case C.FPDF_ERR_PASSWORD:
-			errMsg = "Invalid password"
+			pdfiumError = pdfium_errors.ErrPassword
 		case C.FPDF_ERR_SECURITY:
-			errMsg = "Invalid encryption"
+			pdfiumError = pdfium_errors.ErrSecurity
 		case C.FPDF_ERR_PAGE:
-			errMsg = "Incorrect page"
+			pdfiumError = pdfium_errors.ErrPage
 		default:
-			errMsg = "Unexpected error"
+			pdfiumError = pdfium_errors.ErrUnexpected
 		}
-		return errors.New(errMsg)
+		return pdfiumError
 	}
 
 	p.currentDoc = doc
