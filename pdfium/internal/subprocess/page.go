@@ -6,24 +6,24 @@ import "C"
 
 // GetPageSize returns the page size in points
 // One point is 1/72 inch (around 0.3528 mm)
-func (d *Document) loadPage(page int) {
+func (p *Pdfium) loadPage(page int) {
 	// Already loaded this page.
-	if d.currentPage != nil && *d.currentPage == page {
+	if p.currentPageNumber != nil && *p.currentPageNumber == page {
 		return
 	}
 
-	mutex.Lock()
-	if d.currentPage != nil {
+	p.Lock()
+	if p.currentPageNumber != nil {
 		// Unload the current page.
-		C.FPDF_ClosePage(d.page)
-		d.page = nil
-		d.currentPage = nil
+		C.FPDF_ClosePage(p.currentPage)
+		p.currentPage = nil
+		p.currentPageNumber = nil
 	}
 
-	pageObject := C.FPDF_LoadPage(d.doc, C.int(page))
-	d.page = pageObject
-	d.currentPage = &page
-	mutex.Unlock()
+	pageObject := C.FPDF_LoadPage(p.currentDoc, C.int(page))
+	p.currentPage = pageObject
+	p.currentPageNumber = &page
+	p.Unlock()
 
 	return
 }
