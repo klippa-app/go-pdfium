@@ -1,103 +1,24 @@
 package commons
 
 import (
-	"image"
 	"net/rpc"
+
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
 
 	"github.com/hashicorp/go-plugin"
 )
 
-type OpenDocumentRequest struct {
-	File *[]byte
-}
-
-type RenderPageInDPIRequest struct {
-	Page int
-	DPI  int
-}
-
-type RenderPageInPixelsRequest struct {
-	Page   int
-	Width  int
-	Height int
-}
-
-type RenderPageResponse struct {
-	Image *image.RGBA
-}
-
-type GetPageSizeRequest struct {
-	Page int
-}
-
-type GetPageSizeInPixelsRequest struct {
-	Page int
-	DPI  int
-}
-
-type GetPageSizeResponse struct {
-	Width  float64
-	Height float64
-}
-
-type GetPageSizeInPixelsResponse struct {
-	Width  int
-	Height int
-}
-
-type GetPageTextRequest struct {
-	Page int
-}
-
-type GetPageTextResponse struct {
-	Text *string
-}
-
-type GetPageTextStructuredRequest struct {
-	Page int
-	Mode GetPageTextStructuredRequestMode
-}
-
-type GetPageTextStructuredRequestMode string
-
-const (
-	GetPageTextStructuredRequestModeChars GetPageTextStructuredRequestMode = "char"
-	GetPageTextStructuredRequestModeRects GetPageTextStructuredRequestMode = "rect"
-	GetPageTextStructuredRequestModeBoth  GetPageTextStructuredRequestMode = "both"
-)
-
-type GetPageTextStructuredResponseChar struct {
-	Text   string
-	Left   float64
-	Top    float64
-	Right  float64
-	Bottom float64
-	Angle  float64
-}
-
-type GetPageTextStructuredResponseRect struct {
-	Text   string
-	Left   float64
-	Top    float64
-	Right  float64
-	Bottom float64
-}
-
-type GetPageTextStructuredResponse struct {
-	Chars []*GetPageTextStructuredResponseChar
-	Rects []*GetPageTextStructuredResponseRect
-}
-
 type Pdfium interface {
 	Ping() (string, error)
-	OpenDocument(*OpenDocumentRequest) error
-	GetPageCount() (int, error)
-	GetPageText(*GetPageTextRequest) (GetPageTextResponse, error)
-	GetPageTextStructured(*GetPageTextStructuredRequest) (GetPageTextStructuredResponse, error)
-	RenderPageInDPI(*RenderPageInDPIRequest) (RenderPageResponse, error)
-	RenderPageInPixels(*RenderPageInPixelsRequest) (RenderPageResponse, error)
-	GetPageSize(*GetPageSizeRequest) (GetPageSizeResponse, error)
-	GetPageSizeInPixels(*GetPageSizeInPixelsRequest) (GetPageSizeInPixelsResponse, error)
+	OpenDocument(*requests.OpenDocument) error
+	GetPageCount(*requests.GetPageCount) (*responses.GetPageCount, error)
+	GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
+	GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+	RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
+	RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
+	GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
+	GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
 	Close() error
 }
 
@@ -113,7 +34,7 @@ func (g *PdfiumRPC) Ping() (string, error) {
 	return resp, nil
 }
 
-func (g *PdfiumRPC) OpenDocument(request *OpenDocumentRequest) error {
+func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) error {
 	err := g.client.Call("Plugin.OpenDocument", request, new(interface{}))
 	if err != nil {
 		return err
@@ -122,71 +43,71 @@ func (g *PdfiumRPC) OpenDocument(request *OpenDocumentRequest) error {
 	return nil
 }
 
-func (g *PdfiumRPC) GetPageCount() (int, error) {
-	var resp int
-	err := g.client.Call("Plugin.GetPageCount", new(interface{}), &resp)
+func (g *PdfiumRPC) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+	resp := &responses.GetPageCount{}
+	err := g.client.Call("Plugin.GetPageCount", request, resp)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageText(request *GetPageTextRequest) (GetPageTextResponse, error) {
-	var resp GetPageTextResponse
-	err := g.client.Call("Plugin.GetPageText", request, &resp)
+func (g *PdfiumRPC) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+	resp := &responses.GetPageText{}
+	err := g.client.Call("Plugin.GetPageText", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageTextStructured(request *GetPageTextStructuredRequest) (GetPageTextStructuredResponse, error) {
-	var resp GetPageTextStructuredResponse
-	err := g.client.Call("Plugin.GetPageTextStructured", request, &resp)
+func (g *PdfiumRPC) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+	resp := &responses.GetPageTextStructured{}
+	err := g.client.Call("Plugin.GetPageTextStructured", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPageInDPI(request *RenderPageInDPIRequest) (RenderPageResponse, error) {
-	var resp RenderPageResponse
-	err := g.client.Call("Plugin.RenderPageInDPI", request, &resp)
+func (g *PdfiumRPC) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
+	resp := &responses.RenderPage{}
+	err := g.client.Call("Plugin.RenderPageInDPI", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPageInPixels(request *RenderPageInPixelsRequest) (RenderPageResponse, error) {
-	var resp RenderPageResponse
-	err := g.client.Call("Plugin.RenderPageInPixels", request, &resp)
+func (g *PdfiumRPC) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
+	resp := &responses.RenderPage{}
+	err := g.client.Call("Plugin.RenderPageInPixels", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageSize(request *GetPageSizeRequest) (GetPageSizeResponse, error) {
-	var resp GetPageSizeResponse
-	err := g.client.Call("Plugin.GetPageSize", request, &resp)
+func (g *PdfiumRPC) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
+	resp := &responses.GetPageSize{}
+	err := g.client.Call("Plugin.GetPageSize", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageSizeInPixels(request *GetPageSizeInPixelsRequest) (GetPageSizeInPixelsResponse, error) {
-	var resp GetPageSizeInPixelsResponse
-	err := g.client.Call("Plugin.GetPageSizeInPixels", request, &resp)
+func (g *PdfiumRPC) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
+	resp := &responses.GetPageSizeInPixels{}
+	err := g.client.Call("Plugin.GetPageSizeInPixels", request, resp)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
@@ -214,7 +135,7 @@ func (s *PdfiumRPCServer) Ping(args interface{}, resp *string) error {
 	return nil
 }
 
-func (s *PdfiumRPCServer) OpenDocument(request *OpenDocumentRequest, resp *interface{}) error {
+func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *interface{}) error {
 	var err error
 	err = s.Impl.OpenDocument(request)
 	if err != nil {
@@ -223,71 +144,93 @@ func (s *PdfiumRPCServer) OpenDocument(request *OpenDocumentRequest, resp *inter
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageCount(args interface{}, resp *int) error {
+func (s *PdfiumRPCServer) GetPageCount(request *requests.GetPageCount, resp *responses.GetPageCount) error {
 	var err error
-	*resp, err = s.Impl.GetPageCount()
+	implResp, err := s.Impl.GetPageCount(request)
 	if err != nil {
 		return err
 	}
-	return nil
-}
 
-func (s *PdfiumRPCServer) GetPageText(request *GetPageTextRequest, resp *GetPageTextResponse) error {
-	var err error
-	*resp, err = s.Impl.GetPageText(request)
-	if err != nil {
-		return err
-	}
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageTextStructured(request *GetPageTextStructuredRequest, resp *GetPageTextStructuredResponse) error {
+func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *responses.GetPageText) error {
 	var err error
-	*resp, err = s.Impl.GetPageTextStructured(request)
+	implResp, err := s.Impl.GetPageText(request)
 	if err != nil {
 		return err
 	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInDPI(request *RenderPageInDPIRequest, resp *RenderPageResponse) error {
+func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) error {
 	var err error
-	*resp, err = s.Impl.RenderPageInDPI(request)
+	implResp, err := s.Impl.GetPageTextStructured(request)
 	if err != nil {
 		return err
 	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInPixels(request *RenderPageInPixelsRequest, resp *RenderPageResponse) error {
+func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, resp *responses.RenderPage) error {
 	var err error
-	*resp, err = s.Impl.RenderPageInPixels(request)
+	implResp, err := s.Impl.RenderPageInDPI(request)
 	if err != nil {
 		return err
 	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageSize(request *GetPageSizeRequest, resp *GetPageSizeResponse) error {
+func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixels, resp *responses.RenderPage) error {
 	var err error
-	*resp, err = s.Impl.GetPageSize(request)
+	implResp, err := s.Impl.RenderPageInPixels(request)
 	if err != nil {
 		return err
 	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageSizeInPixels(request *GetPageSizeInPixelsRequest, resp *GetPageSizeInPixelsResponse) error {
+func (s *PdfiumRPCServer) GetPageSize(request *requests.GetPageSize, resp *responses.GetPageSize) error {
 	var err error
-	*resp, err = s.Impl.GetPageSizeInPixels(request)
+	implResp, err := s.Impl.GetPageSize(request)
 	if err != nil {
 		return err
 	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageSizeInPixels(request *requests.GetPageSizeInPixels, resp *responses.GetPageSizeInPixels) error {
+	var err error
+	implResp, err := s.Impl.GetPageSizeInPixels(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
 
 	return nil
 }
