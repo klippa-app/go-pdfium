@@ -57,8 +57,9 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 	}
 
 	return &responses.GetPageSizeInPixels{
-		Width:  int(math.Ceil(pageSize.Width * scale)),
-		Height: int(math.Ceil(pageSize.Height * scale)),
+		Width:             int(math.Ceil(pageSize.Width * scale)),
+		Height:            int(math.Ceil(pageSize.Height * scale)),
+		PointToPixelRatio: (pageSize.Width * scale) / pageSize.Width,
 	}, nil
 }
 
@@ -77,8 +78,48 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 	}
 
 	return &responses.RenderPage{
-		Image: p.renderPage(request.Page, pixelSize.Width, pixelSize.Height),
+		Image:             p.renderPage(request.Page, pixelSize.Width, pixelSize.Height),
+		PointToPixelRatio: pixelSize.PointToPixelRatio,
 	}, nil
+}
+
+func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, float64, error) {
+	pageSize, err := p.GetPageSize(&requests.GetPageSize{
+		Page: page,
+	})
+
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	targetWidth := float64(width)
+	targetHeight := float64(height)
+	ratio := float64(0)
+	if height == 0 {
+		// Height not set, add ratio to height.
+		ratio = pageSize.Height / pageSize.Width
+		targetHeight = targetWidth * ratio
+	} else if width == 0 {
+		// Width not set, add ratio to width.
+		ratio = pageSize.Width / pageSize.Height
+		targetWidth = targetHeight * ratio
+	} else {
+		// Both values set, automatically pick the correct ratio.
+		ratio = pageSize.Height / pageSize.Width
+		if (targetWidth * ratio) < float64(height) {
+			targetHeight = targetWidth * ratio
+		} else {
+			ratio = pageSize.Width / pageSize.Height
+			if (targetHeight * ratio) < float64(width) {
+				targetWidth = targetHeight * ratio
+			}
+		}
+	}
+
+	width = int(math.Ceil(targetWidth))
+	height = int(math.Ceil(targetHeight))
+
+	return width, height, targetWidth / pageSize.Width, nil
 }
 
 // RenderPageInPixels renders a specific page in a specific pixel size, the result is an image.
@@ -89,42 +130,14 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 		return nil, errors.New("no current document")
 	}
 
-	pageSize, err := p.GetPageSize(&requests.GetPageSize{
-		Page: request.Page,
-	})
-
+	width, height, ratio, err := p.calculateRenderImageSize(request.Page, request.Width, request.Height)
 	if err != nil {
 		return nil, err
 	}
 
-	targetWidth := float64(request.Width)
-	targetHeight := float64(request.Height)
-	if request.Height == 0 {
-		// Height not set, add ratio to height.
-		ratio := pageSize.Height / pageSize.Width
-		targetHeight = targetWidth * ratio
-	} else if request.Width == 0 {
-		// Width not set, add ratio to width.
-		ratio := pageSize.Width / pageSize.Height
-		targetWidth = targetHeight * ratio
-	} else {
-		// Both values set, automatically pick the correct ratio.
-		ratio := pageSize.Height / pageSize.Width
-		if (targetWidth * ratio) < float64(request.Height) {
-			targetHeight = targetWidth * ratio
-		} else {
-			ratio := pageSize.Width / pageSize.Height
-			if (targetHeight * ratio) < float64(request.Width) {
-				targetWidth = targetHeight * ratio
-			}
-		}
-	}
-
-	request.Width = int(math.Ceil(targetWidth))
-	request.Height = int(math.Ceil(targetHeight))
-
 	return &responses.RenderPage{
-		Image: p.renderPage(request.Page, request.Width, request.Height),
+		Image:             p.renderPage(request.Page, width, height),
+		PointToPixelRatio: ratio,
 	}, nil
 }
 
