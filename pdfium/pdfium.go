@@ -4,7 +4,8 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
-	"image"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
 	"os"
 	"os/exec"
 	"time"
@@ -148,12 +149,12 @@ func getWorker() (*worker, error) {
 }
 
 type NewDocumentOption interface {
-	AlterOpenDocumentRequest(*commons.OpenDocumentRequest)
+	AlterOpenDocumentRequest(*requests.OpenDocument)
 }
 
 type openDocumentWithPassword struct{ password string }
 
-func (p openDocumentWithPassword) AlterOpenDocumentRequest(r *commons.OpenDocumentRequest) {
+func (p openDocumentWithPassword) AlterOpenDocumentRequest(r *requests.OpenDocument) {
 	r.Password = &p.password
 }
 
@@ -172,7 +173,7 @@ func NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error) {
 	newDocument := pdfiumDocument{}
 	newDocument.worker = selectedWorker
 
-	openDocRequest := &commons.OpenDocumentRequest{File: file}
+	openDocRequest := &requests.OpenDocument{File: file}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
@@ -187,13 +188,13 @@ func NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error) {
 }
 
 type Document interface {
-	GetPageCount() (int, error)
-	GetPageText(page int) (*string, error)
-	GetPageTextStructured(page int) (*commons.GetPageTextStructuredResponse, error)
-	RenderPageInDPI(page, dpi int) (*image.RGBA, error)
-	RenderPageInPixels(page, width, height int) (*image.RGBA, error)
-	GetPageSize(page int) (float64, float64, error)
-	GetPageSizeInPixels(page, dpi int) (int, int, error)
+	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
+	GetPageText(request *requests.GetPageText) (*responses.GetPageText, error)
+	GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)
+	RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error)
+	GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error)
+	GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
 	Close()
 }
 
@@ -201,74 +202,32 @@ type pdfiumDocument struct {
 	worker *worker
 }
 
-func (d *pdfiumDocument) GetPageCount() (int, error) {
-	return d.worker.plugin.GetPageCount()
+func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+	return d.worker.plugin.GetPageCount(request)
 }
 
-func (d *pdfiumDocument) GetPageText(page int) (*string, error) {
-	pageText, err := d.worker.plugin.GetPageText(&commons.GetPageTextRequest{Page: page})
-	if err != nil {
-		return nil, err
-	}
-	if pageText.Text == nil {
-		return nil, errors.New("did not receive text")
-	}
-	return pageText.Text, err
+func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+	return d.worker.plugin.GetPageText(request)
 }
 
-func (d *pdfiumDocument) GetPageTextStructured(page int) (*commons.GetPageTextStructuredResponse, error) {
-	pageText, err := d.worker.plugin.GetPageTextStructured(&commons.GetPageTextStructuredRequest{Page: page})
-	if err != nil {
-		return nil, err
-	}
-
-	if pageText.Chars == nil && pageText.Rects == nil {
-		return nil, errors.New("did not receive structured text")
-	}
-	return &commons.GetPageTextStructuredResponse{
-		Chars: pageText.Chars,
-		Rects: pageText.Rects,
-	}, err
+func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+	return d.worker.plugin.GetPageTextStructured(request)
 }
 
-func (d *pdfiumDocument) RenderPageInDPI(page, dpi int) (*image.RGBA, error) {
-	renderedPage, err := d.worker.plugin.RenderPageInDPI(&commons.RenderPageInDPIRequest{Page: page, DPI: dpi})
-	if err != nil {
-		return nil, err
-	}
-	if renderedPage.Image == nil {
-		return nil, errors.New("did not receive an image")
-	}
-	return renderedPage.Image, err
+func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
+	return d.worker.plugin.RenderPageInDPI(request)
 }
 
-func (d *pdfiumDocument) RenderPageInPixels(page, width, height int) (*image.RGBA, error) {
-	renderedPage, err := d.worker.plugin.RenderPageInPixels(&commons.RenderPageInPixelsRequest{Page: page, Width: width, Height: height})
-	if err != nil {
-		return nil, err
-	}
-	if renderedPage.Image == nil {
-		return nil, errors.New("did not receive an image")
-	}
-	return renderedPage.Image, err
+func (d *pdfiumDocument) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
+	return d.worker.plugin.RenderPageInPixels(request)
 }
 
-func (d *pdfiumDocument) GetPageSize(page int) (float64, float64, error) {
-	pageSize, err := d.worker.plugin.GetPageSize(&commons.GetPageSizeRequest{Page: page})
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return pageSize.Width, pageSize.Height, nil
+func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
+	return d.worker.plugin.GetPageSize(request)
 }
 
-func (d *pdfiumDocument) GetPageSizeInPixels(page, dpi int) (int, int, error) {
-	pageSize, err := d.worker.plugin.GetPageSizeInPixels(&commons.GetPageSizeInPixelsRequest{Page: page, DPI: dpi})
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return pageSize.Width, pageSize.Height, nil
+func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
+	return d.worker.plugin.GetPageSizeInPixels(request)
 }
 
 func (d *pdfiumDocument) Close() {
