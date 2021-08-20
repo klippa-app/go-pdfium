@@ -95,25 +95,14 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 				},
 			}
 
-			if request.PixelPositions.Calculate {
-				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
+			if request.CollectFontInformation {
+				char.FontInformation = p.getFontInformation(textPage, i)
 			}
 
-			if request.CollectFontInformation {
-				fontSize := C.FPDFText_GetFontSize(textPage, C.int(i))
-				fontWeight := C.FPDFText_GetFontWeight(textPage, C.int(i))
-				fontName := make([]byte, 255)
-				fontFlags := C.int(0)
-				fontNameLength := C.FPDFText_GetFontInfo(textPage, C.int(i), unsafe.Pointer(&fontName[0]), C.ulong(len(fontName)), &fontFlags)
+			if request.PixelPositions.Calculate {
+				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
 
-				char.FontInformation = &responses.FontInformation{
-					Size:   float64(fontSize),
-					Weight: int(fontWeight),
-					Name:   string(removeNullTerminator(fontName[:fontNameLength])),
-					Flags:  int(fontFlags),
-				}
-
-				if request.PixelPositions.Calculate {
+				if char.FontInformation != nil {
 					char.FontInformation.SizeInPixels = int(math.Round(char.FontInformation.Size * pointToPixelRatio))
 				}
 			}
@@ -147,28 +136,17 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 				},
 			}
 
-			if request.PixelPositions.Calculate {
-				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
-			}
-
 			if request.CollectFontInformation {
+				// Find index of the first letter of the rect.
 				// @todo: is 5 a "valid" tolerance?
 				tolerance := C.double(5)
 				charIndex := C.FPDFText_GetCharIndexAtPos(textPage, C.double(char.PointPosition.Left), C.double(char.PointPosition.Top), tolerance, tolerance)
-				fontSize := C.FPDFText_GetFontSize(textPage, C.int(charIndex))
-				fontWeight := C.FPDFText_GetFontWeight(textPage, C.int(charIndex))
-				fontName := make([]byte, 255)
-				fontFlags := C.int(0)
-				fontNameLength := C.FPDFText_GetFontInfo(textPage, C.int(charIndex), unsafe.Pointer(&fontName[0]), C.ulong(len(fontName)), &fontFlags)
+				char.FontInformation = p.getFontInformation(textPage, int(charIndex))
+			}
 
-				char.FontInformation = &responses.FontInformation{
-					Size:   float64(fontSize),
-					Weight: int(fontWeight),
-					Name:   string(removeNullTerminator(fontName[:fontNameLength])),
-					Flags:  int(fontFlags),
-				}
-
-				if request.PixelPositions.Calculate {
+			if request.PixelPositions.Calculate {
+				char.PixelPosition = convertPointPositions(char.PointPosition, pointToPixelRatio)
+				if char.FontInformation != nil {
 					char.FontInformation.SizeInPixels = int(math.Round(char.FontInformation.Size * pointToPixelRatio))
 				}
 			}
@@ -181,6 +159,21 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	p.Unlock()
 
 	return resp, nil
+}
+
+func (p *Pdfium) getFontInformation(textPage C.FPDF_TEXTPAGE, charIndex int) *responses.FontInformation {
+	fontSize := C.FPDFText_GetFontSize(textPage, C.int(charIndex))
+	fontWeight := C.FPDFText_GetFontWeight(textPage, C.int(charIndex))
+	fontName := make([]byte, 255)
+	fontFlags := C.int(0)
+	fontNameLength := C.FPDFText_GetFontInfo(textPage, C.int(charIndex), unsafe.Pointer(&fontName[0]), C.ulong(len(fontName)), &fontFlags)
+
+	return &responses.FontInformation{
+		Size:   float64(fontSize),
+		Weight: int(fontWeight),
+		Name:   string(removeNullTerminator(fontName[:fontNameLength])),
+		Flags:  int(fontFlags),
+	}
 }
 
 func convertPointPositions(pointPositions responses.CharPosition, ratio float64) *responses.CharPosition {
