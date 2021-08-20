@@ -6,76 +6,38 @@ import "C"
 
 import (
 	"errors"
-	"sync"
-	"unsafe"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
 )
 
-var currentDoc *Document
-
-// Document is good
-type Document struct {
-	// C data
-	doc  C.FPDF_DOCUMENT
-	page C.FPDF_PAGE
-
-	currentPage *int    // Remember which page is currently loaded in the page variable.
-	data        *[]byte // Keep a reference to the data otherwise weird stuff happens
-}
-
-var mutex = &sync.Mutex{}
-
-// NewDocument creates a new pdfium doc from a byte array
-func NewDocument(data *[]byte) (*Document, error) {
-	mutex.Lock()
-	defer mutex.Unlock()
-	doc := C.FPDF_LoadMemDocument(
-		unsafe.Pointer(&((*data)[0])),
-		C.int(len(*data)),
-		nil)
-
-	if doc == nil {
-		var errMsg string
-
-		errorCode := C.FPDF_GetLastError()
-		switch errorCode {
-		case C.FPDF_ERR_SUCCESS:
-			errMsg = "Success"
-		case C.FPDF_ERR_UNKNOWN:
-			errMsg = "Unknown error"
-		case C.FPDF_ERR_FILE:
-			errMsg = "Unable to read file"
-		case C.FPDF_ERR_FORMAT:
-			errMsg = "Incorrect format"
-		case C.FPDF_ERR_PASSWORD:
-			errMsg = "Invalid password"
-		case C.FPDF_ERR_SECURITY:
-			errMsg = "Invalid encryption"
-		case C.FPDF_ERR_PAGE:
-			errMsg = "Incorrect page"
-		default:
-			errMsg = "Unexpected error"
-		}
-		return nil, errors.New(errMsg)
-	}
-	return &Document{doc: doc, data: data}, nil
-}
-
 // GetPageCount counts the amount of pages
-func (d *Document) GetPageCount() int {
-	mutex.Lock()
-	defer mutex.Unlock()
-	return int(C.FPDF_GetPageCount(d.doc))
+func (p *Pdfium) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	p.Lock()
+	defer p.Unlock()
+	return &responses.GetPageCount{
+		PageCount: int(C.FPDF_GetPageCount(p.currentDoc.doc)),
+	}, nil
 }
 
 // Close closes the internal references in FPDF
-func (d *Document) Close() {
-	mutex.Lock()
-	if d.currentPage != nil {
-		C.FPDF_ClosePage(d.page)
-		d.page = nil
-		d.currentPage = nil
+func (p *Pdfium) Close() error {
+	if p.currentDoc == nil {
+		return errors.New("no current document")
 	}
-	C.FPDF_CloseDocument(d.doc)
-	d.doc = nil
-	mutex.Unlock()
+
+	p.Lock()
+	if p.currentDoc.currentPage != nil {
+		C.FPDF_ClosePage(p.currentDoc.page)
+		p.currentDoc.page = nil
+		p.currentDoc.currentPage = nil
+	}
+	C.FPDF_CloseDocument(p.currentDoc.doc)
+	p.currentDoc.doc = nil
+	p.currentDoc = nil
+	p.Unlock()
+	return nil
 }

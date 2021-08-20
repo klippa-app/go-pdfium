@@ -7,40 +7,51 @@ import "C"
 
 import (
 	"bytes"
+	"errors"
 	"unsafe"
 
-	"github.com/klippa-app/go-pdfium/pdfium/internal/commons"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
 )
 
 // GetPageText returns the text of a page
-func (d *Document) GetPageText(page int) string {
-	d.loadPage(page)
+func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
 
-	mutex.Lock()
-	textPage := C.FPDFText_LoadPage(d.page)
+	p.loadPage(request.Page)
+
+	p.Lock()
+	textPage := C.FPDFText_LoadPage(p.currentDoc.page)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
 	charData := make([]byte, (charsInPage+1)*4) // UTF-8 = Max 4 bytes per char, add 1 for terminator.
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
 	C.FPDFText_ClosePage(textPage)
-	mutex.Unlock()
+	p.Unlock()
 
-	return string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{}))
+	return &responses.GetPageText{
+		Text: string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
+	}, nil
 }
 
-// GetPageText returns the text of a page in a structured way
-func (d *Document) GetPageTextStructured(page int, mode commons.GetPageTextStructuredRequestMode) *commons.GetPageTextStructuredResponse {
-	d.loadPage(page)
+// GetPageTextStructured returns the text of a page in a structured way
+func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+	p.loadPage(request.Page)
 
-	resp := &commons.GetPageTextStructuredResponse{
-		Chars: []*commons.GetPageTextStructuredResponseChar{},
-		Rects: []*commons.GetPageTextStructuredResponseRect{},
+	resp := &responses.GetPageTextStructured{
+		Chars: []*responses.GetPageTextStructuredChar{},
+		Rects: []*responses.GetPageTextStructuredRect{},
 	}
 
-	mutex.Lock()
-	textPage := C.FPDFText_LoadPage(d.page)
+	p.Lock()
+	textPage := C.FPDFText_LoadPage(p.currentDoc.page)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
-	if mode == "" || mode == commons.GetPageTextStructuredRequestModeChars || mode == commons.GetPageTextStructuredRequestModeBoth {
+	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
 		for i := 0; i < int(charsInPage); i++ {
 			angle := C.FPDFText_GetCharAngle(textPage, C.int(i))
 			left := C.double(0)
@@ -50,18 +61,22 @@ func (d *Document) GetPageTextStructured(page int, mode commons.GetPageTextStruc
 			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &top, &right, &bottom)
 			charData := make([]byte, 8) // UTF-8 = Max 4 bytes per char, room for 2 chars.
 			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
-			resp.Chars = append(resp.Chars, &commons.GetPageTextStructuredResponseChar{
-				Text:   string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
+			pointPosition := responses.CharPosition{
 				Left:   float64(left),
 				Top:    float64(top),
 				Right:  float64(right),
 				Bottom: float64(bottom),
-				Angle:  float64(angle),
+			}
+			resp.Chars = append(resp.Chars, &responses.GetPageTextStructuredChar{
+				Text:          string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
+				Angle:         float64(angle),
+				PointPosition: pointPosition,
+				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, 0),
 			})
 		}
 	}
 
-	if mode == "" || mode == commons.GetPageTextStructuredRequestModeRects || mode == commons.GetPageTextStructuredRequestModeBoth {
+	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth {
 		rectsCount := C.FPDFText_CountRects(textPage, C.int(0), C.int(charsInPage))
 		for i := 0; i < int(rectsCount); i++ {
 			// Create a buffer that has room for all chars in this page, since
@@ -76,18 +91,30 @@ func (d *Document) GetPageTextStructured(page int, mode commons.GetPageTextStruc
 			C.FPDFText_GetRect(textPage, C.int(i), &left, &top, &right, &bottom)
 
 			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
-			resp.Rects = append(resp.Rects, &commons.GetPageTextStructuredResponseRect{
-				Text:   string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
+			pointPosition := responses.CharPosition{
 				Left:   float64(left),
 				Top:    float64(top),
 				Right:  float64(right),
 				Bottom: float64(bottom),
+			}
+			resp.Rects = append(resp.Rects, &responses.GetPageTextStructuredRect{
+				Text:          string(bytes.ReplaceAll(charData[0:charsWritten*4], []byte("\x00"), []byte{})),
+				PointPosition: pointPosition,
+				PixelPosition: convertPointPositions(request.PixelPositions, pointPosition, 0),
 			})
 		}
 	}
 
 	C.FPDFText_ClosePage(textPage)
-	mutex.Unlock()
+	p.Unlock()
 
-	return resp
+	return resp, nil
+}
+
+func convertPointPositions(pixelPositions requests.GetPageTextStructuredPixelPositions, pointPositions responses.CharPosition, scale float64) *responses.CharPosition {
+	if !pixelPositions.Calculate {
+		return nil
+	}
+
+	return &responses.CharPosition{}
 }
