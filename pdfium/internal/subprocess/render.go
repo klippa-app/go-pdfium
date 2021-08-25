@@ -47,6 +47,10 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 		return nil, errors.New("no current document")
 	}
 
+	if request.DPI == 0 {
+		return nil, errors.New("no DPI given")
+	}
+
 	scale := float64(request.DPI) / 72.0
 	pageSize, err := p.GetPageSize(&requests.GetPageSize{
 		Page: request.Page,
@@ -67,6 +71,10 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
+	}
+
+	if request.DPI == 0 {
+		return nil, errors.New("no DPI given")
 	}
 
 	pixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
@@ -128,6 +136,10 @@ func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, fl
 func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
+	}
+
+	if request.Width == 0 && request.Height == 0 {
+		return nil, errors.New("no width or height given")
 	}
 
 	width, height, ratio, err := p.calculateRenderImageSize(request.Page, request.Width, request.Height)

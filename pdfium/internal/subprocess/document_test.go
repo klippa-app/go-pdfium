@@ -1,0 +1,60 @@
+package subprocess_test
+
+import (
+	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium/pdfium/responses"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+)
+
+var _ = Describe("Document", func() {
+	pdfium := subprocess.Pdfium{}
+
+	Context("a normal PDF file with 1 page", func() {
+		BeforeEach(func() {
+			pdfData, _ := ioutil.ReadFile("./testdata/test.pdf")
+			pdfium.OpenDocument(&requests.OpenDocument{
+				File: &pdfData,
+			})
+		})
+
+		AfterEach(func() {
+			pdfium.Close()
+		})
+
+		When("is opened", func() {
+			It("returns the correct page count", func() {
+				pageCount, err := pdfium.GetPageCount(&requests.GetPageCount{})
+				Expect(err).To(BeNil())
+				Expect(pageCount).To(Equal(&responses.GetPageCount{
+					PageCount: 1,
+				}))
+			})
+		})
+	})
+
+	Context("a normal PDF file with multiple pages", func() {
+		BeforeEach(func() {
+			pdfData, _ := ioutil.ReadFile("./testdata/test_multipage.pdf")
+			pdfium.OpenDocument(&requests.OpenDocument{
+				File: &pdfData,
+			})
+		})
+
+		AfterEach(func() {
+			pdfium.Close()
+		})
+
+		When("is opened", func() {
+			It("returns the correct page count", func() {
+				pageCount, err := pdfium.GetPageCount(&requests.GetPageCount{})
+				Expect(err).To(BeNil())
+				Expect(pageCount).To(Equal(&responses.GetPageCount{
+					PageCount: 2,
+				}))
+			})
+		})
+	})
+})
