@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
+	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
 	"image"
@@ -77,6 +78,52 @@ var _ = Describe("Render", func() {
 		})
 
 		When("is opened", func() {
+			Context("when an invalid page is given", func() {
+				Context("GetPageSize()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfium.GetPageSize(&requests.GetPageSize{
+							Page: 1,
+						})
+						Expect(err).To(MatchError(pdfium_errors.ErrPage))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("GetPageSizeInPixels()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfium.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+							Page: 1,
+							DPI:  100,
+						})
+						Expect(err).To(MatchError(pdfium_errors.ErrPage))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfium.RenderPageInDPI(&requests.RenderPageInDPI{
+							Page: 1,
+							DPI:  300,
+						})
+						Expect(err).To(MatchError(pdfium_errors.ErrPage))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInPixels()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfium.RenderPageInPixels(&requests.RenderPageInPixels{
+							Page:   1,
+							Width:  2000,
+							Height: 2000,
+						})
+						Expect(err).To(MatchError(pdfium_errors.ErrPage))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+			})
+
 			Context("when the page size is requested", func() {
 				Context("in points", func() {
 					It("returns the correct amount of points", func() {
