@@ -21,7 +21,10 @@ func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageT
 		return nil, errors.New("no current document")
 	}
 
-	p.loadPage(request.Page)
+	err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
 
 	p.Lock()
 	textPage := C.FPDFText_LoadPage(p.currentPage)
@@ -41,7 +44,11 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
-	p.loadPage(request.Page)
+
+	err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
 
 	pointToPixelRatio := float64(0)
 	if request.PixelPositions.Calculate {
