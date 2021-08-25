@@ -7,8 +7,8 @@ type GetPageCount struct {
 }
 
 type RenderPage struct {
-	Image             *image.RGBA
 	PointToPixelRatio float64
+	Image             *image.RGBA
 }
 
 type GetPageSize struct {
