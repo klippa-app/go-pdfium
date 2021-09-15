@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/klippa-app/go-pdfium/pdfium"
 )
 
