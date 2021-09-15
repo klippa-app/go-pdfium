@@ -6,7 +6,6 @@ import "C"
 
 import (
 	"errors"
-
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
 )
