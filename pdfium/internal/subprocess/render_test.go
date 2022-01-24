@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/gob"
 	"image"
+	"image/png"
 	"io/ioutil"
+	"log"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
 	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
@@ -202,7 +205,7 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_100.gob"),
+								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_100.gob", renderedPage.Image),
 								PointToPixelRatio: 1.3888888888888888,
 							}))
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
@@ -218,7 +221,7 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_300.gob"),
+								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_300.gob", renderedPage.Image),
 								PointToPixelRatio: 4.166666666666667,
 							}))
 
@@ -248,7 +251,7 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x0.gob"),
+								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x0.gob", renderedPage.Image),
 								PointToPixelRatio: 3.3597884547259587,
 							}))
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
@@ -265,7 +268,7 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_0x2000.gob"),
+								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_0x2000.gob", renderedPage.Image),
 								PointToPixelRatio: 2.375608084404265,
 							}))
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
@@ -284,7 +287,7 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x2000.gob"),
+									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x2000.gob", renderedPage.Image),
 									PointToPixelRatio: 2.375608084404265,
 								}))
 
@@ -302,7 +305,7 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_4000x2000.gob"),
+									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_4000x2000.gob", renderedPage.Image),
 									PointToPixelRatio: 2.375608084404265,
 								}))
 
@@ -321,7 +324,7 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x4000.gob"),
+									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x4000.gob", renderedPage.Image),
 									PointToPixelRatio: 3.3597884547259587,
 								}))
 
@@ -376,7 +379,13 @@ var _ = Describe("Render", func() {
 	})
 })
 
-func loadPrerenderedImage(path string) *image.RGBA {
+func loadPrerenderedImage(path string, renderedImage *image.RGBA) *image.RGBA {
+	err := writePrerenderedImage(path, renderedImage)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
 	preRender, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil
@@ -390,14 +399,28 @@ func loadPrerenderedImage(path string) *image.RGBA {
 	return &preRenderImage
 }
 
-func writePrerenderedImage(path string, image image.RGBA) error {
+func writePrerenderedImage(path string, renderedImage *image.RGBA) error {
+	return nil // Comment this in case of updating pdfium versions and rendering has changed.
+
+	// Be sure to validate the difference in image to sensure rendering has not been broken.
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(&image); err != nil {
+	if err := enc.Encode(renderedImage); err != nil {
 		return err
 	}
 
 	if err := ioutil.WriteFile(path, buf.Bytes(), 0777); err != nil {
+		return err
+	}
+
+	f, err := os.Create(path + ".png")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = png.Encode(f, renderedImage)
+	if err != nil {
 		return err
 	}
 
