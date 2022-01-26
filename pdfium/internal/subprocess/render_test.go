@@ -1079,7 +1079,7 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 }
 
 func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
-	//return nil // Comment this in case of updating pdfium versions and rendering has changed.
+	return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
