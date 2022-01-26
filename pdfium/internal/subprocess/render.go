@@ -6,10 +6,15 @@ package subprocess
 import "C"
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"image"
+	"image/jpeg"
+	"image/png"
+	"io/ioutil"
 	"math"
+	"os"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
@@ -356,4 +361,136 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, C.int(offset), C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
 
 	return nil
+}
+
+func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
+	var image *image.RGBA
+
+	pages := []responses.RenderPagesPage{}
+	if request.RenderPageInDPI != nil {
+		resp, err := p.RenderPageInDPI(request.RenderPageInDPI)
+		if err != nil {
+			return nil, err
+		}
+
+		image = resp.Image
+		pages = append(pages, responses.RenderPagesPage{
+			PointToPixelRatio: resp.PointToPixelRatio,
+			Width:             resp.Image.Bounds().Max.X,
+			Height:            resp.Image.Bounds().Max.Y,
+			X:                 0,
+			Y:                 0,
+		})
+	}
+	if request.RenderPagesInDPI != nil {
+		resp, err := p.RenderPagesInDPI(request.RenderPagesInDPI)
+		if err != nil {
+			return nil, err
+		}
+
+		image = resp.Image
+		pages = append(pages, resp.Pages...)
+	}
+
+	if request.RenderPageInPixels != nil {
+		resp, err := p.RenderPageInPixels(request.RenderPageInPixels)
+		if err != nil {
+			return nil, err
+		}
+
+		image = resp.Image
+		pages = append(pages, responses.RenderPagesPage{
+			PointToPixelRatio: resp.PointToPixelRatio,
+			Width:             resp.Image.Bounds().Max.X,
+			Height:            resp.Image.Bounds().Max.Y,
+			X:                 0,
+			Y:                 0,
+		})
+	}
+	if request.RenderPagesInPixels != nil {
+		resp, err := p.RenderPagesInPixels(request.RenderPagesInPixels)
+		if err != nil {
+			return nil, err
+		}
+
+		image = resp.Image
+		pages = append(pages, resp.Pages...)
+	}
+
+	var imgBuf bytes.Buffer
+
+	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
+		var opt jpeg.Options
+		opt.Quality = 95
+
+		for {
+			err := jpeg.Encode(&imgBuf, image, &opt)
+			if err != nil {
+				return nil, err
+			}
+
+			if request.MaxFileSize == 0 || int64(imgBuf.Len()) < request.MaxFileSize {
+				break
+			}
+
+			opt.Quality -= 10
+
+			if opt.Quality <= 45 {
+				return nil, errors.New("PDF image would exceed maximum filesize")
+			}
+
+			imgBuf.Reset()
+		}
+	}
+
+	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
+		err := png.Encode(&imgBuf, image)
+		if err != nil {
+			return nil, err
+		}
+
+		if request.MaxFileSize != 0 && int64(imgBuf.Len()) > request.MaxFileSize {
+			return nil, errors.New("PDF image would exceed maximum filesize")
+		}
+	}
+
+	resp := &responses.RenderToFileRequest{
+		Pages: pages,
+	}
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
+		imageBytes := imgBuf.Bytes()
+		resp.ImageBytes = &imageBytes
+	}
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		var targetFile *os.File
+		if request.TargetFilePath != "" {
+			existingFile, err := os.Create(request.TargetFilePath)
+			if err != nil {
+				return nil, err
+			}
+			targetFile = existingFile
+		} else {
+			tempFile, err := ioutil.TempFile("", "")
+			if err != nil {
+				return nil, err
+			}
+			targetFile = tempFile
+		}
+
+		_, err := targetFile.Write(imgBuf.Bytes())
+		if err != nil {
+			return nil, err
+		}
+
+		err = targetFile.Close()
+		if err != nil {
+			return nil, err
+		}
+
+		resp.ImagePath = targetFile.Name()
+	}
+
+	return resp, nil
 }

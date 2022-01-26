@@ -197,6 +197,7 @@ type Document interface {
 	RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error)
 	GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error)
 	GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
+	RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error)
 	Close()
 }
 
@@ -238,6 +239,10 @@ func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.
 
 func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
 	return d.worker.plugin.GetPageSizeInPixels(request)
+}
+
+func (d *pdfiumDocument) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
+	return d.worker.plugin.RenderToFileRequest(request)
 }
 
 func (d *pdfiumDocument) Close() {
