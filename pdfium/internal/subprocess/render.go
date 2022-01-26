@@ -308,6 +308,12 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 	// pointer to the first pixel, pdfium will do the rest.
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
 
+	// White
+	fillColor := 4294967295
+
+	// Fill the rectangle with the color.
+	C.FPDFBitmap_FillRect(bitmap, 0, 0, C.int(totalWidth), C.int(totalHeight), C.ulong(fillColor))
+
 	pagesInfo := []responses.RenderPagesPage{}
 
 	currentOffset := 0
@@ -343,18 +349,6 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	if err != nil {
 		return err
 	}
-
-	// Check whether the page has transparency, this determines the fill color.
-	alpha := C.FPDFPage_HasTransparency(p.currentPage)
-	fillColor := 4294967295
-
-	// @todo: add a unit test for a PDF with alpha channel.
-	if int(alpha) == 1 {
-		fillColor = 0
-	}
-
-	// Fill the rectangle with the color (transparent or white)
-	C.FPDFBitmap_FillRect(bitmap, 0, C.int(offset), C.int(width), C.int(height), C.ulong(fillColor))
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
