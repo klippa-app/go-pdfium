@@ -10,7 +10,7 @@ import (
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
