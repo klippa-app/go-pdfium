@@ -119,13 +119,16 @@ func init() {
 ```
 
 ### Get page count
+
 ```go
 package renderer
 
 import (
+	"io/ioutil"
 	"log"
 
 	"github.com/klippa-app/go-pdfium/pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
 )
 
 func main() {
@@ -155,11 +158,72 @@ func getPageCount(filePath string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return pageCount.PageCount, nil
 }
 ```
 
+### Render a page
+
+```go
+package renderer
+
+import (
+	"image/png"
+	"io/ioutil"
+	"log"
+	"os"
+
+	"github.com/klippa-app/go-pdfium/pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium/requests"
+)
+
+func main() {
+	filePath := "example.pdf"
+	output := "example.pdf.png"
+	err := renderPage(filePath, 1, output)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func renderPage(filePath string, page int, output string) error {
+	// Load the PDF file into a byte array.
+	pdfBytes, err := ioutil.ReadFile(filePath)
+
+	// Open the PDF using pdfium (and claim a worker)
+	doc, err := pdfium.NewDocument(&pdfBytes)
+	if err != nil {
+		return err
+	}
+
+	// Always close the document, this will release the worker and it's resources
+	defer doc.Close()
+
+	// Render the page in DPI 200.
+	pageRender, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
+		DPI:  200,      // The DPI to render the page in.
+		Page: page - 1, // The page to render, 0-indexed.
+	})
+	if err != nil {
+		return err
+	}
+
+	// Write the output to a file.
+	f, err := os.Create(output)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = png.Encode(f, pageRender.Image)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+```
 
 ## About Klippa
 
