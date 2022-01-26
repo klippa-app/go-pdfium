@@ -2,11 +2,12 @@ package subprocess_test
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
+	"fmt"
 	"image"
 	"image/png"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
@@ -270,10 +271,9 @@ var _ = Describe("Render", func() {
 								DPI:  100,
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_100.gob", renderedPage.Image),
+							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 1.3888888888888888,
-							}))
+							}, "./testdata/render_testpdf_dpi_100")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(1170))
 						})
@@ -286,11 +286,9 @@ var _ = Describe("Render", func() {
 								DPI:  300,
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_dpi_300.gob", renderedPage.Image),
+							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 4.166666666666667,
-							}))
-
+							}, "./testdata/render_testpdf_dpi_300")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3508))
 						})
@@ -316,10 +314,9 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x0.gob", renderedPage.Image),
+							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 3.3597884547259587,
-							}))
+							}, "./testdata/render_testpdf_pixels_2000x0")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
 						})
@@ -333,10 +330,9 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPage{
-								Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_0x2000.gob", renderedPage.Image),
+							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 2.375608084404265,
-							}))
+							}, "./testdata/render_testpdf_pixels_0x2000")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 						})
@@ -352,11 +348,9 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x2000.gob", renderedPage.Image),
+								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 2.375608084404265,
-								}))
-
+								}, "./testdata/render_testpdf_pixels_2000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 							})
@@ -370,11 +364,9 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_4000x2000.gob", renderedPage.Image),
+								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 2.375608084404265,
-								}))
-
+								}, "./testdata/render_testpdf_pixels_4000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 							})
@@ -389,11 +381,9 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPage{
-									Image:             loadPrerenderedImage("./testdata/render_testpdf_pixels_2000x4000.gob", renderedPage.Image),
+								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 3.3597884547259587,
-								}))
-
+								}, "./testdata/render_testpdf_pixels_2000x4000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
 							})
@@ -446,8 +436,7 @@ var _ = Describe("Render", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_100.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 1.3888888888888888,
@@ -464,7 +453,7 @@ var _ = Describe("Render", func() {
 										Y:                 1170,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_dpi_100")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2340))
 						})
@@ -485,8 +474,7 @@ var _ = Describe("Render", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_300.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 4.166666666666667,
@@ -503,8 +491,7 @@ var _ = Describe("Render", func() {
 										Y:                 3508,
 									},
 								},
-							}))
-
+							}, "./testdata/render_pages_testpdf_dpi_300")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7016))
 						})
@@ -525,8 +512,7 @@ var _ = Describe("Render", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_200_300.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.7777777777777777,
@@ -543,8 +529,7 @@ var _ = Describe("Render", func() {
 										Y:                 2339,
 									},
 								},
-							}))
-
+							}, "./testdata/render_pages_testpdf_dpi_200_300")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5847))
 						})
@@ -566,8 +551,7 @@ var _ = Describe("Render", func() {
 								Padding: 50,
 							})
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_300_padding_50.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 4.166666666666667,
@@ -584,8 +568,7 @@ var _ = Describe("Render", func() {
 										Y:                 3558,
 									},
 								},
-							}))
-
+							}, "./testdata/render_pages_testpdf_dpi_300_padding_50")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7066))
 						})
@@ -635,8 +618,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x0.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 3.3597884547259587,
@@ -653,7 +635,7 @@ var _ = Describe("Render", func() {
 										Y:                 2829,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_2000x0")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
 						})
@@ -675,8 +657,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_0x2000.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -693,7 +674,7 @@ var _ = Describe("Render", func() {
 										Y:                 2000,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_0x2000")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 						})
@@ -718,8 +699,7 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPages{
-									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000.gob", renderedPage.Image),
+								compareRenderHashForPages(renderedPage, &responses.RenderPages{
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 2.375608084404265,
@@ -736,8 +716,7 @@ var _ = Describe("Render", func() {
 											Y:                 2000,
 										},
 									},
-								}))
-
+								}, "./testdata/render_pages_testpdf_pixels_2000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 							})
@@ -760,8 +739,7 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPages{
-									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_4000x2000.gob", renderedPage.Image),
+								compareRenderHashForPages(renderedPage, &responses.RenderPages{
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 2.375608084404265,
@@ -778,8 +756,7 @@ var _ = Describe("Render", func() {
 											Y:                 2000,
 										},
 									},
-								}))
-
+								}, "./testdata/render_pages_testpdf_pixels_4000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 							})
@@ -803,8 +780,7 @@ var _ = Describe("Render", func() {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(renderedPage).To(Equal(&responses.RenderPages{
-									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x4000.gob", renderedPage.Image),
+								compareRenderHashForPages(renderedPage, &responses.RenderPages{
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 3.3597884547259587,
@@ -821,8 +797,7 @@ var _ = Describe("Render", func() {
 											Y:                 2829,
 										},
 									},
-								}))
-
+								}, "./testdata/render_pages_testpdf_pixels_2000x4000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
 							})
@@ -845,8 +820,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x0_1500x0.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 3.3597884547259587,
@@ -863,7 +837,7 @@ var _ = Describe("Render", func() {
 										Y:                 2829,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_2000x0_1500x0")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4951))
 						})
@@ -885,8 +859,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_0x2000_0x1500.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -903,7 +876,7 @@ var _ = Describe("Render", func() {
 										Y:                 2000,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_0x2000_0x1500")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
 						})
@@ -927,8 +900,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000_1500x1500.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -945,7 +917,7 @@ var _ = Describe("Render", func() {
 										Y:                 2000,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_2000x2000_1500x1500")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
 						})
@@ -970,8 +942,7 @@ var _ = Describe("Render", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(renderedPage).To(Equal(&responses.RenderPages{
-								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50.gob", renderedPage.Image),
+							compareRenderHashForPages(renderedPage, &responses.RenderPages{
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -988,7 +959,7 @@ var _ = Describe("Render", func() {
 										Y:                 2050,
 									},
 								},
-							}))
+							}, "./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4050))
 						})
@@ -1039,28 +1010,76 @@ var _ = Describe("Render", func() {
 	})
 })
 
-func loadPrerenderedImage(path string, renderedImage *image.RGBA) *image.RGBA {
-	err := writePrerenderedImage(path, renderedImage)
+func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *responses.RenderPage, testName string) {
+	err := writePrerenderedImage(testName, renderedPage.Image)
 	if err != nil {
-		log.Println(err)
-		return nil
+		Expect(err).To(BeNil())
+		return
 	}
 
-	preRender, err := ioutil.ReadFile(path)
+	// Copy object so we can skip Image.
+	// For the image we compare the file hash.
+	copiedPage := &responses.RenderPage{
+		PointToPixelRatio: renderedPage.PointToPixelRatio,
+	}
+	Expect(copiedPage).To(Equal(expectedPage))
+
+	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
 	if err != nil {
-		return nil
+		Expect(err).To(BeNil())
+		return
 	}
 
-	buf := bytes.NewBuffer(preRender)
-	dec := gob.NewDecoder(buf)
+	hasher := sha256.New()
 
-	var preRenderImage image.RGBA
-	err = dec.Decode(&preRenderImage)
-	return &preRenderImage
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if err := enc.Encode(renderedPage.Image); err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	hasher.Write(buf.Bytes())
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+	Expect(string(existingFileHash)).To(Equal(currentHash))
 }
 
-func writePrerenderedImage(path string, renderedImage *image.RGBA) error {
-	return nil // Comment this in case of updating pdfium versions and rendering has changed.
+func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPage *responses.RenderPages, testName string) {
+	err := writePrerenderedImage(testName, renderedPages.Image)
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	// Copy object so we can skip Image.
+	// For the image we compare the file hash.
+	copiedPage := &responses.RenderPages{
+		Pages: renderedPages.Pages,
+	}
+
+	Expect(copiedPage).To(Equal(expectedPage))
+
+	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if err := enc.Encode(renderedPages.Image); err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	hasher := sha256.New()
+	hasher.Write(buf.Bytes())
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+	Expect(string(existingFileHash)).To(Equal(currentHash))
+}
+
+func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
+	//return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
@@ -1069,11 +1088,15 @@ func writePrerenderedImage(path string, renderedImage *image.RGBA) error {
 		return err
 	}
 
-	if err := ioutil.WriteFile(path, buf.Bytes(), 0777); err != nil {
+	hasher := sha256.New()
+	hasher.Write(buf.Bytes())
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	if err := ioutil.WriteFile(testName+".hash", []byte(currentHash), 0777); err != nil {
 		return err
 	}
 
-	f, err := os.Create(path + ".png")
+	f, err := os.Create(testName + ".png")
 	if err != nil {
 		return err
 	}
