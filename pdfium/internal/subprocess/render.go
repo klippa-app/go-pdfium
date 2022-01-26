@@ -89,14 +89,13 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 		return nil, err
 	}
 
-	pages := []renderPage{
+	// Render a single page.
+	result, err := p.renderPages([]renderPage{
 		{
 			Page:      request.Page,
 			PixelSize: *pixelSize,
 		},
-	}
-
-	result, err := p.renderPages(pages, 0)
+	}, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +195,8 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 		return nil, err
 	}
 
-	pages := []renderPage{
+	// Render a single page.
+	result, err := p.renderPages([]renderPage{
 		{
 			Page: request.Page,
 			PixelSize: responses.GetPageSizeInPixels{
@@ -205,9 +205,7 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 				PointToPixelRatio: ratio,
 			},
 		},
-	}
-
-	result, err := p.renderPages(pages, 0)
+	}, 0)
 	if err != nil {
 		return nil, err
 	}
