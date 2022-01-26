@@ -6,9 +6,9 @@
 [build-status]:https://github.com/klippa-app/go-pdfium/workflows/Go/badge.svg
 [build-url]:https://github.com/klippa-app/go-pdfium/actions
 
-:rocket: *Easy PDF rendering using Go and pdfium* :rocket:
+:rocket: *Easy PDF rendering and text extraction using Go and pdfium* :rocket:
 
-**A fast, multithreaded and easy to use PDF renderer for Go applications.**
+**A fast, multithreaded and easy to use PDF renderer / text extractor for Go applications.**
 
 ## Features
 * Get page count
@@ -17,9 +17,9 @@
 * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
 * Get page size in either points or pixel size (when rendered in a specific DPI)
 
-## PDF renderer
+## pdfium
 
-This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/)
+This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF documents.
 
 ## Multithreading 
 
@@ -28,7 +28,7 @@ We have solved this using [HashiCorp's Go Plugin System](https://github.com/hash
  
 **Be aware that pdfium could use quite some memory depending on the size of the PDF and the requests that you do, so be aware of the amount of workers that you configure**
  
-## pdfium Library
+## Prerequisites
 
 To use this Go library, you will need the actual pdfium library to run it and have it available through pkgconfig.
 
