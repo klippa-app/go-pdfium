@@ -8,7 +8,6 @@ import "C"
 import (
 	"errors"
 	"image"
-	"image/color"
 	"math"
 	"unsafe"
 
@@ -174,39 +173,32 @@ func (p *Pdfium) renderPage(page, width, height int) (*image.RGBA, error) {
 		return nil, err
 	}
 
-	p.Lock()
-	alpha := C.FPDFPage_HasTransparency(p.currentPage)
-	bitmap := C.FPDFBitmap_Create(C.int(width), C.int(height), alpha)
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
 
+	p.Lock()
+	defer p.Unlock()
+
+	// Check whether the page has transparency, this determines the fill color.
+	alpha := C.FPDFPage_HasTransparency(p.currentPage)
 	fillColor := 4294967295
 	if int(alpha) == 1 {
 		fillColor = 0
 	}
 
+	// Create a device independent bitmap to the external buffer by passing a
+	// pointer to the first pixel, pdfium will do the rest.
+	bitmap := C.FPDFBitmap_CreateEx(C.int(width), C.int(height), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+
+	// Fill the rectangle with the color (transparent or white)
 	C.FPDFBitmap_FillRect(bitmap, 0, 0, C.int(width), C.int(height), C.ulong(fillColor))
-	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, 0, C.int(width), C.int(height), 0, C.FPDF_ANNOT)
 
-	b := C.FPDFBitmap_GetBuffer(bitmap)
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
-	img.Stride = int(C.FPDFBitmap_GetStride(bitmap))
-	p.Unlock()
+	// Render the bitmap into the given external bitmap, write the bytes
+	// in reverse order so that BGRA becomes RGBA.
+	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, 0, C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
 
-	// This takes a bit of time and I *think* we can do this without the lock
-	// @todo: figure out if we can do this better/faster.
-	bgra := make([]byte, 4)
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			for i := range bgra {
-				bgra[i] = *((*byte)(b))
-				b = unsafe.Pointer(uintptr(b) + 1)
-			}
-			pixelColor := color.RGBA{B: bgra[0], G: bgra[1], R: bgra[2], A: bgra[3]}
-			img.SetRGBA(x, y, pixelColor)
-		}
-	}
-	p.Lock()
+	// Release bitmap resources and buffers.
+	// This does not clear the Go image pixel buffer.
 	C.FPDFBitmap_Destroy(bitmap)
-	p.Unlock()
 
 	return img, nil
 }
