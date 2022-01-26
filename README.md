@@ -118,6 +118,49 @@ func init() {
 }
 ```
 
+### Get page count
+```go
+package renderer
+
+import (
+	"log"
+
+	"github.com/klippa-app/go-pdfium/pdfium"
+)
+
+func main() {
+	filePath := "example.pdf"
+	pageCount, err := getPageCount(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("The PDF %s has %d pages", filePath, pageCount)
+}
+
+func getPageCount(filePath string) (int, error) {
+	// Load the PDF file into a byte array.
+	pdfBytes, err := ioutil.ReadFile(filePath)
+
+	// Open the PDF using pdfium (and claim a worker)
+	doc, err := pdfium.NewDocument(&pdfBytes)
+	if err != nil {
+		return 0, err
+	}
+
+	// Always close the document, this will release the worker and it's resources
+	defer doc.Close()
+
+	pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+	if err != nil {
+		return 0, err
+	}
+	
+	return pageCount.PageCount, nil
+}
+```
+
+
 ## About Klippa
 
 Founded in 2015, [Klippa](https://www.klippa.com/en)'s goal is to digitize & automate administrative processes with modern technologies. We help clients enhance the effectiveness of their organization by using machine learning and OCR. Since 2015, more than a thousand happy clients have used Klippa's software solutions. Klippa currently has an international team of 50 people, with offices in Groningen, Amsterdam and Brasov.
