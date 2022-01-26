@@ -11,6 +11,19 @@ type RenderPage struct {
 	Image             *image.RGBA
 }
 
+type RenderPagesPage struct {
+	PointToPixelRatio float64
+	Width             int
+	Height            int
+	X                 int
+	Y                 int
+}
+
+type RenderPages struct {
+	Pages []RenderPagesPage
+	Image *image.RGBA
+}
+
 type GetPageSize struct {
 	Width  float64
 	Height float64
