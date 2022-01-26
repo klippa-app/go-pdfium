@@ -70,3 +70,28 @@ type GetPageTextStructuredPixelPositions struct {
 	Width  int
 	Height int
 }
+
+type RenderToFileOutputFormat string
+
+const (
+	RenderToFileOutputFormatJPG RenderToFileOutputFormat = "jpg"
+	RenderToFileOutputFormatPNG RenderToFileOutputFormat = "png"
+)
+
+type RenderToFileOutputTarget string
+
+const (
+	RenderToFileOutputTargetBytes RenderToFileOutputTarget = "bytes"
+	RenderToFileOutputTargetFile  RenderToFileOutputTarget = "file"
+)
+
+type RenderToFileRequest struct {
+	RenderPageInDPI     *RenderPageInDPI
+	RenderPagesInDPI    *RenderPagesInDPI
+	RenderPageInPixels  *RenderPageInPixels
+	RenderPagesInPixels *RenderPagesInPixels
+	OutputFormat        RenderToFileOutputFormat
+	OutputTarget        RenderToFileOutputTarget
+	MaxFileSize         int64
+	TargetFilePath      string // When OutputTarget is file, the path to write it to, if not given, a temp file is created
+}

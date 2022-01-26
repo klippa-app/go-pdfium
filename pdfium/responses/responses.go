@@ -74,3 +74,9 @@ type GetPageTextStructured struct {
 	Rects             []*GetPageTextStructuredRect
 	PointToPixelRatio float64
 }
+
+type RenderToFileRequest struct {
+	Pages      []RenderPagesPage
+	ImageBytes *[]byte
+	ImagePath  string
+}
