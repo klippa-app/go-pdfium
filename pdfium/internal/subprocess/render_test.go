@@ -969,6 +969,33 @@ var _ = Describe("Render", func() {
 		})
 	})
 
+	Context("a PDF file that uses an alpha channel", func() {
+		BeforeEach(func() {
+			pdfData, _ := ioutil.ReadFile("./testdata/alpha_channel.pdf")
+			pdfium.OpenDocument(&requests.OpenDocument{
+				File: &pdfData,
+			})
+		})
+
+		AfterEach(func() {
+			pdfium.Close()
+		})
+
+		When("it is rendered", func() {
+			It("returns the right image", func() {
+				renderedPage, err := pdfium.RenderPageInDPI(&requests.RenderPageInDPI{
+					Page: 0,
+					DPI:  200,
+				})
+
+				Expect(err).To(BeNil())
+				compareRenderHash(renderedPage, &responses.RenderPage{
+					PointToPixelRatio: 2.7777777777777777,
+				}, "./testdata/render_page_alpha_channel")
+			})
+		})
+	})
+
 	// This test is only here to test the closing of an opened page.
 	Context("a multipage PDF file", func() {
 		BeforeEach(func() {
