@@ -55,12 +55,45 @@ var _ = Describe("Render", func() {
 				})
 			})
 
+			Context("RenderPageInDPI()", func() {
+				It("returns an error", func() {
+					renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+						Pages: []requests.RenderPageInDPI{
+							{
+								Page: 0,
+								DPI:  300,
+							},
+						},
+						Padding: 50,
+					})
+					Expect(err).To(MatchError("no current document"))
+					Expect(renderedPage).To(BeNil())
+				})
+			})
+
 			Context("RenderPageInPixels()", func() {
 				It("returns an error", func() {
 					renderedPage, err := pdfium.RenderPageInPixels(&requests.RenderPageInPixels{
 						Page:   0,
 						Width:  2000,
 						Height: 2000,
+					})
+					Expect(err).To(MatchError("no current document"))
+					Expect(renderedPage).To(BeNil())
+				})
+			})
+
+			Context("RenderPagesInPixels()", func() {
+				It("returns an error", func() {
+					renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+						Pages: []requests.RenderPageInPixels{
+							{
+								Page:   0,
+								Width:  2000,
+								Height: 2000,
+							},
+						},
+						Padding: 50,
 					})
 					Expect(err).To(MatchError("no current document"))
 					Expect(renderedPage).To(BeNil())
@@ -115,6 +148,22 @@ var _ = Describe("Render", func() {
 					})
 				})
 
+				Context("RenderPagesInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+							Pages: []requests.RenderPageInDPI{
+								{
+									Page: 1,
+									DPI:  300,
+								},
+							},
+							Padding: 50,
+						})
+						Expect(err).To(MatchError(pdfium_errors.ErrPage))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
 				Context("RenderPageInPixels()", func() {
 					It("returns an error", func() {
 						renderedPage, err := pdfium.RenderPageInPixels(&requests.RenderPageInPixels{
@@ -125,6 +174,23 @@ var _ = Describe("Render", func() {
 						Expect(err).To(MatchError(pdfium_errors.ErrPage))
 						Expect(renderedPage).To(BeNil())
 					})
+				})
+			})
+
+			Context("RenderPagesInPixels()", func() {
+				It("returns an error", func() {
+					renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+						Pages: []requests.RenderPageInPixels{
+							{
+								Page:   1,
+								Width:  2000,
+								Height: 2000,
+							},
+						},
+						Padding: 50,
+					})
+					Expect(err).To(MatchError(pdfium_errors.ErrPage))
+					Expect(renderedPage).To(BeNil())
 				})
 			})
 
@@ -335,6 +401,600 @@ var _ = Describe("Render", func() {
 					})
 				})
 			})
+
+			Context("the pages are rendered", func() {
+				Context("in points", func() {
+					Context("with no pages given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{},
+							})
+							Expect(err).To(MatchError("no pages given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with no DPI", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+										Page: 0,
+									},
+									{
+										Page: 0,
+									},
+								},
+							})
+							Expect(err).To(MatchError("no DPI given for requested page 0"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with DPI 100", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+										Page: 0,
+										DPI:  100,
+									},
+									{
+										Page: 0,
+										DPI:  100,
+									},
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_100.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 1.3888888888888888,
+										Width:             827,
+										Height:            1170,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 1.3888888888888888,
+										Width:             827,
+										Height:            1170,
+										X:                 0,
+										Y:                 1170,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2340))
+						})
+					})
+
+					Context("with DPI 300", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+										Page: 0,
+										DPI:  300,
+									},
+									{
+										Page: 0,
+										DPI:  300,
+									},
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_300.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 4.166666666666667,
+										Width:             2481,
+										Height:            3508,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 4.166666666666667,
+										Width:             2481,
+										Height:            3508,
+										X:                 0,
+										Y:                 3508,
+									},
+								},
+							}))
+
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7016))
+						})
+					})
+
+					Context("with different DPI per page", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+										Page: 0,
+										DPI:  200,
+									},
+									{
+										Page: 0,
+										DPI:  300,
+									},
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_200_300.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 2.7777777777777777,
+										Width:             1654,
+										Height:            2339,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 4.166666666666667,
+										Width:             2481,
+										Height:            3508,
+										X:                 0,
+										Y:                 2339,
+									},
+								},
+							}))
+
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5847))
+						})
+					})
+
+					Context("with padding between pages", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+										Page: 0,
+										DPI:  300,
+									},
+									{
+										Page: 0,
+										DPI:  300,
+									},
+								},
+								Padding: 50,
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_dpi_300_padding_50.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 4.166666666666667,
+										Width:             2481,
+										Height:            3508,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 4.166666666666667,
+										Width:             2481,
+										Height:            3508,
+										X:                 0,
+										Y:                 3558,
+									},
+								},
+							}))
+
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7066))
+						})
+					})
+				})
+
+				Context("in pixels", func() {
+					Context("with no pages given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{},
+							})
+							Expect(err).To(MatchError("no pages given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+					Context("with no width or height given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page: 0,
+									},
+									{
+										Page: 0,
+									},
+								},
+							})
+							Expect(err).To(MatchError("no width or height given for requested page 0"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with only the width given", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:  0,
+										Width: 2000,
+									},
+									{
+										Page:  0,
+										Width: 2000,
+									},
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x0.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 3.3597884547259587,
+										Width:             2000,
+										Height:            2829,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 3.3597884547259587,
+										Width:             2000,
+										Height:            2829,
+										X:                 0,
+										Y:                 2829,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
+						})
+					})
+
+					Context("with only the height given", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:   0,
+										Height: 2000,
+									},
+									{
+										Page:   0,
+										Height: 2000,
+									},
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_0x2000.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 2000,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+						})
+					})
+
+					Context("with both the width and height given", func() {
+						Context("and the width and height being equal", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									Pages: []requests.RenderPageInPixels{
+										{
+											Page:   0,
+											Width:  2000,
+											Height: 2000,
+										},
+										{
+											Page:   0,
+											Width:  2000,
+											Height: 2000,
+										},
+									},
+								})
+
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Equal(&responses.RenderPages{
+									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000.gob", renderedPage.Image),
+									Pages: []responses.RenderPagesPage{
+										{
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+										{
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 2000,
+										},
+									},
+								}))
+
+								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+							})
+						})
+						Context("and the width being larger than the height", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									Pages: []requests.RenderPageInPixels{
+										{
+											Page:   0,
+											Width:  4000,
+											Height: 2000,
+										},
+										{
+											Page:   0,
+											Width:  4000,
+											Height: 2000,
+										},
+									},
+								})
+
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Equal(&responses.RenderPages{
+									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_4000x2000.gob", renderedPage.Image),
+									Pages: []responses.RenderPagesPage{
+										{
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+										{
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 2000,
+										},
+									},
+								}))
+
+								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+							})
+						})
+
+						Context("and the height being larger than the width", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									Pages: []requests.RenderPageInPixels{
+										{
+											Page:   0,
+											Width:  2000,
+											Height: 4000,
+										},
+										{
+											Page:   0,
+											Width:  2000,
+											Height: 4000,
+										},
+									},
+								})
+
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Equal(&responses.RenderPages{
+									Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x4000.gob", renderedPage.Image),
+									Pages: []responses.RenderPagesPage{
+										{
+											PointToPixelRatio: 3.3597884547259587,
+											Width:             2000,
+											Height:            2829,
+											X:                 0,
+											Y:                 0,
+										},
+										{
+											PointToPixelRatio: 3.3597884547259587,
+											Width:             2000,
+											Height:            2829,
+											X:                 0,
+											Y:                 2829,
+										},
+									},
+								}))
+
+								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
+								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
+							})
+						})
+					})
+
+					Context("with the width being different between pages", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:  0,
+										Width: 2000,
+									},
+									{
+										Page:  0,
+										Width: 1500,
+									},
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x0_1500x0.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 3.3597884547259587,
+										Width:             2000,
+										Height:            2829,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 2.519841341044469,
+										Width:             1500,
+										Height:            2122,
+										X:                 0,
+										Y:                 2829,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4951))
+						})
+					})
+
+					Context("with the height being different between pages", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:   0,
+										Height: 2000,
+									},
+									{
+										Page:   0,
+										Height: 1500,
+									},
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_0x2000_0x1500.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 1.7817060633031987,
+										Width:             1061,
+										Height:            1500,
+										X:                 0,
+										Y:                 2000,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
+						})
+					})
+
+					Context("with the width and height being different between pages", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+									{
+										Page:   0,
+										Width:  1500,
+										Height: 1500,
+									},
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000_1500x1500.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 1.7817060633031987,
+										Width:             1061,
+										Height:            1500,
+										X:                 0,
+										Y:                 2000,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
+						})
+					})
+
+					Context("with padding between pages", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								Pages: []requests.RenderPageInPixels{
+									{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+									{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+								},
+								Padding: 50,
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Equal(&responses.RenderPages{
+								Image: loadPrerenderedImage("./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50.gob", renderedPage.Image),
+								Pages: []responses.RenderPagesPage{
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+									{
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 2050,
+									},
+								},
+							}))
+							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4050))
+						})
+					})
+				})
+			})
 		})
 	})
 
@@ -402,7 +1062,7 @@ func loadPrerenderedImage(path string, renderedImage *image.RGBA) *image.RGBA {
 func writePrerenderedImage(path string, renderedImage *image.RGBA) error {
 	return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
-	// Be sure to validate the difference in image to sensure rendering has not been broken.
+	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	if err := enc.Encode(renderedImage); err != nil {

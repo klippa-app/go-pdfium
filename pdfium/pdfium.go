@@ -192,7 +192,9 @@ type Document interface {
 	GetPageText(request *requests.GetPageText) (*responses.GetPageText, error)
 	GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
 	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)
+	RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error)
 	RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error)
+	RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error)
 	GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error)
 	GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
 	Close()
@@ -218,8 +220,16 @@ func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*re
 	return d.worker.plugin.RenderPageInDPI(request)
 }
 
+func (d *pdfiumDocument) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
+	return d.worker.plugin.RenderPagesInDPI(request)
+}
+
 func (d *pdfiumDocument) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
 	return d.worker.plugin.RenderPageInPixels(request)
+}
+
+func (d *pdfiumDocument) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
+	return d.worker.plugin.RenderPagesInPixels(request)
 }
 
 func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {

@@ -7,6 +7,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"image"
 	"math"
 	"unsafe"
@@ -88,15 +89,54 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 		return nil, err
 	}
 
-	renderedPage, err := p.renderPage(request.Page, pixelSize.Width, pixelSize.Height)
+	// Render a single page.
+	result, err := p.renderPages([]renderPage{
+		{
+			Page:      request.Page,
+			PixelSize: *pixelSize,
+		},
+	}, 0)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.RenderPage{
-		Image:             renderedPage,
+		Image:             result.Image,
 		PointToPixelRatio: pixelSize.PointToPixelRatio,
 	}, nil
+}
+
+// RenderPagesInDPI renders a list of pages in a specific dpi, the result is an image.
+func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	if len(request.Pages) == 0 {
+		return nil, errors.New("no pages given")
+	}
+
+	pages := []renderPage{}
+	for i := range request.Pages {
+		if request.Pages[i].DPI == 0 {
+			return nil, fmt.Errorf("no DPI given for requested page %d", i)
+		}
+
+		pixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+			Page: request.Pages[i].Page,
+			DPI:  request.Pages[i].DPI,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		pages = append(pages, renderPage{
+			Page:      request.Pages[i].Page,
+			PixelSize: *pixelSize,
+		})
+	}
+
+	return p.renderPages(pages, request.Padding)
 }
 
 func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, float64, error) {
@@ -155,25 +195,132 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 		return nil, err
 	}
 
-	renderedPage, err := p.renderPage(request.Page, width, height)
+	// Render a single page.
+	result, err := p.renderPages([]renderPage{
+		{
+			Page: request.Page,
+			PixelSize: responses.GetPageSizeInPixels{
+				Width:             width,
+				Height:            height,
+				PointToPixelRatio: ratio,
+			},
+		},
+	}, 0)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.RenderPage{
-		Image:             renderedPage,
+		Image:             result.Image,
 		PointToPixelRatio: ratio,
 	}, nil
 }
 
-// RenderPage renders a specific page in a specific dpi, the result is an image.
-func (p *Pdfium) renderPage(page, width, height int) (*image.RGBA, error) {
-	err := p.loadPage(page)
-	if err != nil {
-		return nil, err
+// RenderPagesInPixels renders a list of pages in a specific pixel size, the result is an image.
+// The given resolution is a maximum, we automatically calculate either the width or the height
+// to make sure it stays withing the maximum resolution.
+func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	if len(request.Pages) == 0 {
+		return nil, errors.New("no pages given")
+	}
+
+	pages := []renderPage{}
+	for i := range request.Pages {
+		if request.Pages[i].Width == 0 && request.Pages[i].Height == 0 {
+			return nil, fmt.Errorf("no width or height given for requested page %d", i)
+		}
+
+		width, height, ratio, err := p.calculateRenderImageSize(request.Pages[i].Page, request.Pages[i].Width, request.Pages[i].Height)
+		if err != nil {
+			return nil, err
+		}
+
+		pages = append(pages, renderPage{
+			Page: request.Pages[i].Page,
+			PixelSize: responses.GetPageSizeInPixels{
+				Width:             width,
+				Height:            height,
+				PointToPixelRatio: ratio,
+			},
+		})
+	}
+
+	return p.renderPages(pages, request.Padding)
+}
+
+type renderPage struct {
+	Page      int
+	PixelSize responses.GetPageSizeInPixels
+}
+
+// renderPages renders a list of pages, the result is an image.
+func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.RenderPages, error) {
+	totalHeight := 0
+	totalWidth := 0
+
+	// First calculate the total image size
+	for i := range pages {
+		if pages[i].PixelSize.Width > totalWidth {
+			totalWidth = pages[i].PixelSize.Width
+		}
+
+		totalHeight += pages[i].PixelSize.Height
+
+		// Add padding between the renders
+		if i > 0 {
+			totalHeight += padding
+		}
+	}
+
+	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
+
+	// Create a device independent bitmap to the external buffer by passing a
+	// pointer to the first pixel, pdfium will do the rest.
+	p.Lock()
+	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+	p.Unlock()
+
+	pagesInfo := []responses.RenderPagesPage{}
+
+	currentOffset := 0
+	for i := range pages {
+		// Keep track of page information in the total image.
+		pagesInfo = append(pagesInfo, responses.RenderPagesPage{
+			PointToPixelRatio: pages[i].PixelSize.PointToPixelRatio,
+			Width:             pages[i].PixelSize.Width,
+			Height:            pages[i].PixelSize.Height,
+			X:                 0,
+			Y:                 currentOffset,
+		})
+		err := p.renderPage(bitmap, pages[i].Page, pages[i].PixelSize.Width, pages[i].PixelSize.Height, currentOffset)
+		if err != nil {
+			return nil, err
+		}
+		currentOffset += pages[i].PixelSize.Height + padding
+	}
+
+	// Release bitmap resources and buffers.
+	// This does not clear the Go image pixel buffer.
+	p.Lock()
+	C.FPDFBitmap_Destroy(bitmap)
+	p.Unlock()
+
+	return &responses.RenderPages{
+		Image: img,
+		Pages: pagesInfo,
+	}, nil
+}
+
+// renderPage renders a specific page in a specific size on a bitmap.
+func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset int) error {
+	err := p.loadPage(page)
+	if err != nil {
+		return err
+	}
 
 	p.Lock()
 	defer p.Unlock()
@@ -181,24 +328,18 @@ func (p *Pdfium) renderPage(page, width, height int) (*image.RGBA, error) {
 	// Check whether the page has transparency, this determines the fill color.
 	alpha := C.FPDFPage_HasTransparency(p.currentPage)
 	fillColor := 4294967295
+
+	// @todo: add a unit test for a PDF with alpha channel.
 	if int(alpha) == 1 {
 		fillColor = 0
 	}
 
-	// Create a device independent bitmap to the external buffer by passing a
-	// pointer to the first pixel, pdfium will do the rest.
-	bitmap := C.FPDFBitmap_CreateEx(C.int(width), C.int(height), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
-
 	// Fill the rectangle with the color (transparent or white)
-	C.FPDFBitmap_FillRect(bitmap, 0, 0, C.int(width), C.int(height), C.ulong(fillColor))
+	C.FPDFBitmap_FillRect(bitmap, 0, C.int(offset), C.int(width), C.int(height), C.ulong(fillColor))
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, 0, C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
+	C.FPDF_RenderPageBitmap(bitmap, p.currentPage, 0, C.int(offset), C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
 
-	// Release bitmap resources and buffers.
-	// This does not clear the Go image pixel buffer.
-	C.FPDFBitmap_Destroy(bitmap)
-
-	return img, nil
+	return nil
 }
