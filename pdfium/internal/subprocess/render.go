@@ -347,12 +347,12 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	alpha := C.FPDFPage_HasTransparency(p.currentPage)
 
 	// White
-	fillColor := 4294967295
+	fillColor := 0xFFFFFFFF
 
 	// When the page has transparency, fill with black, not white.
 	if int(alpha) == 1 {
 		// Black
-		fillColor = 0
+		fillColor = 0x00000000
 	}
 
 	// Fill the page rect with the specified color.
