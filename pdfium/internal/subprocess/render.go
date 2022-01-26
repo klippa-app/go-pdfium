@@ -328,6 +328,8 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	// Check whether the page has transparency, this determines the fill color.
 	alpha := C.FPDFPage_HasTransparency(p.currentPage)
 	fillColor := 4294967295
+
+	// @todo: add a unit test for a PDF with alpha channel.
 	if int(alpha) == 1 {
 		fillColor = 0
 	}
