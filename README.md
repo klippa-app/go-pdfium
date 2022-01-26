@@ -16,6 +16,7 @@
 * Get structured text of a page (text, angle, position, size, font information)
 * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
 * Get page size in either points or pixel size (when rendered in a specific DPI)
+* High test coverage ⭐
 
 ## pdfium
 
