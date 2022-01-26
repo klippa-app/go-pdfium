@@ -1,0 +1,9 @@
+/bin/*
+
+/.idea
+/*.log
+/*.log.*
+/out
+
+
+coverage.out
