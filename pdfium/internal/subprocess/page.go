@@ -14,9 +14,7 @@ func (p *Pdfium) loadPage(page int) error {
 	if p.currentPageNumber != nil && *p.currentPageNumber == page {
 		return nil
 	}
-
-	p.Lock()
-	defer p.Unlock()
+	
 	if p.currentPageNumber != nil {
 		// Unload the current page.
 		C.FPDF_ClosePage(p.currentPage)

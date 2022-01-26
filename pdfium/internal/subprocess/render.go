@@ -16,29 +16,46 @@ import (
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
 )
 
-// getPageSize returns the pixel size of a page given the pdfium page object DPI.
-func (p *Pdfium) getPageSize() (float64, float64) {
-	p.Lock()
+// getPageSize returns the points size of a page given the pdfium page index.
+func (p *Pdfium) getPageSize(page int) (float64, float64, error) {
+	err := p.loadPage(page)
+	if err != nil {
+		return 0, 0, err
+	}
+
 	imgWidth := C.FPDF_GetPageWidth(p.currentPage)
 	imgHeight := C.FPDF_GetPageHeight(p.currentPage)
-	p.Unlock()
 
-	return float64(imgWidth), float64(imgHeight)
+	return float64(imgWidth), float64(imgHeight), nil
+}
+
+// getPageSizeInPixels returns the pixel size of a page given the page index and DPI.
+func (p *Pdfium) getPageSizeInPixels(page, dpi int) (int, int, float64, error) {
+	widthInPoints, heightInPoints, err := p.getPageSize(page)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	scale := float64(dpi) / 72.0
+
+	return int(math.Ceil(widthInPoints * scale)), int(math.Ceil(heightInPoints * scale)), (widthInPoints * scale) / widthInPoints, nil
 }
 
 // GetPageSize returns the page size in points
 // One point is 1/72 inch (around 0.3528 mm)
 func (p *Pdfium) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
 
-	err := p.loadPage(request.Page)
+	widthInPoints, heightInPoints, err := p.getPageSize(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	widthInPoints, heightInPoints := p.getPageSize()
 	return &responses.GetPageSize{
 		Width:  widthInPoints,
 		Height: heightInPoints,
@@ -47,6 +64,9 @@ func (p *Pdfium) GetPageSize(request *requests.GetPageSize) (*responses.GetPageS
 
 // GetPageSizeInPixels returns the pixel size of a page given the page number and the DPI.
 func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -55,24 +75,23 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 		return nil, errors.New("no DPI given")
 	}
 
-	scale := float64(request.DPI) / 72.0
-	pageSize, err := p.GetPageSize(&requests.GetPageSize{
-		Page: request.Page,
-	})
-
+	widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Page, request.DPI)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.GetPageSizeInPixels{
-		Width:             int(math.Ceil(pageSize.Width * scale)),
-		Height:            int(math.Ceil(pageSize.Height * scale)),
-		PointToPixelRatio: (pageSize.Width * scale) / pageSize.Width,
+		Width:             widthInPixels,
+		Height:            heightInPixels,
+		PointToPixelRatio: pointToPixelRatio,
 	}, nil
 }
 
 // RenderPageInDPI renders a specific page in a specific dpi, the result is an image.
 func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -81,10 +100,7 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 		return nil, errors.New("no DPI given")
 	}
 
-	pixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-		Page: request.Page,
-		DPI:  request.DPI,
-	})
+	widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Page, request.DPI)
 	if err != nil {
 		return nil, err
 	}
@@ -92,8 +108,10 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 	// Render a single page.
 	result, err := p.renderPages([]renderPage{
 		{
-			Page:      request.Page,
-			PixelSize: *pixelSize,
+			Page:              request.Page,
+			Width:             widthInPixels,
+			Height:            heightInPixels,
+			PointToPixelRatio: pointToPixelRatio,
 		},
 	}, 0)
 	if err != nil {
@@ -102,12 +120,15 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 
 	return &responses.RenderPage{
 		Image:             result.Image,
-		PointToPixelRatio: pixelSize.PointToPixelRatio,
+		PointToPixelRatio: pointToPixelRatio,
 	}, nil
 }
 
 // RenderPagesInDPI renders a list of pages in a specific dpi, the result is an image.
 func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -122,17 +143,16 @@ func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*response
 			return nil, fmt.Errorf("no DPI given for requested page %d", i)
 		}
 
-		pixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-			Page: request.Pages[i].Page,
-			DPI:  request.Pages[i].DPI,
-		})
+		widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Pages[i].Page, request.Pages[i].DPI)
 		if err != nil {
 			return nil, err
 		}
 
 		pages = append(pages, renderPage{
-			Page:      request.Pages[i].Page,
-			PixelSize: *pixelSize,
+			Page:              request.Pages[i].Page,
+			Width:             widthInPixels,
+			Height:            heightInPixels,
+			PointToPixelRatio: pointToPixelRatio,
 		})
 	}
 
@@ -140,10 +160,7 @@ func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*response
 }
 
 func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, float64, error) {
-	pageSize, err := p.GetPageSize(&requests.GetPageSize{
-		Page: page,
-	})
-
+	widthInPoints, heightInPoints, err := p.getPageSize(page)
 	if err != nil {
 		return 0, 0, 0, err
 	}
@@ -153,19 +170,19 @@ func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, fl
 	ratio := float64(0)
 	if height == 0 {
 		// Height not set, add ratio to height.
-		ratio = pageSize.Height / pageSize.Width
+		ratio = heightInPoints / widthInPoints
 		targetHeight = targetWidth * ratio
 	} else if width == 0 {
 		// Width not set, add ratio to width.
-		ratio = pageSize.Width / pageSize.Height
+		ratio = widthInPoints / heightInPoints
 		targetWidth = targetHeight * ratio
 	} else {
 		// Both values set, automatically pick the correct ratio.
-		ratio = pageSize.Height / pageSize.Width
+		ratio = heightInPoints / widthInPoints
 		if (targetWidth * ratio) < float64(height) {
 			targetHeight = targetWidth * ratio
 		} else {
-			ratio = pageSize.Width / pageSize.Height
+			ratio = widthInPoints / heightInPoints
 			if (targetHeight * ratio) < float64(width) {
 				targetWidth = targetHeight * ratio
 			}
@@ -175,13 +192,16 @@ func (p *Pdfium) calculateRenderImageSize(page, width, height int) (int, int, fl
 	width = int(math.Ceil(targetWidth))
 	height = int(math.Ceil(targetHeight))
 
-	return width, height, targetWidth / pageSize.Width, nil
+	return width, height, targetWidth / widthInPoints, nil
 }
 
 // RenderPageInPixels renders a specific page in a specific pixel size, the result is an image.
 // The given resolution is a maximum, we automatically calculate either the width or the height
 // to make sure it stays withing the maximum resolution.
 func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -198,12 +218,10 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 	// Render a single page.
 	result, err := p.renderPages([]renderPage{
 		{
-			Page: request.Page,
-			PixelSize: responses.GetPageSizeInPixels{
-				Width:             width,
-				Height:            height,
-				PointToPixelRatio: ratio,
-			},
+			Page:              request.Page,
+			Width:             width,
+			Height:            height,
+			PointToPixelRatio: ratio,
 		},
 	}, 0)
 	if err != nil {
@@ -220,6 +238,9 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 // The given resolution is a maximum, we automatically calculate either the width or the height
 // to make sure it stays withing the maximum resolution.
 func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -240,12 +261,10 @@ func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*re
 		}
 
 		pages = append(pages, renderPage{
-			Page: request.Pages[i].Page,
-			PixelSize: responses.GetPageSizeInPixels{
-				Width:             width,
-				Height:            height,
-				PointToPixelRatio: ratio,
-			},
+			Page:              request.Pages[i].Page,
+			Width:             width,
+			Height:            height,
+			PointToPixelRatio: ratio,
 		})
 	}
 
@@ -253,8 +272,10 @@ func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*re
 }
 
 type renderPage struct {
-	Page      int
-	PixelSize responses.GetPageSizeInPixels
+	Page              int
+	Width             int
+	Height            int
+	PointToPixelRatio float64
 }
 
 // renderPages renders a list of pages, the result is an image.
@@ -264,11 +285,11 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 
 	// First calculate the total image size
 	for i := range pages {
-		if pages[i].PixelSize.Width > totalWidth {
-			totalWidth = pages[i].PixelSize.Width
+		if pages[i].Width > totalWidth {
+			totalWidth = pages[i].Width
 		}
 
-		totalHeight += pages[i].PixelSize.Height
+		totalHeight += pages[i].Height
 
 		// Add padding between the renders
 		if i > 0 {
@@ -280,9 +301,7 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 
 	// Create a device independent bitmap to the external buffer by passing a
 	// pointer to the first pixel, pdfium will do the rest.
-	p.Lock()
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
-	p.Unlock()
 
 	pagesInfo := []responses.RenderPagesPage{}
 
@@ -290,24 +309,22 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 	for i := range pages {
 		// Keep track of page information in the total image.
 		pagesInfo = append(pagesInfo, responses.RenderPagesPage{
-			PointToPixelRatio: pages[i].PixelSize.PointToPixelRatio,
-			Width:             pages[i].PixelSize.Width,
-			Height:            pages[i].PixelSize.Height,
+			PointToPixelRatio: pages[i].PointToPixelRatio,
+			Width:             pages[i].Width,
+			Height:            pages[i].Height,
 			X:                 0,
 			Y:                 currentOffset,
 		})
-		err := p.renderPage(bitmap, pages[i].Page, pages[i].PixelSize.Width, pages[i].PixelSize.Height, currentOffset)
+		err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset)
 		if err != nil {
 			return nil, err
 		}
-		currentOffset += pages[i].PixelSize.Height + padding
+		currentOffset += pages[i].Height + padding
 	}
 
 	// Release bitmap resources and buffers.
 	// This does not clear the Go image pixel buffer.
-	p.Lock()
 	C.FPDFBitmap_Destroy(bitmap)
-	p.Unlock()
 
 	return &responses.RenderPages{
 		Image: img,
@@ -321,9 +338,6 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	if err != nil {
 		return err
 	}
-
-	p.Lock()
-	defer p.Unlock()
 
 	// Check whether the page has transparency, this determines the fill color.
 	alpha := C.FPDFPage_HasTransparency(p.currentPage)

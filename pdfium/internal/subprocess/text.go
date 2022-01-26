@@ -17,6 +17,9 @@ import (
 
 // GetPageText returns the text of a page
 func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -26,13 +29,11 @@ func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageT
 		return nil, err
 	}
 
-	p.Lock()
 	textPage := C.FPDFText_LoadPage(p.currentPage)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
 	charData := make([]byte, (charsInPage+1)*4) // UTF-8 = Max 4 bytes per char, add 1 for terminator.
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
 	C.FPDFText_ClosePage(textPage)
-	p.Unlock()
 
 	return &responses.GetPageText{
 		Text: string(removeNullTerminator(charData[0 : charsWritten*4])),
@@ -41,6 +42,9 @@ func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageT
 
 // GetPageTextStructured returns the text of a page in a structured way
 func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.currentDoc == nil {
 		return nil, errors.New("no current document")
 	}
@@ -53,14 +57,10 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	pointToPixelRatio := float64(0)
 	if request.PixelPositions.Calculate {
 		if request.PixelPositions.DPI > 0 {
-			pagePixelSize, err := p.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-				Page: request.Page,
-				DPI:  request.PixelPositions.DPI,
-			})
+			_, _, pointToPixelRatio, err = p.getPageSizeInPixels(request.Page, request.PixelPositions.DPI)
 			if err != nil {
 				return nil, err
 			}
-			pointToPixelRatio = pagePixelSize.PointToPixelRatio
 		} else if request.PixelPositions.Width == 0 && request.PixelPositions.Height == 0 {
 			return nil, errors.New("no DPI or resolution given to calculate pixel positions")
 		} else {
@@ -78,7 +78,6 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 		PointToPixelRatio: pointToPixelRatio,
 	}
 
-	p.Lock()
 	textPage := C.FPDFText_LoadPage(p.currentPage)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
@@ -167,7 +166,6 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	}
 
 	C.FPDFText_ClosePage(textPage)
-	p.Unlock()
 
 	return resp, nil
 }
