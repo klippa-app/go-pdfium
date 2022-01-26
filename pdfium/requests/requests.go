@@ -12,10 +12,20 @@ type RenderPageInDPI struct {
 	DPI  int // The DPI to render the page in.
 }
 
+type RenderPagesInDPI struct {
+	Pages   []RenderPageInDPI // The pages
+	Padding int               // The amount of padding (in pixels) between the images
+}
+
 type RenderPageInPixels struct {
 	Page   int // The page number (0-index based).
 	Width  int // The maximum width of the image.
 	Height int // The maximum height of the image.
+}
+
+type RenderPagesInPixels struct {
+	Pages   []RenderPageInPixels // The pages
+	Padding int                  // The amount of padding (in pixels) between the images
 }
 
 type GetPageSize struct {
