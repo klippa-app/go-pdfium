@@ -376,10 +376,10 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 	return nil
 }
 
-func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
+func (p *Pdfium) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
 	var renderedImage *image.RGBA
 
-	var myResp *responses.RenderToFileRequest
+	var myResp *responses.RenderToFile
 	if request.RenderPageInDPI != nil {
 		resp, err := p.RenderPageInDPI(request.RenderPageInDPI)
 		if err != nil {
@@ -387,7 +387,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		}
 
 		renderedImage = resp.Image
-		myResp = &responses.RenderToFileRequest{
+		myResp = &responses.RenderToFile{
 			Width:             resp.Width,
 			Height:            resp.Height,
 			PointToPixelRatio: resp.PointToPixelRatio,
@@ -409,7 +409,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		}
 
 		renderedImage = resp.Image
-		myResp = &responses.RenderToFileRequest{
+		myResp = &responses.RenderToFile{
 			Width:  resp.Width,
 			Height: resp.Height,
 			Pages:  resp.Pages,
@@ -421,7 +421,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		}
 
 		renderedImage = resp.Image
-		myResp = &responses.RenderToFileRequest{
+		myResp = &responses.RenderToFile{
 			Width:             resp.Width,
 			Height:            resp.Height,
 			PointToPixelRatio: resp.PointToPixelRatio,
@@ -443,7 +443,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		}
 
 		renderedImage = resp.Image
-		myResp = &responses.RenderToFileRequest{
+		myResp = &responses.RenderToFile{
 			Width:  resp.Width,
 			Height: resp.Height,
 			Pages:  resp.Pages,
