@@ -1007,22 +1007,30 @@ var _ = Describe("Render", func() {
 				})
 
 				Context("and directly rendered to a file", func() {
+					Context("with no output target given", func() {
+
+					})
+
+					Context("with no output format given", func() {
+
+					})
+
 					Context("in pixels", func() {
 						Context("with 1 page", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								/*
-									renderedPage, err := pdfium.RenderToFileRequest(&requests.RenderToFileRequest{
-										RenderPageInPixels: &requests.RenderPageInPixels{
-											Page:   0,
-											Width:  2000,
-											Height: 2000,
-										},
-									})
+								request := &requests.RenderToFile{
+									RenderPageInPixels: &requests.RenderPageInPixels{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
 
-									Expect(err).To(BeNil())
-									compareRenderHash(renderedPage, &responses.RenderPage{
-										PointToPixelRatio: 2.375608084404265,
-									}, "./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")*/
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									PointToPixelRatio: 2.375608084404265,
+								}, "./testdata/render_file_testpdf_1_page")
 							})
 						})
 
@@ -1197,6 +1205,47 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 	Expect(string(existingFileHash)).To(Equal(currentHash))
 }
 
+func compareFileHash(request *requests.RenderToFile, renderedFile *responses.RenderToFile, expectedFile *responses.RenderToFile, testName string) {
+	err := writePrerenderedFile(testName, request, renderedFile)
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	// Copy object so we can skip Image.
+	// For the image we compare the file hash.
+	copiedFile := &responses.RenderToFile{
+		Pages:             renderedFile.Pages,
+		PointToPixelRatio: renderedFile.PointToPixelRatio,
+		Width:             renderedFile.Width,
+		Height:            renderedFile.Height,
+	}
+	Expect(copiedFile).To(Equal(expectedFile))
+
+	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	hasher := sha256.New()
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
+		hasher.Write(*renderedFile.ImageBytes)
+	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+
+		hasher.Write(fileContent)
+	}
+
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+	Expect(string(existingFileHash)).To(Equal(currentHash))
+}
+
 func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 	return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
@@ -1222,6 +1271,46 @@ func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 	defer f.Close()
 
 	err = png.Encode(f, renderedImage)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writePrerenderedFile(testName string, request *requests.RenderToFile, renderedFile *responses.RenderToFile) error {
+	//return nil // Comment this in case of updating pdfium versions and rendering has changed.
+
+	var fileBytes []byte
+
+	hasher := sha256.New()
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
+		hasher.Write(*renderedFile.ImageBytes)
+		fileBytes = *renderedFile.ImageBytes
+	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		if err != nil {
+			return err
+		}
+
+		hasher.Write(fileContent)
+		fileBytes = fileContent
+	}
+
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	if err := ioutil.WriteFile(testName+".hash", []byte(currentHash), 0777); err != nil {
+		return err
+	}
+
+	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
+		testName += ".png"
+	} else if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
+		testName += ".jpg"
+	}
+
+	err := ioutil.WriteFile(testName, fileBytes, 0777)
 	if err != nil {
 		return err
 	}

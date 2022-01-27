@@ -42,7 +42,7 @@ const (
 	RenderToFileOutputTargetFile  RenderToFileOutputTarget = "file"  // Writes away the file to a given path or a generated tmp file.
 )
 
-type RenderToFileRequest struct {
+type RenderToFile struct {
 	RenderPageInDPI     *RenderPageInDPI         // To execute the RenderPageInDPI request
 	RenderPagesInDPI    *RenderPagesInDPI        // To execute the RenderPagesInDPI request
 	RenderPageInPixels  *RenderPageInPixels      // To execute the RenderPageInPixels request
