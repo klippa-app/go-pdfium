@@ -21,7 +21,7 @@ type Pdfium interface {
 	RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
 	GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
 	GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
-	RenderToFileRequest(*requests.RenderToFileRequest) (*responses.RenderToFileRequest, error)
+	RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
 	Close() error
 }
 
@@ -136,9 +136,9 @@ func (g *PdfiumRPC) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
-	resp := &responses.RenderToFileRequest{}
-	err := g.client.Call("Plugin.RenderToFileRequest", request, resp)
+func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
+	resp := &responses.RenderToFile{}
+	err := g.client.Call("Plugin.RenderToFile", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -294,9 +294,9 @@ func (s *PdfiumRPCServer) GetPageSizeInPixels(request *requests.GetPageSizeInPix
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderToFileRequest(request *requests.RenderToFileRequest, resp *responses.RenderToFileRequest) error {
+func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
 	var err error
-	implResp, err := s.Impl.RenderToFileRequest(request)
+	implResp, err := s.Impl.RenderToFile(request)
 	if err != nil {
 		return err
 	}

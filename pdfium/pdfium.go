@@ -220,9 +220,9 @@ type Document interface {
 	// GetPageSizeInPixels returns the size of a page in pixels when rendered in the given DPI.
 	GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
 
-	// RenderToFileRequest allows you to call one of the other render functions
+	// RenderToFile allows you to call one of the other render functions
 	// and output the resulting image into a file.
-	RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error)
+	RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error)
 
 	// Close closes the document, releases the resources and gives back the worker to the pool.
 	Close()
@@ -268,8 +268,8 @@ func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixe
 	return d.worker.plugin.GetPageSizeInPixels(request)
 }
 
-func (d *pdfiumDocument) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
-	return d.worker.plugin.RenderToFileRequest(request)
+func (d *pdfiumDocument) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
+	return d.worker.plugin.RenderToFile(request)
 }
 
 func (d *pdfiumDocument) Close() {
