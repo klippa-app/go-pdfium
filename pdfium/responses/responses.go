@@ -10,6 +10,8 @@ type RenderPage struct {
 	Page              int         // The rendered page number (0-index based).
 	PointToPixelRatio float64     // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image.
 	Image             *image.RGBA // The rendered image.
+	Width             int         // The width of the rendered image.
+	Height            int         // The height of the rendered image.
 }
 
 type RenderPagesPage struct {
@@ -22,14 +24,19 @@ type RenderPagesPage struct {
 }
 
 type RenderPages struct {
-	Pages []RenderPagesPage // Information about the rendered pages inside this image.
-	Image *image.RGBA       // The rendered image.
+	Pages  []RenderPagesPage // Information about the rendered pages inside this image.
+	Image  *image.RGBA       // The rendered image.
+	Width  int               // The width of the rendered image.
+	Height int               // The height of the rendered image.
 }
 
 type RenderToFileRequest struct {
-	Pages      []RenderPagesPage // Information about the rendered pages inside this image.
-	ImageBytes *[]byte           // The byte array of the rendered file when OutputTarget is RenderToFileOutputTargetBytes.
-	ImagePath  string            // The file path when OutputTarget is RenderToFileOutputTargetFile, is a tmp path when TargetFilePath was empty in the request.
+	Pages             []RenderPagesPage // Information about the rendered pages inside this image.
+	ImageBytes        *[]byte           // The byte array of the rendered file when OutputTarget is RenderToFileOutputTargetBytes.
+	ImagePath         string            // The file path when OutputTarget is RenderToFileOutputTargetFile, is a tmp path when TargetFilePath was empty in the request.
+	Width             int               // The width of the rendered image.
+	Height            int               // The height of the rendered image.
+	PointToPixelRatio float64           // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image. Only set when rendering one page.
 }
 
 type GetPageSize struct {
