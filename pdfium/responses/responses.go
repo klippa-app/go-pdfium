@@ -30,7 +30,7 @@ type RenderPages struct {
 	Height int               // The height of the rendered image.
 }
 
-type RenderToFileRequest struct {
+type RenderToFile struct {
 	Pages             []RenderPagesPage // Information about the rendered pages inside this image.
 	ImageBytes        *[]byte           // The byte array of the rendered file when OutputTarget is RenderToFileOutputTargetBytes.
 	ImagePath         string            // The file path when OutputTarget is RenderToFileOutputTargetFile, is a tmp path when TargetFilePath was empty in the request.

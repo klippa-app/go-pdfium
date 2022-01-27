@@ -1007,46 +1007,385 @@ var _ = Describe("Render", func() {
 				})
 
 				Context("and directly rendered to a file", func() {
-					Context("in pixels", func() {
-						Context("with 1 page", func() {
-							It("returns the right image, point to pixel ratio and resolution", func() {
-								/*
-									renderedPage, err := pdfium.RenderToFileRequest(&requests.RenderToFileRequest{
-										RenderPageInPixels: &requests.RenderPageInPixels{
+					Context("with no output target given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderToFile(&requests.RenderToFile{
+								OutputFormat: requests.RenderToFileOutputFormatJPG,
+								RenderPagesInPixels: &requests.RenderPagesInPixels{
+									Pages: []requests.RenderPageInPixels{
+										{
 											Page:   0,
 											Width:  2000,
 											Height: 2000,
 										},
-									})
+									},
+								},
+							})
+							Expect(err).To(MatchError("invalid output target given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
 
-									Expect(err).To(BeNil())
-									compareRenderHash(renderedPage, &responses.RenderPage{
-										PointToPixelRatio: 2.375608084404265,
-									}, "./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")*/
+					Context("with no output format given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderToFile(&requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								RenderPagesInPixels: &requests.RenderPagesInPixels{
+									Pages: []requests.RenderPageInPixels{
+										{
+											Page:   0,
+											Width:  2000,
+											Height: 2000,
+										},
+									},
+								},
+							})
+							Expect(err).To(MatchError("invalid output format given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with no render operation given", func() {
+						It("returns an error", func() {
+							renderedPage, err := pdfium.RenderToFile(&requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatJPG,
+							})
+							Expect(err).To(MatchError("no render operation given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("in pixels", func() {
+						Context("with 1 page", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetBytes,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPageInPixels: &requests.RenderPageInPixels{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
+
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375608084404265,
+								}, "./testdata/render_file_testpdf_1_page_pixels")
 							})
 						})
 
 						Context("with multiple pages", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetBytes,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPagesInPixels: &requests.RenderPagesInPixels{
+										Pages: []requests.RenderPageInPixels{
+											{
+												Page:   0,
+												Width:  2000,
+												Height: 2000,
+											},
+											{
+												Page:   0,
+												Width:  2000,
+												Height: 2000,
+											},
+										},
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
 
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 2000,
+										},
+									},
+									Width:  1415,
+									Height: 4000,
+								}, "./testdata/render_file_testpdf_multiple_pages_pixels")
+							})
 						})
 					})
 
 					Context("in points", func() {
 						Context("with 1 page", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetBytes,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPageInDPI: &requests.RenderPageInDPI{
+										Page: 0,
+										DPI:  200,
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
 
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.7777777777777777,
+											Width:             1654,
+											Height:            2339,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1654,
+									Height:            2339,
+									PointToPixelRatio: 2.7777777777777777,
+								}, "./testdata/render_file_testpdf_1_page_dpi")
+							})
 						})
 
 						Context("with multiple pages", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetBytes,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPagesInDPI: &requests.RenderPagesInDPI{
+										Pages: []requests.RenderPageInDPI{
+											{
+												Page: 0,
+												DPI:  200,
+											},
+											{
+												Page: 0,
+												DPI:  200,
+											},
+										},
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
 
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.7777777777777777,
+											Width:             1654,
+											Height:            2339,
+
+											X: 0,
+											Y: 0,
+										},
+										{
+											Page:              0,
+											PointToPixelRatio: 2.7777777777777777,
+											Width:             1654,
+											Height:            2339,
+
+											X: 0,
+											Y: 2339,
+										},
+									},
+									Width:  1654,
+									Height: 4678,
+								}, "./testdata/render_file_testpdf_multiple_pages_dpi")
+							})
 						})
 					})
 
 					Context("to jpeg", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							request := &requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatJPG,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page:   0,
+									Width:  2000,
+									Height: 2000,
+								},
+							}
+							renderedFile, err := pdfium.RenderToFile(request)
 
+							Expect(err).To(BeNil())
+							compareFileHash(request, renderedFile, &responses.RenderToFile{
+								Pages: []responses.RenderPagesPage{
+									{
+										Page:              0,
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+								},
+								Width:             1415,
+								Height:            2000,
+								PointToPixelRatio: 2.375608084404265,
+							}, "./testdata/render_file_testpdf_jpg")
+						})
 					})
 
 					Context("to png", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							request := &requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatPNG,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page:   0,
+									Width:  2000,
+									Height: 2000,
+								},
+							}
+							renderedFile, err := pdfium.RenderToFile(request)
 
+							Expect(err).To(BeNil())
+							compareFileHash(request, renderedFile, &responses.RenderToFile{
+								Pages: []responses.RenderPagesPage{
+									{
+										Page:              0,
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+								},
+								Width:             1415,
+								Height:            2000,
+								PointToPixelRatio: 2.375608084404265,
+							}, "./testdata/render_file_testpdf_png")
+						})
+					})
+
+					Context("to bytes", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							request := &requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatJPG,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page:   0,
+									Width:  2000,
+									Height: 2000,
+								},
+							}
+							renderedFile, err := pdfium.RenderToFile(request)
+
+							Expect(err).To(BeNil())
+							compareFileHash(request, renderedFile, &responses.RenderToFile{
+								Pages: []responses.RenderPagesPage{
+									{
+										Page:              0,
+										PointToPixelRatio: 2.375608084404265,
+										Width:             1415,
+										Height:            2000,
+										X:                 0,
+										Y:                 0,
+									},
+								},
+								Width:             1415,
+								Height:            2000,
+								PointToPixelRatio: 2.375608084404265,
+							}, "./testdata/render_file_testpdf_bytes")
+						})
+					})
+
+					Context("to file", func() {
+						Context("with a filepath given", func() {
+							It("returns the right image, point to pixel ratio and resolution in the given filepath", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetFile,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPageInPixels: &requests.RenderPageInPixels{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+									TargetFilePath: "/tmp/render_file_testpdf_filepath",
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
+
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375608084404265,
+								}, "./testdata/render_file_testpdf_filepath")
+
+								os.Remove(request.TargetFilePath)
+							})
+						})
+
+						Context("with no filepath given", func() {
+							It("returns the right image, point to pixel ratio and resolution in a temp filepath", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetFile,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPageInPixels: &requests.RenderPageInPixels{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
+
+								Expect(err).To(BeNil())
+								compareFileHash(request, renderedFile, &responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375608084404265,
+								}, "./testdata/render_file_testpdf_no_filepath")
+							})
+						})
+
+						// @todo: test max image size for jpg (with quality loop)
+						// @todo: test max image size for png
+						// @todo: test invalid path
 					})
 				})
 			})
@@ -1197,6 +1536,53 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 	Expect(string(existingFileHash)).To(Equal(currentHash))
 }
 
+func compareFileHash(request *requests.RenderToFile, renderedFile *responses.RenderToFile, expectedFile *responses.RenderToFile, testName string) {
+	err := writePrerenderedFile(testName, request, renderedFile)
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	// Copy object so we can skip Image.
+	// For the image we compare the file hash.
+	copiedFile := &responses.RenderToFile{
+		Pages:             renderedFile.Pages,
+		PointToPixelRatio: renderedFile.PointToPixelRatio,
+		Width:             renderedFile.Width,
+		Height:            renderedFile.Height,
+	}
+	Expect(copiedFile).To(Equal(expectedFile))
+
+	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+	if err != nil {
+		Expect(err).To(BeNil())
+		return
+	}
+
+	hasher := sha256.New()
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
+		hasher.Write(*renderedFile.ImageBytes)
+	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		if request.TargetFilePath != "" {
+			Expect(request.TargetFilePath).To(Equal(renderedFile.ImagePath))
+		} else {
+			// Cleanup tmp file.
+			defer os.Remove(renderedFile.ImagePath)
+		}
+		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+
+		hasher.Write(fileContent)
+	}
+
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+	Expect(string(existingFileHash)).To(Equal(currentHash))
+}
+
 func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 	return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
@@ -1222,6 +1608,46 @@ func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 	defer f.Close()
 
 	err = png.Encode(f, renderedImage)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writePrerenderedFile(testName string, request *requests.RenderToFile, renderedFile *responses.RenderToFile) error {
+	return nil // Comment this in case of updating pdfium versions and rendering has changed.
+
+	var fileBytes []byte
+
+	hasher := sha256.New()
+
+	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
+		hasher.Write(*renderedFile.ImageBytes)
+		fileBytes = *renderedFile.ImageBytes
+	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		if err != nil {
+			return err
+		}
+
+		hasher.Write(fileContent)
+		fileBytes = fileContent
+	}
+
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	if err := ioutil.WriteFile(testName+".hash", []byte(currentHash), 0777); err != nil {
+		return err
+	}
+
+	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
+		testName += ".png"
+	} else if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
+		testName += ".jpg"
+	}
+
+	err := ioutil.WriteFile(testName, fileBytes, 0777)
 	if err != nil {
 		return err
 	}

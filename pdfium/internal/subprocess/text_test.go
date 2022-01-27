@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-
+	
 	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
 	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
@@ -139,6 +139,33 @@ var _ = Describe("Text", func() {
 
 							Expect(err).To(BeNil())
 							Expect(pageTextStructured).To(Equal(loadStructuredText("./testdata/text_testpdf_with_resolution_pixel_calculations.json")))
+						})
+					})
+				})
+
+				Context("when PixelPositions is enabled", func() {
+					It("returns the correct font information", func() {
+						pageTextStructured, err := pdfium.GetPageTextStructured(&requests.GetPageTextStructured{
+							Page:                   0,
+							CollectFontInformation: true,
+						})
+						Expect(err).To(BeNil())
+						Expect(pageTextStructured).To(Equal(loadStructuredText("./testdata/text_testpdf_with_font_information.json")))
+					})
+
+					Context("and PixelPositions is enabled", func() {
+						It("returns the correct font information", func() {
+							pageTextStructured, err := pdfium.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page:                   0,
+								CollectFontInformation: true,
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									Width:     3000,
+									Height:    3000,
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(pageTextStructured).To(Equal(loadStructuredText("./testdata/text_testpdf_with_font_information_and_pixel_positions.json")))
 						})
 					})
 				})
