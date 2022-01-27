@@ -8,3 +8,4 @@
 
 coverage.out
 pdfium/internal/subprocess/testdata/render_*.png
+pdfium/internal/subprocess/testdata/render_*.jpg
