@@ -273,6 +273,8 @@ var _ = Describe("Render", func() {
 							Expect(err).To(BeNil())
 							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 1.3888888888888888,
+								Width:             827,
+								Height:            1170,
 							}, "./testdata/render_testpdf_dpi_100")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(1170))
@@ -288,6 +290,8 @@ var _ = Describe("Render", func() {
 							Expect(err).To(BeNil())
 							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 4.166666666666667,
+								Width:             2481,
+								Height:            3508,
 							}, "./testdata/render_testpdf_dpi_300")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3508))
@@ -316,6 +320,8 @@ var _ = Describe("Render", func() {
 							Expect(err).To(BeNil())
 							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 3.3597884547259587,
+								Width:             2000,
+								Height:            2829,
 							}, "./testdata/render_testpdf_pixels_2000x0")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
@@ -332,6 +338,8 @@ var _ = Describe("Render", func() {
 							Expect(err).To(BeNil())
 							compareRenderHash(renderedPage, &responses.RenderPage{
 								PointToPixelRatio: 2.375608084404265,
+								Width:             1415,
+								Height:            2000,
 							}, "./testdata/render_testpdf_pixels_0x2000")
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
@@ -350,6 +358,8 @@ var _ = Describe("Render", func() {
 								Expect(err).To(BeNil())
 								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
 								}, "./testdata/render_testpdf_pixels_2000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
@@ -366,6 +376,8 @@ var _ = Describe("Render", func() {
 								Expect(err).To(BeNil())
 								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
 								}, "./testdata/render_testpdf_pixels_4000x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
@@ -383,6 +395,8 @@ var _ = Describe("Render", func() {
 								Expect(err).To(BeNil())
 								compareRenderHash(renderedPage, &responses.RenderPage{
 									PointToPixelRatio: 3.3597884547259587,
+									Width:             2000,
+									Height:            2829,
 								}, "./testdata/render_testpdf_pixels_2000x4000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
@@ -437,6 +451,8 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  827,
+								Height: 2340,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 1.3888888888888888,
@@ -475,6 +491,8 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  2481,
+								Height: 7016,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 4.166666666666667,
@@ -513,6 +531,8 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  2481,
+								Height: 5847,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.7777777777777777,
@@ -552,6 +572,8 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  2481,
+								Height: 7066,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 4.166666666666667,
@@ -619,6 +641,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  2000,
+								Height: 5658,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 3.3597884547259587,
@@ -658,6 +682,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  1415,
+								Height: 4000,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -700,6 +726,8 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Width:  1415,
+									Height: 4000,
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 2.375608084404265,
@@ -740,6 +768,8 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Width:  1415,
+									Height: 4000,
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 2.375608084404265,
@@ -781,6 +811,8 @@ var _ = Describe("Render", func() {
 
 								Expect(err).To(BeNil())
 								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Width:  2000,
+									Height: 5658,
 									Pages: []responses.RenderPagesPage{
 										{
 											PointToPixelRatio: 3.3597884547259587,
@@ -821,6 +853,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  2000,
+								Height: 4951,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 3.3597884547259587,
@@ -860,6 +894,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  1415,
+								Height: 3500,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -901,6 +937,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  1415,
+								Height: 3500,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -943,6 +981,8 @@ var _ = Describe("Render", func() {
 
 							Expect(err).To(BeNil())
 							compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Width:  1415,
+								Height: 4050,
 								Pages: []responses.RenderPagesPage{
 									{
 										PointToPixelRatio: 2.375608084404265,
@@ -963,6 +1003,50 @@ var _ = Describe("Render", func() {
 							Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4050))
 						})
+					})
+				})
+
+				Context("and directly rendered to a file", func() {
+					Context("in pixels", func() {
+						Context("with 1 page", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								/*
+									renderedPage, err := pdfium.RenderToFileRequest(&requests.RenderToFileRequest{
+										RenderPageInPixels: &requests.RenderPageInPixels{
+											Page:   0,
+											Width:  2000,
+											Height: 2000,
+										},
+									})
+
+									Expect(err).To(BeNil())
+									compareRenderHash(renderedPage, &responses.RenderPage{
+										PointToPixelRatio: 2.375608084404265,
+									}, "./testdata/render_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")*/
+							})
+						})
+
+						Context("with multiple pages", func() {
+
+						})
+					})
+
+					Context("in points", func() {
+						Context("with 1 page", func() {
+
+						})
+
+						Context("with multiple pages", func() {
+
+						})
+					})
+
+					Context("to jpeg", func() {
+
+					})
+
+					Context("to png", func() {
+
 					})
 				})
 			})
@@ -991,6 +1075,8 @@ var _ = Describe("Render", func() {
 				Expect(err).To(BeNil())
 				compareRenderHash(renderedPage, &responses.RenderPage{
 					PointToPixelRatio: 2.7777777777777777,
+					Width:             1653,
+					Height:            2339,
 				}, "./testdata/render_page_alpha_channel")
 			})
 		})
@@ -1050,6 +1136,8 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 	copiedPage := &responses.RenderPage{
 		Page:              renderedPage.Page,
 		PointToPixelRatio: renderedPage.PointToPixelRatio,
+		Width:             renderedPage.Width,
+		Height:            renderedPage.Height,
 	}
 	Expect(copiedPage).To(Equal(expectedPage))
 
@@ -1083,7 +1171,9 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
 	copiedPage := &responses.RenderPages{
-		Pages: renderedPages.Pages,
+		Pages:  renderedPages.Pages,
+		Width:  renderedPages.Width,
+		Height: renderedPages.Height,
 	}
 
 	Expect(copiedPage).To(Equal(expectedPage))

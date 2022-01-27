@@ -130,6 +130,8 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 		Page:              request.Page,
 		Image:             result.Image,
 		PointToPixelRatio: pointToPixelRatio,
+		Width:             widthInPixels,
+		Height:            heightInPixels,
 	}, nil
 }
 
@@ -146,7 +148,7 @@ func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*response
 		return nil, errors.New("no pages given")
 	}
 
-	pages := []renderPage{}
+	pages := make([]renderPage, len(request.Pages))
 	for i := range request.Pages {
 		if request.Pages[i].DPI == 0 {
 			return nil, fmt.Errorf("no DPI given for requested page %d", i)
@@ -157,12 +159,12 @@ func (p *Pdfium) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*response
 			return nil, err
 		}
 
-		pages = append(pages, renderPage{
+		pages[i] = renderPage{
 			Page:              request.Pages[i].Page,
 			Width:             widthInPixels,
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
-		})
+		}
 	}
 
 	return p.renderPages(pages, request.Padding)
@@ -241,6 +243,8 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 		Page:              request.Page,
 		Image:             result.Image,
 		PointToPixelRatio: ratio,
+		Width:             width,
+		Height:            height,
 	}, nil
 }
 
@@ -259,7 +263,7 @@ func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*re
 		return nil, errors.New("no pages given")
 	}
 
-	pages := []renderPage{}
+	pages := make([]renderPage, len(request.Pages))
 	for i := range request.Pages {
 		if request.Pages[i].Width == 0 && request.Pages[i].Height == 0 {
 			return nil, fmt.Errorf("no width or height given for requested page %d", i)
@@ -270,12 +274,12 @@ func (p *Pdfium) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*re
 			return nil, err
 		}
 
-		pages = append(pages, renderPage{
+		pages[i] = renderPage{
 			Page:              request.Pages[i].Page,
 			Width:             width,
 			Height:            height,
 			PointToPixelRatio: ratio,
-		})
+		}
 	}
 
 	return p.renderPages(pages, request.Padding)
@@ -290,8 +294,8 @@ type renderPage struct {
 
 // renderPages renders a list of pages, the result is an image.
 func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.RenderPages, error) {
-	totalHeight := 0
 	totalWidth := 0
+	totalHeight := 0
 
 	// First calculate the total image size
 	for i := range pages {
@@ -313,19 +317,18 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 	// pointer to the first pixel, pdfium will do the rest.
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
 
-	pagesInfo := []responses.RenderPagesPage{}
-
+	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
 	for i := range pages {
 		// Keep track of page information in the total image.
-		pagesInfo = append(pagesInfo, responses.RenderPagesPage{
+		pagesInfo[i] = responses.RenderPagesPage{
 			Page:              pages[i].Page,
 			PointToPixelRatio: pages[i].PointToPixelRatio,
 			Width:             pages[i].Width,
 			Height:            pages[i].Height,
 			X:                 0,
 			Y:                 currentOffset,
-		})
+		}
 		err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset)
 		if err != nil {
 			return nil, err
@@ -338,8 +341,10 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 	C.FPDFBitmap_Destroy(bitmap)
 
 	return &responses.RenderPages{
-		Image: img,
-		Pages: pagesInfo,
+		Image:  img,
+		Pages:  pagesInfo,
+		Width:  totalWidth,
+		Height: totalHeight,
 	}, nil
 }
 
@@ -372,59 +377,79 @@ func (p *Pdfium) renderPage(bitmap C.FPDF_BITMAP, page, width, height, offset in
 }
 
 func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error) {
-	var image *image.RGBA
+	var renderedImage *image.RGBA
 
-	pages := []responses.RenderPagesPage{}
+	var myResp *responses.RenderToFileRequest
 	if request.RenderPageInDPI != nil {
 		resp, err := p.RenderPageInDPI(request.RenderPageInDPI)
 		if err != nil {
 			return nil, err
 		}
 
-		image = resp.Image
-		pages = append(pages, responses.RenderPagesPage{
-			Page:              request.RenderPageInDPI.Page,
+		renderedImage = resp.Image
+		myResp = &responses.RenderToFileRequest{
+			Width:             resp.Width,
+			Height:            resp.Height,
 			PointToPixelRatio: resp.PointToPixelRatio,
-			Width:             resp.Image.Bounds().Max.X,
-			Height:            resp.Image.Bounds().Max.Y,
-			X:                 0,
-			Y:                 0,
-		})
-	}
-	if request.RenderPagesInDPI != nil {
+			Pages: []responses.RenderPagesPage{
+				{
+					Page:              request.RenderPageInDPI.Page,
+					PointToPixelRatio: resp.PointToPixelRatio,
+					Width:             resp.Image.Bounds().Max.X,
+					Height:            resp.Image.Bounds().Max.Y,
+					X:                 0,
+					Y:                 0,
+				},
+			},
+		}
+	} else if request.RenderPagesInDPI != nil {
 		resp, err := p.RenderPagesInDPI(request.RenderPagesInDPI)
 		if err != nil {
 			return nil, err
 		}
 
-		image = resp.Image
-		pages = append(pages, resp.Pages...)
-	}
-
-	if request.RenderPageInPixels != nil {
+		renderedImage = resp.Image
+		myResp = &responses.RenderToFileRequest{
+			Width:  resp.Width,
+			Height: resp.Height,
+			Pages:  resp.Pages,
+		}
+	} else if request.RenderPageInPixels != nil {
 		resp, err := p.RenderPageInPixels(request.RenderPageInPixels)
 		if err != nil {
 			return nil, err
 		}
 
-		image = resp.Image
-		pages = append(pages, responses.RenderPagesPage{
-			Page:              request.RenderPageInPixels.Page,
+		renderedImage = resp.Image
+		myResp = &responses.RenderToFileRequest{
+			Width:             resp.Width,
+			Height:            resp.Height,
 			PointToPixelRatio: resp.PointToPixelRatio,
-			Width:             resp.Image.Bounds().Max.X,
-			Height:            resp.Image.Bounds().Max.Y,
-			X:                 0,
-			Y:                 0,
-		})
-	}
-	if request.RenderPagesInPixels != nil {
+			Pages: []responses.RenderPagesPage{
+				{
+					Page:              request.RenderPageInPixels.Page,
+					PointToPixelRatio: resp.PointToPixelRatio,
+					Width:             resp.Image.Bounds().Max.X,
+					Height:            resp.Image.Bounds().Max.Y,
+					X:                 0,
+					Y:                 0,
+				},
+			},
+		}
+	} else if request.RenderPagesInPixels != nil {
 		resp, err := p.RenderPagesInPixels(request.RenderPagesInPixels)
 		if err != nil {
 			return nil, err
 		}
 
-		image = resp.Image
-		pages = append(pages, resp.Pages...)
+		renderedImage = resp.Image
+		myResp = &responses.RenderToFileRequest{
+			Width:  resp.Width,
+			Height: resp.Height,
+			Pages:  resp.Pages,
+		}
+	} else {
+		return nil, errors.New("no render operation given")
 	}
 
 	var imgBuf bytes.Buffer
@@ -434,7 +459,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		opt.Quality = 95
 
 		for {
-			err := jpeg.Encode(&imgBuf, image, &opt)
+			err := jpeg.Encode(&imgBuf, renderedImage, &opt)
 			if err != nil {
 				return nil, err
 			}
@@ -451,10 +476,8 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 
 			imgBuf.Reset()
 		}
-	}
-
-	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
-		err := png.Encode(&imgBuf, image)
+	} else if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
+		err := png.Encode(&imgBuf, renderedImage)
 		if err != nil {
 			return nil, err
 		}
@@ -462,18 +485,14 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 		if request.MaxFileSize != 0 && int64(imgBuf.Len()) > request.MaxFileSize {
 			return nil, errors.New("PDF image would exceed maximum filesize")
 		}
-	}
-
-	resp := &responses.RenderToFileRequest{
-		Pages: pages,
+	} else {
+		return nil, errors.New("invalid output format given")
 	}
 
 	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
 		imageBytes := imgBuf.Bytes()
-		resp.ImageBytes = &imageBytes
-	}
-
-	if request.OutputTarget == requests.RenderToFileOutputTargetFile {
+		myResp.ImageBytes = &imageBytes
+	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
 		var targetFile *os.File
 		if request.TargetFilePath != "" {
 			existingFile, err := os.Create(request.TargetFilePath)
@@ -499,8 +518,10 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 			return nil, err
 		}
 
-		resp.ImagePath = targetFile.Name()
+		myResp.ImagePath = targetFile.Name()
+	} else {
+		return nil, errors.New("invalid output target given")
 	}
 
-	return resp, nil
+	return myResp, nil
 }
