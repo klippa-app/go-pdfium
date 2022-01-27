@@ -3,11 +3,12 @@ package subprocess_test
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+	
 	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
 	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
-	"io/ioutil"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
