@@ -158,12 +158,16 @@ func (p openDocumentWithPassword) AlterOpenDocumentRequest(r *requests.OpenDocum
 	r.Password = &p.password
 }
 
+// OpenDocumentWithPasswordOption can be used as NewDocumentOption when your PDF contains a password.
 func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
 	return openDocumentWithPassword{
 		password: password,
 	}
 }
 
+// NewDocument creates a new pdfium document from a byte array.
+// This will automatically select a worker and keep it for you until you execute
+// the close method on the document.
 func NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error) {
 	selectedWorker, err := getWorker()
 	if err != nil {
@@ -188,16 +192,39 @@ func NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error) {
 }
 
 type Document interface {
+	// GetPageCount returns the amount of pages for the document.
 	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
+
+	// GetPageText returns the text of a given page in plain text.
 	GetPageText(request *requests.GetPageText) (*responses.GetPageText, error)
+
+	// GetPageTextStructured returns the text of a given page in a structured way,
+	// with coordinates and font information.
 	GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+
+	// RenderPageInDPI renders a given page in the given DPI.
 	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)
+
+	// RenderPagesInDPI renders the given pages in the given DPI.
 	RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error)
+
+	// RenderPageInPixels renders a given page in the given pixel size.
 	RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error)
+
+	// RenderPagesInPixels renders the given pages in the given pixel sizes.
 	RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error)
+
+	// GetPageSize returns the size of the page in points.
 	GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error)
+
+	// GetPageSizeInPixels returns the size of a page in pixels when rendered in the given DPI.
 	GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
+
+	// RenderToFileRequest allows you to call one of the other render functions
+	// and output the resulting image into a file.
 	RenderToFileRequest(request *requests.RenderToFileRequest) (*responses.RenderToFileRequest, error)
+
+	// Close closes the document, releases the resources and gives back the worker to the pool.
 	Close()
 }
 

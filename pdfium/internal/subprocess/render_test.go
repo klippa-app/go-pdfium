@@ -1027,6 +1027,7 @@ var _ = Describe("Render", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(pageSize).To(Equal(&responses.GetPageSize{
+							Page:   1,
 							Width:  595.2755737304688,
 							Height: 841.8897094726562,
 						}))
@@ -1047,6 +1048,7 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
 	copiedPage := &responses.RenderPage{
+		Page:              renderedPage.Page,
 		PointToPixelRatio: renderedPage.PointToPixelRatio,
 	}
 	Expect(copiedPage).To(Equal(expectedPage))

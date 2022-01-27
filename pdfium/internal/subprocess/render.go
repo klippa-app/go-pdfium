@@ -22,7 +22,7 @@ import (
 )
 
 // getPageSize returns the points size of a page given the pdfium page index.
-// One point is 1/72 inch (around 0.3528 mm)
+// One point is 1/72 inch (around 0.3528 mm).
 func (p *Pdfium) getPageSize(page int) (float64, float64, error) {
 	err := p.loadPage(page)
 	if err != nil {
@@ -63,6 +63,7 @@ func (p *Pdfium) GetPageSize(request *requests.GetPageSize) (*responses.GetPageS
 	}
 
 	return &responses.GetPageSize{
+		Page:   request.Page,
 		Width:  widthInPoints,
 		Height: heightInPoints,
 	}, nil
@@ -87,6 +88,7 @@ func (p *Pdfium) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*re
 	}
 
 	return &responses.GetPageSizeInPixels{
+		Page:              request.Page,
 		Width:             widthInPixels,
 		Height:            heightInPixels,
 		PointToPixelRatio: pointToPixelRatio,
@@ -125,6 +127,7 @@ func (p *Pdfium) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.
 	}
 
 	return &responses.RenderPage{
+		Page:              request.Page,
 		Image:             result.Image,
 		PointToPixelRatio: pointToPixelRatio,
 	}, nil
@@ -235,6 +238,7 @@ func (p *Pdfium) RenderPageInPixels(request *requests.RenderPageInPixels) (*resp
 	}
 
 	return &responses.RenderPage{
+		Page:              request.Page,
 		Image:             result.Image,
 		PointToPixelRatio: ratio,
 	}, nil
@@ -315,6 +319,7 @@ func (p *Pdfium) renderPages(pages []renderPage, padding int) (*responses.Render
 	for i := range pages {
 		// Keep track of page information in the total image.
 		pagesInfo = append(pagesInfo, responses.RenderPagesPage{
+			Page:              pages[i].Page,
 			PointToPixelRatio: pages[i].PointToPixelRatio,
 			Width:             pages[i].Width,
 			Height:            pages[i].Height,
@@ -378,6 +383,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 
 		image = resp.Image
 		pages = append(pages, responses.RenderPagesPage{
+			Page:              request.RenderPageInDPI.Page,
 			PointToPixelRatio: resp.PointToPixelRatio,
 			Width:             resp.Image.Bounds().Max.X,
 			Height:            resp.Image.Bounds().Max.Y,
@@ -403,6 +409,7 @@ func (p *Pdfium) RenderToFileRequest(request *requests.RenderToFileRequest) (*re
 
 		image = resp.Image
 		pages = append(pages, responses.RenderPagesPage{
+			Page:              request.RenderPageInPixels.Page,
 			PointToPixelRatio: resp.PointToPixelRatio,
 			Width:             resp.Image.Bounds().Max.X,
 			Height:            resp.Image.Bounds().Max.Y,
