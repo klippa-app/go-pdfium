@@ -3,51 +3,62 @@ package responses
 import "image"
 
 type GetPageCount struct {
-	PageCount int
+	PageCount int // The amount of pages of the document.
 }
 
 type RenderPage struct {
-	PointToPixelRatio float64
-	Image             *image.RGBA
+	Page              int         // The rendered page number (0-index based).
+	PointToPixelRatio float64     // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image.
+	Image             *image.RGBA // The rendered image.
 }
 
 type RenderPagesPage struct {
-	PointToPixelRatio float64
-	Width             int
-	Height            int
-	X                 int
-	Y                 int
+	Page              int     // The rendered page number (0-index based).
+	PointToPixelRatio float64 // The point to pixel ratio for the rendered image. How many points is 1 pixel for this page in this image.
+	Width             int     // The width of the rendered page inside the image.
+	Height            int     // The height of the rendered page inside the image.
+	X                 int     // The X start position of this page inside the image.
+	Y                 int     // The Y start position of this page inside the image.
 }
 
 type RenderPages struct {
-	Pages []RenderPagesPage
-	Image *image.RGBA
+	Pages []RenderPagesPage // Information about the rendered pages inside this image.
+	Image *image.RGBA       // The rendered image.
+}
+
+type RenderToFileRequest struct {
+	Pages      []RenderPagesPage // Information about the rendered pages inside this image.
+	ImageBytes *[]byte           // The byte array of the rendered file when OutputTarget is RenderToFileOutputTargetBytes.
+	ImagePath  string            // The file path when OutputTarget is RenderToFileOutputTargetFile, is a tmp path when TargetFilePath was empty in the request.
 }
 
 type GetPageSize struct {
-	Width  float64
-	Height float64
+	Page   int     // The page this size came from (0-index based).
+	Width  float64 // The width of the page in points. One point is 1/72 inch (around 0.3528 mm).
+	Height float64 // The height of the page in points. One point is 1/72 inch (around 0.3528 mm).
 }
 
 type GetPageSizeInPixels struct {
-	Width             int
-	Height            int
-	PointToPixelRatio float64
+	Page              int     // The page this size came from (0-index based).
+	Width             int     // The width of the page in pixels.
+	Height            int     // The height of the page in pixels.
+	PointToPixelRatio float64 // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image.
 }
 
 type GetPageText struct {
-	Text string
+	Page int    // The page this text came from (0-index based).
+	Text string // The plain text of a page.
 }
 
 type CharPosition struct {
-	Left   float64
-	Top    float64
-	Right  float64
-	Bottom float64
+	Left   float64 // The position of this char from the left.
+	Top    float64 // The position of this char from the top.
+	Right  float64 // The position of this char from the right.
+	Bottom float64 // The position of this char from the bottom.
 }
 
 type FontInformation struct {
-	Size         float64 // Font size in points (also known as em)
+	Size         float64 // Font size in points (also known as em).
 	SizeInPixels *int    // Font size in pixels, only available when PixelPositions is used.
 	Weight       int     // The weight of the font, can be negative for spaces and newlines.
 	Name         string  // The name of the font, can be empty for spaces and newlines.
@@ -55,28 +66,23 @@ type FontInformation struct {
 }
 
 type GetPageTextStructuredChar struct {
-	Text            string
-	Angle           float64
-	PointPosition   CharPosition
-	PixelPosition   *CharPosition
-	FontInformation *FontInformation
+	Text            string           // The text of this char.
+	Angle           float64          // The angle this char is in.
+	PointPosition   CharPosition     // The position of this char in points.
+	PixelPosition   *CharPosition    // The position of this char in pixels. When PixelPositions are requested.
+	FontInformation *FontInformation // The font information of this char. When CollectFontInformation is enabled.
 }
 
 type GetPageTextStructuredRect struct {
-	Text            string
-	PointPosition   CharPosition
-	PixelPosition   *CharPosition
-	FontInformation *FontInformation
+	Text            string           // The text of this rect.
+	PointPosition   CharPosition     // The position of this rect in points.
+	PixelPosition   *CharPosition    // The position of this rect in pixels. When PixelPositions are requested.
+	FontInformation *FontInformation // The font information of this rect. When CollectFontInformation is enabled.
 }
 
 type GetPageTextStructured struct {
-	Chars             []*GetPageTextStructuredChar
-	Rects             []*GetPageTextStructuredRect
-	PointToPixelRatio float64
-}
-
-type RenderToFileRequest struct {
-	Pages      []RenderPagesPage
-	ImageBytes *[]byte
-	ImagePath  string
+	Page              int                          // The page structured this text came from (0-index based).
+	Chars             []*GetPageTextStructuredChar // A list of chars in a page. When Mode is GetPageTextStructuredModeChars or GetPageTextStructuredModeBoth.
+	Rects             []*GetPageTextStructuredRect // A list of rects in a page. When Mode is GetPageTextStructuredModeRects or GetPageTextStructuredModeBoth.
+	PointToPixelRatio float64                      // The point to pixel ratio for the calculated positions.
 }

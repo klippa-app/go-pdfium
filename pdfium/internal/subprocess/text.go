@@ -36,6 +36,7 @@ func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageT
 	C.FPDFText_ClosePage(textPage)
 
 	return &responses.GetPageText{
+		Page: request.Page,
 		Text: string(removeNullTerminator(charData[0 : charsWritten*4])),
 	}, nil
 }
@@ -73,6 +74,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	}
 
 	resp := &responses.GetPageTextStructured{
+		Page:              request.Page,
 		Chars:             []*responses.GetPageTextStructuredChar{},
 		Rects:             []*responses.GetPageTextStructuredRect{},
 		PointToPixelRatio: pointToPixelRatio,
