@@ -1616,7 +1616,7 @@ func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 }
 
 func writePrerenderedFile(testName string, request *requests.RenderToFile, renderedFile *responses.RenderToFile) error {
-	//return nil // Comment this in case of updating pdfium versions and rendering has changed.
+	return nil // Comment this in case of updating pdfium versions and rendering has changed.
 
 	var fileBytes []byte
 
