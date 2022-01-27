@@ -22,6 +22,7 @@ import (
 )
 
 // getPageSize returns the points size of a page given the pdfium page index.
+// One point is 1/72 inch (around 0.3528 mm)
 func (p *Pdfium) getPageSize(page int) (float64, float64, error) {
 	err := p.loadPage(page)
 	if err != nil {
