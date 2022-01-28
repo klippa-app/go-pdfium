@@ -15,6 +15,7 @@
 * Get plain text of a page 
 * Get structured text of a page (text, angle, position, size, font information)
 * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
+* Render the image above directly as a jpeg or png into a file path or byte array
 * Get page size in either points or pixel size (when rendered in a specific DPI)
 * High test coverage ⭐
 
