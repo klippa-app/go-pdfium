@@ -1316,6 +1316,24 @@ var _ = Describe("Render", func() {
 					})
 
 					Context("to file", func() {
+						Context("with an invalid filepath given", func() {
+							It("returns an error", func() {
+								request := &requests.RenderToFile{
+									OutputTarget: requests.RenderToFileOutputTargetFile,
+									OutputFormat: requests.RenderToFileOutputFormatJPG,
+									RenderPageInPixels: &requests.RenderPageInPixels{
+										Page:   0,
+										Width:  2000,
+										Height: 2000,
+									},
+									TargetFilePath: "/file/path/that/is/invalid",
+								}
+								renderedFile, err := pdfium.RenderToFile(request)
+								Expect(err).To(MatchError("open /file/path/that/is/invalid: no such file or directory"))
+								Expect(renderedFile).To(BeNil())
+							})
+						})
+
 						Context("with a filepath given", func() {
 							It("returns the right image, point to pixel ratio and resolution in the given filepath", func() {
 								request := &requests.RenderToFile{
@@ -1383,9 +1401,80 @@ var _ = Describe("Render", func() {
 							})
 						})
 
-						// @todo: test max image size for jpg (with quality loop)
-						// @todo: test max image size for png
-						// @todo: test invalid path
+						Context("with a max filesize given", func() {
+							Context("while rendering to jpg", func() {
+								Context("with a max filesize that is unreasonable", func() {
+									It("returns an error", func() {
+										renderedPage, err := pdfium.RenderToFile(&requests.RenderToFile{
+											OutputTarget: requests.RenderToFileOutputTargetBytes,
+											OutputFormat: requests.RenderToFileOutputFormatJPG,
+											RenderPageInPixels: &requests.RenderPageInPixels{
+												Page:   0,
+												Width:  2000,
+												Height: 2000,
+											},
+											MaxFileSize: 1000, // 1000 bytes
+										})
+										Expect(err).To(MatchError("PDF image would exceed maximum filesize"))
+										Expect(renderedPage).To(BeNil())
+									})
+								})
+								Context("with a max filesize that is reasonable", func() {
+									It("returns the right image, point to pixel ratio and resolution, filesize under the limit", func() {
+										request := &requests.RenderToFile{
+											OutputTarget: requests.RenderToFileOutputTargetBytes,
+											OutputFormat: requests.RenderToFileOutputFormatJPG,
+											RenderPageInPixels: &requests.RenderPageInPixels{
+												Page:   0,
+												Width:  2000,
+												Height: 2000,
+											},
+											MaxFileSize: 60000, // 60 kb
+										}
+										renderedFile, err := pdfium.RenderToFile(request)
+
+										Expect(err).To(BeNil())
+										compareFileHash(request, renderedFile, &responses.RenderToFile{
+											Pages: []responses.RenderPagesPage{
+												{
+													Page:              0,
+													PointToPixelRatio: 2.375608084404265,
+													Width:             1415,
+													Height:            2000,
+													X:                 0,
+													Y:                 0,
+												},
+											},
+											Width:             1415,
+											Height:            2000,
+											PointToPixelRatio: 2.375608084404265,
+										}, "./testdata/render_file_testpdf_max_filesize")
+										if renderedFile.ImageBytes != nil {
+											Expect(len(*renderedFile.ImageBytes)).To(BeNumerically("<=", 60000))
+										}
+									})
+								})
+							})
+
+							Context("while rendering to png", func() {
+								Context("with a max filesize that is over the rendered size", func() {
+									It("returns an error", func() {
+										renderedPage, err := pdfium.RenderToFile(&requests.RenderToFile{
+											OutputTarget: requests.RenderToFileOutputTargetBytes,
+											OutputFormat: requests.RenderToFileOutputFormatPNG,
+											RenderPageInPixels: &requests.RenderPageInPixels{
+												Page:   0,
+												Width:  2000,
+												Height: 2000,
+											},
+											MaxFileSize: 1000, // 1000 bytes
+										})
+										Expect(err).To(MatchError("PDF image would exceed maximum filesize"))
+										Expect(renderedPage).To(BeNil())
+									})
+								})
+							})
+						})
 					})
 				})
 			})
