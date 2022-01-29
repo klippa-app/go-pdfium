@@ -23,7 +23,6 @@
 * Get page size in either points or pixel size (when rendered in a specific DPI)
 
 ## pdfium
-![https://app.codecov.io/gh/klippa-app/go-pdfium/settings/badge](Coverage)
 This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents.
 
