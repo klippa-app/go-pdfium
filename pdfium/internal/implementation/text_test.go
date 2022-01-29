@@ -1,11 +1,11 @@
-package subprocess_test
+package implementation_test
 
 import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
+	"github.com/klippa-app/go-pdfium/pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 	"github.com/klippa-app/go-pdfium/pdfium/responses"
@@ -15,7 +15,7 @@ import (
 )
 
 var _ = Describe("Text", func() {
-	pdfium := subprocess.Pdfium{}
+	pdfium := implementation.Pdfium{}
 
 	Context("no document", func() {
 		When("is opened", func() {
