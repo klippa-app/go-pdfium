@@ -13,6 +13,7 @@ type Pdfium interface {
 	Ping() (string, error)
 	OpenDocument(*requests.OpenDocument) error
 	GetPageCount(*requests.GetPageCount) (*responses.GetPageCount, error)
+	GetMetadata(*requests.GetMetadata) (*responses.GetMetadata, error)
 	GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
 	GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
 	RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
@@ -49,6 +50,16 @@ func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) error {
 func (g *PdfiumRPC) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
 	resp := &responses.GetPageCount{}
 	err := g.client.Call("Plugin.GetPageCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
+	resp := &responses.GetMetadata{}
+	err := g.client.Call("Plugin.GetMetadata", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +191,19 @@ func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *int
 func (s *PdfiumRPCServer) GetPageCount(request *requests.GetPageCount, resp *responses.GetPageCount) error {
 	var err error
 	implResp, err := s.Impl.GetPageCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetMetadata(request *requests.GetMetadata, resp *responses.GetMetadata) error {
+	var err error
+	implResp, err := s.Impl.GetMetadata(request)
 	if err != nil {
 		return err
 	}

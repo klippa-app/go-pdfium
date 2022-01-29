@@ -26,7 +26,7 @@ func init() {
 }
 
 func main() {
-	filePath := "pdfium/internal/implementation/testdata/test.pdf"
+	filePath := "shared_tests/testdata/test.pdf"
 	pageCount, err := getPageCount(filePath)
 	if err != nil {
 		log.Fatal(err)

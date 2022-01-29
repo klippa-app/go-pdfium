@@ -6,6 +6,11 @@ type GetPageCount struct {
 	PageCount int // The amount of pages of the document.
 }
 
+type GetMetadata struct {
+	Tag   string
+	Value string
+}
+
 type RenderPage struct {
 	Page              int         // The rendered page number (0-index based).
 	PointToPixelRatio float64     // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image.
