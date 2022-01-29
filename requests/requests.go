@@ -7,6 +7,10 @@ type OpenDocument struct {
 
 type GetPageCount struct{}
 
+type GetMetadata struct {
+	Tag string
+}
+
 type RenderPageInDPI struct {
 	Page int // The page number (0-index based).
 	DPI  int // The DPI to render the page in.

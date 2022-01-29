@@ -44,6 +44,17 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						PageCount: 1,
 					}))
 				})
+
+				It("returns the correct metadata", func() {
+					metadata, err := doc.GetMetadata(&requests.GetMetadata{
+						Tag: "Producer",
+					})
+					Expect(err).To(BeNil())
+					Expect(metadata).To(Equal(&responses.GetMetadata{
+						Tag:   "Producer",
+						Value: "cairo 1.16.0 (https://cairographics.org)",
+					}))
+				})
 			})
 		})
 

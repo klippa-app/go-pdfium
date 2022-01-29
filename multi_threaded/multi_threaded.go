@@ -196,6 +196,10 @@ func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*response
 	return d.worker.plugin.GetPageCount(request)
 }
 
+func (d *pdfiumDocument) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
+	return d.worker.plugin.GetMetadata(request)
+}
+
 func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
 	return d.worker.plugin.GetPageText(request)
 }

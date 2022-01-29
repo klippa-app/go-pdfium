@@ -31,6 +31,9 @@ type Document interface {
 	// GetPageCount returns the amount of pages for the document.
 	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
 
+	// GetMetadata returns the requested metadata.
+	GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error)
+
 	// GetPageText returns the text of a given page in plain text.
 	GetPageText(request *requests.GetPageText) (*responses.GetPageText, error)
 
