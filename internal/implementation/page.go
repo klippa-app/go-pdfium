@@ -4,7 +4,7 @@ package implementation
 // #include "fpdfview.h"
 import "C"
 import (
-	"github.com/klippa-app/go-pdfium/pdfium_errors"
+	"github.com/klippa-app/go-pdfium/errors"
 )
 
 // loadPage changes the active page if it's different from what's currently
@@ -24,7 +24,7 @@ func (p *Pdfium) loadPage(page int) error {
 
 	pageObject := C.FPDF_LoadPage(p.currentDoc, C.int(page))
 	if pageObject == nil {
-		return pdfium_errors.ErrPage
+		return errors.ErrPage
 	}
 
 	p.currentPage = pageObject

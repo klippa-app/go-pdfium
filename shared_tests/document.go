@@ -1,7 +1,7 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/pdfium_errors"
+	"github.com/klippa-app/go-pdfium/errors"
 	"io/ioutil"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -85,7 +85,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
 					doc, err := pdfiumContainer.NewDocument(&pdfData)
-					Expect(err).To(MatchError(pdfium_errors.ErrPassword.Error()))
+					Expect(err).To(MatchError(errors.ErrPassword.Error()))
 					Expect(doc).To(BeNil())
 				})
 			})
@@ -93,7 +93,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				It("returns the password error", func() {
 					wrongPassword := "test"
 					doc, err := pdfiumContainer.NewDocument(&pdfData, pdfium.OpenDocumentWithPasswordOption(wrongPassword))
-					Expect(err).To(MatchError(pdfium_errors.ErrPassword.Error()))
+					Expect(err).To(MatchError(errors.ErrPassword.Error()))
 					Expect(doc).To(BeNil())
 				})
 			})

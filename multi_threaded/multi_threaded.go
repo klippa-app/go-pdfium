@@ -1,4 +1,4 @@
-package pdfium_multi_threaded
+package multi_threaded
 
 import (
 	goctx "context"

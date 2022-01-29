@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium_errors"
+	"github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -45,7 +45,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 							pageText, err := doc.GetPageText(&requests.GetPageText{
 								Page: 1,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageText).To(BeNil())
 						})
 					})
@@ -55,7 +55,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 							pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
 								Page: 1,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageTextStructured).To(BeNil())
 						})
 					})

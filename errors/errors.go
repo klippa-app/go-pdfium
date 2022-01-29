@@ -1,4 +1,4 @@
-package pdfium_errors
+package errors
 
 import "errors"
 

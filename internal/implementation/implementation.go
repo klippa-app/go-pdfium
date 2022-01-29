@@ -8,7 +8,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/klippa-app/go-pdfium/pdfium_errors"
+	"github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 
 	"github.com/hashicorp/go-hclog"
@@ -58,21 +58,21 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		errorCode := C.FPDF_GetLastError()
 		switch errorCode {
 		case C.FPDF_ERR_SUCCESS:
-			pdfiumError = pdfium_errors.ErrSuccess
+			pdfiumError = errors.ErrSuccess
 		case C.FPDF_ERR_UNKNOWN:
-			pdfiumError = pdfium_errors.ErrUnknown
+			pdfiumError = errors.ErrUnknown
 		case C.FPDF_ERR_FILE:
-			pdfiumError = pdfium_errors.ErrFile
+			pdfiumError = errors.ErrFile
 		case C.FPDF_ERR_FORMAT:
-			pdfiumError = pdfium_errors.ErrFormat
+			pdfiumError = errors.ErrFormat
 		case C.FPDF_ERR_PASSWORD:
-			pdfiumError = pdfium_errors.ErrPassword
+			pdfiumError = errors.ErrPassword
 		case C.FPDF_ERR_SECURITY:
-			pdfiumError = pdfium_errors.ErrSecurity
+			pdfiumError = errors.ErrSecurity
 		case C.FPDF_ERR_PAGE:
-			pdfiumError = pdfium_errors.ErrPage
+			pdfiumError = errors.ErrPage
 		default:
-			pdfiumError = pdfium_errors.ErrUnexpected
+			pdfiumError = errors.ErrUnexpected
 		}
 		return pdfiumError
 	}

@@ -1,4 +1,4 @@
-package pdfium_single_threaded
+package single_threaded
 
 import (
 	"sync"
