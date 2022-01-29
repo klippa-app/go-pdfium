@@ -1,6 +1,8 @@
 package pdfium
 
 import (
+	"io"
+
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -23,8 +25,18 @@ func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
 }
 
 type Pdfium interface {
-	// NewDocument returns a pdfium Document from the given PDF.
-	NewDocument(file *[]byte, opts ...NewDocumentOption) (Document, error)
+	// NewDocumentFromBytes returns a pdfium Document from the given PDF bytes.
+	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (Document, error)
+
+	// NewDocumentFromFilePath returns a pdfium Document from the given PDF file path.
+	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (Document, error)
+
+	// NewDocumentFromReader returns a pdfium Document from the given PDF file reader.
+	// This is only really efficient for single threaded usage, the multi-threaded
+	// usage will just load the file in memory because it can't transfer readers
+	// over gRPC. The single-threaded usage will actually efficiently walk over
+	// the PDF as it's being used by pdfium.
+	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (Document, error)
 }
 
 type Document interface {

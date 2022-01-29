@@ -43,7 +43,7 @@ func getPageCount(filePath string) (int, error) {
 	}
 
 	// Open the PDF using pdfium (and claim a worker)
-	doc, err := Pdfium.NewDocument(&pdfBytes)
+	doc, err := Pdfium.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err
 	}

@@ -36,7 +36,7 @@ This library allows you to call pdfium in a single or multi-threaded way.
 We have implemented multi-threading this using [HashiCorp's Go Plugin System](https://github.com/hashicorp/go-plugin),
 which allows us launch separate pdfium worker processes, and then route the requests through the different workers. This
 also makes it a bit more safe to use pdfium, as it's less likely to segfaults or corrupt your main Go application. The
-Plugin system provides the communication between the processes using GRPc, however, when implementing this library, you
+Plugin system provides the communication between the processes using gRPC, however, when implementing this library, you
 won't really see anything of that. From the outside it will look like normal Go code. The inter-process communication
 does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the pdfium
 workers.

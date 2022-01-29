@@ -26,7 +26,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					return
 				}
 
-				newDoc, err := pdfiumContainer.NewDocument(&pdfData)
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
 				if err != nil {
 					return
 				}
