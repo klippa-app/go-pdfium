@@ -7,5 +7,6 @@
 /vendor
 
 coverage.out
-internal/implementation/testdata/render_*.png
-internal/implementation/testdata/render_*.jpg
+shared_tests/testdata/render_*.png
+shared_tests/testdata/render_*.jpg
+

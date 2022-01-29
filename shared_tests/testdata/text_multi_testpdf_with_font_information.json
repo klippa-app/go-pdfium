@@ -1,4 +1,5 @@
 {
+  "Page": 0,
   "Chars": [
     {
       "Text": "F",
@@ -9,7 +10,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "i",
@@ -20,7 +28,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "l",
@@ -31,7 +46,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "e",
@@ -42,7 +64,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": ":",
@@ -53,7 +82,14 @@
         "Right": 789.1592407226562,
         "Bottom": 794.8462524414062
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -64,7 +100,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "U",
@@ -75,7 +118,14 @@
         "Right": 789.0162353515625,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "n",
@@ -86,7 +136,14 @@
         "Right": 789.1592407226562,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "t",
@@ -97,7 +154,14 @@
         "Right": 789.1592407226562,
         "Bottom": 796.8812255859375
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "i",
@@ -108,7 +172,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "t",
@@ -119,7 +190,14 @@
         "Right": 789.1592407226562,
         "Bottom": 796.8812255859375
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "l",
@@ -130,7 +208,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "e",
@@ -141,7 +226,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "d",
@@ -152,7 +244,14 @@
         "Right": 789.0162353515625,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -163,7 +262,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "D",
@@ -174,7 +280,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "o",
@@ -185,7 +298,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "c",
@@ -196,7 +316,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "u",
@@ -207,7 +334,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "m",
@@ -218,7 +352,14 @@
         "Right": 789.1592407226562,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "e",
@@ -229,7 +370,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "n",
@@ -240,7 +388,14 @@
         "Right": 789.1592407226562,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "t",
@@ -251,7 +406,14 @@
         "Right": 789.1592407226562,
         "Bottom": 796.8812255859375
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -262,7 +424,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "2",
@@ -273,7 +442,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.3212280273438
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -284,7 +460,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1592407226562
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
+      }
     },
     {
       "Text": "P",
@@ -295,7 +478,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "a",
@@ -306,7 +496,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "g",
@@ -317,7 +514,14 @@
         "Right": 786.8822631835938,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "e",
@@ -328,7 +532,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -339,7 +550,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "1",
@@ -350,7 +568,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -361,7 +586,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "o",
@@ -372,7 +604,14 @@
         "Right": 789.0162353515625,
         "Bottom": 795.3192138671875
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "f",
@@ -383,7 +622,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.5192260742188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -394,7 +640,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1702270507812
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "1",
@@ -405,7 +658,14 @@
         "Right": 789.1592407226562,
         "Bottom": 797.17822265625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "\r",
@@ -416,7 +676,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1592407226562
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
+      }
     },
     {
       "Text": "\n",
@@ -427,7 +694,14 @@
         "Right": 789.1592407226562,
         "Bottom": 789.1592407226562
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
+      }
     },
     {
       "Text": "T",
@@ -438,7 +712,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.40478515625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "h",
@@ -449,7 +730,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.683837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "i",
@@ -460,7 +748,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.683837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "s",
@@ -471,7 +766,14 @@
         "Right": 762.726806640625,
         "Bottom": 767.8837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -482,7 +784,14 @@
         "Right": 762.8438110351562,
         "Bottom": 762.852783203125
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "i",
@@ -493,7 +802,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.683837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "s",
@@ -504,7 +820,14 @@
         "Right": 762.726806640625,
         "Bottom": 767.8837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -515,7 +838,14 @@
         "Right": 762.8438110351562,
         "Bottom": 762.852783203125
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "a",
@@ -526,7 +856,14 @@
         "Right": 762.726806640625,
         "Bottom": 767.8837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -537,7 +874,14 @@
         "Right": 762.8438110351562,
         "Bottom": 762.852783203125
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "t",
@@ -548,7 +892,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.1618041992188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "e",
@@ -559,7 +910,14 @@
         "Right": 762.726806640625,
         "Bottom": 767.8837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "s",
@@ -570,7 +928,14 @@
         "Right": 762.726806640625,
         "Bottom": 767.8837890625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "t",
@@ -581,7 +946,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.1618041992188
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": " ",
@@ -592,7 +964,14 @@
         "Right": 762.8438110351562,
         "Bottom": 762.852783203125
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "P",
@@ -603,7 +982,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.40478515625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "D",
@@ -614,7 +1000,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.40478515625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     },
     {
       "Text": "F",
@@ -625,7 +1018,14 @@
         "Right": 762.8438110351562,
         "Bottom": 769.40478515625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     }
   ],
   "Rects": [
@@ -637,7 +1037,14 @@
         "Right": 208.60919189453125,
         "Bottom": 789.0162353515625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "Page 1 of 1",
@@ -647,7 +1054,14 @@
         "Right": 523.3381958007812,
         "Bottom": 786.8822631835938
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
+      }
     },
     {
       "Text": "This is a test PDF",
@@ -657,7 +1071,14 @@
         "Right": 160.75021362304688,
         "Bottom": 762.726806640625
       },
-      "PixelPosition": null
+      "PixelPosition": null,
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": null,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
+      }
     }
   ],
   "PointToPixelRatio": 0

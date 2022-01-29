@@ -1,4 +1,5 @@
 {
+  "Page": 0,
   "Chars": [
     {
       "Text": "F",
@@ -14,6 +15,13 @@
         "Top": 273,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -30,6 +38,13 @@
         "Top": 281,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -46,6 +61,13 @@
         "Top": 292,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -62,6 +84,13 @@
         "Top": 317,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -78,6 +107,13 @@
         "Top": 329,
         "Right": 2812,
         "Bottom": 2832
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -94,6 +130,13 @@
         "Top": 347,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -110,6 +153,13 @@
         "Top": 370,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -126,6 +176,13 @@
         "Top": 395,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -142,6 +199,13 @@
         "Top": 413,
         "Right": 2812,
         "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -158,6 +222,13 @@
         "Top": 420,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -174,6 +245,13 @@
         "Top": 438,
         "Right": 2812,
         "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -190,6 +268,13 @@
         "Top": 445,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -206,6 +291,13 @@
         "Top": 470,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -222,6 +314,13 @@
         "Top": 494,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -238,6 +337,13 @@
         "Top": 510,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -254,6 +360,13 @@
         "Top": 537,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -270,6 +383,13 @@
         "Top": 559,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -286,6 +406,13 @@
         "Top": 581,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -302,6 +429,13 @@
         "Top": 605,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -318,6 +452,13 @@
         "Top": 643,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -334,6 +475,13 @@
         "Top": 670,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -350,6 +498,13 @@
         "Top": 694,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -366,6 +521,13 @@
         "Top": 712,
         "Right": 2812,
         "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -382,6 +544,13 @@
         "Top": 724,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -398,6 +567,13 @@
         "Top": 743,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -414,6 +590,13 @@
         "Top": 725,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -430,6 +613,13 @@
         "Top": 1674,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -446,6 +636,13 @@
         "Top": 1693,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -462,6 +659,13 @@
         "Top": 1719,
         "Right": 2804,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -478,6 +682,13 @@
         "Top": 1744,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -494,6 +705,13 @@
         "Top": 1760,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -510,6 +728,13 @@
         "Top": 1779,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -526,6 +751,13 @@
         "Top": 1795,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -542,6 +774,13 @@
         "Top": 1816,
         "Right": 2812,
         "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -558,6 +797,13 @@
         "Top": 1833,
         "Right": 2812,
         "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -574,6 +820,13 @@
         "Top": 1845,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -590,6 +843,13 @@
         "Top": 1865,
         "Right": 2812,
         "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -606,6 +866,13 @@
         "Top": 1846,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -622,6 +889,13 @@
         "Top": 1846,
         "Right": 2812,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -638,6 +912,13 @@
         "Top": 271,
         "Right": 2718,
         "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -654,6 +935,13 @@
         "Top": 287,
         "Right": 2718,
         "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -670,6 +958,13 @@
         "Top": 305,
         "Right": 2718,
         "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -686,6 +981,13 @@
         "Top": 322,
         "Right": 2718,
         "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -702,6 +1004,13 @@
         "Top": 343,
         "Right": 2718,
         "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -718,6 +1027,13 @@
         "Top": 359,
         "Right": 2718,
         "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -734,6 +1050,13 @@
         "Top": 376,
         "Right": 2718,
         "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -750,6 +1073,13 @@
         "Top": 397,
         "Right": 2718,
         "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -766,6 +1096,13 @@
         "Top": 412,
         "Right": 2718,
         "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -782,6 +1119,13 @@
         "Top": 432,
         "Right": 2718,
         "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -798,6 +1142,13 @@
         "Top": 447,
         "Right": 2718,
         "Bottom": 2741
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -814,6 +1165,13 @@
         "Top": 466,
         "Right": 2718,
         "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -830,6 +1188,13 @@
         "Top": 482,
         "Right": 2718,
         "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -846,6 +1211,13 @@
         "Top": 500,
         "Right": 2718,
         "Bottom": 2741
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -862,6 +1234,13 @@
         "Top": 521,
         "Right": 2718,
         "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -878,6 +1257,13 @@
         "Top": 538,
         "Right": 2718,
         "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -894,6 +1280,13 @@
         "Top": 555,
         "Right": 2718,
         "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -910,6 +1303,13 @@
         "Top": 573,
         "Right": 2718,
         "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     }
   ],
@@ -927,6 +1327,13 @@
         "Top": 2842,
         "Right": 743,
         "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -942,6 +1349,13 @@
         "Top": 2842,
         "Right": 1865,
         "Bottom": 2804
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -957,6 +1371,13 @@
         "Top": 2743,
         "Right": 573,
         "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     }
   ],
