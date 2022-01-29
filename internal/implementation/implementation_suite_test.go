@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSubprocess(t *testing.T) {
+func TestImplementation(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Subprocess Suite")
+	RunSpecs(t, "Implementation Suite")
 }

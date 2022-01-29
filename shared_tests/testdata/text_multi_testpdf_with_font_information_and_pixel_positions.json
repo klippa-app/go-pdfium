@@ -1,4 +1,5 @@
 {
+  "Page": 0,
   "Chars": [
     {
       "Text": "F",
@@ -10,10 +11,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 300,
-        "Top": 319,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 256,
+        "Top": 273,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -26,10 +34,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 325,
-        "Top": 329,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 278,
+        "Top": 281,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -42,10 +57,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 337,
-        "Top": 341,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 288,
+        "Top": 292,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -58,10 +80,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 348,
-        "Top": 371,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 297,
+        "Top": 317,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -74,10 +103,17 @@
         "Bottom": 794.8462524414062
       },
       "PixelPosition": {
-        "Left": 380,
-        "Top": 384,
-        "Right": 3288,
-        "Bottom": 3312
+        "Left": 325,
+        "Top": 329,
+        "Right": 2812,
+        "Bottom": 2832
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -90,10 +126,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 391,
-        "Top": 406,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 334,
+        "Top": 347,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -106,10 +149,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 407,
-        "Top": 433,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 348,
+        "Top": 370,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -122,10 +172,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 441,
-        "Top": 462,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 377,
+        "Top": 395,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -138,10 +195,17 @@
         "Bottom": 796.8812255859375
       },
       "PixelPosition": {
-        "Left": 467,
-        "Top": 483,
-        "Right": 3288,
-        "Bottom": 3320
+        "Left": 399,
+        "Top": 413,
+        "Right": 2812,
+        "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -154,10 +218,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 487,
-        "Top": 491,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 416,
+        "Top": 420,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -170,10 +241,17 @@
         "Bottom": 796.8812255859375
       },
       "PixelPosition": {
-        "Left": 496,
-        "Top": 512,
-        "Right": 3288,
-        "Bottom": 3320
+        "Left": 424,
+        "Top": 438,
+        "Right": 2812,
+        "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -186,10 +264,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 516,
-        "Top": 520,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 441,
+        "Top": 445,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -202,10 +287,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 527,
-        "Top": 550,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 450,
+        "Top": 470,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -218,10 +310,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 556,
-        "Top": 578,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 475,
+        "Top": 494,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -234,10 +333,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 582,
-        "Top": 597,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 498,
+        "Top": 510,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -250,10 +356,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 599,
-        "Top": 627,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 513,
+        "Top": 537,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -266,10 +379,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 631,
-        "Top": 654,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 539,
+        "Top": 559,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -282,10 +402,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 660,
-        "Top": 680,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 564,
+        "Top": 581,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -298,10 +425,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 686,
-        "Top": 707,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 587,
+        "Top": 605,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -314,10 +448,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 715,
-        "Top": 752,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 612,
+        "Top": 643,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -330,10 +471,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 760,
-        "Top": 783,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 650,
+        "Top": 670,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -346,10 +494,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 791,
-        "Top": 812,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 676,
+        "Top": 694,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -362,10 +517,17 @@
         "Bottom": 796.8812255859375
       },
       "PixelPosition": {
-        "Left": 817,
-        "Top": 832,
-        "Right": 3288,
-        "Bottom": 3320
+        "Left": 699,
+        "Top": 712,
+        "Right": 2812,
+        "Bottom": 2840
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -378,10 +540,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 832,
-        "Top": 847,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 712,
+        "Top": 724,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -394,10 +563,17 @@
         "Bottom": 797.3212280273438
       },
       "PixelPosition": {
-        "Left": 848,
-        "Top": 869,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 725,
+        "Top": 743,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -410,10 +586,17 @@
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
-        "Left": 847,
-        "Top": 847,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 725,
+        "Top": 725,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -426,10 +609,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 1935,
-        "Top": 1957,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 1655,
+        "Top": 1674,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -442,10 +632,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 1959,
-        "Top": 1980,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 1675,
+        "Top": 1693,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -458,10 +655,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 1988,
-        "Top": 2010,
-        "Right": 3279,
-        "Bottom": 3314
+        "Left": 1700,
+        "Top": 1719,
+        "Right": 2804,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -474,10 +678,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 2017,
-        "Top": 2040,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 1725,
+        "Top": 1744,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -490,10 +701,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 2043,
-        "Top": 2058,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 1747,
+        "Top": 1760,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -506,10 +724,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 2061,
-        "Top": 2081,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 1762,
+        "Top": 1779,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -522,10 +747,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 2085,
-        "Top": 2099,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 1783,
+        "Top": 1795,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -538,10 +770,17 @@
         "Bottom": 795.3192138671875
       },
       "PixelPosition": {
-        "Left": 2100,
-        "Top": 2123,
-        "Right": 3288,
-        "Bottom": 3314
+        "Left": 1796,
+        "Top": 1816,
+        "Right": 2812,
+        "Bottom": 2834
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -554,10 +793,17 @@
         "Bottom": 797.5192260742188
       },
       "PixelPosition": {
-        "Left": 2128,
-        "Top": 2143,
-        "Right": 3288,
-        "Bottom": 3323
+        "Left": 1820,
+        "Top": 1833,
+        "Right": 2812,
+        "Bottom": 2842
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -570,10 +816,17 @@
         "Bottom": 789.1702270507812
       },
       "PixelPosition": {
-        "Left": 2143,
-        "Top": 2158,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 1833,
+        "Top": 1845,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -586,10 +839,17 @@
         "Bottom": 797.17822265625
       },
       "PixelPosition": {
-        "Left": 2161,
-        "Top": 2181,
-        "Right": 3288,
-        "Bottom": 3322
+        "Left": 1848,
+        "Top": 1865,
+        "Right": 2812,
+        "Bottom": 2841
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -602,10 +862,17 @@
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
-        "Left": 2158,
-        "Top": 2158,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 1846,
+        "Top": 1846,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -618,10 +885,17 @@
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
-        "Left": 2158,
-        "Top": 2158,
-        "Right": 3288,
-        "Bottom": 3288
+        "Left": 1846,
+        "Top": 1846,
+        "Right": 2812,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": -1,
+        "Name": "",
+        "Flags": 0
       }
     },
     {
@@ -634,10 +908,17 @@
         "Bottom": 769.40478515625
       },
       "PixelPosition": {
-        "Left": 296,
-        "Top": 317,
-        "Right": 3179,
-        "Bottom": 3206
+        "Left": 253,
+        "Top": 271,
+        "Right": 2718,
+        "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -650,10 +931,17 @@
         "Bottom": 769.683837890625
       },
       "PixelPosition": {
-        "Left": 320,
-        "Top": 335,
-        "Right": 3179,
-        "Bottom": 3207
+        "Left": 273,
+        "Top": 287,
+        "Right": 2718,
+        "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -666,10 +954,17 @@
         "Bottom": 769.683837890625
       },
       "PixelPosition": {
-        "Left": 340,
-        "Top": 357,
-        "Right": 3179,
-        "Bottom": 3207
+        "Left": 291,
+        "Top": 305,
+        "Right": 2718,
+        "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -682,10 +977,17 @@
         "Bottom": 767.8837890625
       },
       "PixelPosition": {
-        "Left": 362,
-        "Top": 377,
-        "Right": 3178,
-        "Bottom": 3200
+        "Left": 309,
+        "Top": 322,
+        "Right": 2718,
+        "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -698,10 +1000,17 @@
         "Bottom": 762.852783203125
       },
       "PixelPosition": {
-        "Left": 379,
-        "Top": 401,
-        "Right": 3179,
-        "Bottom": 3179
+        "Left": 324,
+        "Top": 343,
+        "Right": 2718,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -714,10 +1023,17 @@
         "Bottom": 769.683837890625
       },
       "PixelPosition": {
-        "Left": 403,
-        "Top": 419,
-        "Right": 3179,
-        "Bottom": 3207
+        "Left": 344,
+        "Top": 359,
+        "Right": 2718,
+        "Bottom": 2743
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -730,10 +1046,17 @@
         "Bottom": 767.8837890625
       },
       "PixelPosition": {
-        "Left": 424,
-        "Top": 439,
-        "Right": 3178,
-        "Bottom": 3200
+        "Left": 363,
+        "Top": 376,
+        "Right": 2718,
+        "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -746,10 +1069,17 @@
         "Bottom": 762.852783203125
       },
       "PixelPosition": {
-        "Left": 441,
-        "Top": 464,
-        "Right": 3179,
-        "Bottom": 3179
+        "Left": 377,
+        "Top": 397,
+        "Right": 2718,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -762,10 +1092,17 @@
         "Bottom": 767.8837890625
       },
       "PixelPosition": {
-        "Left": 464,
-        "Top": 481,
-        "Right": 3178,
-        "Bottom": 3200
+        "Left": 397,
+        "Top": 412,
+        "Right": 2718,
+        "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -778,10 +1115,17 @@
         "Bottom": 762.852783203125
       },
       "PixelPosition": {
-        "Left": 483,
-        "Top": 505,
-        "Right": 3179,
-        "Bottom": 3179
+        "Left": 413,
+        "Top": 432,
+        "Right": 2718,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -794,10 +1138,17 @@
         "Bottom": 769.1618041992188
       },
       "PixelPosition": {
-        "Left": 506,
-        "Top": 522,
-        "Right": 3179,
-        "Bottom": 3205
+        "Left": 433,
+        "Top": 447,
+        "Right": 2718,
+        "Bottom": 2741
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -810,10 +1161,17 @@
         "Bottom": 767.8837890625
       },
       "PixelPosition": {
-        "Left": 527,
-        "Top": 545,
-        "Right": 3178,
-        "Bottom": 3200
+        "Left": 450,
+        "Top": 466,
+        "Right": 2718,
+        "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -826,10 +1184,17 @@
         "Bottom": 767.8837890625
       },
       "PixelPosition": {
-        "Left": 549,
-        "Top": 564,
-        "Right": 3178,
-        "Bottom": 3200
+        "Left": 470,
+        "Top": 482,
+        "Right": 2718,
+        "Bottom": 2736
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -842,10 +1207,17 @@
         "Bottom": 769.1618041992188
       },
       "PixelPosition": {
-        "Left": 569,
-        "Top": 585,
-        "Right": 3179,
-        "Bottom": 3205
+        "Left": 486,
+        "Top": 500,
+        "Right": 2718,
+        "Bottom": 2741
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -858,10 +1230,17 @@
         "Bottom": 762.852783203125
       },
       "PixelPosition": {
-        "Left": 587,
-        "Top": 609,
-        "Right": 3179,
-        "Bottom": 3179
+        "Left": 502,
+        "Top": 521,
+        "Right": 2718,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -874,10 +1253,17 @@
         "Bottom": 769.40478515625
       },
       "PixelPosition": {
-        "Left": 611,
-        "Top": 629,
-        "Right": 3179,
-        "Bottom": 3206
+        "Left": 523,
+        "Top": 538,
+        "Right": 2718,
+        "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -890,10 +1276,17 @@
         "Bottom": 769.40478515625
       },
       "PixelPosition": {
-        "Left": 631,
-        "Top": 649,
-        "Right": 3179,
-        "Bottom": 3206
+        "Left": 540,
+        "Top": 555,
+        "Right": 2718,
+        "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     },
     {
@@ -906,10 +1299,17 @@
         "Bottom": 769.40478515625
       },
       "PixelPosition": {
-        "Left": 654,
-        "Top": 670,
-        "Right": 3179,
-        "Bottom": 3206
+        "Left": 559,
+        "Top": 573,
+        "Right": 2718,
+        "Bottom": 2742
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     }
   ],
@@ -923,10 +1323,17 @@
         "Bottom": 789.0162353515625
       },
       "PixelPosition": {
-        "Left": 300,
-        "Top": 3323,
-        "Right": 869,
-        "Bottom": 3288
+        "Left": 256,
+        "Top": 2842,
+        "Right": 743,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -938,10 +1345,17 @@
         "Bottom": 786.8822631835938
       },
       "PixelPosition": {
-        "Left": 1935,
-        "Top": 3323,
-        "Right": 2181,
-        "Bottom": 3279
+        "Left": 1655,
+        "Top": 2842,
+        "Right": 1865,
+        "Bottom": 2804
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "CGKWYO+DejaVuSans",
+        "Flags": 524320
       }
     },
     {
@@ -953,12 +1367,19 @@
         "Bottom": 762.726806640625
       },
       "PixelPosition": {
-        "Left": 296,
-        "Top": 3207,
-        "Right": 670,
-        "Bottom": 3178
+        "Left": 253,
+        "Top": 2743,
+        "Right": 573,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 400,
+        "Name": "XWYRZP+DejaVuSansMono",
+        "Flags": 524320
       }
     }
   ],
-  "PointToPixelRatio": 4.166666666666667
+  "PointToPixelRatio": 3.5634121266063974
 }
