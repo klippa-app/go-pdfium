@@ -2,8 +2,8 @@ package implementation_test
 
 import (
 	"github.com/klippa-app/go-pdfium/internal/implementation"
-	"github.com/klippa-app/go-pdfium/pdfium_single_threaded"
 	"github.com/klippa-app/go-pdfium/shared_tests"
+	"github.com/klippa-app/go-pdfium/single_threaded"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -21,7 +21,7 @@ var _ = Describe("Implementation", func() {
 		})
 	})
 
-	Pdfium := pdfium_single_threaded.Init()
+	Pdfium := single_threaded.Init()
 	shared_tests.RunRenderTests(Pdfium, "../../shared_tests", "internal")
 	shared_tests.RunDocumentTests(Pdfium, "../../shared_tests", "internal")
 	shared_tests.RunTextTests(Pdfium, "../../shared_tests", "internal")

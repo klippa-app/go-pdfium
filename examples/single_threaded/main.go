@@ -5,15 +5,15 @@ import (
 	"log"
 
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium_single_threaded"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/single_threaded"
 )
 
 var Pdfium pdfium.Pdfium
 
 func init() {
 	// Init the pdfium library and return the instance to open documents.
-	Pdfium = pdfium_single_threaded.Init()
+	Pdfium = single_threaded.Init()
 }
 
 func main() {

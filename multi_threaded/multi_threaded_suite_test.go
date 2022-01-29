@@ -1,4 +1,4 @@
-package pdfium_single_threaded_test
+package multi_threaded_test
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestPdfiumSingleThreaded(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Pdfium Single-threaded Suite")
+	RunSpecs(t, "Multi-threaded Suite")
 }

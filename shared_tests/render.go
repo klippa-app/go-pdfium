@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium_errors"
+	"github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -51,7 +51,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							pageSize, err := doc.GetPageSize(&requests.GetPageSize{
 								Page: 1,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageSize).To(BeNil())
 						})
 					})
@@ -62,7 +62,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Page: 1,
 								DPI:  100,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageSize).To(BeNil())
 						})
 					})
@@ -73,7 +73,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Page: 1,
 								DPI:  300,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(renderedPage).To(BeNil())
 						})
 					})
@@ -89,7 +89,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								},
 								Padding: 50,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(renderedPage).To(BeNil())
 						})
 					})
@@ -101,7 +101,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Width:  2000,
 								Height: 2000,
 							})
-							Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(renderedPage).To(BeNil())
 						})
 					})
@@ -119,7 +119,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							},
 							Padding: 50,
 						})
-						Expect(err).To(MatchError(pdfium_errors.ErrPage.Error()))
+						Expect(err).To(MatchError(errors.ErrPage.Error()))
 						Expect(renderedPage).To(BeNil())
 					})
 				})
