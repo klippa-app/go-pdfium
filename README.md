@@ -37,7 +37,9 @@ We have implemented multi-threading this using [HashiCorp's Go Plugin System](ht
 which allows us launch separate pdfium worker processes, and then route the requests through the different workers. This
 also makes it a bit more safe to use pdfium, as it's less likely to segfaults or corrupt your main Go application. The
 Plugin system provides the communication between the processes using GRPc, however, when implementing this library, you
-won't really see anything of that. From the outside it will look like normal Go code.
+won't really see anything of that. From the outside it will look like normal Go code. The inter-process communication
+does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the pdfium
+workers.
 
 Single-threading works by directly calling the pdfium library from the same process. Single-threaded might be preferred
 if the caller is managing the workers themselves and does not want the overhead of another process. Be aware that since
