@@ -20,10 +20,10 @@
 * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
 * Render the image above directly as a jpeg or png into a file path or byte array
 * Get page size in either points or pixel size (when rendered in a specific DPI)
-* High test coverage ⭐
+* High test coverage [![codecov](https://codecov.io/gh/klippa-app/go-pdfium/branch/main/graph/badge.svg?token=WoIlW9RbfH)](https://codecov.io/gh/klippa-app/go-pdfium)
 
 ## pdfium
-
+![https://app.codecov.io/gh/klippa-app/go-pdfium/settings/badge](Coverage)
 This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents.
 
