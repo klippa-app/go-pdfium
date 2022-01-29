@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/pdfium_single_threaded"
-	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium_single_threaded"
+	"github.com/klippa-app/go-pdfium/requests"
 )
 
 var Pdfium pdfium.Pdfium
@@ -17,7 +17,7 @@ func init() {
 }
 
 func main() {
-	filePath := "pdfium/internal/implementation/testdata/test.pdf"
+	filePath := "internal/implementation/testdata/test.pdf"
 	pageCount, err := getPageCount(filePath)
 	if err != nil {
 		log.Fatal(err)
