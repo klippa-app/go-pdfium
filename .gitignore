@@ -4,8 +4,8 @@
 /*.log
 /*.log.*
 /out
-
+/vendor
 
 coverage.out
-pdfium/internal/implementation/testdata/render_*.png
-pdfium/internal/implementation/testdata/render_*.jpg
+internal/implementation/testdata/render_*.png
+internal/implementation/testdata/render_*.jpg

@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/pdfium_multi_threaded"
-	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium_multi_threaded"
+	"github.com/klippa-app/go-pdfium/requests"
 )
 
 var Pdfium pdfium.Pdfium

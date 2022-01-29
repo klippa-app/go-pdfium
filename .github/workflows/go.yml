@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4849/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
           sudo rm pdfium-linux-x64.tgz
-          sudo cp ./docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+          sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
 
       - name: Test
         run: |
@@ -40,33 +40,3 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           files: coverage.out
-
-  build:
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      - name: Set up pdfium library
-        run: |
-          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4849/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
-          sudo rm pdfium-linux-x64.tgz
-          sudo cp ./docker/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
-
-      - name: Build
-        run: |
-          export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go build -o ./bin/pdfium ./main.go
-          go build -o ./bin/subprocess ./subprocess/main.go
-
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: binary
-          path: |
-            ./bin/pdfium
-            ./bin/subprocess

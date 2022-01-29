@@ -104,8 +104,8 @@ For single threaded implementations we just have to initialize the library.
 package renderer
 
 import (
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/pdfium_single_threaded"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium_single_threaded"
 )
 
 var Pdfium pdfium.Pdfium
@@ -129,7 +129,7 @@ workers. Example:
 package main
 
 import (
-	"github.com/klippa-app/go-pdfium/pdfium/pdfium_multi_threaded/worker"
+	"github.com/klippa-app/go-pdfium/pdfium_multi_threaded/worker"
 )
 
 func main() {
@@ -149,8 +149,8 @@ library. Example:
 package renderer
 
 import (
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/pdfium_multi_threaded"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/pdfium_multi_threaded"
 )
 
 var Pdfium pdfium.Pdfium
@@ -179,8 +179,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/requests"
 )
 
 var Pdfium pdfium.Pdfium
@@ -233,8 +233,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/klippa-app/go-pdfium/pdfium"
-	"github.com/klippa-app/go-pdfium/pdfium/requests"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/requests"
 )
 
 var Pdfium pdfium.Pdfium
