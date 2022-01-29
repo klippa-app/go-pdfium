@@ -12,13 +12,13 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-func RunDocumentTests(pdfiumContainer pdfium.Pdfium, prefix string) {
+func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Document", func() {
 		Context("a normal PDF file with 1 page", func() {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/test.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -51,7 +51,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/test_multipage.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -81,7 +81,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 		})
 
 		Context("a password protected PDF file", func() {
-			pdfData, _ := ioutil.ReadFile("../shared_tests/testdata/password_test123.pdf")
+			pdfData, _ := ioutil.ReadFile(testsPath + "/testdata/password_test123.pdf")
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
 					doc, err := pdfiumContainer.NewDocument(&pdfData)

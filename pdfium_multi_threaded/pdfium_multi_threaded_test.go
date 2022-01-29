@@ -16,7 +16,7 @@ var _ = Describe("Multi Threaded", func() {
 			Args:    []string{"run", "../examples/multi_threaded/worker/main.go"}, // This is a reference to the worker package, this can be left empty when using a direct binary path.
 		},
 	})
-	shared_tests.RunRenderTests(Pdfium, "multi")
-	shared_tests.RunDocumentTests(Pdfium, "multi")
-	shared_tests.RunTextTests(Pdfium, "multi")
+	shared_tests.RunRenderTests(Pdfium, "../shared_tests", "multi")
+	shared_tests.RunDocumentTests(Pdfium, "../shared_tests", "multi")
+	shared_tests.RunTextTests(Pdfium, "../shared_tests", "multi")
 })

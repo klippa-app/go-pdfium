@@ -14,13 +14,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
+func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
 		Context("a normal PDF file", func() {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/test.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -80,7 +80,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 						})
 
 						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Equal(loadStructuredText("../shared_tests/testdata/text_"+prefix+"_testpdf_without_pixel_calculations.json", pageTextStructured)))
+						Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_without_pixel_calculations.json", pageTextStructured)))
 					})
 
 					Context("when PixelPositions is enabled", func() {
@@ -107,7 +107,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									},
 								})
 								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText("../shared_tests/testdata/text_"+prefix+"_testpdf_with_dpi_pixel_calculations.json", pageTextStructured)))
+								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_dpi_pixel_calculations.json", pageTextStructured)))
 							})
 						})
 
@@ -123,7 +123,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 								})
 
 								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText("../shared_tests/testdata/text_"+prefix+"_testpdf_with_resolution_pixel_calculations.json", pageTextStructured)))
+								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_resolution_pixel_calculations.json", pageTextStructured)))
 							})
 						})
 					})
@@ -135,7 +135,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 								CollectFontInformation: true,
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText("../shared_tests/testdata/text_"+prefix+"_testpdf_with_font_information.json", pageTextStructured)))
+							Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_font_information.json", pageTextStructured)))
 						})
 
 						Context("and PixelPositions is enabled", func() {
@@ -150,7 +150,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									},
 								})
 								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText("../shared_tests/testdata/text_"+prefix+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
+								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
 							})
 						})
 					})
@@ -176,7 +176,7 @@ func loadStructuredText(path string, resp *responses.GetPageTextStructured) *res
 }
 
 func writeStructuredText(path string, resp *responses.GetPageTextStructured) error {
-	return nil // Comment this in case of updating pdfium versions and output has changed.
+	//return nil // Comment this in case of updating pdfium versions and output has changed.
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)

@@ -20,13 +20,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
+func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
 		Context("a normal PDF file", func() {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/test.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -204,7 +204,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									PointToPixelRatio: 1.3888888888888888,
 									Width:             827,
 									Height:            1170,
-								}, "../shared_tests/testdata/render_"+prefix+"_testpdf_dpi_100")
+								}, testsPath+"/testdata/render_"+prefix+"_testpdf_dpi_100")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(1170))
 							})
@@ -221,7 +221,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									PointToPixelRatio: 4.166666666666667,
 									Width:             2481,
 									Height:            3508,
-								}, "../shared_tests/testdata/render_"+prefix+"_testpdf_dpi_300")
+								}, testsPath+"/testdata/render_"+prefix+"_testpdf_dpi_300")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3508))
 							})
@@ -251,7 +251,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									PointToPixelRatio: 3.3597884547259587,
 									Width:             2000,
 									Height:            2829,
-								}, "../shared_tests/testdata/render_"+prefix+"_testpdf_pixels_2000x0")
+								}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x0")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
 							})
@@ -269,7 +269,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									PointToPixelRatio: 2.375608084404265,
 									Width:             1415,
 									Height:            2000,
-								}, "../shared_tests/testdata/render_"+prefix+"_testpdf_pixels_0x2000")
+								}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_0x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 							})
@@ -289,7 +289,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										PointToPixelRatio: 2.375608084404265,
 										Width:             1415,
 										Height:            2000,
-									}, "../shared_tests/testdata/render_"+prefix+"_testpdf_pixels_2000x2000")
+									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x2000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 								})
@@ -307,7 +307,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										PointToPixelRatio: 2.375608084404265,
 										Width:             1415,
 										Height:            2000,
-									}, "../shared_tests/testdata/render_"+prefix+"_testpdf_pixels_4000x2000")
+									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_4000x2000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
 								})
@@ -326,7 +326,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										PointToPixelRatio: 3.3597884547259587,
 										Width:             2000,
 										Height:            2829,
-									}, "../shared_tests/testdata/render_"+prefix+"_testpdf_pixels_2000x4000")
+									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x4000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
 								})
@@ -398,7 +398,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 1170,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_dpi_100")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_100")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2340))
 							})
@@ -438,7 +438,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 3508,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_dpi_300")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_300")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7016))
 							})
@@ -478,7 +478,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2339,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_dpi_200_300")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_200_300")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5847))
 							})
@@ -519,7 +519,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 3558,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_dpi_300_padding_50")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_300_padding_50")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7066))
 							})
@@ -588,7 +588,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2829,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
 							})
@@ -629,7 +629,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2000,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 							})
@@ -673,7 +673,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 												Y:                 2000,
 											},
 										},
-									}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000")
+									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 								})
@@ -715,7 +715,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 												Y:                 2000,
 											},
 										},
-									}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_4000x2000")
+									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_4000x2000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
 								})
@@ -758,7 +758,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 												Y:                 2829,
 											},
 										},
-									}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x4000")
+									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x4000")
 									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
 								})
@@ -800,7 +800,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2829,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0_1500x0")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0_1500x0")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4951))
 							})
@@ -841,7 +841,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2000,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000_0x1500")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000_0x1500")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
 							})
@@ -884,7 +884,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2000,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_1500x1500")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_1500x1500")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
 							})
@@ -928,7 +928,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 											Y:                 2050,
 										},
 									},
-								}, "../shared_tests/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")
+								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")
 								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4050))
 							})
@@ -1014,7 +1014,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										Width:             1415,
 										Height:            2000,
 										PointToPixelRatio: 2.375608084404265,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_1_page_pixels")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_1_page_pixels")
 								})
 							})
 
@@ -1062,7 +1062,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										},
 										Width:  1415,
 										Height: 4000,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_multiple_pages_pixels")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_multiple_pages_pixels")
 								})
 							})
 						})
@@ -1095,7 +1095,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										Width:             1654,
 										Height:            2339,
 										PointToPixelRatio: 2.7777777777777777,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_1_page_dpi")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_1_page_dpi")
 								})
 							})
 
@@ -1143,7 +1143,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										},
 										Width:  1654,
 										Height: 4678,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_multiple_pages_dpi")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_multiple_pages_dpi")
 								})
 							})
 						})
@@ -1176,7 +1176,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									Width:             1415,
 									Height:            2000,
 									PointToPixelRatio: 2.375608084404265,
-								}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_jpg")
+								}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_jpg")
 							})
 						})
 
@@ -1208,7 +1208,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									Width:             1415,
 									Height:            2000,
 									PointToPixelRatio: 2.375608084404265,
-								}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_png")
+								}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_png")
 							})
 						})
 
@@ -1240,7 +1240,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 									Width:             1415,
 									Height:            2000,
 									PointToPixelRatio: 2.375608084404265,
-								}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_bytes")
+								}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_bytes")
 							})
 						})
 
@@ -1292,7 +1292,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										Width:             1415,
 										Height:            2000,
 										PointToPixelRatio: 2.375608084404265,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_filepath")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_filepath")
 
 									os.Remove(request.TargetFilePath)
 								})
@@ -1326,7 +1326,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 										Width:             1415,
 										Height:            2000,
 										PointToPixelRatio: 2.375608084404265,
-									}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_no_filepath")
+									}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_no_filepath")
 								})
 							})
 
@@ -1377,7 +1377,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 												Width:             1415,
 												Height:            2000,
 												PointToPixelRatio: 2.375608084404265,
-											}, "../shared_tests/testdata/render_"+prefix+"_file_testpdf_max_filesize")
+											}, testsPath+"/testdata/render_"+prefix+"_file_testpdf_max_filesize")
 											if renderedFile.ImageBytes != nil {
 												Expect(len(*renderedFile.ImageBytes)).To(BeNumerically("<=", 60000))
 											}
@@ -1414,7 +1414,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/alpha_channel.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -1444,7 +1444,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 						PointToPixelRatio: 2.7777777777777777,
 						Width:             1653,
 						Height:            2339,
-					}, "../shared_tests/testdata/render_"+prefix+"_page_alpha_channel")
+					}, testsPath+"/testdata/render_"+prefix+"_page_alpha_channel")
 				})
 			})
 		})
@@ -1454,7 +1454,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, prefix string) {
 			var doc pdfium.Document
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile("../shared_tests/testdata/test_multipage.pdf")
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 				if err != nil {
 					return
@@ -1621,14 +1621,22 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
 	Expect(string(existingFileHash)).To(Equal(currentHash))
 
-	// Compare the single variant to the multi variant.
 	if strings.Contains(testName, "_single_") {
+		// Compare the single variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
 		if err != nil {
 			Expect(err).To(BeNil())
 			return
 		}
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
+
+		// Compare the single variant to the internal variant.
+		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	} else if strings.Contains(testName, "_multi_") {
 		// Compare the multi variant to the single variant.
 		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_single_", 1) + ".hash")
@@ -1637,6 +1645,30 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 			return
 		}
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
+
+		// Compare the multi variant to the internal variant.
+		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
+	} else if strings.Contains(testName, "_internal_") {
+		// Compare the internal variant to the single variant.
+		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_single_", 1) + ".hash")
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
+
+		// Compare the internal variant to the multi variant.
+		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
+		if err != nil {
+			Expect(err).To(BeNil())
+			return
+		}
+		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
 	}
 }
 
