@@ -32,7 +32,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					return
 				}
 
-				newDoc, err := pdfiumContainer.NewDocument(&pdfData)
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
 				if err != nil {
 					return
 				}
@@ -1420,7 +1420,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					return
 				}
 
-				newDoc, err := pdfiumContainer.NewDocument(&pdfData)
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
 				if err != nil {
 					return
 				}
@@ -1460,7 +1460,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					return
 				}
 
-				newDoc, err := pdfiumContainer.NewDocument(&pdfData)
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
 				if err != nil {
 					return
 				}

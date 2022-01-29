@@ -1,8 +1,13 @@
 package requests
 
+import "io"
+
 type OpenDocument struct {
-	File     *[]byte // A reference to the file data.
-	Password *string // The password of the document.
+	File           *[]byte // A reference to the file data.
+	FilePath       *string // A path to a PDF file.
+	FileReader     io.ReadSeeker
+	FileReaderSize int
+	Password       *string // The password of the document.
 }
 
 type GetPageCount struct{}

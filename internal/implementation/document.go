@@ -59,22 +59,3 @@ func (p *Pdfium) GetMetadata(request *requests.GetMetadata) (*responses.GetMetad
 		Value: transformedText,
 	}, nil
 }
-
-// Close closes the internal references in FPDF
-func (p *Pdfium) Close() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.currentDoc == nil {
-		return errors.New("no current document")
-	}
-
-	if p.currentPageNumber != nil {
-		C.FPDF_ClosePage(p.currentPage)
-		p.currentPage = nil
-		p.currentPageNumber = nil
-	}
-	C.FPDF_CloseDocument(p.currentDoc)
-	p.currentDoc = nil
-	return nil
-}

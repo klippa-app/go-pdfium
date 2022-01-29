@@ -4,6 +4,8 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
@@ -151,10 +153,10 @@ func Init(config Config) pdfium.Pdfium {
 	return container
 }
 
-// NewDocument creates a new pdfium document from a byte array.
+// NewDocumentFromBytes creates a new pdfium document from a byte array.
 // This will automatically select a worker and keep it for you until you execute
 // the close method on the document.
-func (c *multiThreadedPdfiumContainer) NewDocument(file *[]byte, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
+func (c *multiThreadedPdfiumContainer) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
 	selectedWorker, err := c.getWorker()
 	if err != nil {
 		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
@@ -175,6 +177,42 @@ func (c *multiThreadedPdfiumContainer) NewDocument(file *[]byte, opts ...pdfium.
 	}
 
 	return &newDocument, nil
+}
+
+// NewDocumentFromFilePath creates a new pdfium document from a file path.
+func (c *multiThreadedPdfiumContainer) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
+	selectedWorker, err := c.getWorker()
+	if err != nil {
+		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
+	}
+
+	newDocument := pdfiumDocument{}
+	newDocument.worker = selectedWorker
+
+	openDocRequest := &requests.OpenDocument{FilePath: &filePath}
+	for _, opt := range opts {
+		opt.AlterOpenDocumentRequest(openDocRequest)
+	}
+
+	err = newDocument.worker.plugin.OpenDocument(openDocRequest)
+	if err != nil {
+		newDocument.Close()
+		return nil, err
+	}
+
+	return &newDocument, nil
+}
+
+// NewDocumentFromReader creates a new pdfium document from a reader.
+func (c *multiThreadedPdfiumContainer) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
+	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
+	// To make it support the full interface, we just complete read the file into memory.
+	fileData, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.NewDocumentFromBytes(&fileData, opts...)
 }
 
 func (c *multiThreadedPdfiumContainer) getWorker() (*worker, error) {
