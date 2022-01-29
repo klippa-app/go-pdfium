@@ -1,4 +1,4 @@
-package subprocess
+package implementation
 
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"

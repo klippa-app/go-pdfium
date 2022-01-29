@@ -1,9 +1,9 @@
-package subprocess_test
+package implementation_test
 
 import (
 	"io/ioutil"
 
-	"github.com/klippa-app/go-pdfium/pdfium/internal/subprocess"
+	"github.com/klippa-app/go-pdfium/pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/pdfium/pdfium_errors"
 	"github.com/klippa-app/go-pdfium/pdfium/requests"
 
@@ -12,7 +12,8 @@ import (
 )
 
 var _ = Describe("Subprocess", func() {
-	pdfium := subprocess.Pdfium{}
+	implementation.InitLibrary()
+	pdfium := implementation.Pdfium{}
 	AfterEach(func() {
 		pdfium.Close()
 	})

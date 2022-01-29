@@ -7,5 +7,5 @@
 
 
 coverage.out
-pdfium/internal/subprocess/testdata/render_*.png
-pdfium/internal/subprocess/testdata/render_*.jpg
+pdfium/internal/implementation/testdata/render_*.png
+pdfium/internal/implementation/testdata/render_*.jpg
