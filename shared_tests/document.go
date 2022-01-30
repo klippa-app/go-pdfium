@@ -70,6 +70,14 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					}))
 				})
 
+				It("returns the correct page mode", func() {
+					pageMode, err := doc.GetPageMode(&requests.GetPageMode{})
+					Expect(err).To(BeNil())
+					Expect(pageMode).To(Equal(&responses.GetPageMode{
+						PageMode: responses.PageModeUseNone,
+					}))
+				})
+
 				It("returns the correct metadata", func() {
 					metadata, err := doc.GetMetadata(&requests.GetMetadata{
 						Tag: "Producer",

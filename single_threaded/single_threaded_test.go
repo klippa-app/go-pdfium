@@ -8,7 +8,5 @@ import (
 
 var _ = Describe("Single Threaded", func() {
 	Pdfium := single_threaded.Init()
-	shared_tests.RunRenderTests(Pdfium, "../shared_tests", "single")
-	shared_tests.RunDocumentTests(Pdfium, "../shared_tests", "single")
-	shared_tests.RunTextTests(Pdfium, "../shared_tests", "single")
+	shared_tests.RunTests(Pdfium, "../shared_tests", "single")
 })

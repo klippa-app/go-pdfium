@@ -3,6 +3,7 @@ package implementation
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"
 // #include "fpdf_doc.h"
+// #include "fpdf_ext.h"
 // #include <stdlib.h>
 import "C"
 
@@ -77,6 +78,22 @@ func (p *Pdfium) GetPageCount(request *requests.GetPageCount) (*responses.GetPag
 
 	return &responses.GetPageCount{
 		PageCount: int(C.FPDF_GetPageCount(p.currentDoc)),
+	}, nil
+}
+
+// GetPageMode returns the document's page mode, which describes how the document should be displayed when opened.
+func (p *Pdfium) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	if p.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	pageMode := C.FPDFDoc_GetPageMode(p.currentDoc)
+
+	return &responses.GetPageMode{
+		PageMode: responses.PageMode(pageMode),
 	}, nil
 }
 

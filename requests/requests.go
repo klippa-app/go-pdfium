@@ -18,8 +18,30 @@ type GetSecurityHandlerRevision struct{}
 
 type GetPageCount struct{}
 
+type GetPageMode struct{}
+
 type GetMetadata struct {
 	Tag string // A metadata tag. Title, Author, Subject, Keywords, Creator, Producer, CreationDate, ModDate. For detailed explanation of these tags and their respective values, please refer to section 10.2.1 "Document Information Dictionary" in PDF Reference 1.7.
+}
+
+type GetPageRotation struct {
+	Page int // The page number (0-index based).
+}
+
+type GetPageTransparency struct {
+	Page int // The page number (0-index based).
+}
+
+type FlattenPageUsage int
+
+const (
+	FlattenPageUsageNormalDisplay FlattenPageUsage = 0
+	FlattenPageUsagePrint         FlattenPageUsage = 1
+)
+
+type FlattenPage struct {
+	Page  int              // The page number (0-index based).
+	Usage FlattenPageUsage // The usage flag for the flattening.
 }
 
 type RenderPageInDPI struct {

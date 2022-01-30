@@ -8,6 +8,10 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (d *pdfiumDocument) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
+	return d.pdfium.FlattenPage(request)
+}
+
 func (d *pdfiumDocument) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
 	return d.pdfium.GetDocPermissions(request)
 }
@@ -24,6 +28,14 @@ func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*response
 	return d.pdfium.GetPageCount(request)
 }
 
+func (d *pdfiumDocument) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
+	return d.pdfium.GetPageMode(request)
+}
+
+func (d *pdfiumDocument) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
+	return d.pdfium.GetPageRotation(request)
+}
+
 func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
 	return d.pdfium.GetPageSize(request)
 }
@@ -38,6 +50,10 @@ func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.
 
 func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
 	return d.pdfium.GetPageTextStructured(request)
+}
+
+func (d *pdfiumDocument) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
+	return d.pdfium.GetPageTransparency(request)
 }
 
 func (d *pdfiumDocument) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {

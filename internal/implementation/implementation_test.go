@@ -22,7 +22,5 @@ var _ = Describe("Implementation", func() {
 	})
 
 	Pdfium := single_threaded.Init()
-	shared_tests.RunRenderTests(Pdfium, "../../shared_tests", "internal")
-	shared_tests.RunDocumentTests(Pdfium, "../../shared_tests", "internal")
-	shared_tests.RunTextTests(Pdfium, "../../shared_tests", "internal")
+	shared_tests.RunTests(Pdfium, "../../shared_tests", "internal")
 })
