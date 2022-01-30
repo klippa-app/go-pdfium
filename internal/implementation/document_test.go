@@ -37,6 +37,12 @@ var _ = Describe("Document", func() {
 				Expect(pageCount).To(BeNil())
 			})
 
+			It("returns an error when getting the page mode", func() {
+				pageMode, err := pdfium.GetPageMode(&requests.GetPageMode{})
+				Expect(err).To(MatchError("no current document"))
+				Expect(pageMode).To(BeNil())
+			})
+
 			It("returns an error when getting the page metadata", func() {
 				pageCount, err := pdfium.GetMetadata(&requests.GetMetadata{
 					Tag: "Creator",

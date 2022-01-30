@@ -11,14 +11,18 @@ import (
 type Pdfium interface {
 	Ping() (string, error)
 	OpenDocument(*requests.OpenDocument) error
+    FlattenPage(*requests.FlattenPage) (*responses.FlattenPage, error)
     GetDocPermissions(*requests.GetDocPermissions) (*responses.GetDocPermissions, error)
     GetFileVersion(*requests.GetFileVersion) (*responses.GetFileVersion, error)
     GetMetadata(*requests.GetMetadata) (*responses.GetMetadata, error)
     GetPageCount(*requests.GetPageCount) (*responses.GetPageCount, error)
+    GetPageMode(*requests.GetPageMode) (*responses.GetPageMode, error)
+    GetPageRotation(*requests.GetPageRotation) (*responses.GetPageRotation, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
     GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+    GetPageTransparency(*requests.GetPageTransparency) (*responses.GetPageTransparency, error)
     GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
     RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
@@ -28,6 +32,16 @@ type Pdfium interface {
 	Close() error
 }
 
+
+func (g *PdfiumRPC) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
+	resp := &responses.FlattenPage{}
+	err := g.client.Call("Plugin.FlattenPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
 
 func (g *PdfiumRPC) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
 	resp := &responses.GetDocPermissions{}
@@ -69,6 +83,26 @@ func (g *PdfiumRPC) GetPageCount(request *requests.GetPageCount) (*responses.Get
 	return resp, nil
 }
 
+func (g *PdfiumRPC) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
+	resp := &responses.GetPageMode{}
+	err := g.client.Call("Plugin.GetPageMode", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
+	resp := &responses.GetPageRotation{}
+	err := g.client.Call("Plugin.GetPageRotation", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
 	resp := &responses.GetPageSize{}
 	err := g.client.Call("Plugin.GetPageSize", request, resp)
@@ -102,6 +136,16 @@ func (g *PdfiumRPC) GetPageText(request *requests.GetPageText) (*responses.GetPa
 func (g *PdfiumRPC) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
 	resp := &responses.GetPageTextStructured{}
 	err := g.client.Call("Plugin.GetPageTextStructured", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
+	resp := &responses.GetPageTransparency{}
+	err := g.client.Call("Plugin.GetPageTransparency", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +215,19 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 
 
 
+func (s *PdfiumRPCServer) FlattenPage(request *requests.FlattenPage, resp *responses.FlattenPage) error {
+	var err error
+	implResp, err := s.Impl.FlattenPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) GetDocPermissions(request *requests.GetDocPermissions, resp *responses.GetDocPermissions) error {
 	var err error
 	implResp, err := s.Impl.GetDocPermissions(request)
@@ -223,6 +280,32 @@ func (s *PdfiumRPCServer) GetPageCount(request *requests.GetPageCount, resp *res
 	return nil
 }
 
+func (s *PdfiumRPCServer) GetPageMode(request *requests.GetPageMode, resp *responses.GetPageMode) error {
+	var err error
+	implResp, err := s.Impl.GetPageMode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageRotation(request *requests.GetPageRotation, resp *responses.GetPageRotation) error {
+	var err error
+	implResp, err := s.Impl.GetPageRotation(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) GetPageSize(request *requests.GetPageSize, resp *responses.GetPageSize) error {
 	var err error
 	implResp, err := s.Impl.GetPageSize(request)
@@ -265,6 +348,19 @@ func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *respo
 func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) error {
 	var err error
 	implResp, err := s.Impl.GetPageTextStructured(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetPageTransparency(request *requests.GetPageTransparency, resp *responses.GetPageTransparency) error {
+	var err error
+	implResp, err := s.Impl.GetPageTransparency(request)
 	if err != nil {
 		return err
 	}

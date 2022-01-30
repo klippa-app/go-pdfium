@@ -52,6 +52,9 @@ type Document interface {
 	// GetPageCount returns the amount of pages for the document.
 	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
 
+	// GetPageMode document's page mode, which describes how the document should be displayed when opened.
+	GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error)
+
 	// GetMetadata returns the requested metadata.
 	GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error)
 
@@ -61,6 +64,15 @@ type Document interface {
 	// GetPageTextStructured returns the text of a given page in a structured way,
 	// with coordinates and font information.
 	GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+
+	// GetPageRotation returns the rotation of the given page.
+	GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error)
+
+	// GetPageTransparency returns whether a page has transparency.
+	GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error)
+
+	// FlattenPage makes annotations and form fields become part of the page contents itself
+	FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error)
 
 	// RenderPageInDPI renders a given page in the given DPI.
 	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)

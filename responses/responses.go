@@ -18,9 +18,57 @@ type GetPageCount struct {
 	PageCount int // The amount of pages of the document.
 }
 
+type PageMode int
+
+const (
+	PageModeUnknown        PageMode = -1 // Page mode: unknown.
+	PageModeUseNone        PageMode = 0  // Page mode: use none, which means neither document outline nor thumbnail images visible.
+	PageModeUseOutlines    PageMode = 1  // Page mode: document outline visible.
+	PageModeUseThumbs      PageMode = 2  // Page mode: thumbnail images visible.
+	PageModeFullScreen     PageMode = 3  // Page mode: full screen - with no menu bar, no windows controls and no any other windows visible.
+	PageModeUseOC          PageMode = 4  // Page mode: optional content group panel visible.
+	PageModeUseAttachments PageMode = 5  // Page mode: attachments panel visible.
+)
+
+type GetPageMode struct {
+	PageMode PageMode // The document's page mode, which describes how the document should be displayed when opened.
+}
+
 type GetMetadata struct {
 	Tag   string // The requested metadata tag.
 	Value string // The value of the tag if found, string is empty if the value is not found.
+}
+
+type PageRotation int
+
+const (
+	PageRotationNone  PageRotation = 0 // 0: no rotation.
+	PageRotation90CW  PageRotation = 1 // 1: rotate 90 degrees in clockwise direction.
+	PageRotation180CW PageRotation = 2 // 2: rotate 180 degrees in clockwise direction.
+	PageRotation270CW PageRotation = 3 // 3: rotate 270 degrees in clockwise direction.
+)
+
+type GetPageRotation struct {
+	Page         int          // The page number (0-index based).
+	PageRotation PageRotation // The page rotation.
+}
+
+type GetPageTransparency struct {
+	Page            int  // The page number (0-index based).
+	HasTransparency bool // Whether the page has transparency.
+}
+
+type FlattenPageResult int
+
+const (
+	FlattenPageResultFail        FlattenPageResult = 0 // Flatten operation failed.
+	FlattenPageResultSuccess     FlattenPageResult = 1 // Flatten operation succeed.
+	FlattenPageResultNothingToDo FlattenPageResult = 2 // There is nothing can be flatten.
+)
+
+type FlattenPage struct {
+	Page   int               // The page number (0-index based).
+	Result FlattenPageResult // The result of the flatten.
 }
 
 type RenderPage struct {
