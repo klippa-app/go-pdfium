@@ -10,6 +10,12 @@ type OpenDocument struct {
 	Password       *string // The password of the document.
 }
 
+type GetFileVersion struct{}
+
+type GetDocPermissions struct{}
+
+type GetSecurityHandlerRevision struct{}
+
 type GetPageCount struct{}
 
 type GetMetadata struct {

@@ -38,6 +38,30 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			When("is opened", func() {
+				It("returns the correct file version", func() {
+					fileVersion, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					Expect(err).To(BeNil())
+					Expect(fileVersion).To(Equal(&responses.GetFileVersion{
+						FileVersion: 15,
+					}))
+				})
+
+				It("returns the correct document permissions", func() {
+					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+					Expect(err).To(BeNil())
+					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+						DocPermissions: 0xffffffff, // 0xffffffff (4294967295) = not protected
+					}))
+				})
+
+				It("returns the correct security handler revision", func() {
+					securityHandlerRevision, err := doc.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{})
+					Expect(err).To(BeNil())
+					Expect(securityHandlerRevision).To(Equal(&responses.GetSecurityHandlerRevision{
+						SecurityHandlerRevision: -1, // -1 = no security handler.
+					}))
+				})
+
 				It("returns the correct page count", func() {
 					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
 					Expect(err).To(BeNil())
@@ -308,11 +332,68 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			When("is opened", func() {
+				It("returns the correct file version", func() {
+					pageCount, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.GetFileVersion{
+						FileVersion: 15,
+					}))
+				})
+
 				It("returns the correct page count", func() {
 					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 2,
+					}))
+				})
+			})
+		})
+
+		Context("a normal PDF file with alpha channel", func() {
+			var doc pdfium.Document
+			var file *os.File
+
+			BeforeEach(func() {
+				pdfFile, err := os.Open(testsPath + "/testdata/alpha_channel.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+				file = pdfFile
+				fileStat, err := file.Stat()
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
+				if err != nil {
+					return
+				}
+
+				doc = newDoc
+			})
+
+			AfterEach(func() {
+				doc.Close()
+				file.Close()
+			})
+
+			When("is opened", func() {
+				It("returns the correct file version", func() {
+					pageCount, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.GetFileVersion{
+						FileVersion: 17,
+					}))
+				})
+
+				It("returns the correct page count", func() {
+					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.GetPageCount{
+						PageCount: 1,
 					}))
 				})
 			})
@@ -373,6 +454,25 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					doc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()), pdfium.OpenDocumentWithPasswordOption(pdfPassword))
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
+
+					fileVersion, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					Expect(err).To(BeNil())
+					Expect(fileVersion).To(Equal(&responses.GetFileVersion{
+						FileVersion: 15,
+					}))
+
+					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+					Expect(err).To(BeNil())
+					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+						DocPermissions: 0xFFFFFFFC, // 0xFFFFFFFC (4294967292) = owner password
+					}))
+
+					securityHandlerRevision, err := doc.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{})
+					Expect(err).To(BeNil())
+					Expect(securityHandlerRevision).To(Equal(&responses.GetSecurityHandlerRevision{
+						SecurityHandlerRevision: 3,
+					}))
+
 					doc.Close()
 				})
 			})
