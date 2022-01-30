@@ -7,7 +7,6 @@ import (
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/requests"
-	"github.com/klippa-app/go-pdfium/responses"
 )
 
 type singleThreadedPdfiumContainer struct {
@@ -114,50 +113,6 @@ func (c *singleThreadedPdfiumContainer) NewDocumentFromReader(reader io.ReadSeek
 
 type pdfiumDocument struct {
 	pdfium *implementation.Pdfium
-}
-
-func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
-	return d.pdfium.GetPageCount(request)
-}
-
-func (d *pdfiumDocument) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
-	return d.pdfium.GetMetadata(request)
-}
-
-func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
-	return d.pdfium.GetPageText(request)
-}
-
-func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
-	return d.pdfium.GetPageTextStructured(request)
-}
-
-func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
-	return d.pdfium.RenderPageInDPI(request)
-}
-
-func (d *pdfiumDocument) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
-	return d.pdfium.RenderPagesInDPI(request)
-}
-
-func (d *pdfiumDocument) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
-	return d.pdfium.RenderPageInPixels(request)
-}
-
-func (d *pdfiumDocument) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
-	return d.pdfium.RenderPagesInPixels(request)
-}
-
-func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
-	return d.pdfium.GetPageSize(request)
-}
-
-func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
-	return d.pdfium.GetPageSizeInPixels(request)
-}
-
-func (d *pdfiumDocument) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
-	return d.pdfium.RenderToFile(request)
 }
 
 func (d *pdfiumDocument) Close() {
