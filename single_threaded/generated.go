@@ -8,6 +8,14 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (d *pdfiumDocument) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
+	return d.pdfium.GetDocPermissions(request)
+}
+
+func (d *pdfiumDocument) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
+	return d.pdfium.GetFileVersion(request)
+}
+
 func (d *pdfiumDocument) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
 	return d.pdfium.GetMetadata(request)
 }
@@ -30,6 +38,10 @@ func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.
 
 func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
 	return d.pdfium.GetPageTextStructured(request)
+}
+
+func (d *pdfiumDocument) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
+	return d.pdfium.GetSecurityHandlerRevision(request)
 }
 
 func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {

@@ -40,6 +40,15 @@ type Pdfium interface {
 }
 
 type Document interface {
+	// GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
+	GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error)
+
+	// GetDocPermissions returns the permission flags of the file.
+	GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error)
+
+	// GetSecurityHandlerRevision returns the revision number of security handlers of the file.
+	GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
+
 	// GetPageCount returns the amount of pages for the document.
 	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
 

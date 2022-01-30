@@ -11,12 +11,15 @@ import (
 type Pdfium interface {
 	Ping() (string, error)
 	OpenDocument(*requests.OpenDocument) error
+    GetDocPermissions(*requests.GetDocPermissions) (*responses.GetDocPermissions, error)
+    GetFileVersion(*requests.GetFileVersion) (*responses.GetFileVersion, error)
     GetMetadata(*requests.GetMetadata) (*responses.GetMetadata, error)
     GetPageCount(*requests.GetPageCount) (*responses.GetPageCount, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
     GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
+    GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
     RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
@@ -25,6 +28,26 @@ type Pdfium interface {
 	Close() error
 }
 
+
+func (g *PdfiumRPC) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
+	resp := &responses.GetDocPermissions{}
+	err := g.client.Call("Plugin.GetDocPermissions", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
+	resp := &responses.GetFileVersion{}
+	err := g.client.Call("Plugin.GetFileVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
 
 func (g *PdfiumRPC) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
 	resp := &responses.GetMetadata{}
@@ -86,6 +109,16 @@ func (g *PdfiumRPC) GetPageTextStructured(request *requests.GetPageTextStructure
 	return resp, nil
 }
 
+func (g *PdfiumRPC) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
+	resp := &responses.GetSecurityHandlerRevision{}
+	err := g.client.Call("Plugin.GetSecurityHandlerRevision", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
 	resp := &responses.RenderPage{}
 	err := g.client.Call("Plugin.RenderPageInDPI", request, resp)
@@ -137,6 +170,32 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 }
 
 
+
+func (s *PdfiumRPCServer) GetDocPermissions(request *requests.GetDocPermissions, resp *responses.GetDocPermissions) error {
+	var err error
+	implResp, err := s.Impl.GetDocPermissions(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetFileVersion(request *requests.GetFileVersion, resp *responses.GetFileVersion) error {
+	var err error
+	implResp, err := s.Impl.GetFileVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
 
 func (s *PdfiumRPCServer) GetMetadata(request *requests.GetMetadata, resp *responses.GetMetadata) error {
 	var err error
@@ -206,6 +265,19 @@ func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *respo
 func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) error {
 	var err error
 	implResp, err := s.Impl.GetPageTextStructured(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision, resp *responses.GetSecurityHandlerRevision) error {
+	var err error
+	implResp, err := s.Impl.GetSecurityHandlerRevision(request)
 	if err != nil {
 		return err
 	}

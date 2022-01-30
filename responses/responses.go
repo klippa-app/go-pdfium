@@ -2,6 +2,18 @@ package responses
 
 import "image"
 
+type GetFileVersion struct {
+	FileVersion int // The numeric version of the file: 14 for 1.4, 15 for 1.5, ...
+}
+
+type GetDocPermissions struct {
+	DocPermissions uint32 // A 32-bit integer which indicates the permission flags. Please refer to "TABLE 3.20 User access permissions" in PDF Reference 1.7 P123 for detailed description. If the document is not protected, 0xffffffff (4294967295) will be returned.
+}
+
+type GetSecurityHandlerRevision struct {
+	SecurityHandlerRevision int // The revision number of security handler. Please refer to key "R" in "TABLE 3.19 Additional encryption dictionary entries for the standard security handler" in PDF Reference 1.7 P122 for detailed description. If the document is not protected, -1 will be returned.
+}
+
 type GetPageCount struct {
 	PageCount int // The amount of pages of the document.
 }
