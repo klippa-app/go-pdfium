@@ -13,7 +13,6 @@ import (
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/commons"
 	"github.com/klippa-app/go-pdfium/requests"
-	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
@@ -228,50 +227,6 @@ func (c *multiThreadedPdfiumContainer) getWorker() (*worker, error) {
 
 type pdfiumDocument struct {
 	worker *worker
-}
-
-func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
-	return d.worker.plugin.GetPageCount(request)
-}
-
-func (d *pdfiumDocument) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
-	return d.worker.plugin.GetMetadata(request)
-}
-
-func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
-	return d.worker.plugin.GetPageText(request)
-}
-
-func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
-	return d.worker.plugin.GetPageTextStructured(request)
-}
-
-func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
-	return d.worker.plugin.RenderPageInDPI(request)
-}
-
-func (d *pdfiumDocument) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
-	return d.worker.plugin.RenderPagesInDPI(request)
-}
-
-func (d *pdfiumDocument) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
-	return d.worker.plugin.RenderPageInPixels(request)
-}
-
-func (d *pdfiumDocument) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
-	return d.worker.plugin.RenderPagesInPixels(request)
-}
-
-func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
-	return d.worker.plugin.GetPageSize(request)
-}
-
-func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
-	return d.worker.plugin.GetPageSizeInPixels(request)
-}
-
-func (d *pdfiumDocument) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
-	return d.worker.plugin.RenderToFile(request)
 }
 
 func (d *pdfiumDocument) Close() {

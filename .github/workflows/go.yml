@@ -29,7 +29,7 @@ jobs:
       - name: Test
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test $(go list -v ./... | grep -v "/examples/" | grep -v "/shared_tests" | grep -v "internal/commons") -coverprofile=coverage.out -covermode=atomic
+          go test $(go list -v ./... | grep -v "/examples/" | grep -v "/shared_tests" | grep -v "internal/commons" | grep -v "code_generation") -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
