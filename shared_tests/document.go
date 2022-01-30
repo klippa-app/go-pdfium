@@ -50,7 +50,17 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
 					Expect(err).To(BeNil())
 					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
-						DocPermissions: 0xffffffff, // 0xffffffff (4294967295) = not protected
+						DocPermissions:                      0xffffffff, // 0xffffffff (4294967295) = not protected
+						PrintDocument:                       true,
+						ModifyContents:                      true,
+						CopyOrExtractText:                   true,
+						AddOrModifyTextAnnotations:          true,
+						FillInInteractiveFormFields:         true,
+						CreateOrModifyInteractiveFormFields: true,
+						FillInExistingInteractiveFormFields: true,
+						ExtractTextAndGraphics:              true,
+						AssembleDocument:                    true,
+						PrintDocumentAsFaithfulDigitalCopy:  true,
 					}))
 				})
 
@@ -472,7 +482,17 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
 					Expect(err).To(BeNil())
 					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
-						DocPermissions: 0xFFFFFFFC, // 0xFFFFFFFC (4294967292) = owner password
+						DocPermissions:                      0xFFFFFFFC, // 0xFFFFFFFC (4294967292) = owner password
+						PrintDocument:                       true,
+						ModifyContents:                      true,
+						CopyOrExtractText:                   true,
+						AddOrModifyTextAnnotations:          true,
+						FillInInteractiveFormFields:         true,
+						CreateOrModifyInteractiveFormFields: true,
+						FillInExistingInteractiveFormFields: true,
+						ExtractTextAndGraphics:              true,
+						AssembleDocument:                    true,
+						PrintDocumentAsFaithfulDigitalCopy:  true,
 					}))
 
 					securityHandlerRevision, err := doc.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{})
@@ -482,6 +502,906 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					}))
 
 					doc.Close()
+				})
+			})
+		})
+
+		Context("a protected PDF file with no permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963392,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with printing permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294965444,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with degraded printing permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963396,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with modify content permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294964424,
+							PrintDocument:                       false,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with assembly permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294964416,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with copy contents permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963920,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with screen readers permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963904,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with modify annotations permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963680,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with fill in permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294963648,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+		})
+
+		Context("a protected PDF file with all feature permissions", func() {
+			Context("is opened with the user password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "test123"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+				})
+			})
+
+			Context("is opened with the owner password", func() {
+				var doc pdfium.Document
+
+				BeforeEach(func() {
+					pdfPassword := "123test"
+					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
+					Expect(err).To(BeNil())
+					if err != nil {
+						return
+					}
+
+					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
+					if err != nil {
+						return
+					}
+
+					doc = newDoc
+				})
+
+				AfterEach(func() {
+					doc.Close()
+				})
+
+				When("is opened", func() {
+					It("returns the correct permission", func() {
+						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
+							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
 				})
 			})
 		})

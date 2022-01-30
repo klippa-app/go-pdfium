@@ -46,9 +46,42 @@ func (p *Pdfium) GetDocPermissions(request *requests.GetDocPermissions) (*respon
 	}
 
 	permissions := C.FPDF_GetDocPermissions(p.currentDoc)
-	return &responses.GetDocPermissions{
+
+	docPermissions := &responses.GetDocPermissions{
 		DocPermissions: uint32(permissions),
-	}, nil
+	}
+
+	PrintDocument := uint32(1 << 2)
+	ModifyContents := uint32(1 << 3)
+	CopyOrExtractText := uint32(1 << 4)
+	AddOrModifyTextAnnotations := uint32(1 << 5)
+	FillInExistingInteractiveFormFields := uint32(1 << 8)
+	ExtractTextAndGraphics := uint32(1 << 9)
+	AssembleDocument := uint32(1 << 10)
+	PrintDocumentAsFaithfulDigitalCopy := uint32(1 << 11)
+
+	hasPermission := func(permission uint32) bool {
+		if docPermissions.DocPermissions&permission > 0 {
+			return true
+		}
+
+		return false
+	}
+
+	docPermissions.PrintDocument = hasPermission(PrintDocument)
+	docPermissions.ModifyContents = hasPermission(ModifyContents)
+	docPermissions.CopyOrExtractText = hasPermission(CopyOrExtractText)
+	docPermissions.AddOrModifyTextAnnotations = hasPermission(AddOrModifyTextAnnotations)
+	docPermissions.FillInInteractiveFormFields = hasPermission(AddOrModifyTextAnnotations)
+	docPermissions.FillInExistingInteractiveFormFields = hasPermission(FillInExistingInteractiveFormFields)
+	docPermissions.ExtractTextAndGraphics = hasPermission(ExtractTextAndGraphics)
+	docPermissions.AssembleDocument = hasPermission(AssembleDocument)
+	docPermissions.PrintDocumentAsFaithfulDigitalCopy = hasPermission(PrintDocumentAsFaithfulDigitalCopy)
+
+	// Calculated permissions
+	docPermissions.CreateOrModifyInteractiveFormFields = docPermissions.ModifyContents && docPermissions.AddOrModifyTextAnnotations
+
+	return docPermissions, nil
 }
 
 // GetSecurityHandlerRevision returns the revision number of security handlers of the file.
