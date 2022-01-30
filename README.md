@@ -15,7 +15,8 @@
 ## Features
 
 * Option between single-threaded and multi-threaded
-* Get page count
+* Get document information: PDF version, page count, document permissions, security handler revision, page mode, meta data
+* Get page rotation
 * Get plain text of a page
 * Get structured text of a page (text, angle, position, size, font information)
 * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
