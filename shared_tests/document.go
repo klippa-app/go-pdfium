@@ -1,6 +1,7 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/errors"
 	"io/ioutil"
 	"os"
@@ -16,7 +17,7 @@ import (
 func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("NewDocumentFromBytes", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -30,16 +31,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				It("returns the correct file version", func() {
-					fileVersion, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					fileVersion, err := pdfiumContainer.GetFileVersion(&requests.GetFileVersion{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(fileVersion).To(Equal(&responses.GetFileVersion{
 						FileVersion: 15,
@@ -47,7 +51,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct document permissions", func() {
-					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+					docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 						DocPermissions:                      0xffffffff, // 0xffffffff (4294967295) = not protected
@@ -65,7 +71,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct security handler revision", func() {
-					securityHandlerRevision, err := doc.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{})
+					securityHandlerRevision, err := pdfiumContainer.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(securityHandlerRevision).To(Equal(&responses.GetSecurityHandlerRevision{
 						SecurityHandlerRevision: -1, // -1 = no security handler.
@@ -73,7 +81,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 1,
@@ -81,7 +91,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page mode", func() {
-					pageMode, err := doc.GetPageMode(&requests.GetPageMode{})
+					pageMode, err := pdfiumContainer.GetPageMode(&requests.GetPageMode{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageMode).To(Equal(&responses.GetPageMode{
 						PageMode: responses.PageModeUseNone,
@@ -89,8 +101,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct metadata", func() {
-					metadata, err := doc.GetMetadata(&requests.GetMetadata{
-						Tag: "Producer",
+					metadata, err := pdfiumContainer.GetMetadata(&requests.GetMetadata{
+						Document: doc,
+						Tag:      "Producer",
 					})
 					Expect(err).To(BeNil())
 					Expect(metadata).To(Equal(&responses.GetMetadata{
@@ -102,7 +115,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
@@ -116,16 +129,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 2,
@@ -157,7 +173,8 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					doc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
-					doc.Close()
+					err = pdfiumContainer.CloseDocument(*doc)
+					Expect(err).To(BeNil())
 				})
 			})
 		})
@@ -165,7 +182,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 	Describe("NewDocumentFromFilePath", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test.pdf")
@@ -173,16 +190,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 1,
@@ -190,8 +210,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct metadata", func() {
-					metadata, err := doc.GetMetadata(&requests.GetMetadata{
-						Tag: "Producer",
+					metadata, err := pdfiumContainer.GetMetadata(&requests.GetMetadata{
+						Document: doc,
+						Tag:      "Producer",
 					})
 					Expect(err).To(BeNil())
 					Expect(metadata).To(Equal(&responses.GetMetadata{
@@ -203,7 +224,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test_multipage.pdf")
@@ -211,16 +232,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 2,
@@ -252,7 +276,8 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					doc, err := pdfiumContainer.NewDocumentFromFilePath(filePath, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
-					doc.Close()
+					err = pdfiumContainer.CloseDocument(*doc)
+					Expect(err).To(BeNil())
 				})
 			})
 		})
@@ -271,7 +296,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 	Describe("NewDocumentFromReader", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				file, err := os.Open(testsPath + "/testdata/test.pdf")
@@ -290,16 +315,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 1,
@@ -307,8 +335,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct metadata", func() {
-					metadata, err := doc.GetMetadata(&requests.GetMetadata{
-						Tag: "Producer",
+					metadata, err := pdfiumContainer.GetMetadata(&requests.GetMetadata{
+						Document: doc,
+						Tag:      "Producer",
 					})
 					Expect(err).To(BeNil())
 					Expect(metadata).To(Equal(&responses.GetMetadata{
@@ -320,7 +349,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 			var file *os.File
 
 			BeforeEach(func() {
@@ -341,17 +370,20 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 				file.Close()
 			})
 
 			When("is opened", func() {
 				It("returns the correct file version", func() {
-					pageCount, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					pageCount, err := pdfiumContainer.GetFileVersion(&requests.GetFileVersion{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetFileVersion{
 						FileVersion: 15,
@@ -359,7 +391,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 2,
@@ -369,7 +403,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with alpha channel", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 			var file *os.File
 
 			BeforeEach(func() {
@@ -390,17 +424,20 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 				file.Close()
 			})
 
 			When("is opened", func() {
 				It("returns the correct file version", func() {
-					pageCount, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					pageCount, err := pdfiumContainer.GetFileVersion(&requests.GetFileVersion{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetFileVersion{
 						FileVersion: 17,
@@ -408,7 +445,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page count", func() {
-					pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+					pageCount, err := pdfiumContainer.GetPageCount(&requests.GetPageCount{
+						Document: doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(pageCount).To(Equal(&responses.GetPageCount{
 						PageCount: 1,
@@ -473,13 +512,17 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
 
-					fileVersion, err := doc.GetFileVersion(&requests.GetFileVersion{})
+					fileVersion, err := pdfiumContainer.GetFileVersion(&requests.GetFileVersion{
+						Document: *doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(fileVersion).To(Equal(&responses.GetFileVersion{
 						FileVersion: 15,
 					}))
 
-					docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+					docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+						Document: *doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 						DocPermissions:                      0xFFFFFFFC, // 0xFFFFFFFC (4294967292) = owner password
@@ -495,20 +538,23 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						PrintDocumentAsFaithfulDigitalCopy:  true,
 					}))
 
-					securityHandlerRevision, err := doc.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{})
+					securityHandlerRevision, err := pdfiumContainer.GetSecurityHandlerRevision(&requests.GetSecurityHandlerRevision{
+						Document: *doc,
+					})
 					Expect(err).To(BeNil())
 					Expect(securityHandlerRevision).To(Equal(&responses.GetSecurityHandlerRevision{
 						SecurityHandlerRevision: 3,
 					}))
 
-					doc.Close()
+					err = pdfiumContainer.CloseDocument(*doc)
+					Expect(err).To(BeNil())
 				})
 			})
 		})
 
 		Context("a protected PDF file with no permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -523,16 +569,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963392,
@@ -552,7 +601,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -567,16 +616,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -598,7 +650,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with printing permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -613,16 +665,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294965444,
@@ -642,7 +697,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -657,16 +712,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -688,7 +746,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with degraded printing permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -703,16 +761,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963396,
@@ -732,7 +793,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -747,16 +808,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -778,7 +842,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with modify content permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -793,16 +857,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294964424,
@@ -822,7 +889,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -837,16 +904,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -868,7 +938,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with assembly permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -883,16 +953,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294964416,
@@ -912,7 +985,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -927,16 +1000,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -958,7 +1034,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with copy contents permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -973,16 +1049,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963920,
@@ -1002,7 +1081,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1017,16 +1096,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -1048,7 +1130,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with screen readers permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1063,16 +1145,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963904,
@@ -1092,7 +1177,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1107,16 +1192,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -1138,7 +1226,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with modify annotations permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1153,16 +1241,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963680,
@@ -1182,7 +1273,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1197,16 +1288,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -1228,7 +1322,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with fill in permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1243,16 +1337,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294963648,
@@ -1272,7 +1369,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1287,16 +1384,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -1318,7 +1418,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with all feature permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1333,16 +1433,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,
@@ -1362,7 +1465,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc pdfium.Document
+				var doc document.Ref
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1377,16 +1480,19 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						return
 					}
 
-					doc = newDoc
+					doc = *newDoc
 				})
 
 				AfterEach(func() {
-					doc.Close()
+					err := pdfiumContainer.CloseDocument(doc)
+					Expect(err).To(BeNil())
 				})
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := doc.GetDocPermissions(&requests.GetDocPermissions{})
+						docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
+							Document: doc,
+						})
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.GetDocPermissions{
 							DocPermissions:                      4294967292,

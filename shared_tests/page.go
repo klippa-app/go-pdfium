@@ -1,6 +1,7 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"io/ioutil"
 
 	"github.com/klippa-app/go-pdfium"
@@ -15,7 +16,7 @@ import (
 func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Page", func() {
 		Context("a normal PDF file", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -29,19 +30,21 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				Context("when an invalid page is given", func() {
 					Context("GetPageRotation()", func() {
 						It("returns an error", func() {
-							pageRotation, err := doc.GetPageRotation(&requests.GetPageRotation{
-								Page: 1,
+							pageRotation, err := pdfiumContainer.GetPageRotation(&requests.GetPageRotation{
+								Document: doc,
+								Page:     1,
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageRotation).To(BeNil())
@@ -50,8 +53,9 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 					Context("GetPageTransparency()", func() {
 						It("returns an error", func() {
-							pageTransparency, err := doc.GetPageTransparency(&requests.GetPageTransparency{
-								Page: 1,
+							pageTransparency, err := pdfiumContainer.GetPageTransparency(&requests.GetPageTransparency{
+								Document: doc,
+								Page:     1,
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageTransparency).To(BeNil())
@@ -60,9 +64,10 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 					Context("FlattenPage()", func() {
 						It("returns an error", func() {
-							flattenedPage, err := doc.FlattenPage(&requests.FlattenPage{
-								Page:  1,
-								Usage: requests.FlattenPageUsageNormalDisplay,
+							flattenedPage, err := pdfiumContainer.FlattenPage(&requests.FlattenPage{
+								Document: doc,
+								Page:     1,
+								Usage:    requests.FlattenPageUsageNormalDisplay,
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(flattenedPage).To(BeNil())
@@ -72,8 +77,9 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 				Context("when the page rotation is requested", func() {
 					It("returns the correct rotation", func() {
-						rotation, err := doc.GetPageRotation(&requests.GetPageRotation{
-							Page: 0,
+						rotation, err := pdfiumContainer.GetPageRotation(&requests.GetPageRotation{
+							Document: doc,
+							Page:     0,
 						})
 						Expect(err).To(BeNil())
 						Expect(rotation).To(Equal(&responses.GetPageRotation{}))
@@ -82,8 +88,9 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 				Context("when the page transparency is requested", func() {
 					It("returns the correct transparency", func() {
-						pageTransparency, err := doc.GetPageTransparency(&requests.GetPageTransparency{
-							Page: 0,
+						pageTransparency, err := pdfiumContainer.GetPageTransparency(&requests.GetPageTransparency{
+							Document: doc,
+							Page:     0,
 						})
 						Expect(err).To(BeNil())
 						Expect(pageTransparency).To(Equal(&responses.GetPageTransparency{
@@ -94,9 +101,10 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 				Context("when the page flattening is requested", func() {
 					It("returns that the page does not need to be flattened", func() {
-						pageFlattenResult, err := doc.FlattenPage(&requests.FlattenPage{
-							Page:  0,
-							Usage: requests.FlattenPageUsageNormalDisplay,
+						pageFlattenResult, err := pdfiumContainer.FlattenPage(&requests.FlattenPage{
+							Document: doc,
+							Page:     0,
+							Usage:    requests.FlattenPageUsageNormalDisplay,
 						})
 						Expect(err).To(BeNil())
 						Expect(pageFlattenResult).To(Equal(&responses.FlattenPage{
@@ -108,7 +116,7 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 		})
 
 		Context("a PDF file that uses an alpha channel", func() {
-			var doc pdfium.Document
+			var doc document.Ref
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
@@ -122,17 +130,19 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					return
 				}
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("the page transparency is requested", func() {
 				It("returns the correct transparency", func() {
-					pageTransparency, err := doc.GetPageTransparency(&requests.GetPageTransparency{
-						Page: 0,
+					pageTransparency, err := pdfiumContainer.GetPageTransparency(&requests.GetPageTransparency{
+						Document: doc,
+						Page:     0,
 					})
 					Expect(err).To(BeNil())
 					Expect(pageTransparency).To(Equal(&responses.GetPageTransparency{

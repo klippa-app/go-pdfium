@@ -1,7 +1,9 @@
 package pdfium
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"io"
+	"time"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -24,22 +26,40 @@ func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
 	}
 }
 
+type Pool interface {
+	// GetInstance returns an instance to the pool.
+	// For single-threaded this is thread safe, but you can only do one pdfium action at the same time.
+	// For multi-threaded it will try to get a worker from the pool.
+	GetInstance(timeout time.Duration) (Pdfium, error)
+
+	// Close closes the pool.
+	// It will close any unclosed instances.
+	// For single-threaded it will unload the library if it's the last pool.
+	// For multi-threaded it will stop all the pool workers.
+	Close() error
+}
+
+// Pdfium describes a Pdfium instance.
 type Pdfium interface {
 	// NewDocumentFromBytes returns a pdfium Document from the given PDF bytes.
-	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (Document, error)
+	// This is a helper around OpenDocument.
+	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*document.Ref, error)
 
 	// NewDocumentFromFilePath returns a pdfium Document from the given PDF file path.
-	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (Document, error)
+	// This is a helper around OpenDocument.
+	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*document.Ref, error)
 
 	// NewDocumentFromReader returns a pdfium Document from the given PDF file reader.
+	// This is a helper around OpenDocument.
 	// This is only really efficient for single threaded usage, the multi-threaded
 	// usage will just load the file in memory because it can't transfer readers
 	// over gRPC. The single-threaded usage will actually efficiently walk over
 	// the PDF as it's being used by pdfium.
-	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (Document, error)
-}
+	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*document.Ref, error)
 
-type Document interface {
+	// OpenDocument returns a pdfium document for the given file data.
+	OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error)
+
 	// GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
 	GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error)
 
@@ -96,6 +116,11 @@ type Document interface {
 	// and output the resulting image into a file.
 	RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error)
 
-	// Close closes the document, releases the resources and gives back the worker to the pool.
-	Close()
+	// CloseDocument closes the document, releases the resources.
+	CloseDocument(request document.Ref) error
+
+	// Close closes the instance.
+	// It will close any unclosed documents.
+	// For multi-threaded it will give back the worker to the pool.
+	Close() error
 }

@@ -2,12 +2,14 @@ package implementation
 
 import (
 	"errors"
+	"github.com/klippa-app/go-pdfium/document"
 	"io"
 	"sync"
 	"unsafe"
 
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/hashicorp/go-hclog"
 )
@@ -57,32 +59,104 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 	return C.int(readBytes)
 }
 
-// Here is the real implementation of Pdfium
-type Pdfium struct {
-	// C data
-	currentDoc    C.FPDF_DOCUMENT
-	currentPage   C.FPDF_PAGE
-	readSeekerRef unsafe.Pointer
-
-	logger            hclog.Logger
-	mutex             sync.Mutex
-	currentPageNumber *int    // Remember which page is currently loaded in the page variable.
-	data              *[]byte // Keep a reference to the data otherwise weird stuff happens
+// Pdfium is a container so that we can always only have 1 instance of pdfium
+// per process. We need this so that we can guarantee thread safety.
+var Pdfium = &mainPdfium{
+	mutex:        &sync.Mutex{},
+	instanceRefs: map[int]*PdfiumImplementation{},
+	documentRefs: map[document.Ref]*NativeDocument{},
 }
 
-func (p *Pdfium) Ping() (string, error) {
+var isInitialized = false
+
+// InitLibrary loads the actual C++ library.
+func InitLibrary() {
+	Pdfium.mutex.Lock()
+	defer Pdfium.mutex.Unlock()
+
+	// Only initialize when we aren't already.
+	if isInitialized {
+		return
+	}
+
+	C.FPDF_InitLibrary()
+	isInitialized = true
+}
+
+// DestroyLibrary unloads the actual C++ library.
+// If any documents were loaded, it closes them.
+func DestroyLibrary() {
+	Pdfium.mutex.Lock()
+	defer Pdfium.mutex.Unlock()
+
+	// Only destroy when we're initialized.
+	if !isInitialized {
+		return
+	}
+
+	for i := range Pdfium.instanceRefs {
+		Pdfium.instanceRefs[i].Close()
+		delete(Pdfium.instanceRefs, Pdfium.instanceRefs[i].instanceRef)
+	}
+
+	C.FPDF_DestroyLibrary()
+	isInitialized = false
+}
+
+// Here is the real implementation of Pdfium
+type mainPdfium struct {
+	// logger is for communication with the plugin.
+	logger hclog.Logger
+
+	// mutex will ensure thread safety.
+	mutex *sync.Mutex
+
+	// instance keeps track of the opened instances for this process.
+	instanceRefs map[int]*PdfiumImplementation
+
+	// documentRefs keeps track of the opened document for this process.
+	// we need this for document lookups and in case of closing the instance
+	documentRefs map[document.Ref]*NativeDocument
+}
+
+func (p *mainPdfium) GetInstance() *PdfiumImplementation {
+	newInstance := &PdfiumImplementation{
+		logger:       p.logger,
+		documentRefs: map[document.Ref]*NativeDocument{},
+	}
+
+	newInstance.instanceRef = len(p.instanceRefs)
+	p.instanceRefs[newInstance.instanceRef] = newInstance
+
+	return newInstance
+}
+
+// Here is the real implementation of Pdfium
+type PdfiumImplementation struct {
+	// logger is for communication with the plugin.
+	logger hclog.Logger
+
+	// documentRefs keeps track of the opened document for this instance.
+	// we need this for document lookups and in case of closing the instance
+	documentRefs map[document.Ref]*NativeDocument
+
+	// We need to keep track of our own instance.
+	instanceRef int
+}
+
+func (p *PdfiumImplementation) Ping() (string, error) {
 	return "Pong", nil
 }
 
-func (p *Pdfium) Lock() {
-	p.mutex.Lock()
+func (p *PdfiumImplementation) Lock() {
+	Pdfium.mutex.Lock()
 }
 
-func (p *Pdfium) Unlock() {
-	p.mutex.Unlock()
+func (p *PdfiumImplementation) Unlock() {
+	Pdfium.mutex.Unlock()
 }
 
-func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
+func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -91,6 +165,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		cPassword = C.CString(*request.Password)
 	}
 
+	nativeDoc := &NativeDocument{}
 	var doc C.FPDF_DOCUMENT
 
 	if request.File != nil {
@@ -106,7 +181,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 			cPassword)
 	} else if request.FileReader != nil {
 		if request.FileReaderSize == 0 {
-			return errors.New("FileReaderSize should be given when FileReader is set")
+			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
 		// Allocate memory on C heap. we send the io.ReadSeeker address in this pointer.
@@ -119,7 +194,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		a[0] = &(*(*io.ReadSeeker)(unsafe.Pointer(&request.FileReader)))
 
 		// Keep track of the allocated memory to free it later on.
-		p.readSeekerRef = readSeekerAlloc
+		nativeDoc.readSeekerRef = readSeekerAlloc
 
 		// Create a pdfium file access struct.
 		readerStruct := C.FPDF_FILEACCESS{}
@@ -133,7 +208,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 			&readerStruct,
 			cPassword)
 	} else {
-		return errors.New("No file given")
+		return nil, errors.New("No file given")
 	}
 
 	if doc == nil {
@@ -158,49 +233,104 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		default:
 			pdfiumError = pdfium_errors.ErrUnexpected
 		}
-		return pdfiumError
+		return nil, pdfiumError
 	}
 
-	p.currentDoc = doc
-	p.data = request.File
-	return nil
+	nativeDoc.currentDoc = doc
+	nativeDoc.data = request.File
+	nativeDoc.nativeRef = document.Ref(len(Pdfium.documentRefs) + 1)
+	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
+	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
+
+	return &responses.OpenDocument{
+		Document: nativeDoc.nativeRef,
+	}, nil
 }
 
-// Close closes the internal references in FPDF
-func (p *Pdfium) Close() error {
+func (p *PdfiumImplementation) CloseDocument(document document.Ref) error {
 	p.Lock()
 	defer p.Unlock()
 
-	if p.currentDoc == nil {
-		return errors.New("no current document")
+	nativeDocument, err := p.getNativeDocument(document)
+	if err != nil {
+		return err
 	}
 
-	if p.currentPageNumber != nil {
-		C.FPDF_ClosePage(p.currentPage)
-		p.currentPage = nil
-		p.currentPageNumber = nil
+	err = nativeDocument.Close()
+	if err != nil {
+		return err
 	}
-	C.FPDF_CloseDocument(p.currentDoc)
-	p.currentDoc = nil
 
-	if p.readSeekerRef != nil {
-		C.free(p.readSeekerRef)
-		p.readSeekerRef = nil
-	}
+	delete(p.documentRefs, nativeDocument.nativeRef)
 
 	return nil
 }
 
-var globalMutex = &sync.Mutex{}
+func (p *PdfiumImplementation) Close() error {
+	p.Lock()
+	defer p.Unlock()
 
-func InitLibrary() {
-	globalMutex.Lock()
-	C.FPDF_InitLibrary()
-	globalMutex.Unlock()
+	for i := range p.documentRefs {
+		err := p.documentRefs[i].Close()
+		if err != nil {
+			return err
+		}
+
+		delete(p.documentRefs, p.documentRefs[i].nativeRef)
+	}
+
+	delete(Pdfium.instanceRefs, p.instanceRef)
+
+	return nil
 }
 
-func DestroyLibrary() {
-	globalMutex.Lock()
-	C.FPDF_DestroyLibrary()
-	globalMutex.Unlock()
+func (p *PdfiumImplementation) getNativeDocument(documentRef document.Ref) (*NativeDocument, error) {
+	if documentRef == 0 {
+		return nil, errors.New("Document.Ref not given")
+	}
+
+	if val, ok := p.documentRefs[documentRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find native instance of document, perhaps the document was already closed or you tried to share documents between instances")
+}
+
+type NativeDocument struct {
+	currentDoc    C.FPDF_DOCUMENT
+	currentPage   C.FPDF_PAGE
+	readSeekerRef unsafe.Pointer
+
+	currentPageNumber *int         // Remember which page is currently loaded in the page variable.
+	data              *[]byte      // Keep a reference to the data otherwise weird stuff happens
+	nativeRef         document.Ref // An integer that is our reference inside the process. We need this to close the document in DestroyLibrary.
+}
+
+// Close closes the internal references in FPDF
+func (d *NativeDocument) Close() error {
+	if d.currentDoc == nil {
+		return errors.New("no current document")
+	}
+
+	if d.currentPageNumber != nil {
+		C.FPDF_ClosePage(d.currentPage)
+		d.currentPage = nil
+		d.currentPageNumber = nil
+	}
+	C.FPDF_CloseDocument(d.currentDoc)
+	d.currentDoc = nil
+
+	if d.readSeekerRef != nil {
+		C.free(d.readSeekerRef)
+		d.readSeekerRef = nil
+	}
+
+	// Remove reference to data.
+	if d.data != nil {
+		d.data = nil
+	}
+
+	delete(Pdfium.documentRefs, d.nativeRef)
+
+	return nil
 }

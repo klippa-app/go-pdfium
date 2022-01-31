@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("Page", func() {
-	pdfium := implementation.Pdfium{}
+	pdfium := implementation.Pdfium.GetInstance()
 
 	Context("no document", func() {
 		When("is opened", func() {
@@ -17,7 +17,7 @@ var _ = Describe("Page", func() {
 				pageCount, err := pdfium.GetPageRotation(&requests.GetPageRotation{
 					Page: 0,
 				})
-				Expect(err).To(MatchError("no current document"))
+				Expect(err).To(MatchError("Document.Ref not given"))
 				Expect(pageCount).To(BeNil())
 			})
 
@@ -25,7 +25,7 @@ var _ = Describe("Page", func() {
 				pageCount, err := pdfium.GetPageTransparency(&requests.GetPageTransparency{
 					Page: 0,
 				})
-				Expect(err).To(MatchError("no current document"))
+				Expect(err).To(MatchError("Document.Ref not given"))
 				Expect(pageCount).To(BeNil())
 			})
 
@@ -33,7 +33,7 @@ var _ = Describe("Page", func() {
 				pageCount, err := pdfium.FlattenPage(&requests.FlattenPage{
 					Page: 0,
 				})
-				Expect(err).To(MatchError("no current document"))
+				Expect(err).To(MatchError("Document.Ref not given"))
 				Expect(pageCount).To(BeNil())
 			})
 		})

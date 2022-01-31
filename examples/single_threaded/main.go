@@ -1,24 +1,31 @@
 package main
 
 import (
+	"github.com/klippa-app/go-pdfium"
 	"io/ioutil"
 	"log"
+	"time"
 
-	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/single_threaded"
 )
 
-var Pdfium pdfium.Pdfium
-
-func init() {
-	// Init the pdfium library and return the instance to open documents.
-	Pdfium = single_threaded.Init()
-}
-
 func main() {
+	// Init the pdfium library and return the instance to open documents.
+	pool := single_threaded.Init()
+	instance, err := pool.GetInstance(time.Second * 30)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Cleanup
+	defer func() {
+		instance.Close()
+		pool.Close()
+	}()
+
 	filePath := "shared_tests/testdata/test.pdf"
-	pageCount, err := getPageCount(filePath)
+	pageCount, err := getPageCount(instance, filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,7 +33,7 @@ func main() {
 	log.Printf("The PDF %s has %d page(s)", filePath, pageCount)
 }
 
-func getPageCount(filePath string) (int, error) {
+func getPageCount(instance pdfium.Pdfium, filePath string) (int, error) {
 	// Load the PDF file into a byte array.
 	pdfBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -34,15 +41,17 @@ func getPageCount(filePath string) (int, error) {
 	}
 
 	// Open the PDF using pdfium (and claim a worker)
-	doc, err := Pdfium.NewDocumentFromBytes(&pdfBytes)
+	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err
 	}
 
 	// Always close the document, this will release the worker and it's resources
-	defer doc.Close()
+	defer instance.CloseDocument(*doc)
 
-	pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+	pageCount, err := instance.GetPageCount(&requests.GetPageCount{
+		Document: *doc,
+	})
 	if err != nil {
 		return 0, err
 	}
