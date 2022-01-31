@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/klippa-app/go-pdfium"
 	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/single_threaded"
 )

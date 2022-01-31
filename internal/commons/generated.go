@@ -34,6 +34,7 @@ type Pdfium interface {
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
     RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
+    SetRotation(*requests.SetRotation) (*responses.SetRotation, error)
     CloseDocument(references.Document) error
     Close() error
 }
@@ -262,6 +263,16 @@ func (g *PdfiumRPC) RenderPagesInPixels(request *requests.RenderPagesInPixels) (
 func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
 	resp := &responses.RenderToFile{}
 	err := g.client.Call("Plugin.RenderToFile", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) SetRotation(request *requests.SetRotation) (*responses.SetRotation, error) {
+	resp := &responses.SetRotation{}
+	err := g.client.Call("Plugin.SetRotation", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -560,6 +571,19 @@ func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPix
 func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
 	var err error
 	implResp, err := s.Impl.RenderToFile(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) SetRotation(request *requests.SetRotation, resp *responses.SetRotation) error {
+	var err error
+	implResp, err := s.Impl.SetRotation(request)
 	if err != nil {
 		return err
 	}

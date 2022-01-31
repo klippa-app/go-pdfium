@@ -178,6 +178,8 @@ type GetPageTextStructuredPixelPositions struct {
 	Height    int  // If rendered with a specific resolution, give the height resolution. Useful if you used RenderPageInPixels.
 }
 
+// Begin PPO
+
 type ImportPages struct {
 	Source      references.Document
 	Destination references.Document
@@ -189,3 +191,24 @@ type CopyViewerPreferences struct {
 	Source      references.Document
 	Destination references.Document
 }
+
+// End PPO
+
+// Begin Edit
+
+type PageRotation int
+
+const (
+	PageRotationNone  PageRotation = 0 // 0: no rotation.
+	PageRotation90CW  PageRotation = 1 // 1: rotate 90 degrees in clockwise direction.
+	PageRotation180CW PageRotation = 2 // 2: rotate 180 degrees in clockwise direction.
+	PageRotation270CW PageRotation = 3 // 3: rotate 270 degrees in clockwise direction.
+)
+
+type SetRotation struct {
+	Document references.Document
+	Page     Page
+	Rotate   PageRotation // New value of PDF page rotation.
+}
+
+// End Edit

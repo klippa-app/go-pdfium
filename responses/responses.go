@@ -187,6 +187,14 @@ type GetPageTextStructured struct {
 	PointToPixelRatio float64                      // The point to pixel ratio for the calculated positions.
 }
 
+// Begin PPO
+
 type ImportPages struct{}
 
 type CopyViewerPreferences struct{}
+
+// Begin Edit
+
+type SetRotation struct{}
+
+// End Edit
