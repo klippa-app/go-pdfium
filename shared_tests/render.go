@@ -86,11 +86,11 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("RenderPagesInDPI()", func() {
 						It("returns an error", func() {
 							renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-								Document: doc,
 								Pages: []requests.RenderPageInDPI{
 									{
-										Page: 1,
-										DPI:  300,
+										Document: doc,
+										Page:     1,
+										DPI:      300,
 									},
 								},
 								Padding: 50,
@@ -117,12 +117,12 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				Context("RenderPagesInPixels()", func() {
 					It("returns an error", func() {
 						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-							Document: doc,
 							Pages: []requests.RenderPageInPixels{
 								{
-									Page:   1,
-									Width:  2000,
-									Height: 2000,
+									Document: doc,
+									Page:     1,
+									Width:    2000,
+									Height:   2000,
 								},
 							},
 							Padding: 50,
@@ -361,8 +361,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with no pages given", func() {
 							It("returns an error", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
-									Pages:    []requests.RenderPageInDPI{},
+									Pages: []requests.RenderPageInDPI{},
 								})
 								Expect(err).To(MatchError("no pages given"))
 								Expect(renderedPage).To(BeNil())
@@ -372,13 +371,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with no DPI", func() {
 							It("returns an error", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
+											Document: doc,
+											Page:     0,
 										},
 										{
-											Page: 0,
+											Document: doc,
+											Page:     0,
 										},
 									},
 								})
@@ -390,15 +390,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with DPI 100", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  100,
+											Document: doc,
+											Page:     0,
+											DPI:      100,
 										},
 										{
-											Page: 0,
-											DPI:  100,
+											Document: doc,
+											Page:     0,
+											DPI:      100,
 										},
 									},
 								})
@@ -431,15 +432,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with DPI 300", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  300,
+											Document: doc,
+											Page:     0,
+											DPI:      300,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+											Document: doc,
+											Page:     0,
+											DPI:      300,
 										},
 									},
 								})
@@ -472,15 +474,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with different DPI per page", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  200,
+											Document: doc,
+											Page:     0,
+											DPI:      200,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+											Document: doc,
+											Page:     0,
+											DPI:      300,
 										},
 									},
 								})
@@ -513,15 +516,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with padding between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
-									Document: doc,
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  300,
+											Document: doc,
+											Page:     0,
+											DPI:      300,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+											Document: doc,
+											Page:     0,
+											DPI:      300,
 										},
 									},
 									Padding: 50,
@@ -557,8 +561,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with no pages given", func() {
 							It("returns an error", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
-									Pages:    []requests.RenderPageInPixels{},
+									Pages: []requests.RenderPageInPixels{},
 								})
 								Expect(err).To(MatchError("no pages given"))
 								Expect(renderedPage).To(BeNil())
@@ -567,13 +570,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with no width or height given", func() {
 							It("returns an error", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page: 0,
+											Document: doc,
+											Page:     0,
 										},
 										{
-											Page: 0,
+											Document: doc,
+											Page:     0,
 										},
 									},
 								})
@@ -585,15 +589,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with only the width given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:  0,
-											Width: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
 										},
 										{
-											Page:  0,
-											Width: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
 										},
 									},
 								})
@@ -627,15 +632,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with only the height given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Height:   2000,
 										},
 										{
-											Page:   0,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Height:   2000,
 										},
 									},
 								})
@@ -670,17 +676,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							Context("and the width and height being equal", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
 									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-										Document: doc,
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   2000,
 											},
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   2000,
 											},
 										},
 									})
@@ -713,17 +720,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							Context("and the width being larger than the height", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
 									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-										Document: doc,
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
-												Width:  4000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    4000,
+												Height:   2000,
 											},
 											{
-												Page:   0,
-												Width:  4000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    4000,
+												Height:   2000,
 											},
 										},
 									})
@@ -757,17 +765,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							Context("and the height being larger than the width", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
 									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-										Document: doc,
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 4000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   4000,
 											},
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 4000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   4000,
 											},
 										},
 									})
@@ -802,15 +811,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with the width being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:  0,
-											Width: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
 										},
 										{
-											Page:  0,
-											Width: 1500,
+											Document: doc,
+											Page:     0,
+											Width:    1500,
 										},
 									},
 								})
@@ -844,15 +854,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with the height being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Height:   2000,
 										},
 										{
-											Page:   0,
-											Height: 1500,
+											Document: doc,
+											Page:     0,
+											Height:   1500,
 										},
 									},
 								})
@@ -886,17 +897,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with the width and height being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
-											Width:  2000,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
+											Height:   2000,
 										},
 										{
-											Page:   0,
-											Width:  1500,
-											Height: 1500,
+											Document: doc,
+											Page:     0,
+											Width:    1500,
+											Height:   1500,
 										},
 									},
 								})
@@ -930,17 +942,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with padding between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
-									Document: doc,
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
-											Width:  2000,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
+											Height:   2000,
 										},
 										{
-											Page:   0,
-											Width:  2000,
-											Height: 2000,
+											Document: doc,
+											Page:     0,
+											Width:    2000,
+											Height:   2000,
 										},
 									},
 									Padding: 50,
@@ -979,12 +992,12 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
 									RenderPagesInPixels: &requests.RenderPagesInPixels{
-										Document: doc,
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   2000,
 											},
 										},
 									},
@@ -999,12 +1012,12 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									RenderPagesInPixels: &requests.RenderPagesInPixels{
-										Document: doc,
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
-												Width:  2000,
-												Height: 2000,
+												Document: doc,
+												Page:     0,
+												Width:    2000,
+												Height:   2000,
 											},
 										},
 									},
@@ -1065,17 +1078,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetBytes,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPagesInPixels: &requests.RenderPagesInPixels{
-											Document: doc,
 											Pages: []requests.RenderPageInPixels{
 												{
-													Page:   0,
-													Width:  2000,
-													Height: 2000,
+													Document: doc,
+													Page:     0,
+													Width:    2000,
+													Height:   2000,
 												},
 												{
-													Page:   0,
-													Width:  2000,
-													Height: 2000,
+													Document: doc,
+													Page:     0,
+													Width:    2000,
+													Height:   2000,
 												},
 											},
 										},
@@ -1148,15 +1162,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetBytes,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPagesInDPI: &requests.RenderPagesInDPI{
-											Document: doc,
 											Pages: []requests.RenderPageInDPI{
 												{
-													Page: 0,
-													DPI:  200,
+													Document: doc,
+													Page:     0,
+													DPI:      200,
 												},
 												{
-													Page: 0,
-													DPI:  200,
+													Document: doc,
+													Page:     0,
+													DPI:      200,
 												},
 											},
 										},

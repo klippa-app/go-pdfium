@@ -73,9 +73,8 @@ type RenderPageInDPI struct {
 }
 
 type RenderPagesInDPI struct {
-	Document document.Ref
-	Pages    []RenderPageInDPI // The pages
-	Padding  int               // The amount of padding (in pixels) between the images
+	Pages   []RenderPageInDPI // The pages
+	Padding int               // The amount of padding (in pixels) between the images
 }
 
 type RenderPageInPixels struct {
@@ -86,9 +85,8 @@ type RenderPageInPixels struct {
 }
 
 type RenderPagesInPixels struct {
-	Document document.Ref
-	Pages    []RenderPageInPixels // The pages
-	Padding  int                  // The amount of padding (in pixels) between the images
+	Pages   []RenderPageInPixels // The pages
+	Padding int                  // The amount of padding (in pixels) between the images
 }
 
 type RenderToFileOutputFormat string // The file format to render output as.

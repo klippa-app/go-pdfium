@@ -29,7 +29,9 @@ func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
 type Pool interface {
 	// GetInstance returns an instance to the pool.
 	// For single-threaded this is thread safe, but you can only do one pdfium action at the same time.
-	// For multi-threaded it will try to get a worker from the pool.
+	// For multi-threaded it will try to get a worker from the pool for the length of timeout
+	// It is important to Close instances when you are done with them. To either return them to the pool
+	// or clear it's resources.
 	GetInstance(timeout time.Duration) (Pdfium, error)
 
 	// Close closes the pool.

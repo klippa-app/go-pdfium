@@ -51,6 +51,10 @@ type pdfiumPool struct {
 var poolRefs = map[int]*pdfiumPool{}
 var multiThreadedMutex = &sync.Mutex{}
 
+// Init will return a multi-threaded pool.
+// It will launch a new worker for every requested instance as long as the limits
+// allow it. If the pool has been exhausted. It will wait until a worker becomes
+// available. So it's important that you close instances when you're done with them.
 func Init(config Config) pdfium.Pool {
 	// Create an hclog.Logger
 	logger := hclog.New(&hclog.LoggerOptions{
