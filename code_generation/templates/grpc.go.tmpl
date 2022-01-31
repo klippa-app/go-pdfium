@@ -4,7 +4,7 @@
 package commons
 
 import (
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -14,7 +14,7 @@ type Pdfium interface {
 {{- range $method := .Methods }}
     {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}
-    CloseDocument(document.Ref) error
+    CloseDocument(references.Document) error
     Close() error
 }
 

@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/internal/commons"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 
 	"github.com/hashicorp/go-hclog"
@@ -225,10 +225,10 @@ type pdfiumInstance struct {
 	lock        *sync.Mutex
 }
 
-// NewDocumentFromBytes creates a new pdfium document from a byte array.
+// NewDocumentFromBytes creates a new pdfium references from a byte array.
 // This will automatically select a worker and keep it for you until you execute
-// the close method on the document.
-func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+// the close method on the references.
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -249,8 +249,8 @@ func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDo
 	return &doc.Document, nil
 }
 
-// NewDocumentFromFilePath creates a new pdfium document from a file path.
-func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+// NewDocumentFromFilePath creates a new pdfium references from a file path.
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -271,8 +271,8 @@ func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium
 	return &doc.Document, nil
 }
 
-// NewDocumentFromReader creates a new pdfium document from a reader.
-func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+// NewDocumentFromReader creates a new pdfium references from a reader.
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -310,7 +310,7 @@ func (i *pdfiumInstance) Close() error {
 	return i.worker.plugin.Close()
 }
 
-func (i *pdfiumInstance) CloseDocument(document document.Ref) error {
+func (i *pdfiumInstance) CloseDocument(document references.Document) error {
 	if i.closed {
 		return errors.New("instance is closed")
 	}

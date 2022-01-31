@@ -2,7 +2,7 @@ package implementation
 
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 	"io"
 	"sync"
 	"unsafe"
@@ -11,6 +11,7 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/go-hclog"
 )
 
@@ -64,7 +65,7 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 var Pdfium = &mainPdfium{
 	mutex:        &sync.Mutex{},
 	instanceRefs: map[int]*PdfiumImplementation{},
-	documentRefs: map[document.Ref]*NativeDocument{},
+	documentRefs: map[references.Document]*NativeDocument{},
 }
 
 var isInitialized = false
@@ -114,15 +115,15 @@ type mainPdfium struct {
 	// instance keeps track of the opened instances for this process.
 	instanceRefs map[int]*PdfiumImplementation
 
-	// documentRefs keeps track of the opened document for this process.
+	// documentRefs keeps track of the opened documents for this process.
 	// we need this for document lookups and in case of closing the instance
-	documentRefs map[document.Ref]*NativeDocument
+	documentRefs map[references.Document]*NativeDocument
 }
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		logger:       p.logger,
-		documentRefs: map[document.Ref]*NativeDocument{},
+		documentRefs: map[references.Document]*NativeDocument{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -136,9 +137,9 @@ type PdfiumImplementation struct {
 	// logger is for communication with the plugin.
 	logger hclog.Logger
 
-	// documentRefs keeps track of the opened document for this instance.
+	// documentRefs keeps track of the opened documents for this instance.
 	// we need this for document lookups and in case of closing the instance
-	documentRefs map[document.Ref]*NativeDocument
+	documentRefs map[references.Document]*NativeDocument
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -238,7 +239,8 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 	nativeDoc.currentDoc = doc
 	nativeDoc.data = request.File
-	nativeDoc.nativeRef = document.Ref(len(Pdfium.documentRefs) + 1)
+	documentRef := uuid.New()
+	nativeDoc.nativeRef = references.Document(documentRef.String())
 	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
 	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
 
@@ -247,7 +249,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}, nil
 }
 
-func (p *PdfiumImplementation) CloseDocument(document document.Ref) error {
+func (p *PdfiumImplementation) CloseDocument(document references.Document) error {
 	p.Lock()
 	defer p.Unlock()
 
@@ -284,26 +286,37 @@ func (p *PdfiumImplementation) Close() error {
 	return nil
 }
 
-func (p *PdfiumImplementation) getNativeDocument(documentRef document.Ref) (*NativeDocument, error) {
-	if documentRef == 0 {
-		return nil, errors.New("Document.Ref not given")
+func (p *PdfiumImplementation) getNativeDocument(documentRef references.Document) (*NativeDocument, error) {
+	if documentRef == "" {
+		return nil, errors.New("document not given")
 	}
 
 	if val, ok := p.documentRefs[documentRef]; ok {
 		return val, nil
 	}
 
-	return nil, errors.New("could not find native instance of document, perhaps the document was already closed or you tried to share documents between instances")
+	return nil, errors.New("could not find native doc instance, perhaps the doc was already closed or you tried to share documents between instances")
 }
 
 type NativeDocument struct {
 	currentDoc    C.FPDF_DOCUMENT
-	currentPage   C.FPDF_PAGE
 	readSeekerRef unsafe.Pointer
+	currentPage   *NativePage
+	data          *[]byte                         // Keep a reference to the data otherwise weird stuff happens
+	nativeRef     references.Document             // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	pageRefs      map[references.Page]*NativePage // A lookup table for page references of this document.
+}
 
-	currentPageNumber *int         // Remember which page is currently loaded in the page variable.
-	data              *[]byte      // Keep a reference to the data otherwise weird stuff happens
-	nativeRef         document.Ref // An integer that is our reference inside the process. We need this to close the document in DestroyLibrary.
+func (d *NativeDocument) getNativePage(pageRef references.Page) (*NativePage, error) {
+	if pageRef == "" {
+		return nil, errors.New("page not given")
+	}
+
+	if val, ok := d.pageRefs[pageRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
 }
 
 // Close closes the internal references in FPDF
@@ -312,11 +325,16 @@ func (d *NativeDocument) Close() error {
 		return errors.New("no current document")
 	}
 
-	if d.currentPageNumber != nil {
-		C.FPDF_ClosePage(d.currentPage)
+	if d.currentPage != nil {
+		d.currentPage.Close()
 		d.currentPage = nil
-		d.currentPageNumber = nil
 	}
+
+	for i := range d.pageRefs {
+		d.pageRefs[i].Close()
+		delete(d.pageRefs, i)
+	}
+
 	C.FPDF_CloseDocument(d.currentDoc)
 	d.currentDoc = nil
 
@@ -333,4 +351,18 @@ func (d *NativeDocument) Close() error {
 	delete(Pdfium.documentRefs, d.nativeRef)
 
 	return nil
+}
+
+type NativePage struct {
+	page      C.FPDF_PAGE
+	index     int
+	nativeRef references.Page // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+// Close closes the internal references in FPDF
+func (p *NativePage) Close() {
+	if p.page != nil {
+		C.FPDF_ClosePage(p.page)
+		p.page = nil
+	}
 }

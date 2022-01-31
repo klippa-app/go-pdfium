@@ -3,7 +3,7 @@ package requests
 import (
 	"io"
 
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 )
 
 type OpenDocument struct {
@@ -15,42 +15,59 @@ type OpenDocument struct {
 }
 
 type CloseDocument struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetFileVersion struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetDocPermissions struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetSecurityHandlerRevision struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetPageCount struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetPageMode struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetMetadata struct {
-	Document document.Ref
+	Document references.Document
 	Tag      string // A metadata tag. Title, Author, Subject, Keywords, Creator, Producer, CreationDate, ModDate. For detailed explanation of these tags and their respective values, please refer to section 10.2.1 "Document Information Dictionary" in PDF Reference 1.7.
 }
 
+// Page can either be the index of a page or a page reference.
+// When you use an index. The library will always cache the last opened page.
+type Page struct {
+	Index     int             // The page number (0-index based).
+	Reference references.Page // A reference to a page. Received by GetPage()
+}
+
+type LoadPage struct {
+	Document references.Document
+	Index    int // The page number (0-index based).
+}
+
+type UnloadPage struct {
+	Document references.Document
+	Page     references.Page
+}
+
 type GetPageRotation struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 }
 
 type GetPageTransparency struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 }
 
 type FlattenPageUsage int
@@ -61,14 +78,14 @@ const (
 )
 
 type FlattenPage struct {
-	Document document.Ref
-	Page     int              // The page number (0-index based).
+	Document references.Document
+	Page     Page
 	Usage    FlattenPageUsage // The usage flag for the flattening.
 }
 
 type RenderPageInDPI struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 	DPI      int // The DPI to render the page in.
 }
 
@@ -78,8 +95,8 @@ type RenderPagesInDPI struct {
 }
 
 type RenderPageInPixels struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 	Width    int // The maximum width of the image.
 	Height   int // The maximum height of the image.
 }
@@ -115,24 +132,24 @@ type RenderToFile struct {
 }
 
 type GetPageSize struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 }
 
 type GetPageSizeInPixels struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 	DPI      int // The DPI to calculate the size for.
 }
 
 type GetPageText struct {
-	Document document.Ref
-	Page     int // The page number (0-index based).
+	Document references.Document
+	Page     Page
 }
 
 type GetPageTextStructured struct {
-	Document               document.Ref
-	Page                   int                                 // The page number (0-index based).
+	Document               references.Document
+	Page                   Page
 	Mode                   GetPageTextStructuredMode           // The mode to get structured text for.
 	CollectFontInformation bool                                // Whether to collect font information like name/size/weight.
 	PixelPositions         GetPageTextStructuredPixelPositions // Pixel position calculation settings.
@@ -147,7 +164,7 @@ const (
 )
 
 type GetPageTextStructuredPixelPositions struct {
-	Document  document.Ref
+	Document  references.Document
 	Calculate bool // Whether to calculate from points to pixel. Useful if you used RenderPageInDPI or RenderPageInPixels.
 	DPI       int  // If rendered in a specific DPI, give the DPI. Useful if you used RenderPageInDPI.
 	Width     int  // If rendered with a specific resolution, give the width resolution. Useful if you used RenderPageInPixels.

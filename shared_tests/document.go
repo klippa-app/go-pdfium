@@ -1,8 +1,8 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"io/ioutil"
 	"os"
 
@@ -17,7 +17,7 @@ import (
 func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("NewDocumentFromBytes", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc document.Ref
+			var doc references.Document
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -50,7 +50,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					}))
 				})
 
-				It("returns the correct document permissions", func() {
+				It("returns the correct references permissions", func() {
 					docPermissions, err := pdfiumContainer.GetDocPermissions(&requests.GetDocPermissions{
 						Document: doc,
 					})
@@ -115,7 +115,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc document.Ref
+			var doc references.Document
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
@@ -182,7 +182,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 	Describe("NewDocumentFromFilePath", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc document.Ref
+			var doc references.Document
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test.pdf")
@@ -224,7 +224,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc document.Ref
+			var doc references.Document
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test_multipage.pdf")
@@ -296,7 +296,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 	Describe("NewDocumentFromReader", func() {
 		Context("a normal PDF file with 1 page", func() {
-			var doc document.Ref
+			var doc references.Document
 
 			BeforeEach(func() {
 				file, err := os.Open(testsPath + "/testdata/test.pdf")
@@ -349,7 +349,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with multiple pages", func() {
-			var doc document.Ref
+			var doc references.Document
 			var file *os.File
 
 			BeforeEach(func() {
@@ -403,7 +403,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a normal PDF file with alpha channel", func() {
-			var doc document.Ref
+			var doc references.Document
 			var file *os.File
 
 			BeforeEach(func() {
@@ -554,7 +554,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with no permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -601,7 +601,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -650,7 +650,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with printing permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -697,7 +697,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -746,7 +746,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with degraded printing permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -793,7 +793,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -842,7 +842,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with modify content permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -889,7 +889,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -938,7 +938,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with assembly permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -985,7 +985,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1034,7 +1034,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with copy contents permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1081,7 +1081,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1130,7 +1130,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with screen readers permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1177,7 +1177,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1226,7 +1226,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with modify annotations permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1273,7 +1273,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1322,7 +1322,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with fill in permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1369,7 +1369,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
@@ -1418,7 +1418,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 		Context("a protected PDF file with all feature permissions", func() {
 			Context("is opened with the user password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
@@ -1465,7 +1465,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			Context("is opened with the owner password", func() {
-				var doc document.Ref
+				var doc references.Document
 
 				BeforeEach(func() {
 					pdfPassword := "123test"

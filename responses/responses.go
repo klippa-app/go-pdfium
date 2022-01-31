@@ -3,11 +3,11 @@ package responses
 import (
 	"image"
 
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 )
 
 type OpenDocument struct {
-	Document document.Ref
+	Document references.Document
 }
 
 type GetFileVersion struct {
@@ -56,6 +56,12 @@ type GetMetadata struct {
 	Tag   string // The requested metadata tag.
 	Value string // The value of the tag if found, string is empty if the value is not found.
 }
+
+type LoadPage struct {
+	Page references.Page
+}
+
+type UnloadPage struct{}
 
 type PageRotation int
 
