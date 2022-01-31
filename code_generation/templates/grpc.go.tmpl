@@ -10,7 +10,7 @@ import (
 )
 
 type Pdfium interface {
-	Ping() (string, error)
+    Ping() (string, error)
 {{- range $method := .Methods }}
     {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}

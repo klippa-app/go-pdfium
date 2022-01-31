@@ -61,7 +61,11 @@ type LoadPage struct {
 	Page references.Page
 }
 
-type UnloadPage struct{}
+type ClosePage struct{}
+
+type NewPage struct {
+	Page references.Page
+}
 
 type PageRotation int
 
@@ -182,3 +186,7 @@ type GetPageTextStructured struct {
 	Rects             []*GetPageTextStructuredRect // A list of rects in a page. When Mode is GetPageTextStructuredModeRects or GetPageTextStructuredModeBoth.
 	PointToPixelRatio float64                      // The point to pixel ratio for the calculated positions.
 }
+
+type ImportPages struct{}
+
+type CopyViewerPreferences struct{}

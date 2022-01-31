@@ -81,8 +81,8 @@ func (p *PdfiumImplementation) LoadPage(request *requests.LoadPage) (*responses.
 	}, nil
 }
 
-// UnloadPage unloads a page by reference.
-func (p *PdfiumImplementation) UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error) {
+// ClosePage unloads a page by reference.
+func (p *PdfiumImplementation) ClosePage(request *requests.ClosePage) (*responses.ClosePage, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -103,7 +103,7 @@ func (p *PdfiumImplementation) UnloadPage(request *requests.UnloadPage) (*respon
 	pageRef.Close()
 	delete(nativeDoc.pageRefs, request.Page)
 
-	return &responses.UnloadPage{}, nil
+	return &responses.ClosePage{}, nil
 }
 
 // GetPageRotation returns the page rotation.
