@@ -1710,6 +1710,115 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				})
 			})
 		})
+
+		Context("multiple PDF files", func() {
+			var doc references.Document
+			var doc2 references.Document
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+
+				pdfData2, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc2, err := pdfiumContainer.NewDocumentFromBytes(&pdfData2)
+				if err != nil {
+					return
+				}
+
+				doc2 = *newDoc2
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.CloseDocument(doc)
+				Expect(err).To(BeNil())
+
+				err = pdfiumContainer.CloseDocument(doc2)
+				Expect(err).To(BeNil())
+			})
+
+			When("are opened", func() {
+				Context("when another document is rendered after the first one", func() {
+					It("returns the right image, point to pixel ratio and resolution", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
+							Pages: []requests.RenderPageInPixels{
+								{
+									Document: doc,
+									Page: requests.Page{
+										Index: 0,
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+								{
+									Document: doc2,
+									Page: requests.Page{
+										Index: 0,
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+								{
+									Document: doc2,
+									Page: requests.Page{
+										Index: 1,
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+							},
+							Padding: 50,
+						})
+
+						Expect(err).To(BeNil())
+						compareRenderHashForPages(renderedPage, &responses.RenderPages{
+							Width:  1415,
+							Height: 6100,
+							Pages: []responses.RenderPagesPage{
+								{
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 0,
+								},
+								{
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 2050,
+								},
+								{
+									Page:              1,
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 4100,
+								},
+							},
+						}, testsPath+"/testdata/render_"+prefix+"_testpdf_multiple_pdf_combined")
+						Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+						Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(6100))
+					})
+				})
+			})
+		})
 	})
 }
 
