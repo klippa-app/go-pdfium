@@ -15,6 +15,11 @@ var singleThreadedMutex = &sync.Mutex{}
 
 var poolRefs = map[int]*pdfiumPool{}
 
+// Init will return a single-threaded pool.
+// Every pool will keep track of its own instances and the documents that
+// belong to those instances. When you close it, it will clean up the resources
+// of that pool. Underwater every pool/instance uses the same mutex to ensure
+// thread safety in pdfium across pools/instances/documents.
 func Init() pdfium.Pool {
 	singleThreadedMutex.Lock()
 	defer singleThreadedMutex.Unlock()
@@ -41,6 +46,9 @@ type pdfiumPool struct {
 	lock         *sync.Mutex
 }
 
+// GetInstance will return a unique pdfium instance that keeps track of its
+// own documents. When you close it, it will clean up all resources of this
+// instance.
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 	if p.closed {
 		return nil, errors.New("pool is closed")
@@ -61,6 +69,7 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 	return newInstance, nil
 }
 
+// Close will close the pool and all instances in it.
 func (p *pdfiumPool) Close() error {
 	if p.closed {
 		return errors.New("pool is already closed")
@@ -158,6 +167,8 @@ func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, o
 	return &doc.Document, nil
 }
 
+// Close will close the instance and will clean up the underlying pdfium resources
+// by calling i.pdfium.Close().
 func (i *pdfiumInstance) Close() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
@@ -184,6 +195,7 @@ func (i *pdfiumInstance) Close() error {
 	return nil
 }
 
+// CloseDocument closes a single Document and it's resources.
 func (i *pdfiumInstance) CloseDocument(document document.Ref) error {
 	if i.closed {
 		return errors.New("instance is closed")
