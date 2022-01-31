@@ -4,17 +4,18 @@
 package commons
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
 type Pdfium interface {
 	Ping() (string, error)
-	OpenDocument(*requests.OpenDocument) error
 {{- range $method := .Methods }}
     {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}
-	Close() error
+    CloseDocument(document.Ref) error
+    Close() error
 }
 
 {{ range $method := .Methods }}

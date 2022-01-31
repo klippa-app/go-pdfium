@@ -4,11 +4,16 @@
 package single_threaded
 
 import (
+    "errors"
+
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 {{ range $method := .Methods }}
-func (d *pdfiumDocument) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
-	return d.pdfium.{{ $method.Name }}(request)
+func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.{{ $method.Name }}(request)
 }
 {{end}}

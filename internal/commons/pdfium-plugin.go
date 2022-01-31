@@ -1,9 +1,8 @@
 package commons
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"net/rpc"
-
-	"github.com/klippa-app/go-pdfium/requests"
 
 	"github.com/hashicorp/go-plugin"
 )
@@ -20,8 +19,8 @@ func (g *PdfiumRPC) Ping() (string, error) {
 	return resp, nil
 }
 
-func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) error {
-	err := g.client.Call("Plugin.OpenDocument", request, new(interface{}))
+func (g *PdfiumRPC) Close() error {
+	err := g.client.Call("Plugin.Close", new(interface{}), new(interface{}))
 	if err != nil {
 		return err
 	}
@@ -29,8 +28,8 @@ func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) error {
 	return nil
 }
 
-func (g *PdfiumRPC) Close() error {
-	err := g.client.Call("Plugin.Close", new(interface{}), new(interface{}))
+func (g *PdfiumRPC) CloseDocument(document document.Ref) error {
+	err := g.client.Call("Plugin.CloseDocument", document, new(interface{}))
 	if err != nil {
 		return err
 	}
@@ -51,21 +50,22 @@ func (s *PdfiumRPCServer) Ping(args interface{}, resp *string) error {
 	return nil
 }
 
-func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *interface{}) error {
-	var err error
-	err = s.Impl.OpenDocument(request)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *PdfiumRPCServer) Close(args interface{}, resp *interface{}) error {
 	var err error
 	err = s.Impl.Close()
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *PdfiumRPCServer) CloseDocument(document document.Ref, resp *interface{}) error {
+	var err error
+	err = s.Impl.CloseDocument(document)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

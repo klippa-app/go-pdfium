@@ -18,9 +18,9 @@ func StartPlugin() {
 		JSONFormat: true,
 	})
 
-	pdfium := &Pdfium{
-		logger: logger,
-	}
+	Pdfium.logger = logger
+
+	pdfium := Pdfium.GetInstance()
 
 	// pluginMap is the map of plugins we can dispense.
 	var pluginMap = map[string]plugin.Plugin{

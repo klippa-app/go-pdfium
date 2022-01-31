@@ -1,123 +1,193 @@
 package single_threaded
 
 import (
-	"io"
-	"sync"
-
+	"errors"
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/requests"
+	"io"
+	"sync"
+	"time"
 )
 
-type singleThreadedPdfiumContainer struct {
-	pdfium *implementation.Pdfium
-	mutex  *sync.Mutex
-}
+var singleThreadedMutex = &sync.Mutex{}
 
-var container *singleThreadedPdfiumContainer
+var poolRefs = map[int]*pdfiumPool{}
 
-func Init() pdfium.Pdfium {
-	if container != nil {
-		return container
-	}
+func Init() pdfium.Pool {
+	singleThreadedMutex.Lock()
+	defer singleThreadedMutex.Unlock()
 
 	// Init the pdfium library.
 	implementation.InitLibrary()
 
-	// Create a new pdfium container and ake sure we only have 1 container.
-	container = &singleThreadedPdfiumContainer{
-		pdfium: &implementation.Pdfium{},
-		mutex:  &sync.Mutex{},
+	// Create a new pdfium pool
+	pool := &pdfiumPool{
+		poolRef:      len(poolRefs),
+		instanceRefs: map[int]*pdfiumInstance{},
+		lock:         &sync.Mutex{},
 	}
 
-	return container
+	poolRefs[pool.poolRef] = pool
+
+	return pool
 }
 
-func Destroy() {
-	if container == nil {
-		return
+type pdfiumPool struct {
+	instanceRefs map[int]*pdfiumInstance
+	poolRef      int
+	closed       bool
+	lock         *sync.Mutex
+}
+
+func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	if p.closed {
+		return nil, errors.New("pool is closed")
 	}
 
-	container.pdfium.Close()
-	implementation.DestroyLibrary()
+	newInstance := &pdfiumInstance{
+		pdfium: implementation.Pdfium.GetInstance(),
+		lock:   &sync.Mutex{},
+		pool:   p,
+	}
+
+	instanceRef := len(p.instanceRefs)
+	newInstance.instanceRef = instanceRef
+	p.lock.Lock()
+	p.instanceRefs[instanceRef] = newInstance
+	p.lock.Unlock()
+
+	return newInstance, nil
+}
+
+func (p *pdfiumPool) Close() error {
+	if p.closed {
+		return errors.New("pool is already closed")
+	}
+
+	// Close all instances
+	for i := range p.instanceRefs {
+		p.instanceRefs[i].Close()
+	}
+
+	singleThreadedMutex.Lock()
+	delete(poolRefs, p.poolRef)
+
+	// Unload library if this was the last pool.
+	if len(poolRefs) == 0 {
+		implementation.DestroyLibrary()
+	}
+
+	singleThreadedMutex.Unlock()
+
+	return nil
+}
+
+type pdfiumInstance struct {
+	pdfium      *implementation.PdfiumImplementation
+	instanceRef int
+	closed      bool
+	pool        *pdfiumPool
+	lock        *sync.Mutex
 }
 
 // NewDocumentFromBytes creates a new pdfium document from a byte array.
-func (c *singleThreadedPdfiumContainer) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
-	// Make sure there can only be one document at the same time.
-	c.mutex.Lock()
-
-	newDocument := pdfiumDocument{
-		pdfium: c.pdfium,
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
 	}
+	i.lock.Unlock()
 
 	openDocRequest := &requests.OpenDocument{File: file}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	err := c.pdfium.OpenDocument(openDocRequest)
+	doc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
-		newDocument.Close()
 		return nil, err
 	}
 
-	return &newDocument, nil
+	return &doc.Document, nil
 }
 
 // NewDocumentFromFilePath creates a new pdfium document from a file path.
-func (c *singleThreadedPdfiumContainer) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
-	// Make sure there can only be one document at the same time.
-	c.mutex.Lock()
-
-	newDocument := pdfiumDocument{
-		pdfium: c.pdfium,
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
 	}
+	i.lock.Unlock()
 
 	openDocRequest := &requests.OpenDocument{FilePath: &filePath}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	err := c.pdfium.OpenDocument(openDocRequest)
+	doc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
-		newDocument.Close()
 		return nil, err
 	}
 
-	return &newDocument, nil
+	return &doc.Document, nil
 }
 
 // NewDocumentFromReader creates a new pdfium document from a reader.
-func (c *singleThreadedPdfiumContainer) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
-	// Make sure there can only be one document at the same time.
-	c.mutex.Lock()
-
-	newDocument := pdfiumDocument{
-		pdfium: c.pdfium,
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*document.Ref, error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
 	}
+	i.lock.Unlock()
 
 	openDocRequest := &requests.OpenDocument{FileReader: reader, FileReaderSize: size}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	err := c.pdfium.OpenDocument(openDocRequest)
+	doc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
-		newDocument.Close()
 		return nil, err
 	}
 
-	return &newDocument, nil
+	return &doc.Document, nil
 }
 
-type pdfiumDocument struct {
-	pdfium *implementation.Pdfium
+func (i *pdfiumInstance) Close() error {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	if i.closed {
+		return errors.New("instance is already closed")
+	}
+
+	// Close underlying instance. That will close all docs.
+	err := i.pdfium.Close()
+	if err != nil {
+		return err
+	}
+
+	i.pool.lock.Lock()
+	delete(i.pool.instanceRefs, i.instanceRef)
+	i.pool.lock.Unlock()
+
+	// Remove references.
+	i.pool = nil
+	i.pdfium = nil
+	i.closed = true
+
+	return nil
 }
 
-func (d *pdfiumDocument) Close() {
-	d.pdfium.Close()
-	container.mutex.Unlock()
+func (i *pdfiumInstance) CloseDocument(document document.Ref) error {
+	if i.closed {
+		return errors.New("instance is closed")
+	}
 
-	return
+	return i.pdfium.CloseDocument(document)
 }

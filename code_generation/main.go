@@ -31,14 +31,14 @@ func main() {
 		Methods: []GenerateDataMethod{},
 	}
 
-	docType := reflect.TypeOf((*pdfium.Document)(nil)).Elem()
+	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()
 	numMethods := docType.NumMethod()
 
 	for i := 0; i < numMethods; i++ {
 		method := docType.Method(i)
 
-		// Close is special, don't generate it
-		if method.Name == "Close" {
+		// These are special, don't generate them
+		if method.Name == "Close" || method.Name == "CloseDocument" || method.Name == "NewDocumentFromBytes" || method.Name == "NewDocumentFromFilePath" || method.Name == "NewDocumentFromReader" {
 			continue
 		}
 

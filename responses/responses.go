@@ -1,6 +1,14 @@
 package responses
 
-import "image"
+import (
+	"image"
+
+	"github.com/klippa-app/go-pdfium/document"
+)
+
+type OpenDocument struct {
+	Document document.Ref
+}
 
 type GetFileVersion struct {
 	FileVersion int // The numeric version of the file: 14 for 1.4, 15 for 1.5, ...

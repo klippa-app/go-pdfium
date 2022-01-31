@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("Render", func() {
-	pdfium := implementation.Pdfium{}
+	pdfium := implementation.Pdfium.GetInstance()
 
 	Context("no document", func() {
 		When("is opened", func() {
@@ -18,7 +18,7 @@ var _ = Describe("Render", func() {
 					pageSize, err := pdfium.GetPageSize(&requests.GetPageSize{
 						Page: 0,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(pageSize).To(BeNil())
 				})
 			})
@@ -29,7 +29,7 @@ var _ = Describe("Render", func() {
 						Page: 0,
 						DPI:  100,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(pageSize).To(BeNil())
 				})
 			})
@@ -40,7 +40,7 @@ var _ = Describe("Render", func() {
 						Page: 0,
 						DPI:  300,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -56,7 +56,7 @@ var _ = Describe("Render", func() {
 						},
 						Padding: 50,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -68,7 +68,7 @@ var _ = Describe("Render", func() {
 						Width:  2000,
 						Height: 2000,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -85,7 +85,7 @@ var _ = Describe("Render", func() {
 						},
 						Padding: 50,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})

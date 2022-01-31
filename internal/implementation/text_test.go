@@ -8,16 +8,16 @@ import (
 )
 
 var _ = Describe("Text", func() {
-	pdfium := implementation.Pdfium{}
+	pdfium := implementation.Pdfium.GetInstance()
 
 	Context("no document", func() {
-		When("is opened", func() {
+		When("is given", func() {
 			Context("GetPageText()", func() {
 				It("returns an error", func() {
 					pageText, err := pdfium.GetPageText(&requests.GetPageText{
 						Page: 0,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(pageText).To(BeNil())
 				})
 			})
@@ -27,7 +27,7 @@ var _ = Describe("Text", func() {
 					pageTextStructured, err := pdfium.GetPageTextStructured(&requests.GetPageTextStructured{
 						Page: 0,
 					})
-					Expect(err).To(MatchError("no current document"))
+					Expect(err).To(MatchError("Document.Ref not given"))
 					Expect(pageTextStructured).To(BeNil())
 				})
 			})

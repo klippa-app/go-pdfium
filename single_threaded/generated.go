@@ -4,78 +4,141 @@
 package single_threaded
 
 import (
+    "errors"
+
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-func (d *pdfiumDocument) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
-	return d.pdfium.FlattenPage(request)
+func (i *pdfiumInstance) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FlattenPage(request)
 }
 
-func (d *pdfiumDocument) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
-	return d.pdfium.GetDocPermissions(request)
+func (i *pdfiumInstance) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetDocPermissions(request)
 }
 
-func (d *pdfiumDocument) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
-	return d.pdfium.GetFileVersion(request)
+func (i *pdfiumInstance) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetFileVersion(request)
 }
 
-func (d *pdfiumDocument) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
-	return d.pdfium.GetMetadata(request)
+func (i *pdfiumInstance) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetMetadata(request)
 }
 
-func (d *pdfiumDocument) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
-	return d.pdfium.GetPageCount(request)
+func (i *pdfiumInstance) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageCount(request)
 }
 
-func (d *pdfiumDocument) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
-	return d.pdfium.GetPageMode(request)
+func (i *pdfiumInstance) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageMode(request)
 }
 
-func (d *pdfiumDocument) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
-	return d.pdfium.GetPageRotation(request)
+func (i *pdfiumInstance) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageRotation(request)
 }
 
-func (d *pdfiumDocument) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
-	return d.pdfium.GetPageSize(request)
+func (i *pdfiumInstance) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageSize(request)
 }
 
-func (d *pdfiumDocument) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
-	return d.pdfium.GetPageSizeInPixels(request)
+func (i *pdfiumInstance) GetPageSizeInPixels(request *requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageSizeInPixels(request)
 }
 
-func (d *pdfiumDocument) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
-	return d.pdfium.GetPageText(request)
+func (i *pdfiumInstance) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageText(request)
 }
 
-func (d *pdfiumDocument) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
-	return d.pdfium.GetPageTextStructured(request)
+func (i *pdfiumInstance) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageTextStructured(request)
 }
 
-func (d *pdfiumDocument) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
-	return d.pdfium.GetPageTransparency(request)
+func (i *pdfiumInstance) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetPageTransparency(request)
 }
 
-func (d *pdfiumDocument) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
-	return d.pdfium.GetSecurityHandlerRevision(request)
+func (i *pdfiumInstance) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetSecurityHandlerRevision(request)
 }
 
-func (d *pdfiumDocument) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
-	return d.pdfium.RenderPageInDPI(request)
+func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.OpenDocument(request)
 }
 
-func (d *pdfiumDocument) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
-	return d.pdfium.RenderPageInPixels(request)
+func (i *pdfiumInstance) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.RenderPageInDPI(request)
 }
 
-func (d *pdfiumDocument) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
-	return d.pdfium.RenderPagesInDPI(request)
+func (i *pdfiumInstance) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.RenderPageInPixels(request)
 }
 
-func (d *pdfiumDocument) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
-	return d.pdfium.RenderPagesInPixels(request)
+func (i *pdfiumInstance) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.RenderPagesInDPI(request)
 }
 
-func (d *pdfiumDocument) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
-	return d.pdfium.RenderToFile(request)
+func (i *pdfiumInstance) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.RenderPagesInPixels(request)
+}
+
+func (i *pdfiumInstance) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.RenderToFile(request)
 }

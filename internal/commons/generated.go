@@ -4,13 +4,13 @@
 package commons
 
 import (
+	"github.com/klippa-app/go-pdfium/document"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
 type Pdfium interface {
 	Ping() (string, error)
-	OpenDocument(*requests.OpenDocument) error
     FlattenPage(*requests.FlattenPage) (*responses.FlattenPage, error)
     GetDocPermissions(*requests.GetDocPermissions) (*responses.GetDocPermissions, error)
     GetFileVersion(*requests.GetFileVersion) (*responses.GetFileVersion, error)
@@ -24,12 +24,14 @@ type Pdfium interface {
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
     GetPageTransparency(*requests.GetPageTransparency) (*responses.GetPageTransparency, error)
     GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
+    OpenDocument(*requests.OpenDocument) (*responses.OpenDocument, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
     RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
     RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
-	Close() error
+    CloseDocument(document.Ref) error
+    Close() error
 }
 
 
@@ -156,6 +158,16 @@ func (g *PdfiumRPC) GetPageTransparency(request *requests.GetPageTransparency) (
 func (g *PdfiumRPC) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
 	resp := &responses.GetSecurityHandlerRevision{}
 	err := g.client.Call("Plugin.GetSecurityHandlerRevision", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
+	resp := &responses.OpenDocument{}
+	err := g.client.Call("Plugin.OpenDocument", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -374,6 +386,19 @@ func (s *PdfiumRPCServer) GetPageTransparency(request *requests.GetPageTranspare
 func (s *PdfiumRPCServer) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision, resp *responses.GetSecurityHandlerRevision) error {
 	var err error
 	implResp, err := s.Impl.GetSecurityHandlerRevision(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *responses.OpenDocument) error {
+	var err error
+	implResp, err := s.Impl.OpenDocument(request)
 	if err != nil {
 		return err
 	}
