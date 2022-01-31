@@ -101,6 +101,13 @@ func (i *pdfiumInstance) GetSecurityHandlerRevision(request *requests.GetSecurit
 	return i.pdfium.GetSecurityHandlerRevision(request)
 }
 
+func (i *pdfiumInstance) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.LoadPage(request)
+}
+
 func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -141,4 +148,11 @@ func (i *pdfiumInstance) RenderToFile(request *requests.RenderToFile) (*response
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.RenderToFile(request)
+}
+
+func (i *pdfiumInstance) UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.UnloadPage(request)
 }

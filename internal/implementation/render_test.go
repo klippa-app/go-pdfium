@@ -16,9 +16,11 @@ var _ = Describe("Render", func() {
 			Context("GetPageSize()", func() {
 				It("returns an error", func() {
 					pageSize, err := pdfium.GetPageSize(&requests.GetPageSize{
-						Page: 0,
+						Page: requests.Page{
+							Index: 0,
+						},
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(pageSize).To(BeNil())
 				})
 			})
@@ -26,10 +28,12 @@ var _ = Describe("Render", func() {
 			Context("GetPageSizeInPixels()", func() {
 				It("returns an error", func() {
 					pageSize, err := pdfium.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-						Page: 0,
-						DPI:  100,
+						Page: requests.Page{
+							Index: 0,
+						},
+						DPI: 100,
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(pageSize).To(BeNil())
 				})
 			})
@@ -37,10 +41,12 @@ var _ = Describe("Render", func() {
 			Context("RenderPageInDPI()", func() {
 				It("returns an error", func() {
 					renderedPage, err := pdfium.RenderPageInDPI(&requests.RenderPageInDPI{
-						Page: 0,
-						DPI:  300,
+						Page: requests.Page{
+							Index: 0,
+						},
+						DPI: 300,
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -50,13 +56,15 @@ var _ = Describe("Render", func() {
 					renderedPage, err := pdfium.RenderPagesInDPI(&requests.RenderPagesInDPI{
 						Pages: []requests.RenderPageInDPI{
 							{
-								Page: 0,
-								DPI:  300,
+								Page: requests.Page{
+									Index: 0,
+								},
+								DPI: 300,
 							},
 						},
 						Padding: 50,
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -64,11 +72,13 @@ var _ = Describe("Render", func() {
 			Context("RenderPageInPixels()", func() {
 				It("returns an error", func() {
 					renderedPage, err := pdfium.RenderPageInPixels(&requests.RenderPageInPixels{
-						Page:   0,
+						Page: requests.Page{
+							Index: 0,
+						},
 						Width:  2000,
 						Height: 2000,
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})
@@ -78,14 +88,16 @@ var _ = Describe("Render", func() {
 					renderedPage, err := pdfium.RenderPagesInPixels(&requests.RenderPagesInPixels{
 						Pages: []requests.RenderPageInPixels{
 							{
-								Page:   0,
+								Page: requests.Page{
+									Index: 0,
+								},
 								Width:  2000,
 								Height: 2000,
 							},
 						},
 						Padding: 50,
 					})
-					Expect(err).To(MatchError("Document.Ref not given"))
+					Expect(err).To(MatchError("document not given"))
 					Expect(renderedPage).To(BeNil())
 				})
 			})

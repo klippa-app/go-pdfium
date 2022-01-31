@@ -4,7 +4,7 @@
 package commons
 
 import (
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -24,13 +24,15 @@ type Pdfium interface {
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
     GetPageTransparency(*requests.GetPageTransparency) (*responses.GetPageTransparency, error)
     GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
+    LoadPage(*requests.LoadPage) (*responses.LoadPage, error)
     OpenDocument(*requests.OpenDocument) (*responses.OpenDocument, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
     RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
     RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
-    CloseDocument(document.Ref) error
+    UnloadPage(*requests.UnloadPage) (*responses.UnloadPage, error)
+    CloseDocument(references.Document) error
     Close() error
 }
 
@@ -165,6 +167,16 @@ func (g *PdfiumRPC) GetSecurityHandlerRevision(request *requests.GetSecurityHand
 	return resp, nil
 }
 
+func (g *PdfiumRPC) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
+	resp := &responses.LoadPage{}
+	err := g.client.Call("Plugin.LoadPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	resp := &responses.OpenDocument{}
 	err := g.client.Call("Plugin.OpenDocument", request, resp)
@@ -218,6 +230,16 @@ func (g *PdfiumRPC) RenderPagesInPixels(request *requests.RenderPagesInPixels) (
 func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
 	resp := &responses.RenderToFile{}
 	err := g.client.Call("Plugin.RenderToFile", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error) {
+	resp := &responses.UnloadPage{}
+	err := g.client.Call("Plugin.UnloadPage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -396,6 +418,19 @@ func (s *PdfiumRPCServer) GetSecurityHandlerRevision(request *requests.GetSecuri
 	return nil
 }
 
+func (s *PdfiumRPCServer) LoadPage(request *requests.LoadPage, resp *responses.LoadPage) error {
+	var err error
+	implResp, err := s.Impl.LoadPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *responses.OpenDocument) error {
 	var err error
 	implResp, err := s.Impl.OpenDocument(request)
@@ -464,6 +499,19 @@ func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPix
 func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
 	var err error
 	implResp, err := s.Impl.RenderToFile(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) UnloadPage(request *requests.UnloadPage, resp *responses.UnloadPage) error {
+	var err error
+	implResp, err := s.Impl.UnloadPage(request)
 	if err != nil {
 		return err
 	}

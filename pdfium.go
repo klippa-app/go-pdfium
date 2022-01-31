@@ -1,7 +1,7 @@
 package pdfium
 
 import (
-	"github.com/klippa-app/go-pdfium/document"
+	"github.com/klippa-app/go-pdfium/references"
 	"io"
 	"time"
 
@@ -45,11 +45,11 @@ type Pool interface {
 type Pdfium interface {
 	// NewDocumentFromBytes returns a pdfium Document from the given PDF bytes.
 	// This is a helper around OpenDocument.
-	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*document.Ref, error)
+	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*references.Document, error)
 
 	// NewDocumentFromFilePath returns a pdfium Document from the given PDF file path.
 	// This is a helper around OpenDocument.
-	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*document.Ref, error)
+	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*references.Document, error)
 
 	// NewDocumentFromReader returns a pdfium Document from the given PDF file reader.
 	// This is a helper around OpenDocument.
@@ -57,10 +57,16 @@ type Pdfium interface {
 	// usage will just load the file in memory because it can't transfer readers
 	// over gRPC. The single-threaded usage will actually efficiently walk over
 	// the PDF as it's being used by pdfium.
-	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*document.Ref, error)
+	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*references.Document, error)
 
-	// OpenDocument returns a pdfium document for the given file data.
+	// OpenDocument returns a pdfium references for the given file data.
 	OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error)
+
+	// LoadPage loads a page and returns a reference.
+	LoadPage(request *requests.LoadPage) (*responses.LoadPage, error)
+
+	// UnloadPage unloads a page by reference.
+	UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error)
 
 	// GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
 	GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error)
@@ -71,10 +77,10 @@ type Pdfium interface {
 	// GetSecurityHandlerRevision returns the revision number of security handlers of the file.
 	GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
 
-	// GetPageCount returns the amount of pages for the document.
+	// GetPageCount returns the amount of pages for the references.
 	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
 
-	// GetPageMode document's page mode, which describes how the document should be displayed when opened.
+	// GetPageMode references's page mode, which describes how the references should be displayed when opened.
 	GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error)
 
 	// GetMetadata returns the requested metadata.
@@ -118,8 +124,8 @@ type Pdfium interface {
 	// and output the resulting image into a file.
 	RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error)
 
-	// CloseDocument closes the document, releases the resources.
-	CloseDocument(request document.Ref) error
+	// CloseDocument closes the references, releases the resources.
+	CloseDocument(request references.Document) error
 
 	// Close closes the instance.
 	// It will close any unclosed documents.

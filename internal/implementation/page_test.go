@@ -15,25 +15,31 @@ var _ = Describe("Page", func() {
 		When("is opened", func() {
 			It("returns an error when getting the pdf page rotation", func() {
 				pageCount, err := pdfium.GetPageRotation(&requests.GetPageRotation{
-					Page: 0,
+					Page: requests.Page{
+						Index: 0,
+					},
 				})
-				Expect(err).To(MatchError("Document.Ref not given"))
+				Expect(err).To(MatchError("document not given"))
 				Expect(pageCount).To(BeNil())
 			})
 
 			It("returns an error when getting the pdf page transparency", func() {
 				pageCount, err := pdfium.GetPageTransparency(&requests.GetPageTransparency{
-					Page: 0,
+					Page: requests.Page{
+						Index: 0,
+					},
 				})
-				Expect(err).To(MatchError("Document.Ref not given"))
+				Expect(err).To(MatchError("document not given"))
 				Expect(pageCount).To(BeNil())
 			})
 
 			It("returns an error when flattening a pdf page", func() {
 				pageCount, err := pdfium.FlattenPage(&requests.FlattenPage{
-					Page: 0,
+					Page: requests.Page{
+						Index: 0,
+					},
 				})
-				Expect(err).To(MatchError("Document.Ref not given"))
+				Expect(err).To(MatchError("document not given"))
 				Expect(pageCount).To(BeNil())
 			})
 		})
