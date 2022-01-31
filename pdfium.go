@@ -65,8 +65,8 @@ type Pdfium interface {
 	// LoadPage loads a page and returns a reference.
 	LoadPage(request *requests.LoadPage) (*responses.LoadPage, error)
 
-	// UnloadPage unloads a page by reference.
-	UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error)
+	// ClosePage closes a page that was loaded by LoadPage.
+	ClosePage(request *requests.ClosePage) (*responses.ClosePage, error)
 
 	// GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
 	GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error)
@@ -123,6 +123,12 @@ type Pdfium interface {
 	// RenderToFile allows you to call one of the other render functions
 	// and output the resulting image into a file.
 	RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error)
+
+	// ImportPages imports some pages from one PDF document to another one.
+	ImportPages(request *requests.ImportPages) (*responses.ImportPages, error)
+
+	// CopyViewerPreferences copies the viewer preferences from one PDF document to another
+	CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error)
 
 	// CloseDocument closes the references, releases the resources.
 	CloseDocument(request references.Document) error

@@ -10,6 +10,20 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (i *pdfiumInstance) ClosePage(request *requests.ClosePage) (*responses.ClosePage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.ClosePage(request)
+}
+
+func (i *pdfiumInstance) CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.CopyViewerPreferences(request)
+}
+
 func (i *pdfiumInstance) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -101,6 +115,13 @@ func (i *pdfiumInstance) GetSecurityHandlerRevision(request *requests.GetSecurit
 	return i.pdfium.GetSecurityHandlerRevision(request)
 }
 
+func (i *pdfiumInstance) ImportPages(request *requests.ImportPages) (*responses.ImportPages, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.ImportPages(request)
+}
+
 func (i *pdfiumInstance) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -148,11 +169,4 @@ func (i *pdfiumInstance) RenderToFile(request *requests.RenderToFile) (*response
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.RenderToFile(request)
-}
-
-func (i *pdfiumInstance) UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.pdfium.UnloadPage(request)
 }

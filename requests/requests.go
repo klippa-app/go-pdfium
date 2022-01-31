@@ -55,9 +55,16 @@ type LoadPage struct {
 	Index    int // The page number (0-index based).
 }
 
-type UnloadPage struct {
+type ClosePage struct {
 	Document references.Document
 	Page     references.Page
+}
+
+type NewPage struct {
+	Document references.Document
+	Index    int     // A zero-based index which specifies the position of the created page in PDF document. Range: 0 to (pagecount-1). If this value is below 0, the new page will be inserted to the first. If this value is above (pagecount-1), the new page will be inserted to the last.
+	Width    float64 // The page width in points.
+	Height   float64 // The page height in points.
 }
 
 type GetPageRotation struct {
@@ -169,4 +176,16 @@ type GetPageTextStructuredPixelPositions struct {
 	DPI       int  // If rendered in a specific DPI, give the DPI. Useful if you used RenderPageInDPI.
 	Width     int  // If rendered with a specific resolution, give the width resolution. Useful if you used RenderPageInPixels.
 	Height    int  // If rendered with a specific resolution, give the height resolution. Useful if you used RenderPageInPixels.
+}
+
+type ImportPages struct {
+	Source      references.Document
+	Destination references.Document
+	PageRange   *string // The page ranges, such as "1,3,5-7". If it is nil, it means to import all pages from parameter Source to Destination.
+	Index       int     // An integer value which specifies the page index in parameter Destination where the imported pages will be inserted.
+}
+
+type CopyViewerPreferences struct {
+	Source      references.Document
+	Destination references.Document
 }

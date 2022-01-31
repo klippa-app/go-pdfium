@@ -10,7 +10,9 @@ import (
 )
 
 type Pdfium interface {
-	Ping() (string, error)
+    Ping() (string, error)
+    ClosePage(*requests.ClosePage) (*responses.ClosePage, error)
+    CopyViewerPreferences(*requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error)
     FlattenPage(*requests.FlattenPage) (*responses.FlattenPage, error)
     GetDocPermissions(*requests.GetDocPermissions) (*responses.GetDocPermissions, error)
     GetFileVersion(*requests.GetFileVersion) (*responses.GetFileVersion, error)
@@ -24,6 +26,7 @@ type Pdfium interface {
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
     GetPageTransparency(*requests.GetPageTransparency) (*responses.GetPageTransparency, error)
     GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
+    ImportPages(*requests.ImportPages) (*responses.ImportPages, error)
     LoadPage(*requests.LoadPage) (*responses.LoadPage, error)
     OpenDocument(*requests.OpenDocument) (*responses.OpenDocument, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
@@ -31,11 +34,30 @@ type Pdfium interface {
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
     RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
-    UnloadPage(*requests.UnloadPage) (*responses.UnloadPage, error)
     CloseDocument(references.Document) error
     Close() error
 }
 
+
+func (g *PdfiumRPC) ClosePage(request *requests.ClosePage) (*responses.ClosePage, error) {
+	resp := &responses.ClosePage{}
+	err := g.client.Call("Plugin.ClosePage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error) {
+	resp := &responses.CopyViewerPreferences{}
+	err := g.client.Call("Plugin.CopyViewerPreferences", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
 
 func (g *PdfiumRPC) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
 	resp := &responses.FlattenPage{}
@@ -167,6 +189,16 @@ func (g *PdfiumRPC) GetSecurityHandlerRevision(request *requests.GetSecurityHand
 	return resp, nil
 }
 
+func (g *PdfiumRPC) ImportPages(request *requests.ImportPages) (*responses.ImportPages, error) {
+	resp := &responses.ImportPages{}
+	err := g.client.Call("Plugin.ImportPages", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
 	resp := &responses.LoadPage{}
 	err := g.client.Call("Plugin.LoadPage", request, resp)
@@ -237,17 +269,33 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 	return resp, nil
 }
 
-func (g *PdfiumRPC) UnloadPage(request *requests.UnloadPage) (*responses.UnloadPage, error) {
-	resp := &responses.UnloadPage{}
-	err := g.client.Call("Plugin.UnloadPage", request, resp)
+
+
+func (s *PdfiumRPCServer) ClosePage(request *requests.ClosePage, resp *responses.ClosePage) error {
+	var err error
+	implResp, err := s.Impl.ClosePage(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
 }
 
+func (s *PdfiumRPCServer) CopyViewerPreferences(request *requests.CopyViewerPreferences, resp *responses.CopyViewerPreferences) error {
+	var err error
+	implResp, err := s.Impl.CopyViewerPreferences(request)
+	if err != nil {
+		return err
+	}
 
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
 
 func (s *PdfiumRPCServer) FlattenPage(request *requests.FlattenPage, resp *responses.FlattenPage) error {
 	var err error
@@ -418,6 +466,19 @@ func (s *PdfiumRPCServer) GetSecurityHandlerRevision(request *requests.GetSecuri
 	return nil
 }
 
+func (s *PdfiumRPCServer) ImportPages(request *requests.ImportPages, resp *responses.ImportPages) error {
+	var err error
+	implResp, err := s.Impl.ImportPages(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) LoadPage(request *requests.LoadPage, resp *responses.LoadPage) error {
 	var err error
 	implResp, err := s.Impl.LoadPage(request)
@@ -499,19 +560,6 @@ func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPix
 func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
 	var err error
 	implResp, err := s.Impl.RenderToFile(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) UnloadPage(request *requests.UnloadPage, resp *responses.UnloadPage) error {
-	var err error
-	implResp, err := s.Impl.UnloadPage(request)
 	if err != nil {
 		return err
 	}
