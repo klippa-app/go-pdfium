@@ -170,3 +170,10 @@ func (i *pdfiumInstance) RenderToFile(request *requests.RenderToFile) (*response
 	}
 	return i.worker.plugin.RenderToFile(request)
 }
+
+func (i *pdfiumInstance) SetRotation(request *requests.SetRotation) (*responses.SetRotation, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.SetRotation(request)
+}

@@ -130,6 +130,9 @@ type Pdfium interface {
 	// CopyViewerPreferences copies the viewer preferences from one PDF document to another
 	CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error)
 
+	// SetRotation sets the page rotation for a given page.
+	SetRotation(request *requests.SetRotation) (*responses.SetRotation, error)
+
 	// CloseDocument closes the references, releases the resources.
 	CloseDocument(request references.Document) error
 
