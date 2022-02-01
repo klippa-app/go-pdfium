@@ -2,6 +2,7 @@ package single_threaded
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/references"
@@ -13,7 +14,7 @@ import (
 
 var singleThreadedMutex = &sync.Mutex{}
 
-var poolRefs = map[int]*pdfiumPool{}
+var poolRefs = map[string]*pdfiumPool{}
 
 // Init will return a single-threaded pool.
 // Every pool will keep track of its own instances and the documents that
@@ -27,10 +28,12 @@ func Init() pdfium.Pool {
 	// Init the pdfium library.
 	implementation.InitLibrary()
 
+	poolRef := uuid.New()
+
 	// Create a new pdfium pool
 	pool := &pdfiumPool{
-		poolRef:      len(poolRefs),
-		instanceRefs: map[int]*pdfiumInstance{},
+		poolRef:      poolRef.String(),
+		instanceRefs: map[string]*pdfiumInstance{},
 		lock:         &sync.Mutex{},
 	}
 
@@ -40,8 +43,8 @@ func Init() pdfium.Pool {
 }
 
 type pdfiumPool struct {
-	instanceRefs map[int]*pdfiumInstance
-	poolRef      int
+	instanceRefs map[string]*pdfiumInstance
+	poolRef      string
 	closed       bool
 	lock         *sync.Mutex
 }
@@ -60,10 +63,10 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 		pool:   p,
 	}
 
-	instanceRef := len(p.instanceRefs)
-	newInstance.instanceRef = instanceRef
+	instanceRef := uuid.New()
+	newInstance.instanceRef = instanceRef.String()
 	p.lock.Lock()
-	p.instanceRefs[instanceRef] = newInstance
+	p.instanceRefs[newInstance.instanceRef] = newInstance
 	p.lock.Unlock()
 
 	return newInstance, nil
@@ -95,7 +98,7 @@ func (p *pdfiumPool) Close() error {
 
 type pdfiumInstance struct {
 	pdfium      *implementation.PdfiumImplementation
-	instanceRef int
+	instanceRef string
 	closed      bool
 	pool        *pdfiumPool
 	lock        *sync.Mutex

@@ -1,5 +1,7 @@
 package requests
 
+type FPDF_CreateNewDocument struct{}
+
 type FPDFPage_SetRotation struct {
 	Page   Page
 	Rotate PageRotation // New value of PDF page rotation.

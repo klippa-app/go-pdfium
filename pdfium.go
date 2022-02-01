@@ -147,6 +147,9 @@ type Pdfium interface {
 
 	// Start fpdf_edit.h
 
+	// FPDF_CreateNewDocument returns a new document.
+	FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
+
 	// FPDFPage_SetRotation sets the page rotation for a given page.
 	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
 

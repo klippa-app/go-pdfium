@@ -4,9 +4,29 @@ package implementation
 // #include "fpdf_edit.h"
 import "C"
 import (
+	"github.com/google/uuid"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
+
+// FPDF_CreateNewDocument returns a new document.
+func (p *PdfiumImplementation) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativeDoc := &NativeDocument{}
+	doc := C.FPDF_CreateNewDocument()
+	nativeDoc.currentDoc = doc
+	documentRef := uuid.New()
+	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
+	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
+	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
+
+	return &responses.FPDF_CreateNewDocument{
+		Document: nativeDoc.nativeRef,
+	}, nil
+}
 
 // FPDFPage_GetRotation returns the page rotation.
 func (p *PdfiumImplementation) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error) {
