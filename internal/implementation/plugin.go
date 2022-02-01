@@ -27,8 +27,6 @@ func StartPlugin() {
 		"pdfium": &commons.PdfiumPlugin{Impl: pdfium},
 	}
 
-	logger.Debug("message from plugin", "foo", "bar")
-
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: handshakeConfig,
 		Plugins:         pluginMap,

@@ -10,12 +10,14 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 )
 
-var Pdfium pdfium.Pdfium
+// Be sure to close pools/instances when you're done with them.
+var pool pdfium.Pool
+var instance pdfium.Pdfium
 
 func init() {
 	// Init the pdfium library and return the instance to open documents.
 	// You can tweak these configs to your need. Be aware that workers can use quite some memory.
-	pool := multi_threaded.Init(multi_threaded.Config{
+	pool = multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
 		MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
@@ -25,11 +27,11 @@ func init() {
 		},
 	})
 
-	instance, err := pool.GetInstance(time.Second * 30)
+	var err error
+	instance, err = pool.GetInstance(time.Second * 30)
 	if err != nil {
 		log.Fatal(err)
 	}
-	Pdfium = instance
 }
 
 func main() {
@@ -50,15 +52,15 @@ func getPageCount(filePath string) (int, error) {
 	}
 
 	// Open the PDF using pdfium (and claim a worker)
-	doc, err := Pdfium.NewDocumentFromBytes(&pdfBytes)
+	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err
 	}
 
 	// Always close the document, this will release the worker and it's resources
-	defer Pdfium.FPDF_CloseDocument(*doc)
+	defer instance.FPDF_CloseDocument(*doc)
 
-	pageCount, err := Pdfium.FPDF_GetPageCount(&requests.FPDF_GetPageCount{Document: *doc})
+	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{Document: *doc})
 	if err != nil {
 		return 0, err
 	}
