@@ -79,10 +79,6 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	writer := C.FPDF_FILEWRITE{}
 	writer.version = 1
 
@@ -121,9 +117,9 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 
 	var success C.int
 	if request.FileVersion == 0 {
-		success = C.FPDF_SaveAsCopy(nativeDoc.currentDoc, &writer, C.ulong(request.Flags))
+		success = C.FPDF_SaveAsCopy(nativeDoc.doc, &writer, C.ulong(request.Flags))
 	} else {
-		success = C.FPDF_SaveWithVersion(nativeDoc.currentDoc, &writer, C.ulong(request.Flags), C.int(request.FileVersion))
+		success = C.FPDF_SaveWithVersion(nativeDoc.doc, &writer, C.ulong(request.Flags), C.int(request.FileVersion))
 	}
 
 	if int(success) == 0 {

@@ -4,7 +4,6 @@ package implementation
 // #include "fpdf_ext.h"
 import "C"
 import (
-	"errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -19,11 +18,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetPageMode(request *requests.FPDFDoc_Get
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	pageMode := C.FPDFDoc_GetPageMode(nativeDoc.currentDoc)
+	pageMode := C.FPDFDoc_GetPageMode(nativeDoc.doc)
 
 	return &responses.FPDFDoc_GetPageMode{
 		PageMode: responses.FPDFDoc_GetPageModeMode(pageMode),

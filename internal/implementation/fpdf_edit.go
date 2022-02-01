@@ -17,7 +17,7 @@ func (p *PdfiumImplementation) FPDF_CreateNewDocument(request *requests.FPDF_Cre
 
 	nativeDoc := &NativeDocument{}
 	doc := C.FPDF_CreateNewDocument()
-	nativeDoc.currentDoc = doc
+	nativeDoc.doc = doc
 	documentRef := uuid.New()
 	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
 	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
