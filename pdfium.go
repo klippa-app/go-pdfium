@@ -46,19 +46,19 @@ type Pdfium interface {
 	// Start instance functions.
 
 	// NewDocumentFromBytes returns a pdfium Document from the given PDF bytes.
-	// This is a helper around OpenDocument. This is a gateway to FPDF_LoadMemDocument.
+	// This is a helper around OpenDocument and gateway to FPDF_LoadMemDocument.
 	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// NewDocumentFromFilePath returns a pdfium Document from the given PDF file path.
-	// This is a helper around OpenDocument. This is a gateway to FPDF_LoadDocument.
+	// This is a helper around OpenDocument and a gateway to FPDF_LoadDocument.
 	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// NewDocumentFromReader returns a pdfium Document from the given PDF file reader.
-	// This is a helper around OpenDocument.
+	// This is a helper around OpenDocument and a gatweway to FPDF_LoadCustomDocument.
 	// This is only really efficient for single threaded usage, the multi-threaded
 	// usage will just load the file in memory because it can't transfer readers
 	// over gRPC. The single-threaded usage will actually efficiently walk over
-	// the PDF as it's being used by pdfium. This is a gatweway to FPDF_LoadCustomDocument.
+	// the PDF as it's being used by pdfium.
 	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// OpenDocument returns a pdfium references for the given file data.
