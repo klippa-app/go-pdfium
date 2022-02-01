@@ -23,24 +23,20 @@ func (p *PdfiumImplementation) GetMetaData(request *requests.GetMetaData) (*resp
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	getMetaText := func(tag string) (string, error) {
 		cstr := C.CString(tag)
 		defer C.free(unsafe.Pointer(cstr))
 
 		// First get the metadata length.
-		metaSize := C.FPDF_GetMetaText(nativeDoc.currentDoc, cstr, C.NULL, 0)
+		metaSize := C.FPDF_GetMetaText(nativeDoc.doc, cstr, C.NULL, 0)
 		if metaSize == 0 {
 			return "", errors.New("Could not get metadata")
 		}
 
 		charData := make([]byte, metaSize)
-		C.FPDF_GetMetaText(nativeDoc.currentDoc, cstr, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+		C.FPDF_GetMetaText(nativeDoc.doc, cstr, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
-		transformedText, err := p.transformUTF16LEText(charData)
+		transformedText, err := p.transformUTF16LEToUTF8(charData)
 		if err != nil {
 			return "", err
 		}

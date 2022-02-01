@@ -35,7 +35,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
 	C.FPDFText_ClosePage(textPage)
 
-	transformedText, err := p.transformUTF16LEText(charData[0 : charsWritten*2])
+	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			charData := make([]byte, 4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
 			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
 
-			transformedText, err := p.transformUTF16LEText(charData[0 : (charsWritten)*2])
+			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : (charsWritten)*2])
 			if err != nil {
 				return nil, err
 			}
@@ -144,7 +144,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
 
-			transformedText, err := p.transformUTF16LEText(charData[0 : charsWritten*2])
+			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 			if err != nil {
 				return nil, err
 			}
@@ -212,7 +212,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage C.FPDF_TEXTPAGE, char
 	}
 }
 
-func (p *PdfiumImplementation) transformUTF16LEText(charData []byte) (string, error) {
+func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
 	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
 	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
@@ -226,6 +226,18 @@ func (p *PdfiumImplementation) transformUTF16LEText(charData []byte) (string, er
 	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
 
 	return string(decoded), nil
+}
+
+func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
+	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
+
+	output := &bytes.Buffer{}
+	unicodeWriter := transform.NewWriter(output, utf16bom)
+	unicodeWriter.Write([]byte(text))
+	unicodeWriter.Close()
+
+	return output.Bytes(), nil
 }
 
 func convertPointPositions(pointPositions responses.CharPosition, ratio float64) *responses.CharPosition {

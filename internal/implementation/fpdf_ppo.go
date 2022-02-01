@@ -21,17 +21,9 @@ func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPag
 		return nil, err
 	}
 
-	if nativeSourceDoc.currentDoc == nil {
-		return nil, errors.New("no source document")
-	}
-
 	nativeDestinationDoc, err := p.getNativeDocument(request.Destination)
 	if err != nil {
 		return nil, err
-	}
-
-	if nativeDestinationDoc.currentDoc == nil {
-		return nil, errors.New("no destination document")
 	}
 
 	var pageRange *C.char
@@ -40,7 +32,7 @@ func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPag
 		defer C.free(unsafe.Pointer(pageRange))
 	}
 
-	success := C.FPDF_ImportPages(nativeDestinationDoc.currentDoc, nativeSourceDoc.currentDoc, pageRange, C.int(request.Index))
+	success := C.FPDF_ImportPages(nativeDestinationDoc.doc, nativeSourceDoc.doc, pageRange, C.int(request.Index))
 	if int(success) == 0 {
 		return nil, errors.New("import of pages failed")
 	}
@@ -58,20 +50,12 @@ func (p *PdfiumImplementation) FPDF_CopyViewerPreferences(request *requests.FPDF
 		return nil, err
 	}
 
-	if nativeSourceDoc.currentDoc == nil {
-		return nil, errors.New("no source document")
-	}
-
 	nativeDestinationDoc, err := p.getNativeDocument(request.Destination)
 	if err != nil {
 		return nil, err
 	}
 
-	if nativeDestinationDoc.currentDoc == nil {
-		return nil, errors.New("no destination document")
-	}
-
-	success := C.FPDF_CopyViewerPreferences(nativeDestinationDoc.currentDoc, nativeSourceDoc.currentDoc)
+	success := C.FPDF_CopyViewerPreferences(nativeDestinationDoc.doc, nativeSourceDoc.doc)
 	if int(success) == 0 {
 		return nil, errors.New("import of pages failed")
 	}

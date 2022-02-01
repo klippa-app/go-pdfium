@@ -22,26 +22,22 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*NativePage, error)
 		return p.getNativePage(*page.ByReference)
 	}
 
-	doc, err := p.getNativeDocument(page.ByIndex.Document)
+	nativeDoc, err := p.getNativeDocument(page.ByIndex.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	if doc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	// Already loaded this page.
-	if doc.currentPage != nil && doc.currentPage.index == page.ByIndex.Index {
-		return doc.currentPage, nil
+	if nativeDoc.currentPage != nil && nativeDoc.currentPage.index == page.ByIndex.Index {
+		return nativeDoc.currentPage, nil
 	}
 
-	if doc.currentPage != nil {
-		doc.currentPage.Close()
-		doc.currentPage = nil
+	if nativeDoc.currentPage != nil {
+		nativeDoc.currentPage.Close()
+		nativeDoc.currentPage = nil
 	}
 
-	pageObject := C.FPDF_LoadPage(doc.currentDoc, C.int(page.ByIndex.Index))
+	pageObject := C.FPDF_LoadPage(nativeDoc.doc, C.int(page.ByIndex.Index))
 	if pageObject == nil {
 		return nil, pdfium_errors.ErrPage
 	}
@@ -51,7 +47,7 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*NativePage, error)
 		index: page.ByIndex.Index,
 	}
 
-	doc.currentPage = nativePage
+	nativeDoc.currentPage = nativePage
 
 	return nativePage, nil
 }

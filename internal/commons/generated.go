@@ -11,6 +11,10 @@ import (
 
 type Pdfium interface {
     Ping() (string, error)
+    FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
+    FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
+    FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
+    FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
     FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
     FPDFPage_Flatten(*requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
     FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
@@ -48,6 +52,46 @@ type Pdfium interface {
     Close() error
 }
 
+
+func (g *PdfiumRPC) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error) {
+	resp := &responses.FPDFBookmark_Find{}
+	err := g.client.Call("Plugin.FPDFBookmark_Find", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error) {
+	resp := &responses.FPDFBookmark_GetFirstChild{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetFirstChild", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error) {
+	resp := &responses.FPDFBookmark_GetNextSibling{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetNextSibling", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error) {
+	resp := &responses.FPDFBookmark_GetTitle{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetTitle", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
 
 func (g *PdfiumRPC) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
 	resp := &responses.FPDFDoc_GetPageMode{}
@@ -380,6 +424,58 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 }
 
 
+
+func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find, resp *responses.FPDFBookmark_Find) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_Find(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild, resp *responses.FPDFBookmark_GetFirstChild) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_GetFirstChild(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling, resp *responses.FPDFBookmark_GetNextSibling) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_GetNextSibling(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_GetTitle(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
 
 func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) error {
 	var err error

@@ -199,6 +199,18 @@ type Pdfium interface {
 	// FPDF_GetMetaText returns the requested metadata.
 	FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
 
+	// FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
+	FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
+
+	// FPDFBookmark_GetNextSibling returns the next bookmark item at the same level.
+	FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
+
+	// FPDFBookmark_GetTitle returns the title of a bookmark.
+	FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
+
+	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
+	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
+
 	// End fpdf_doc.h
 
 	// Start fpdf_save.h

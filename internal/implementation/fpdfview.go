@@ -48,11 +48,7 @@ func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	pageObject := C.FPDF_LoadPage(nativeDoc.currentDoc, C.int(request.Index))
+	pageObject := C.FPDF_LoadPage(nativeDoc.doc, C.int(request.Index))
 	if pageObject == nil {
 		return nil, pdfium_errors.ErrPage
 	}
@@ -106,13 +102,9 @@ func (p *PdfiumImplementation) FPDF_GetFileVersion(request *requests.FPDF_GetFil
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	fileVersion := C.int(0)
 
-	success := C.FPDF_GetFileVersion(nativeDoc.currentDoc, &fileVersion)
+	success := C.FPDF_GetFileVersion(nativeDoc.doc, &fileVersion)
 	if int(success) == 0 {
 		return nil, errors.New("could not get file version")
 	}
@@ -132,11 +124,7 @@ func (p *PdfiumImplementation) FPDF_GetDocPermissions(request *requests.FPDF_Get
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	permissions := C.FPDF_GetDocPermissions(nativeDoc.currentDoc)
+	permissions := C.FPDF_GetDocPermissions(nativeDoc.doc)
 
 	docPermissions := &responses.FPDF_GetDocPermissions{
 		DocPermissions: uint32(permissions),
@@ -185,11 +173,7 @@ func (p *PdfiumImplementation) FPDF_GetSecurityHandlerRevision(request *requests
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	securityHandlerRevision := C.FPDF_GetSecurityHandlerRevision(nativeDoc.currentDoc)
+	securityHandlerRevision := C.FPDF_GetSecurityHandlerRevision(nativeDoc.doc)
 
 	return &responses.FPDF_GetSecurityHandlerRevision{
 		SecurityHandlerRevision: int(securityHandlerRevision),
@@ -206,12 +190,8 @@ func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageC
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	return &responses.FPDF_GetPageCount{
-		PageCount: int(C.FPDF_GetPageCount(nativeDoc.currentDoc)),
+		PageCount: int(C.FPDF_GetPageCount(nativeDoc.doc)),
 	}, nil
 }
 
@@ -261,14 +241,10 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 		return nil, err
 	}
 
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
 	width := C.double(0)
 	height := C.double(0)
 
-	result := C.FPDF_GetPageSizeByIndex(nativeDoc.currentDoc, C.int(request.Index), &width, &height)
+	result := C.FPDF_GetPageSizeByIndex(nativeDoc.doc, C.int(request.Index), &width, &height)
 	if int(result) == 0 {
 		return nil, errors.New("Could not load page size by index")
 	}

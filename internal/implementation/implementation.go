@@ -124,6 +124,8 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		logger:       p.logger,
 		documentRefs: map[references.FPDF_DOCUMENT]*NativeDocument{},
+		pageRefs:     map[references.FPDF_PAGE]*NativePage{},
+		bookmarkRefs: map[references.FPDF_BOOKMARK]*NativeBookmark{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -144,6 +146,10 @@ type PdfiumImplementation struct {
 	// pageRefs keeps track of the opened documents for this instance.
 	// we need this for document lookups and in case of closing the instance
 	pageRefs map[references.FPDF_PAGE]*NativePage
+
+	// pageRefs keeps track of the opened bookmarks for this instance.
+	// we need this for bookmark lookups and in case of closing the instance
+	bookmarkRefs map[references.FPDF_BOOKMARK]*NativeBookmark
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -170,7 +176,10 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		cPassword = C.CString(*request.Password)
 	}
 
-	nativeDoc := &NativeDocument{}
+	nativeDoc := &NativeDocument{
+		pageRefs:     map[references.FPDF_PAGE]*NativePage{},
+		bookmarkRefs: map[references.FPDF_BOOKMARK]*NativeBookmark{},
+	}
 	var doc C.FPDF_DOCUMENT
 
 	if request.File != nil {
@@ -241,7 +250,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		return nil, pdfiumError
 	}
 
-	nativeDoc.currentDoc = doc
+	nativeDoc.doc = doc
 	nativeDoc.data = request.File
 	documentRef := uuid.New()
 	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
@@ -290,6 +299,11 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.pageRefs, p.pageRefs[i].nativeRef)
 	}
 
+	// Remove bookmark refs, they don't have a close method.
+	for i := range p.bookmarkRefs {
+		delete(p.bookmarkRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -319,13 +333,26 @@ func (d *PdfiumImplementation) getNativePage(pageRef references.FPDF_PAGE) (*Nat
 	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
 }
 
+func (d *PdfiumImplementation) getNativeBookmark(bookmarkRef references.FPDF_BOOKMARK) (*NativeBookmark, error) {
+	if bookmarkRef == "" {
+		return nil, errors.New("bookmark not given")
+	}
+
+	if val, ok := d.bookmarkRefs[bookmarkRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find native bookmark, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
+}
+
 type NativeDocument struct {
-	currentDoc    C.FPDF_DOCUMENT
+	doc           C.FPDF_DOCUMENT
 	readSeekerRef unsafe.Pointer
 	currentPage   *NativePage
-	data          *[]byte                              // Keep a reference to the data otherwise weird stuff happens
-	nativeRef     references.FPDF_DOCUMENT             // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
-	pageRefs      map[references.FPDF_PAGE]*NativePage // A lookup table for page references of this document.
+	data          *[]byte                                      // Keep a reference to the data otherwise weird stuff happens
+	nativeRef     references.FPDF_DOCUMENT                     // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	pageRefs      map[references.FPDF_PAGE]*NativePage         // A lookup table for page references of this document.
+	bookmarkRefs  map[references.FPDF_BOOKMARK]*NativeBookmark // A lookup table for bookmark references of this document.
 }
 
 func (d *NativeDocument) getNativePage(pageRef references.FPDF_PAGE) (*NativePage, error) {
@@ -340,9 +367,21 @@ func (d *NativeDocument) getNativePage(pageRef references.FPDF_PAGE) (*NativePag
 	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
 }
 
+func (d *NativeDocument) getNativeBookmark(bookmarkRef references.FPDF_BOOKMARK) (*NativeBookmark, error) {
+	if bookmarkRef == "" {
+		return nil, errors.New("bookmark not given")
+	}
+
+	if val, ok := d.bookmarkRefs[bookmarkRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find native bookmark, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
+}
+
 // Close closes the internal references in FPDF
 func (d *NativeDocument) Close() error {
-	if d.currentDoc == nil {
+	if d.doc == nil {
 		return errors.New("no current document")
 	}
 
@@ -356,8 +395,13 @@ func (d *NativeDocument) Close() error {
 		delete(d.pageRefs, i)
 	}
 
-	C.FPDF_CloseDocument(d.currentDoc)
-	d.currentDoc = nil
+	// Remove bookmark refs, they don't have a close method.
+	for i := range d.bookmarkRefs {
+		delete(d.bookmarkRefs, i)
+	}
+
+	C.FPDF_CloseDocument(d.doc)
+	d.doc = nil
 
 	if d.readSeekerRef != nil {
 		C.free(d.readSeekerRef)
@@ -387,4 +431,10 @@ func (p *NativePage) Close() {
 		C.FPDF_ClosePage(p.page)
 		p.page = nil
 	}
+}
+
+type NativeBookmark struct {
+	bookmark    C.FPDF_BOOKMARK
+	documentRef references.FPDF_DOCUMENT
+	nativeRef   references.FPDF_BOOKMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
