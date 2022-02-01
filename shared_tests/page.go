@@ -43,9 +43,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("GetPageRotation()", func() {
 						It("returns an error", func() {
 							pageRotation, err := pdfiumContainer.FPDFPage_GetRotation(&requests.FPDFPage_GetRotation{
-								Document: doc,
 								Page: requests.Page{
-									Index: 1,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
 								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
@@ -56,9 +58,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("GetPageTransparency()", func() {
 						It("returns an error", func() {
 							pageTransparency, err := pdfiumContainer.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
-								Document: doc,
 								Page: requests.Page{
-									Index: 1,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
 								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
@@ -69,9 +73,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("FlattenPage()", func() {
 						It("returns an error", func() {
 							flattenedPage, err := pdfiumContainer.FPDFPage_Flatten(&requests.FPDFPage_Flatten{
-								Document: doc,
 								Page: requests.Page{
-									Index: 1,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
 								},
 								Usage: requests.FPDFPage_FlattenUsageNormalDisplay,
 							})
@@ -84,9 +90,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				Context("when the page rotation is requested", func() {
 					It("returns the correct rotation", func() {
 						rotation, err := pdfiumContainer.FPDFPage_GetRotation(&requests.FPDFPage_GetRotation{
-							Document: doc,
 							Page: requests.Page{
-								Index: 0,
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
 							},
 						})
 						Expect(err).To(BeNil())
@@ -97,9 +105,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				Context("when the page transparency is requested", func() {
 					It("returns the correct transparency", func() {
 						pageTransparency, err := pdfiumContainer.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
-							Document: doc,
 							Page: requests.Page{
-								Index: 0,
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
 							},
 						})
 						Expect(err).To(BeNil())
@@ -112,9 +122,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				Context("when the page flattening is requested", func() {
 					It("returns that the page does not need to be flattened", func() {
 						pageFlattenResult, err := pdfiumContainer.FPDFPage_Flatten(&requests.FPDFPage_Flatten{
-							Document: doc,
 							Page: requests.Page{
-								Index: 0,
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
 							},
 							Usage: requests.FPDFPage_FlattenUsageNormalDisplay,
 						})
@@ -153,9 +165,11 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 			When("the page transparency is requested", func() {
 				It("returns the correct transparency", func() {
 					pageTransparency, err := pdfiumContainer.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
-						Document: doc,
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
 						},
 					})
 					Expect(err).To(BeNil())

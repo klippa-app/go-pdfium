@@ -16,7 +16,9 @@ var _ = Describe("Text", func() {
 				It("returns an error", func() {
 					pageText, err := pdfium.GetPageText(&requests.GetPageText{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 					})
 					Expect(err).To(MatchError("document not given"))
@@ -28,7 +30,9 @@ var _ = Describe("Text", func() {
 				It("returns an error", func() {
 					pageTextStructured, err := pdfium.GetPageTextStructured(&requests.GetPageTextStructured{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 					})
 					Expect(err).To(MatchError("document not given"))

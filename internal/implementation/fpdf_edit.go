@@ -4,8 +4,6 @@ package implementation
 // #include "fpdf_edit.h"
 import "C"
 import (
-	"errors"
-
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -15,16 +13,7 @@ func (p *PdfiumImplementation) FPDFPage_GetRotation(request *requests.FPDFPage_G
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -42,16 +31,7 @@ func (p *PdfiumImplementation) FPDFPage_SetRotation(request *requests.FPDFPage_S
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -66,16 +46,7 @@ func (p *PdfiumImplementation) FPDFPage_HasTransparency(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}

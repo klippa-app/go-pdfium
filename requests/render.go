@@ -1,11 +1,8 @@
 package requests
 
-import "github.com/klippa-app/go-pdfium/references"
-
 type RenderPageInDPI struct {
-	Document references.FPDF_DOCUMENT
-	Page     Page
-	DPI      int // The DPI to render the page in.
+	Page Page
+	DPI  int // The DPI to render the page in.
 }
 
 type RenderPagesInDPI struct {
@@ -14,10 +11,9 @@ type RenderPagesInDPI struct {
 }
 
 type RenderPageInPixels struct {
-	Document references.FPDF_DOCUMENT
-	Page     Page
-	Width    int // The maximum width of the image.
-	Height   int // The maximum height of the image.
+	Page   Page
+	Width  int // The maximum width of the image.
+	Height int // The maximum height of the image.
 }
 
 type RenderPagesInPixels struct {

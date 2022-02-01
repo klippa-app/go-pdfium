@@ -45,9 +45,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("GetPageText()", func() {
 						It("returns an error", func() {
 							pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
-								Document: doc,
 								Page: requests.Page{
-									Index: 1,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
 								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
@@ -58,9 +60,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("GetPageTextStructured()", func() {
 						It("returns an error", func() {
 							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-								Document: doc,
 								Page: requests.Page{
-									Index: 1,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
 								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
@@ -72,9 +76,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				Context("when the page text is requested", func() {
 					It("returns the correct text", func() {
 						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
-							Document: doc,
 							Page: requests.Page{
-								Index: 0,
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
 							},
 						})
 						Expect(err).To(BeNil())
@@ -87,9 +93,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				Context("when the structured page text is requested", func() {
 					It("returns the correct structured text", func() {
 						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-							Document: doc,
 							Page: requests.Page{
-								Index: 0,
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
 							},
 						})
 
@@ -101,9 +109,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 						Context("with no DPI and no pixels", func() {
 							It("returns an error", func() {
 								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Document: doc,
 									Page: requests.Page{
-										Index: 0,
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
 									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
@@ -117,9 +127,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 						Context("with DPI", func() {
 							It("returns the correct calculations", func() {
 								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Document: doc,
 									Page: requests.Page{
-										Index: 0,
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
 									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
@@ -134,9 +146,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 						Context("with pixels", func() {
 							It("returns the correct calculations", func() {
 								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Document: doc,
 									Page: requests.Page{
-										Index: 0,
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
 									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
@@ -154,9 +168,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("when PixelPositions is enabled", func() {
 						It("returns the correct font information", func() {
 							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-								Document: doc,
 								Page: requests.Page{
-									Index: 0,
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
 								},
 								CollectFontInformation: true,
 							})
@@ -167,9 +183,11 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 						Context("and PixelPositions is enabled", func() {
 							It("returns the correct font information", func() {
 								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Document: doc,
 									Page: requests.Page{
-										Index: 0,
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
 									},
 									CollectFontInformation: true,
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
