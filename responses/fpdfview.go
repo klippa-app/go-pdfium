@@ -2,6 +2,22 @@ package responses
 
 import "github.com/klippa-app/go-pdfium/references"
 
+type FPDF_GetLastErrorError int
+
+const (
+	FPDF_GetLastErrorErrorSuccess        FPDF_GetLastErrorError = 0 // Error code: Success, which means no error.
+	FPDF_GetLastErrorErrorUnknown        FPDF_GetLastErrorError = 1 // Error code: Unknown error.
+	FPDF_GetLastErrorErrorFile           FPDF_GetLastErrorError = 2 // Error code: File access error, which means file cannot be found or be opened.
+	FPDF_GetLastErrorErrorFormat         FPDF_GetLastErrorError = 3 // Error code: Data format error.
+	FPDF_GetLastErrorErrorPassword       FPDF_GetLastErrorError = 4 // Error code: Incorrect password error.
+	FPDF_GetLastErrorErrorSecurity       FPDF_GetLastErrorError = 5 // Error code: Unsupported security scheme error.
+	FPDF_GetLastErrorErrorInvalidLicense FPDF_GetLastErrorError = 6 // Error code: License authorization error.
+)
+
+type FPDF_GetLastError struct {
+	Error FPDF_GetLastErrorError
+}
+
 type FPDF_LoadPage struct {
 	Page references.FPDF_PAGE
 }
