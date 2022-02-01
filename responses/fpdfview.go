@@ -49,3 +49,19 @@ type FPDF_GetSecurityHandlerRevision struct {
 type FPDF_GetPageCount struct {
 	PageCount int // The amount of pages of the document.
 }
+
+type FPDF_GetPageWidth struct {
+	Page  int     // The page this size came from (0-index based).
+	Width float64 // The width of the page in points. One point is 1/72 inch (around 0.3528 mm).
+}
+
+type FPDF_GetPageHeight struct {
+	Page   int     // The page this size came from (0-index based).
+	Height float64 // The height of the page in points. One point is 1/72 inch (around 0.3528 mm).
+}
+
+type FPDF_GetPageSizeByIndex struct {
+	Page   int     // The page this size came from (0-index based).
+	Width  float64 // The width of the page in points. One point is 1/72 inch (around 0.3528 mm).
+	Height float64 // The height of the page in points. One point is 1/72 inch (around 0.3528 mm).
+}

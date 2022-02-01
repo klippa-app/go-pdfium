@@ -143,6 +143,12 @@ type Pdfium interface {
 	// FPDF_GetPageCount returns the amount of pages for the references.
 	FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
 
+	FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
+
+	FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
+
+	FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
+
 	// End fpdfview.h
 
 	// Start fpdf_edit.h

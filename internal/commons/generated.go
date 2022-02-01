@@ -24,6 +24,9 @@ type Pdfium interface {
     FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
     FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
     FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
+    FPDF_GetPageHeight(*requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
+    FPDF_GetPageSizeByIndex(*requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
+    FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
@@ -166,6 +169,36 @@ func (g *PdfiumRPC) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*respo
 func (g *PdfiumRPC) FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error) {
 	resp := &responses.FPDF_GetPageCount{}
 	err := g.client.Call("Plugin.FPDF_GetPageCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error) {
+	resp := &responses.FPDF_GetPageHeight{}
+	err := g.client.Call("Plugin.FPDF_GetPageHeight", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error) {
+	resp := &responses.FPDF_GetPageSizeByIndex{}
+	err := g.client.Call("Plugin.FPDF_GetPageSizeByIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error) {
+	resp := &responses.FPDF_GetPageWidth{}
+	err := g.client.Call("Plugin.FPDF_GetPageWidth", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -474,6 +507,45 @@ func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, r
 func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount, resp *responses.FPDF_GetPageCount) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetPageCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight, resp *responses.FPDF_GetPageHeight) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageHeight(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex, resp *responses.FPDF_GetPageSizeByIndex) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageSizeByIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth, resp *responses.FPDF_GetPageWidth) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageWidth(request)
 	if err != nil {
 		return err
 	}
