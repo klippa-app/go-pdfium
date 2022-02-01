@@ -10,67 +10,102 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-func (i *pdfiumInstance) ClosePage(request *requests.ClosePage) (*responses.ClosePage, error) {
+func (i *pdfiumInstance) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.ClosePage(request)
+	return i.worker.plugin.FPDFDoc_GetPageMode(request)
 }
 
-func (i *pdfiumInstance) CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error) {
+func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.CopyViewerPreferences(request)
+	return i.worker.plugin.FPDFPage_Flatten(request)
 }
 
-func (i *pdfiumInstance) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
+func (i *pdfiumInstance) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.FlattenPage(request)
+	return i.worker.plugin.FPDFPage_GetRotation(request)
 }
 
-func (i *pdfiumInstance) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
+func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetDocPermissions(request)
+	return i.worker.plugin.FPDFPage_HasTransparency(request)
 }
 
-func (i *pdfiumInstance) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
+func (i *pdfiumInstance) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetFileVersion(request)
+	return i.worker.plugin.FPDFPage_SetRotation(request)
 }
 
-func (i *pdfiumInstance) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
+func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetMetadata(request)
+	return i.worker.plugin.FPDF_ClosePage(request)
 }
 
-func (i *pdfiumInstance) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+func (i *pdfiumInstance) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetPageCount(request)
+	return i.worker.plugin.FPDF_CopyViewerPreferences(request)
 }
 
-func (i *pdfiumInstance) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
+func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetPageMode(request)
+	return i.worker.plugin.FPDF_GetDocPermissions(request)
 }
 
-func (i *pdfiumInstance) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
+func (i *pdfiumInstance) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
-	return i.worker.plugin.GetPageRotation(request)
+	return i.worker.plugin.FPDF_GetFileVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_GetMetaText(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_GetPageCount(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_GetSecurityHandlerRevision(request)
+}
+
+func (i *pdfiumInstance) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_ImportPages(request)
+}
+
+func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_LoadPage(request)
 }
 
 func (i *pdfiumInstance) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
@@ -99,34 +134,6 @@ func (i *pdfiumInstance) GetPageTextStructured(request *requests.GetPageTextStru
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.GetPageTextStructured(request)
-}
-
-func (i *pdfiumInstance) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.GetPageTransparency(request)
-}
-
-func (i *pdfiumInstance) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.GetSecurityHandlerRevision(request)
-}
-
-func (i *pdfiumInstance) ImportPages(request *requests.ImportPages) (*responses.ImportPages, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.ImportPages(request)
-}
-
-func (i *pdfiumInstance) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.LoadPage(request)
 }
 
 func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
@@ -169,11 +176,4 @@ func (i *pdfiumInstance) RenderToFile(request *requests.RenderToFile) (*response
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.RenderToFile(request)
-}
-
-func (i *pdfiumInstance) SetRotation(request *requests.SetRotation) (*responses.SetRotation, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.SetRotation(request)
 }

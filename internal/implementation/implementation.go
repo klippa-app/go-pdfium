@@ -65,7 +65,7 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 var Pdfium = &mainPdfium{
 	mutex:        &sync.Mutex{},
 	instanceRefs: map[int]*PdfiumImplementation{},
-	documentRefs: map[references.Document]*NativeDocument{},
+	documentRefs: map[references.FPDF_DOCUMENT]*NativeDocument{},
 }
 
 var isInitialized = false
@@ -117,13 +117,13 @@ type mainPdfium struct {
 
 	// documentRefs keeps track of the opened documents for this process.
 	// we need this for document lookups and in case of closing the instance
-	documentRefs map[references.Document]*NativeDocument
+	documentRefs map[references.FPDF_DOCUMENT]*NativeDocument
 }
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		logger:       p.logger,
-		documentRefs: map[references.Document]*NativeDocument{},
+		documentRefs: map[references.FPDF_DOCUMENT]*NativeDocument{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -139,7 +139,7 @@ type PdfiumImplementation struct {
 
 	// documentRefs keeps track of the opened documents for this instance.
 	// we need this for document lookups and in case of closing the instance
-	documentRefs map[references.Document]*NativeDocument
+	documentRefs map[references.FPDF_DOCUMENT]*NativeDocument
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -240,7 +240,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	nativeDoc.currentDoc = doc
 	nativeDoc.data = request.File
 	documentRef := uuid.New()
-	nativeDoc.nativeRef = references.Document(documentRef.String())
+	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
 	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
 	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
 
@@ -249,7 +249,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}, nil
 }
 
-func (p *PdfiumImplementation) CloseDocument(document references.Document) error {
+func (p *PdfiumImplementation) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
 	p.Lock()
 	defer p.Unlock()
 
@@ -286,7 +286,7 @@ func (p *PdfiumImplementation) Close() error {
 	return nil
 }
 
-func (p *PdfiumImplementation) getNativeDocument(documentRef references.Document) (*NativeDocument, error) {
+func (p *PdfiumImplementation) getNativeDocument(documentRef references.FPDF_DOCUMENT) (*NativeDocument, error) {
 	if documentRef == "" {
 		return nil, errors.New("document not given")
 	}
@@ -302,12 +302,12 @@ type NativeDocument struct {
 	currentDoc    C.FPDF_DOCUMENT
 	readSeekerRef unsafe.Pointer
 	currentPage   *NativePage
-	data          *[]byte                         // Keep a reference to the data otherwise weird stuff happens
-	nativeRef     references.Document             // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
-	pageRefs      map[references.Page]*NativePage // A lookup table for page references of this document.
+	data          *[]byte                              // Keep a reference to the data otherwise weird stuff happens
+	nativeRef     references.FPDF_DOCUMENT             // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	pageRefs      map[references.FPDF_PAGE]*NativePage // A lookup table for page references of this document.
 }
 
-func (d *NativeDocument) getNativePage(pageRef references.Page) (*NativePage, error) {
+func (d *NativeDocument) getNativePage(pageRef references.FPDF_PAGE) (*NativePage, error) {
 	if pageRef == "" {
 		return nil, errors.New("page not given")
 	}
@@ -356,7 +356,7 @@ func (d *NativeDocument) Close() error {
 type NativePage struct {
 	page      C.FPDF_PAGE
 	index     int
-	nativeRef references.Page // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	nativeRef references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 // Close closes the internal references in FPDF

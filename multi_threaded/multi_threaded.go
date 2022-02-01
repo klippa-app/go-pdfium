@@ -228,7 +228,7 @@ type pdfiumInstance struct {
 // NewDocumentFromBytes creates a new pdfium references from a byte array.
 // This will automatically select a worker and keep it for you until you execute
 // the close method on the references.
-func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -250,7 +250,7 @@ func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDo
 }
 
 // NewDocumentFromFilePath creates a new pdfium references from a file path.
-func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -272,7 +272,7 @@ func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium
 }
 
 // NewDocumentFromReader creates a new pdfium references from a reader.
-func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -310,10 +310,10 @@ func (i *pdfiumInstance) Close() error {
 	return i.worker.plugin.Close()
 }
 
-func (i *pdfiumInstance) CloseDocument(document references.Document) error {
+func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
 	if i.closed {
 		return errors.New("instance is closed")
 	}
 
-	return i.worker.plugin.CloseDocument(document)
+	return i.worker.plugin.FPDF_CloseDocument(document)
 }

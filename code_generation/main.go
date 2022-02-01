@@ -38,7 +38,7 @@ func main() {
 		method := docType.Method(i)
 
 		// These are special, don't generate them
-		if method.Name == "Close" || method.Name == "CloseDocument" || method.Name == "NewDocumentFromBytes" || method.Name == "NewDocumentFromFilePath" || method.Name == "NewDocumentFromReader" {
+		if method.Name == "Close" || method.Name == "FPDF_CloseDocument" || method.Name == "NewDocumentFromBytes" || method.Name == "NewDocumentFromFilePath" || method.Name == "NewDocumentFromReader" {
 			continue
 		}
 

@@ -28,8 +28,8 @@ func (g *PdfiumRPC) Close() error {
 	return nil
 }
 
-func (g *PdfiumRPC) CloseDocument(document references.Document) error {
-	err := g.client.Call("Plugin.CloseDocument", document, new(interface{}))
+func (g *PdfiumRPC) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
+	err := g.client.Call("Plugin.FPDF_CloseDocument", document, new(interface{}))
 	if err != nil {
 		return err
 	}
@@ -59,9 +59,9 @@ func (s *PdfiumRPCServer) Close(args interface{}, resp *interface{}) error {
 	return nil
 }
 
-func (s *PdfiumRPCServer) CloseDocument(document references.Document, resp *interface{}) error {
+func (s *PdfiumRPCServer) FPDF_CloseDocument(document references.FPDF_DOCUMENT, resp *interface{}) error {
 	var err error
-	err = s.Impl.CloseDocument(document)
+	err = s.Impl.FPDF_CloseDocument(document)
 	if err != nil {
 		return err
 	}

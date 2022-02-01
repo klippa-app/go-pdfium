@@ -18,7 +18,7 @@ import (
 func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
 		Context("a normal PDF file", func() {
-			var doc references.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -36,7 +36,7 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.CloseDocument(doc)
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
 				Expect(err).To(BeNil())
 			})
 

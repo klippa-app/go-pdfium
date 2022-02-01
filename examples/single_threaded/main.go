@@ -47,9 +47,9 @@ func getPageCount(instance pdfium.Pdfium, filePath string) (int, error) {
 	}
 
 	// Always close the document, this will release the worker and it's resources
-	defer instance.CloseDocument(*doc)
+	defer instance.FPDF_CloseDocument(*doc)
 
-	pageCount, err := instance.GetPageCount(&requests.GetPageCount{
+	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 		Document: *doc,
 	})
 	if err != nil {

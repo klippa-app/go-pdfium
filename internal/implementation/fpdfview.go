@@ -2,21 +2,77 @@ package implementation
 
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"
-// #include "fpdf_doc.h"
-// #include "fpdf_ext.h"
-// #include <stdlib.h>
 import "C"
-
 import (
 	"errors"
-	"unsafe"
+	"github.com/google/uuid"
 
+	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-// GetFileVersion returns the version of the PDF file.
-func (p *PdfiumImplementation) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
+// FPDF_LoadPage loads a page and returns a reference.
+func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativeDoc, err := p.getNativeDocument(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	if nativeDoc.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	pageObject := C.FPDF_LoadPage(nativeDoc.currentDoc, C.int(request.Index))
+	if pageObject == nil {
+		return nil, pdfium_errors.ErrPage
+	}
+
+	pageRef := uuid.New()
+	nativePage := &NativePage{
+		page:      pageObject,
+		index:     request.Index,
+		nativeRef: references.FPDF_PAGE(pageRef.String()),
+	}
+
+	nativeDoc.pageRefs[nativePage.nativeRef] = nativePage
+
+	return &responses.FPDF_LoadPage{
+		Page: nativePage.nativeRef,
+	}, nil
+}
+
+// FPDF_ClosePage unloads a page by reference.
+func (p *PdfiumImplementation) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativeDoc, err := p.getNativeDocument(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	if nativeDoc.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	pageRef, err := nativeDoc.getNativePage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageRef.Close()
+	delete(nativeDoc.pageRefs, request.Page)
+
+	return &responses.FPDF_ClosePage{}, nil
+}
+
+// FPDF_GetFileVersion returns the version of the PDF file.
+func (p *PdfiumImplementation) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -36,13 +92,13 @@ func (p *PdfiumImplementation) GetFileVersion(request *requests.GetFileVersion) 
 		return nil, errors.New("could not get file version")
 	}
 
-	return &responses.GetFileVersion{
+	return &responses.FPDF_GetFileVersion{
 		FileVersion: int(fileVersion),
 	}, nil
 }
 
-// GetDocPermissions returns the permissions of the PDF.
-func (p *PdfiumImplementation) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
+// FPDF_GetDocPermissions returns the permissions of the PDF.
+func (p *PdfiumImplementation) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -57,7 +113,7 @@ func (p *PdfiumImplementation) GetDocPermissions(request *requests.GetDocPermiss
 
 	permissions := C.FPDF_GetDocPermissions(nativeDoc.currentDoc)
 
-	docPermissions := &responses.GetDocPermissions{
+	docPermissions := &responses.FPDF_GetDocPermissions{
 		DocPermissions: uint32(permissions),
 	}
 
@@ -94,8 +150,8 @@ func (p *PdfiumImplementation) GetDocPermissions(request *requests.GetDocPermiss
 	return docPermissions, nil
 }
 
-// GetSecurityHandlerRevision returns the revision number of security handlers of the file.
-func (p *PdfiumImplementation) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
+// FPDF_GetSecurityHandlerRevision returns the revision number of security handlers of the file.
+func (p *PdfiumImplementation) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -110,13 +166,13 @@ func (p *PdfiumImplementation) GetSecurityHandlerRevision(request *requests.GetS
 
 	securityHandlerRevision := C.FPDF_GetSecurityHandlerRevision(nativeDoc.currentDoc)
 
-	return &responses.GetSecurityHandlerRevision{
+	return &responses.FPDF_GetSecurityHandlerRevision{
 		SecurityHandlerRevision: int(securityHandlerRevision),
 	}, nil
 }
 
-// GetPageCount counts the amount of pages.
-func (p *PdfiumImplementation) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
+// FPDF_GetPageCount counts the amount of pages.
+func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -129,65 +185,7 @@ func (p *PdfiumImplementation) GetPageCount(request *requests.GetPageCount) (*re
 		return nil, errors.New("no current document")
 	}
 
-	return &responses.GetPageCount{
+	return &responses.FPDF_GetPageCount{
 		PageCount: int(C.FPDF_GetPageCount(nativeDoc.currentDoc)),
-	}, nil
-}
-
-// GetPageMode returns the document's page mode, which describes how the document should be displayed when opened.
-func (p *PdfiumImplementation) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	pageMode := C.FPDFDoc_GetPageMode(nativeDoc.currentDoc)
-
-	return &responses.GetPageMode{
-		PageMode: responses.PageMode(pageMode),
-	}, nil
-}
-
-// GetMetadata returns the requested metadata.
-func (p *PdfiumImplementation) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	cstr := C.CString(request.Tag)
-	defer C.free(unsafe.Pointer(cstr))
-
-	// First get the metadata length.
-	metaSize := C.FPDF_GetMetaText(nativeDoc.currentDoc, cstr, C.NULL, 0)
-	if metaSize == 0 {
-		return nil, errors.New("Could not get metadata")
-	}
-
-	charData := make([]byte, metaSize)
-	C.FPDF_GetMetaText(nativeDoc.currentDoc, cstr, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
-
-	transformedText, err := p.transformUTF16LEText(charData)
-	if err != nil {
-		return nil, err
-	}
-
-	return &responses.GetMetadata{
-		Tag:   request.Tag,
-		Value: transformedText,
 	}, nil
 }

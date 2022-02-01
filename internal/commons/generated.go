@@ -11,38 +11,38 @@ import (
 
 type Pdfium interface {
     Ping() (string, error)
-    ClosePage(*requests.ClosePage) (*responses.ClosePage, error)
-    CopyViewerPreferences(*requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error)
-    FlattenPage(*requests.FlattenPage) (*responses.FlattenPage, error)
-    GetDocPermissions(*requests.GetDocPermissions) (*responses.GetDocPermissions, error)
-    GetFileVersion(*requests.GetFileVersion) (*responses.GetFileVersion, error)
-    GetMetadata(*requests.GetMetadata) (*responses.GetMetadata, error)
-    GetPageCount(*requests.GetPageCount) (*responses.GetPageCount, error)
-    GetPageMode(*requests.GetPageMode) (*responses.GetPageMode, error)
-    GetPageRotation(*requests.GetPageRotation) (*responses.GetPageRotation, error)
+    FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
+    FPDFPage_Flatten(*requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
+    FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
+    FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
+    FPDFPage_SetRotation(*requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
+    FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
+    FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
+    FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
+    FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
+    FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
+    FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
+    FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
+    FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
+    FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
     GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
-    GetPageTransparency(*requests.GetPageTransparency) (*responses.GetPageTransparency, error)
-    GetSecurityHandlerRevision(*requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
-    ImportPages(*requests.ImportPages) (*responses.ImportPages, error)
-    LoadPage(*requests.LoadPage) (*responses.LoadPage, error)
     OpenDocument(*requests.OpenDocument) (*responses.OpenDocument, error)
     RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
     RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
     RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
     RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
-    SetRotation(*requests.SetRotation) (*responses.SetRotation, error)
-    CloseDocument(references.Document) error
+    FPDF_CloseDocument(references.FPDF_DOCUMENT) error
     Close() error
 }
 
 
-func (g *PdfiumRPC) ClosePage(request *requests.ClosePage) (*responses.ClosePage, error) {
-	resp := &responses.ClosePage{}
-	err := g.client.Call("Plugin.ClosePage", request, resp)
+func (g *PdfiumRPC) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
+	resp := &responses.FPDFDoc_GetPageMode{}
+	err := g.client.Call("Plugin.FPDFDoc_GetPageMode", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +50,9 @@ func (g *PdfiumRPC) ClosePage(request *requests.ClosePage) (*responses.ClosePage
 	return resp, nil
 }
 
-func (g *PdfiumRPC) CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error) {
-	resp := &responses.CopyViewerPreferences{}
-	err := g.client.Call("Plugin.CopyViewerPreferences", request, resp)
+func (g *PdfiumRPC) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error) {
+	resp := &responses.FPDFPage_Flatten{}
+	err := g.client.Call("Plugin.FPDFPage_Flatten", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +60,9 @@ func (g *PdfiumRPC) CopyViewerPreferences(request *requests.CopyViewerPreference
 	return resp, nil
 }
 
-func (g *PdfiumRPC) FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error) {
-	resp := &responses.FlattenPage{}
-	err := g.client.Call("Plugin.FlattenPage", request, resp)
+func (g *PdfiumRPC) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error) {
+	resp := &responses.FPDFPage_GetRotation{}
+	err := g.client.Call("Plugin.FPDFPage_GetRotation", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +70,9 @@ func (g *PdfiumRPC) FlattenPage(request *requests.FlattenPage) (*responses.Flatt
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error) {
-	resp := &responses.GetDocPermissions{}
-	err := g.client.Call("Plugin.GetDocPermissions", request, resp)
+func (g *PdfiumRPC) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error) {
+	resp := &responses.FPDFPage_HasTransparency{}
+	err := g.client.Call("Plugin.FPDFPage_HasTransparency", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -80,9 +80,9 @@ func (g *PdfiumRPC) GetDocPermissions(request *requests.GetDocPermissions) (*res
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error) {
-	resp := &responses.GetFileVersion{}
-	err := g.client.Call("Plugin.GetFileVersion", request, resp)
+func (g *PdfiumRPC) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error) {
+	resp := &responses.FPDFPage_SetRotation{}
+	err := g.client.Call("Plugin.FPDFPage_SetRotation", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -90,9 +90,9 @@ func (g *PdfiumRPC) GetFileVersion(request *requests.GetFileVersion) (*responses
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error) {
-	resp := &responses.GetMetadata{}
-	err := g.client.Call("Plugin.GetMetadata", request, resp)
+func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
+	resp := &responses.FPDF_ClosePage{}
+	err := g.client.Call("Plugin.FPDF_ClosePage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -100,9 +100,9 @@ func (g *PdfiumRPC) GetMetadata(request *requests.GetMetadata) (*responses.GetMe
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error) {
-	resp := &responses.GetPageCount{}
-	err := g.client.Call("Plugin.GetPageCount", request, resp)
+func (g *PdfiumRPC) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
+	resp := &responses.FPDF_CopyViewerPreferences{}
+	err := g.client.Call("Plugin.FPDF_CopyViewerPreferences", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +110,9 @@ func (g *PdfiumRPC) GetPageCount(request *requests.GetPageCount) (*responses.Get
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error) {
-	resp := &responses.GetPageMode{}
-	err := g.client.Call("Plugin.GetPageMode", request, resp)
+func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
+	resp := &responses.FPDF_GetDocPermissions{}
+	err := g.client.Call("Plugin.FPDF_GetDocPermissions", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +120,59 @@ func (g *PdfiumRPC) GetPageMode(request *requests.GetPageMode) (*responses.GetPa
 	return resp, nil
 }
 
-func (g *PdfiumRPC) GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error) {
-	resp := &responses.GetPageRotation{}
-	err := g.client.Call("Plugin.GetPageRotation", request, resp)
+func (g *PdfiumRPC) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
+	resp := &responses.FPDF_GetFileVersion{}
+	err := g.client.Call("Plugin.FPDF_GetFileVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error) {
+	resp := &responses.FPDF_GetMetaText{}
+	err := g.client.Call("Plugin.FPDF_GetMetaText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error) {
+	resp := &responses.FPDF_GetPageCount{}
+	err := g.client.Call("Plugin.FPDF_GetPageCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error) {
+	resp := &responses.FPDF_GetSecurityHandlerRevision{}
+	err := g.client.Call("Plugin.FPDF_GetSecurityHandlerRevision", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error) {
+	resp := &responses.FPDF_ImportPages{}
+	err := g.client.Call("Plugin.FPDF_ImportPages", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
+	resp := &responses.FPDF_LoadPage{}
+	err := g.client.Call("Plugin.FPDF_LoadPage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -163,46 +213,6 @@ func (g *PdfiumRPC) GetPageText(request *requests.GetPageText) (*responses.GetPa
 func (g *PdfiumRPC) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
 	resp := &responses.GetPageTextStructured{}
 	err := g.client.Call("Plugin.GetPageTextStructured", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error) {
-	resp := &responses.GetPageTransparency{}
-	err := g.client.Call("Plugin.GetPageTransparency", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error) {
-	resp := &responses.GetSecurityHandlerRevision{}
-	err := g.client.Call("Plugin.GetSecurityHandlerRevision", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) ImportPages(request *requests.ImportPages) (*responses.ImportPages, error) {
-	resp := &responses.ImportPages{}
-	err := g.client.Call("Plugin.ImportPages", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) LoadPage(request *requests.LoadPage) (*responses.LoadPage, error) {
-	resp := &responses.LoadPage{}
-	err := g.client.Call("Plugin.LoadPage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -270,21 +280,11 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 	return resp, nil
 }
 
-func (g *PdfiumRPC) SetRotation(request *requests.SetRotation) (*responses.SetRotation, error) {
-	resp := &responses.SetRotation{}
-	err := g.client.Call("Plugin.SetRotation", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
 
 
-
-func (s *PdfiumRPCServer) ClosePage(request *requests.ClosePage, resp *responses.ClosePage) error {
+func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) error {
 	var err error
-	implResp, err := s.Impl.ClosePage(request)
+	implResp, err := s.Impl.FPDFDoc_GetPageMode(request)
 	if err != nil {
 		return err
 	}
@@ -295,9 +295,9 @@ func (s *PdfiumRPCServer) ClosePage(request *requests.ClosePage, resp *responses
 	return nil
 }
 
-func (s *PdfiumRPCServer) CopyViewerPreferences(request *requests.CopyViewerPreferences, resp *responses.CopyViewerPreferences) error {
+func (s *PdfiumRPCServer) FPDFPage_Flatten(request *requests.FPDFPage_Flatten, resp *responses.FPDFPage_Flatten) error {
 	var err error
-	implResp, err := s.Impl.CopyViewerPreferences(request)
+	implResp, err := s.Impl.FPDFPage_Flatten(request)
 	if err != nil {
 		return err
 	}
@@ -308,9 +308,9 @@ func (s *PdfiumRPCServer) CopyViewerPreferences(request *requests.CopyViewerPref
 	return nil
 }
 
-func (s *PdfiumRPCServer) FlattenPage(request *requests.FlattenPage, resp *responses.FlattenPage) error {
+func (s *PdfiumRPCServer) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation, resp *responses.FPDFPage_GetRotation) error {
 	var err error
-	implResp, err := s.Impl.FlattenPage(request)
+	implResp, err := s.Impl.FPDFPage_GetRotation(request)
 	if err != nil {
 		return err
 	}
@@ -321,9 +321,9 @@ func (s *PdfiumRPCServer) FlattenPage(request *requests.FlattenPage, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetDocPermissions(request *requests.GetDocPermissions, resp *responses.GetDocPermissions) error {
+func (s *PdfiumRPCServer) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency, resp *responses.FPDFPage_HasTransparency) error {
 	var err error
-	implResp, err := s.Impl.GetDocPermissions(request)
+	implResp, err := s.Impl.FPDFPage_HasTransparency(request)
 	if err != nil {
 		return err
 	}
@@ -334,9 +334,9 @@ func (s *PdfiumRPCServer) GetDocPermissions(request *requests.GetDocPermissions,
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetFileVersion(request *requests.GetFileVersion, resp *responses.GetFileVersion) error {
+func (s *PdfiumRPCServer) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation, resp *responses.FPDFPage_SetRotation) error {
 	var err error
-	implResp, err := s.Impl.GetFileVersion(request)
+	implResp, err := s.Impl.FPDFPage_SetRotation(request)
 	if err != nil {
 		return err
 	}
@@ -347,9 +347,9 @@ func (s *PdfiumRPCServer) GetFileVersion(request *requests.GetFileVersion, resp 
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetMetadata(request *requests.GetMetadata, resp *responses.GetMetadata) error {
+func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) error {
 	var err error
-	implResp, err := s.Impl.GetMetadata(request)
+	implResp, err := s.Impl.FPDF_ClosePage(request)
 	if err != nil {
 		return err
 	}
@@ -360,9 +360,9 @@ func (s *PdfiumRPCServer) GetMetadata(request *requests.GetMetadata, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageCount(request *requests.GetPageCount, resp *responses.GetPageCount) error {
+func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences, resp *responses.FPDF_CopyViewerPreferences) error {
 	var err error
-	implResp, err := s.Impl.GetPageCount(request)
+	implResp, err := s.Impl.FPDF_CopyViewerPreferences(request)
 	if err != nil {
 		return err
 	}
@@ -373,9 +373,9 @@ func (s *PdfiumRPCServer) GetPageCount(request *requests.GetPageCount, resp *res
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageMode(request *requests.GetPageMode, resp *responses.GetPageMode) error {
+func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions, resp *responses.FPDF_GetDocPermissions) error {
 	var err error
-	implResp, err := s.Impl.GetPageMode(request)
+	implResp, err := s.Impl.FPDF_GetDocPermissions(request)
 	if err != nil {
 		return err
 	}
@@ -386,9 +386,74 @@ func (s *PdfiumRPCServer) GetPageMode(request *requests.GetPageMode, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageRotation(request *requests.GetPageRotation, resp *responses.GetPageRotation) error {
+func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion, resp *responses.FPDF_GetFileVersion) error {
 	var err error
-	implResp, err := s.Impl.GetPageRotation(request)
+	implResp, err := s.Impl.FPDF_GetFileVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, resp *responses.FPDF_GetMetaText) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetMetaText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount, resp *responses.FPDF_GetPageCount) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision, resp *responses.FPDF_GetSecurityHandlerRevision) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetSecurityHandlerRevision(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, resp *responses.FPDF_ImportPages) error {
+	var err error
+	implResp, err := s.Impl.FPDF_ImportPages(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) error {
+	var err error
+	implResp, err := s.Impl.FPDF_LoadPage(request)
 	if err != nil {
 		return err
 	}
@@ -441,58 +506,6 @@ func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *respo
 func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) error {
 	var err error
 	implResp, err := s.Impl.GetPageTextStructured(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) GetPageTransparency(request *requests.GetPageTransparency, resp *responses.GetPageTransparency) error {
-	var err error
-	implResp, err := s.Impl.GetPageTransparency(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision, resp *responses.GetSecurityHandlerRevision) error {
-	var err error
-	implResp, err := s.Impl.GetSecurityHandlerRevision(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) ImportPages(request *requests.ImportPages, resp *responses.ImportPages) error {
-	var err error
-	implResp, err := s.Impl.ImportPages(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) LoadPage(request *requests.LoadPage, resp *responses.LoadPage) error {
-	var err error
-	implResp, err := s.Impl.LoadPage(request)
 	if err != nil {
 		return err
 	}
@@ -571,19 +584,6 @@ func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPix
 func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
 	var err error
 	implResp, err := s.Impl.RenderToFile(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) SetRotation(request *requests.SetRotation, resp *responses.SetRotation) error {
-	var err error
-	implResp, err := s.Impl.SetRotation(request)
 	if err != nil {
 		return err
 	}

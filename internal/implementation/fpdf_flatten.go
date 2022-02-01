@@ -1,17 +1,16 @@
 package implementation
 
 // #cgo pkg-config: pdfium
-// #include "fpdf_edit.h"
+// #include "fpdf_flatten.h"
 import "C"
 import (
 	"errors"
-
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-// SetRotation sets the page rotation for a given page.
-func (p *PdfiumImplementation) SetRotation(request *requests.SetRotation) (*responses.SetRotation, error) {
+// FPDFPage_Flatten makes annotations and form fields become part of the page contents itself.
+func (p *PdfiumImplementation) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -29,7 +28,10 @@ func (p *PdfiumImplementation) SetRotation(request *requests.SetRotation) (*resp
 		return nil, err
 	}
 
-	C.FPDFPage_SetRotation(nativePage.page, C.int(request.Rotate))
+	flattenPageResult := C.FPDFPage_Flatten(nativePage.page, C.int(request.Usage))
 
-	return &responses.SetRotation{}, nil
+	return &responses.FPDFPage_Flatten{
+		Page:   nativePage.index,
+		Result: responses.FPDFPage_FlattenResult(flattenPageResult),
+	}, nil
 }
