@@ -36,7 +36,8 @@
     * Render 1 or multiple pages from 1 or multiple documents into a Go `image.Image` using either DPI or pixel size
     * Use the same render instructions to render the image directly as a jpeg or png into a file path or byte array
     * Get page size in either points or pixel size (when rendered in a specific DPI)
-    * Get the point to pixel ratio when rendering or extracting text (to determine the positions when rendering into an image)
+    * Get the point to pixel ratio when rendering or extracting text (to determine the positions when rendering into an
+      image)
 
 ## pdfium
 
@@ -70,6 +71,16 @@ becomes available again.
 
 **Be aware that pdfium could use quite some memory depending on the size of the PDF and the requests that you do, so be
 aware of the amount of workers that you configure.**
+
+### `io.ReadSeeker` and `io.Writer`
+
+Document loading allows you to load a document with a `io.ReadSeeker`. Please be aware that this only works efficiently
+when using the single-threaded usage, as that lives in the same process. For multi-threaded usage this will just load in
+the complete file and pass the bytes through the gRPC interface.
+
+Document/image saving allows you to save using a `io.Writer`. Please be aware this only works when using the
+single-threaded usage. It's not possible to encode the `io.Writer` with gRPC. Or share it between processes for that
+matter.
 
 ## Prerequisites
 
