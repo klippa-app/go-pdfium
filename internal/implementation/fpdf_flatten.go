@@ -4,7 +4,6 @@ package implementation
 // #include "fpdf_flatten.h"
 import "C"
 import (
-	"errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -14,16 +13,7 @@ func (p *PdfiumImplementation) FPDFPage_Flatten(request *requests.FPDFPage_Flatt
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}

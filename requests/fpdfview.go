@@ -12,8 +12,7 @@ type FPDF_LoadPage struct {
 }
 
 type FPDF_ClosePage struct {
-	Document references.FPDF_DOCUMENT
-	Page     references.FPDF_PAGE
+	Page references.FPDF_PAGE
 }
 
 type FPDF_GetFileVersion struct {

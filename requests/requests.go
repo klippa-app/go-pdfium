@@ -14,11 +14,16 @@ type OpenDocument struct {
 	Password       *string // The password of the document.
 }
 
+type PageByIndex struct {
+	Document references.FPDF_DOCUMENT // A reference to a document.
+	Index    int                      // The page number (0-index based).
+}
+
 // Page can either be the index of a page or a page reference.
 // When you use an index. The library will always cache the last opened page.
 type Page struct {
-	Index     int                  // The page number (0-index based).
-	Reference references.FPDF_PAGE // A reference to a page. Received by GetPage()
+	ByIndex     *PageByIndex          // A page index + document reference.
+	ByReference *references.FPDF_PAGE // A reference to a page. Received by GetPage()
 }
 
 type NewPage struct {
@@ -29,14 +34,12 @@ type NewPage struct {
 }
 
 type GetPageSize struct {
-	Document references.FPDF_DOCUMENT
-	Page     Page
+	Page Page
 }
 
 type GetPageSizeInPixels struct {
-	Document references.FPDF_DOCUMENT
-	Page     Page
-	DPI      int // The DPI to calculate the size for.
+	Page Page
+	DPI  int // The DPI to calculate the size for.
 }
 
 type PageRotation int

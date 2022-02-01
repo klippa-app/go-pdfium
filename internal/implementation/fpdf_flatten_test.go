@@ -16,7 +16,9 @@ var _ = Describe("fpdf_flatten", func() {
 			It("returns an error when flattening a pdf page", func() {
 				pageCount, err := pdfium.FPDFPage_Flatten(&requests.FPDFPage_Flatten{
 					Page: requests.Page{
-						Index: 0,
+						ByIndex: &requests.PageByIndex{
+							Index: 0,
+						},
 					},
 				})
 				Expect(err).To(MatchError("document not given"))

@@ -16,7 +16,9 @@ var _ = Describe("fpdf_edit", func() {
 			It("returns an error when getting the pdf page rotation", func() {
 				pageCount, err := pdfium.FPDFPage_GetRotation(&requests.FPDFPage_GetRotation{
 					Page: requests.Page{
-						Index: 0,
+						ByIndex: &requests.PageByIndex{
+							Index: 0,
+						},
 					},
 				})
 				Expect(err).To(MatchError("document not given"))
@@ -26,7 +28,9 @@ var _ = Describe("fpdf_edit", func() {
 			It("returns an error when getting the pdf page transparency", func() {
 				pageCount, err := pdfium.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
 					Page: requests.Page{
-						Index: 0,
+						ByIndex: &requests.PageByIndex{
+							Index: 0,
+						},
 					},
 				})
 				Expect(err).To(MatchError("document not given"))

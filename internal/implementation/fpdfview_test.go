@@ -8,7 +8,7 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 )
 
-var _ = Describe("fpdf_view", func() {
+var _ = Describe("fpdfview", func() {
 	pdfium := implementation.Pdfium.GetInstance()
 
 	Context("no document", func() {

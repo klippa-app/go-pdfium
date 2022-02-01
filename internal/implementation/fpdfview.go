@@ -34,12 +34,14 @@ func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*
 
 	pageRef := uuid.New()
 	nativePage := &NativePage{
-		page:      pageObject,
-		index:     request.Index,
-		nativeRef: references.FPDF_PAGE(pageRef.String()),
+		page:        pageObject,
+		index:       request.Index,
+		nativeRef:   references.FPDF_PAGE(pageRef.String()),
+		documentRef: nativeDoc.nativeRef,
 	}
 
 	nativeDoc.pageRefs[nativePage.nativeRef] = nativePage
+	p.pageRefs[nativePage.nativeRef] = nativePage
 
 	return &responses.FPDF_LoadPage{
 		Page: nativePage.nativeRef,
@@ -51,21 +53,19 @@ func (p *PdfiumImplementation) FPDF_ClosePage(request *requests.FPDF_ClosePage) 
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	pageRef, err := nativeDoc.getNativePage(request.Page)
+	pageRef, err := p.getNativePage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
 	pageRef.Close()
+	delete(p.pageRefs, request.Page)
+
+	// Remove page reference from document.
+	nativeDoc, err := p.getNativeDocument(pageRef.documentRef)
+	if err != nil {
+		return nil, err
+	}
 	delete(nativeDoc.pageRefs, request.Page)
 
 	return &responses.FPDF_ClosePage{}, nil

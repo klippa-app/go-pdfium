@@ -24,16 +24,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -60,16 +51,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
-	if nativeDoc.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	nativePage, err := p.loadPage(nativeDoc, request.Page)
+	nativePage, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -77,14 +59,14 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	pointToPixelRatio := float64(0)
 	if request.PixelPositions.Calculate {
 		if request.PixelPositions.DPI > 0 {
-			_, _, _, pointToPixelRatio, err = p.getPageSizeInPixels(nativeDoc, request.Page, request.PixelPositions.DPI)
+			_, _, _, pointToPixelRatio, err = p.getPageSizeInPixels(request.Page, request.PixelPositions.DPI)
 			if err != nil {
 				return nil, err
 			}
 		} else if request.PixelPositions.Width == 0 && request.PixelPositions.Height == 0 {
 			return nil, errors.New("no DPI or resolution given to calculate pixel positions")
 		} else {
-			_, _, _, ratio, err := p.calculateRenderImageSize(nativeDoc, request.Page, request.PixelPositions.Width, request.PixelPositions.Height)
+			_, _, _, ratio, err := p.calculateRenderImageSize(request.Page, request.PixelPositions.Width, request.PixelPositions.Height)
 			if err != nil {
 				return nil, err
 			}

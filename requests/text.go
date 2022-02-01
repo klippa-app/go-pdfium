@@ -3,12 +3,10 @@ package requests
 import "github.com/klippa-app/go-pdfium/references"
 
 type GetPageText struct {
-	Document references.FPDF_DOCUMENT
-	Page     Page
+	Page Page
 }
 
 type GetPageTextStructured struct {
-	Document               references.FPDF_DOCUMENT
 	Page                   Page
 	Mode                   GetPageTextStructuredMode           // The mode to get structured text for.
 	CollectFontInformation bool                                // Whether to collect font information like name/size/weight.

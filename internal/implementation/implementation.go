@@ -141,6 +141,10 @@ type PdfiumImplementation struct {
 	// we need this for document lookups and in case of closing the instance
 	documentRefs map[references.FPDF_DOCUMENT]*NativeDocument
 
+	// pageRefs keeps track of the opened documents for this instance.
+	// we need this for document lookups and in case of closing the instance
+	pageRefs map[references.FPDF_PAGE]*NativePage
+
 	// We need to keep track of our own instance.
 	instanceRef int
 }
@@ -281,6 +285,11 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.documentRefs, p.documentRefs[i].nativeRef)
 	}
 
+	for i := range p.pageRefs {
+		// Already closed by the document close.
+		delete(p.pageRefs, p.pageRefs[i].nativeRef)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -296,6 +305,18 @@ func (p *PdfiumImplementation) getNativeDocument(documentRef references.FPDF_DOC
 	}
 
 	return nil, errors.New("could not find native doc instance, perhaps the doc was already closed or you tried to share documents between instances")
+}
+
+func (d *PdfiumImplementation) getNativePage(pageRef references.FPDF_PAGE) (*NativePage, error) {
+	if pageRef == "" {
+		return nil, errors.New("page not given")
+	}
+
+	if val, ok := d.pageRefs[pageRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
 }
 
 type NativeDocument struct {
@@ -354,9 +375,10 @@ func (d *NativeDocument) Close() error {
 }
 
 type NativePage struct {
-	page      C.FPDF_PAGE
-	index     int
-	nativeRef references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	page        C.FPDF_PAGE
+	index       int
+	documentRef references.FPDF_DOCUMENT
+	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 // Close closes the internal references in FPDF

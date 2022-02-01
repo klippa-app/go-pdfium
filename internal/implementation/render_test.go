@@ -17,7 +17,9 @@ var _ = Describe("Render", func() {
 				It("returns an error", func() {
 					pageSize, err := pdfium.GetPageSize(&requests.GetPageSize{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 					})
 					Expect(err).To(MatchError("document not given"))
@@ -29,7 +31,9 @@ var _ = Describe("Render", func() {
 				It("returns an error", func() {
 					pageSize, err := pdfium.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 						DPI: 100,
 					})
@@ -42,7 +46,9 @@ var _ = Describe("Render", func() {
 				It("returns an error", func() {
 					renderedPage, err := pdfium.RenderPageInDPI(&requests.RenderPageInDPI{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 						DPI: 300,
 					})
@@ -57,7 +63,9 @@ var _ = Describe("Render", func() {
 						Pages: []requests.RenderPageInDPI{
 							{
 								Page: requests.Page{
-									Index: 0,
+									ByIndex: &requests.PageByIndex{
+										Index: 0,
+									},
 								},
 								DPI: 300,
 							},
@@ -73,7 +81,9 @@ var _ = Describe("Render", func() {
 				It("returns an error", func() {
 					renderedPage, err := pdfium.RenderPageInPixels(&requests.RenderPageInPixels{
 						Page: requests.Page{
-							Index: 0,
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
 						},
 						Width:  2000,
 						Height: 2000,
@@ -89,7 +99,9 @@ var _ = Describe("Render", func() {
 						Pages: []requests.RenderPageInPixels{
 							{
 								Page: requests.Page{
-									Index: 0,
+									ByIndex: &requests.PageByIndex{
+										Index: 0,
+									},
 								},
 								Width:  2000,
 								Height: 2000,
