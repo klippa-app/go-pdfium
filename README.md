@@ -14,7 +14,8 @@
 
 ## Features
 
-* Option between single-threaded and multi-threaded (through subprocesses)
+* Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
+* This library will handle all complicated cgo gymnastics for you
 * Almost all pdfium methods exposed through Go, no cgo required
     * pdfium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
@@ -32,9 +33,10 @@
     * Get all document bookmarks
     * Get plain text of a page
     * Get structured text of a page (text, angle, position, size, font information)
-    * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
-    * Render the image above directly as a jpeg or png into a file path or byte array
+    * Render 1 or multiple pages from 1 or multiple documents into a Go `image.Image` using either DPI or pixel size
+    * Use the same render instructions to render the image directly as a jpeg or png into a file path or byte array
     * Get page size in either points or pixel size (when rendered in a specific DPI)
+    * Get the point to pixel ratio when rendering or extracting text (to determine the positions when rendering into an image)
 
 ## pdfium
 
