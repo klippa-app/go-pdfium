@@ -116,6 +116,13 @@ type Pdfium interface {
 
 	// End render
 
+	// Start bookmarks: bookmark helpers
+
+	// GetBookmarks returns all the bookmarks of a document.
+	GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error)
+
+	// End bookmarks
+
 	// Start fpdfview.h
 
 	// FPDF_GetLastError returns the last error code of a PDFium function, which is just called.

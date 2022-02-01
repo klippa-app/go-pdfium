@@ -192,6 +192,13 @@ func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBox
 	return i.pdfium.FPDF_SetSandBoxPolicy(request)
 }
 
+func (i *pdfiumInstance) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.GetBookmarks(request)
+}
+
 func (i *pdfiumInstance) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
