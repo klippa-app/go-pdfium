@@ -157,6 +157,13 @@ func (i *pdfiumInstance) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVer
 	return i.worker.plugin.FPDF_SaveWithVersion(request)
 }
 
+func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_SetSandBoxPolicy(request)
+}
+
 func (i *pdfiumInstance) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

@@ -122,6 +122,9 @@ type Pdfium interface {
 	// Usually, this function is called after a PDFium function returns, in order to check the error code of the previous PDFium function.
 	FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 
+	// FPDF_SetSandBoxPolicy set the policy for the sandbox environment.
+	FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
+
 	// FPDF_CloseDocument closes the references, releases the resources.
 	FPDF_CloseDocument(request references.FPDF_DOCUMENT) error
 
@@ -202,10 +205,16 @@ type Pdfium interface {
 
 	// FPDF_SaveAsCopy saves the document to a copy.
 	// If no path or writer is given, it will return the saved file as a byte array.
+	// Note that using a fileWriter only works when using the single-threaded version,
+	// the reason for that is that a fileWriter can't be transferred over gRPC
+	// (or between processes at all).
 	FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
 
 	// FPDF_SaveWithVersion save the document to a copy, with a specific file version.
 	// If no path or writer is given, it will return the saved file as a byte array.
+	// Note that using a fileWriter only works when using the single-threaded version,
+	// the reason for that is that a fileWriter can't be transferred over gRPC
+	// (or between processes at all).
 	FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
 
 	// End fpdf_save.h

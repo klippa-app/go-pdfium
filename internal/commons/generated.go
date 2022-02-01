@@ -32,6 +32,7 @@ type Pdfium interface {
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
     FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
     FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
+    FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
     GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
@@ -251,6 +252,16 @@ func (g *PdfiumRPC) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*respons
 func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error) {
 	resp := &responses.FPDF_SaveWithVersion{}
 	err := g.client.Call("Plugin.FPDF_SaveWithVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
+	resp := &responses.FPDF_SetSandBoxPolicy{}
+	err := g.client.Call("Plugin.FPDF_SetSandBoxPolicy", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -633,6 +644,19 @@ func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, res
 func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion, resp *responses.FPDF_SaveWithVersion) error {
 	var err error
 	implResp, err := s.Impl.FPDF_SaveWithVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy, resp *responses.FPDF_SetSandBoxPolicy) error {
+	var err error
+	implResp, err := s.Impl.FPDF_SetSandBoxPolicy(request)
 	if err != nil {
 		return err
 	}

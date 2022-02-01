@@ -4,6 +4,17 @@ import "github.com/klippa-app/go-pdfium/references"
 
 type FPDF_GetLastError struct{}
 
+type FPDF_SetSandBoxPolicyPolicy uint32
+
+const (
+	FPDF_SetSandBoxPolicyPolicyMachinetimeAccess FPDF_SetSandBoxPolicyPolicy = 1 // Policy for accessing the local machine time.
+)
+
+type FPDF_SetSandBoxPolicy struct {
+	Policy FPDF_SetSandBoxPolicyPolicy
+	Enable bool
+}
+
 type FPDF_CloseDocument struct {
 	Document references.FPDF_DOCUMENT
 }

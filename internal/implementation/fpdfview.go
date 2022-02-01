@@ -23,6 +23,21 @@ func (p *PdfiumImplementation) FPDF_GetLastError(request *requests.FPDF_GetLastE
 	}, nil
 }
 
+// FPDF_SetSandBoxPolicy set the policy for the sandbox environment.
+func (p *PdfiumImplementation) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	enable := C.int(0)
+	if request.Enable {
+		enable = C.int(1)
+	}
+
+	C.FPDF_SetSandBoxPolicy(C.FPDF_DWORD(request.Policy), enable)
+
+	return &responses.FPDF_SetSandBoxPolicy{}, nil
+}
+
 // FPDF_LoadPage loads a page and returns a reference.
 func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	p.Lock()

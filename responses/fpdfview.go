@@ -18,6 +18,8 @@ type FPDF_GetLastError struct {
 	Error FPDF_GetLastErrorError
 }
 
+type FPDF_SetSandBoxPolicy struct{}
+
 type FPDF_LoadPage struct {
 	Page references.FPDF_PAGE
 }
