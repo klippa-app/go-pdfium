@@ -10,22 +10,24 @@ import (
 	"github.com/klippa-app/go-pdfium/single_threaded"
 )
 
-func main() {
+// Be sure to close pools/instances when you're done with them.
+var pool pdfium.Pool
+var instance pdfium.Pdfium
+
+func init() {
 	// Init the pdfium library and return the instance to open documents.
-	pool := single_threaded.Init()
-	instance, err := pool.GetInstance(time.Second * 30)
+	pool = single_threaded.Init()
+
+	var err error
+	instance, err = pool.GetInstance(time.Second * 30)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
 
-	// Cleanup
-	defer func() {
-		instance.Close()
-		pool.Close()
-	}()
-
+func main() {
 	filePath := "shared_tests/testdata/test.pdf"
-	pageCount, err := getPageCount(instance, filePath)
+	pageCount, err := getPageCount(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +35,7 @@ func main() {
 	log.Printf("The PDF %s has %d page(s)", filePath, pageCount)
 }
 
-func getPageCount(instance pdfium.Pdfium, filePath string) (int, error) {
+func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
 	pdfBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {

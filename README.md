@@ -8,28 +8,43 @@
 
 [build-url]:https://github.com/klippa-app/go-pdfium/actions
 
-:rocket: *Easy PDF rendering and text extraction using Go and pdfium* :rocket:
+:rocket: *Easy to use PDF library using Go and pdfium* :rocket:
 
-**A fast, multi-threaded and easy to use PDF renderer / text extractor for Go applications.**
+**A fast, multi-threaded and easy to use PDF library for Go applications.**
 
 ## Features
 
-* Option between single-threaded and multi-threaded
-* Get page count
-* Get plain text of a page
-* Get structured text of a page (text, angle, position, size, font information)
-* Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
-* Render the image above directly as a jpeg or png into a file path or byte array
-* Get page size in either points or pixel size (when rendered in a specific DPI)
+* Option between single-threaded and multi-threaded (through subprocesses)
+* Almost all pdfium methods exposed through Go, no cgo required
+    * pdfium instance configuration (sandbox policy, fonts)
+    * Document loading (from bytes, path or io.ReadSeeker)
+    * Document info (metadata, page count, render mode, PDF version, permissions, security handler revision)
+    * Page info (size, transparency)
+    * Rendering (through bitmap)
+    * Creation (create new documents and pages)
+    * Editing (rotating, import pages from another document, copy view preferences from another document, flattening)
+    * Form filling
+    * Text handling (extract, search)
+    * Bookmarks / Links / Weblinks
+    * Document saving (to bytes, path or io.Writer)
+* Useful helpers to make your life easier:
+    * Get all document metadata
+    * Get all document bookmarks
+    * Get plain text of a page
+    * Get structured text of a page (text, angle, position, size, font information)
+    * Render 1 or multiple pages into a Go `image.Image` using either DPI or pixel size
+    * Render the image above directly as a jpeg or png into a file path or byte array
+    * Get page size in either points or pixel size (when rendered in a specific DPI)
 
 ## pdfium
+
 This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents.
 
 ## Single/Multi-threading
 
-Since pdfium is not a multithreaded C++ library, we can not directly make it multithreaded by calling it from Go's
-subroutines.
+Since pdfium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
+make it multithreaded by calling it from Go's subroutines.
 
 This library allows you to call pdfium in a single or multi-threaded way.
 
@@ -38,12 +53,18 @@ which allows us launch separate pdfium worker processes, and then route the requ
 also makes it a bit more safe to use pdfium, as it's less likely to segfaults or corrupt your main Go application. The
 Plugin system provides the communication between the processes using gRPC, however, when implementing this library, you
 won't really see anything of that. From the outside it will look like normal Go code. The inter-process communication
-does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the pdfium
-workers.
+does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the
+pdfium workers.
 
 Single-threading works by directly calling the pdfium library from the same process. Single-threaded might be preferred
 if the caller is managing the workers themselves and does not want the overhead of another process. Be aware that since
-pdfium is C++, we can't handle segfaults caused by pdfium, which may cause your process to be killed.
+pdfium is C++, we can't handle segfaults caused by pdfium, which may cause your process to be killed. So using this
+library in the multi-threaded way, with only 1 worker, can still have some benefits, since it can automatically recover
+from things like segfaults.
+
+Both the single-threaded and multi-threaded implementation are thread/subroutine safe, this has been guaranteed by
+locking the instance that's doing your work while it's doing pdfium operations. New operations will wait until the lock
+becomes available again.
 
 **Be aware that pdfium could use quite some memory depending on the size of the PDF and the requests that you do, so be
 aware of the amount of workers that you configure.**
@@ -105,15 +126,25 @@ For single threaded implementations we just have to initialize the library.
 package renderer
 
 import (
+	"log"
+
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/single_threaded"
 )
 
-var Pdfium pdfium.Pdfium
+// Be sure to close pools/instances when you're done with them.
+var pool pdfium.Pool
+var instance pdfium.Pdfium
 
 func init() {
 	// Init the pdfium library and return the instance to open documents.
-	Pdfium = single_threaded.Init()
+	pool = single_threaded.Init()
+
+	var err error
+	instance, err = pool.GetInstance(time.Second * 30)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 ```
 
@@ -150,16 +181,20 @@ library. Example:
 package renderer
 
 import (
+	"log"
+
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/multi_threaded"
 )
 
-var Pdfium pdfium.Pdfium
+// Be sure to close pools/instances when you're done with them.
+var pool pdfium.Pool
+var instance pdfium.Pdfium
 
 func init() {
 	// Init the pdfium library and return the instance to open documents.
 	// You can tweak these configs to your need. Be aware that workers can use quite some memory.
-	Pdfium = multi_threaded.Init(multi_threaded.Config{
+	pool = multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
 		MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
@@ -168,6 +203,12 @@ func init() {
 			Args:    []string{"run", "pdfium/worker/main.go"}, // This is a reference to the worker package, this can be left empty when using a direct binary path.
 		},
 	})
+
+	var err error
+	instance, err = pool.GetInstance(time.Second * 30)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 ```
 
@@ -183,8 +224,6 @@ import (
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/requests"
 )
-
-var Pdfium pdfium.Pdfium
 
 // Insert the single/multi-threaded init() here.
 
@@ -206,7 +245,7 @@ func getPageCount(filePath string) (int, error) {
 	}
 
 	// Open the PDF using pdfium (and claim a worker)
-	doc, err := Pdfium.NewDocument(&pdfBytes)
+	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err
 	}
@@ -214,7 +253,9 @@ func getPageCount(filePath string) (int, error) {
 	// Always close the document, this will release the worker and it's resources
 	defer doc.Close()
 
-	pageCount, err := doc.GetPageCount(&requests.GetPageCount{})
+	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+		Document: doc,
+	})
 	if err != nil {
 		return 0, err
 	}
@@ -238,8 +279,6 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 )
 
-var Pdfium pdfium.Pdfium
-
 // Insert the single/multi-threaded init() here.
 
 func main() {
@@ -259,7 +298,7 @@ func renderPage(filePath string, page int, output string) error {
 	}
 
 	// Open the PDF using pdfium (and claim a worker)
-	doc, err := Pdfium.NewDocument(&pdfBytes)
+	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return err
 	}
@@ -268,9 +307,14 @@ func renderPage(filePath string, page int, output string) error {
 	defer doc.Close()
 
 	// Render the page in DPI 200.
-	pageRender, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-		DPI:  200,      // The DPI to render the page in.
-		Page: page - 1, // The page to render, 0-indexed.
+	pageRender, err := instance.RenderPageInDPI(&requests.RenderPageInDPI{
+		DPI: 200, // The DPI to render the page in.
+		Page: requests.Page{
+			ByIndex: &requests.PageByIndex{
+				Document: doc,
+				Index:    0,
+			},
+		}, // The page to render, 0-indexed.
 	})
 	if err != nil {
 		return err
