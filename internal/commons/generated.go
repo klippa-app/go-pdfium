@@ -30,6 +30,8 @@ type Pdfium interface {
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
+    FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
+    FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
     GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
@@ -229,6 +231,26 @@ func (g *PdfiumRPC) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*respo
 func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	resp := &responses.FPDF_LoadPage{}
 	err := g.client.Call("Plugin.FPDF_LoadPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error) {
+	resp := &responses.FPDF_SaveAsCopy{}
+	err := g.client.Call("Plugin.FPDF_SaveAsCopy", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error) {
+	resp := &responses.FPDF_SaveWithVersion{}
+	err := g.client.Call("Plugin.FPDF_SaveWithVersion", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -585,6 +607,32 @@ func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, r
 func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) error {
 	var err error
 	implResp, err := s.Impl.FPDF_LoadPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, resp *responses.FPDF_SaveAsCopy) error {
+	var err error
+	implResp, err := s.Impl.FPDF_SaveAsCopy(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion, resp *responses.FPDF_SaveWithVersion) error {
+	var err error
+	implResp, err := s.Impl.FPDF_SaveWithVersion(request)
 	if err != nil {
 		return err
 	}

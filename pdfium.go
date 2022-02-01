@@ -197,4 +197,16 @@ type Pdfium interface {
 	FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
 
 	// End fpdf_doc.h
+
+	// Start fpdf_save.h
+
+	// FPDF_SaveAsCopy saves the document to a copy.
+	// If no path or writer is given, it will return the saved file as a byte array.
+	FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
+
+	// FPDF_SaveWithVersion save the document to a copy, with a specific file version.
+	// If no path or writer is given, it will return the saved file as a byte array.
+	FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
+
+	// End fpdf_save.h
 }
