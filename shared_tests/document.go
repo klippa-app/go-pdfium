@@ -100,7 +100,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					}))
 				})
 
-				It("returns the correct metadata", func() {
+				It("returns the correct metadata text", func() {
 					metadata, err := pdfiumContainer.FPDF_GetMetaText(&requests.FPDF_GetMetaText{
 						Document: doc,
 						Tag:      "Producer",
@@ -109,6 +109,47 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					Expect(metadata).To(Equal(&responses.FPDF_GetMetaText{
 						Tag:   "Producer",
 						Value: "cairo 1.16.0 (https://cairographics.org)",
+					}))
+				})
+
+				It("returns the correct metadata tag", func() {
+					metadata, err := pdfiumContainer.GetMetaData(&requests.GetMetaData{
+						Document: doc,
+						Tags:     &[]string{"Producer"},
+					})
+					Expect(err).To(BeNil())
+					Expect(metadata).To(Equal(&responses.GetMetaData{
+						Tags: []responses.GetMetaDataTag{
+							{
+								Tag:   "Producer",
+								Value: "cairo 1.16.0 (https://cairographics.org)",
+							},
+						},
+					}))
+				})
+
+				It("returns the correct metadata tags when no tags were given", func() {
+					metadata, err := pdfiumContainer.GetMetaData(&requests.GetMetaData{
+						Document: doc,
+					})
+					Expect(err).To(BeNil())
+					Expect(metadata).To(Equal(&responses.GetMetaData{
+						Tags: []responses.GetMetaDataTag{
+							{Tag: "Title", Value: ""},
+							{Tag: "Author", Value: ""},
+							{Tag: "Subject", Value: ""},
+							{Tag: "Keywords", Value: ""},
+							{Tag: "Creator", Value: ""},
+							{
+								Tag:   "Producer",
+								Value: "cairo 1.16.0 (https://cairographics.org)",
+							},
+							{
+								Tag:   "CreationDate",
+								Value: "D:20210823145142+02'00",
+							},
+							{Tag: "ModDate", Value: ""},
+						},
 					}))
 				})
 			})

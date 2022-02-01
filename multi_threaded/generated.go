@@ -115,6 +115,13 @@ func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*respon
 	return i.worker.plugin.FPDF_LoadPage(request)
 }
 
+func (i *pdfiumInstance) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.GetMetaData(request)
+}
+
 func (i *pdfiumInstance) GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

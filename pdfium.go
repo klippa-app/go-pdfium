@@ -83,6 +83,13 @@ type Pdfium interface {
 
 	// End text: text helpers
 
+	// Start text: metadata helpers
+
+	// GetMetaData returns the metadata values of the document.
+	GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error)
+
+	// End text: metadata helpers
+
 	// Start render: render helpers
 
 	// RenderPageInDPI renders a given page in the given DPI.

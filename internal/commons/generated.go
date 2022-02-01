@@ -26,6 +26,7 @@ type Pdfium interface {
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
+    GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
     GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
@@ -184,6 +185,16 @@ func (g *PdfiumRPC) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*respo
 func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	resp := &responses.FPDF_LoadPage{}
 	err := g.client.Call("Plugin.FPDF_LoadPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
+	resp := &responses.GetMetaData{}
+	err := g.client.Call("Plugin.GetMetaData", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -478,6 +489,19 @@ func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, r
 func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) error {
 	var err error
 	implResp, err := s.Impl.FPDF_LoadPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetMetaData(request *requests.GetMetaData, resp *responses.GetMetaData) error {
+	var err error
+	implResp, err := s.Impl.GetMetaData(request)
 	if err != nil {
 		return err
 	}
