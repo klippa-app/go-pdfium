@@ -59,6 +59,13 @@ func (i *pdfiumInstance) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyV
 	return i.pdfium.FPDF_CopyViewerPreferences(request)
 }
 
+func (i *pdfiumInstance) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_CreateNewDocument(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

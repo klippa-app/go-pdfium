@@ -18,6 +18,7 @@ type Pdfium interface {
     FPDFPage_SetRotation(*requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
     FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
+    FPDF_CreateNewDocument(*requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
     FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
     FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
     FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
@@ -105,6 +106,16 @@ func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses
 func (g *PdfiumRPC) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
 	resp := &responses.FPDF_CopyViewerPreferences{}
 	err := g.client.Call("Plugin.FPDF_CopyViewerPreferences", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
+	resp := &responses.FPDF_CreateNewDocument{}
+	err := g.client.Call("Plugin.FPDF_CreateNewDocument", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -385,6 +396,19 @@ func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp 
 func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences, resp *responses.FPDF_CopyViewerPreferences) error {
 	var err error
 	implResp, err := s.Impl.FPDF_CopyViewerPreferences(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument, resp *responses.FPDF_CreateNewDocument) error {
+	var err error
+	implResp, err := s.Impl.FPDF_CreateNewDocument(request)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"os"
@@ -42,13 +43,13 @@ type Command struct {
 
 type pdfiumPool struct {
 	workerPool   *pool.ObjectPool
-	instanceRefs map[int]*pdfiumInstance
-	poolRef      int
+	instanceRefs map[string]*pdfiumInstance
+	poolRef      string
 	closed       bool
 	lock         *sync.Mutex
 }
 
-var poolRefs = map[int]*pdfiumPool{}
+var poolRefs = map[string]*pdfiumPool{}
 var multiThreadedMutex = &sync.Mutex{}
 
 // Init will return a multi-threaded pool.
@@ -152,10 +153,12 @@ func Init(config Config) pdfium.Pool {
 	multiThreadedMutex.Lock()
 	defer multiThreadedMutex.Unlock()
 
+	poolRef := uuid.New()
+
 	// Create a new pdfium pool.
 	newPool := &pdfiumPool{
-		poolRef:      len(poolRefs),
-		instanceRefs: map[int]*pdfiumInstance{},
+		poolRef:      poolRef.String(),
+		instanceRefs: map[string]*pdfiumInstance{},
 		lock:         &sync.Mutex{},
 		workerPool:   p,
 	}
@@ -185,10 +188,10 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 		lock:   &sync.Mutex{},
 	}
 
-	instanceRef := len(p.instanceRefs)
-	newInstance.instanceRef = instanceRef
+	instanceRef := uuid.New()
+	newInstance.instanceRef = instanceRef.String()
 	newInstance.pool = p
-	p.instanceRefs[instanceRef] = newInstance
+	p.instanceRefs[newInstance.instanceRef] = newInstance
 
 	return newInstance, nil
 }
@@ -220,7 +223,7 @@ func (p *pdfiumPool) Close() error {
 type pdfiumInstance struct {
 	worker      *worker
 	pool        *pdfiumPool
-	instanceRef int
+	instanceRef string
 	closed      bool
 	lock        *sync.Mutex
 }
