@@ -7,8 +7,6 @@ import "C"
 
 import (
 	"errors"
-	"github.com/google/uuid"
-	"github.com/klippa-app/go-pdfium/references"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -46,20 +44,6 @@ func (p *PdfiumImplementation) FPDF_GetMetaText(request *requests.FPDF_GetMetaTe
 		Tag:   request.Tag,
 		Value: transformedText,
 	}, nil
-}
-
-func (p *PdfiumImplementation) registerBookMark(bookmark C.FPDF_BOOKMARK, nativeDocument *NativeDocument) *NativeBookmark {
-	bookmarkRef := uuid.New()
-	newNativeBookmark := &NativeBookmark{
-		bookmark:    bookmark,
-		nativeRef:   references.FPDF_BOOKMARK(bookmarkRef.String()),
-		documentRef: nativeDocument.nativeRef,
-	}
-
-	nativeDocument.bookmarkRefs[newNativeBookmark.nativeRef] = newNativeBookmark
-	p.bookmarkRefs[newNativeBookmark.nativeRef] = newNativeBookmark
-
-	return newNativeBookmark
 }
 
 // FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
@@ -132,12 +116,12 @@ func (p *PdfiumImplementation) FPDFBookmark_GetTitle(request *requests.FPDFBookm
 	}
 
 	// First get the title length.
-	metaSize := C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, C.NULL, 0)
-	if metaSize == 0 {
-		return nil, errors.New("Could not get metadata")
+	titleSize := C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, C.NULL, 0)
+	if titleSize == 0 {
+		return nil, errors.New("Could not get title")
 	}
 
-	charData := make([]byte, metaSize)
+	charData := make([]byte, titleSize)
 	C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
