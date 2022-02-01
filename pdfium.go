@@ -111,6 +111,10 @@ type Pdfium interface {
 
 	// Start fpdfview.h
 
+	// FPDF_GetLastError returns the last error code of a PDFium function, which is just called.
+	// Usually, this function is called after a PDFium function returns, in order to check the error code of the previous PDFium function.
+	FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
+
 	// FPDF_CloseDocument closes the references, releases the resources.
 	FPDF_CloseDocument(request references.FPDF_DOCUMENT) error
 

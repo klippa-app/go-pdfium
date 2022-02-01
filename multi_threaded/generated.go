@@ -73,6 +73,13 @@ func (i *pdfiumInstance) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersi
 	return i.worker.plugin.FPDF_GetFileVersion(request)
 }
 
+func (i *pdfiumInstance) FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDF_GetLastError(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

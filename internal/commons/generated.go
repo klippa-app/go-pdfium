@@ -20,6 +20,7 @@ type Pdfium interface {
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
     FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
     FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
+    FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
     FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
     FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
@@ -123,6 +124,16 @@ func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissi
 func (g *PdfiumRPC) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	resp := &responses.FPDF_GetFileVersion{}
 	err := g.client.Call("Plugin.FPDF_GetFileVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error) {
+	resp := &responses.FPDF_GetLastError{}
+	err := g.client.Call("Plugin.FPDF_GetLastError", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -389,6 +400,19 @@ func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPe
 func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion, resp *responses.FPDF_GetFileVersion) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetFileVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetLastError(request *requests.FPDF_GetLastError, resp *responses.FPDF_GetLastError) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetLastError(request)
 	if err != nil {
 		return err
 	}
