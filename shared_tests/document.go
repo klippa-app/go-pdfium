@@ -386,6 +386,51 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						Value: "cairo 1.16.0 (https://cairographics.org)",
 					}))
 				})
+
+				It("returns the correct page width", func() {
+					pageCount, err := pdfiumContainer.FPDF_GetPageWidth(&requests.FPDF_GetPageWidth{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.FPDF_GetPageWidth{
+						Page:  0,
+						Width: 595.2755737304688,
+					}))
+				})
+
+				It("returns the correct page height", func() {
+					pageCount, err := pdfiumContainer.FPDF_GetPageHeight(&requests.FPDF_GetPageHeight{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.FPDF_GetPageHeight{
+						Page:   0,
+						Height: 841.8897094726562,
+					}))
+				})
+
+				It("returns the correct page size by index", func() {
+					pageCount, err := pdfiumContainer.FPDF_GetPageSizeByIndex(&requests.FPDF_GetPageSizeByIndex{
+						Document: doc,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageCount).To(Equal(&responses.FPDF_GetPageSizeByIndex{
+						Page:   0,
+						Width:  595.2755737304688,
+						Height: 841.8897094726562,
+					}))
+				})
 			})
 		})
 

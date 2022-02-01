@@ -32,3 +32,16 @@ type FPDF_GetSecurityHandlerRevision struct {
 type FPDF_GetPageCount struct {
 	Document references.FPDF_DOCUMENT
 }
+
+type FPDF_GetPageWidth struct {
+	Page Page
+}
+
+type FPDF_GetPageHeight struct {
+	Page Page
+}
+
+type FPDF_GetPageSizeByIndex struct {
+	Document references.FPDF_DOCUMENT
+	Index    int
+}

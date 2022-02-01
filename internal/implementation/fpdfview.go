@@ -199,3 +199,68 @@ func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageC
 		PageCount: int(C.FPDF_GetPageCount(nativeDoc.currentDoc)),
 	}, nil
 }
+
+// FPDF_GetPageWidth returns the width of a page.
+func (p *PdfiumImplementation) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativePage, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	width := C.FPDF_GetPageWidth(nativePage.page)
+
+	return &responses.FPDF_GetPageWidth{
+		Page:  nativePage.index,
+		Width: float64(width),
+	}, nil
+}
+
+// FPDF_GetPageHeight returns the height of a page.
+func (p *PdfiumImplementation) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativePage, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	height := C.FPDF_GetPageHeight(nativePage.page)
+
+	return &responses.FPDF_GetPageHeight{
+		Page:   nativePage.index,
+		Height: float64(height),
+	}, nil
+}
+
+// FPDF_GetPageSizeByIndex returns the size of a page by the page index.
+func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	nativeDoc, err := p.getNativeDocument(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	if nativeDoc.currentDoc == nil {
+		return nil, errors.New("no current document")
+	}
+
+	width := C.double(0)
+	height := C.double(0)
+
+	result := C.FPDF_GetPageSizeByIndex(nativeDoc.currentDoc, C.int(request.Index), &width, &height)
+	if int(result) == 0 {
+		return nil, errors.New("Could not load page size by index")
+	}
+
+	return &responses.FPDF_GetPageSizeByIndex{
+		Page:   request.Index,
+		Width:  float64(width),
+		Height: float64(height),
+	}, nil
+}
