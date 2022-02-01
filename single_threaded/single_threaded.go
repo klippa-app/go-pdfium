@@ -102,7 +102,7 @@ type pdfiumInstance struct {
 }
 
 // NewDocumentFromBytes creates a new pdfium references from a byte array.
-func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -124,7 +124,7 @@ func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDo
 }
 
 // NewDocumentFromFilePath creates a new pdfium references from a file path.
-func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -146,7 +146,7 @@ func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium
 }
 
 // NewDocumentFromReader creates a new pdfium references from a reader.
-func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.Document, error) {
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -195,11 +195,11 @@ func (i *pdfiumInstance) Close() error {
 	return nil
 }
 
-// CloseDocument closes a single Document and it's resources.
-func (i *pdfiumInstance) CloseDocument(document references.Document) error {
+// FPDF_CloseDocument closes a single Document and it's resources.
+func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
 	if i.closed {
 		return errors.New("instance is closed")
 	}
 
-	return i.pdfium.CloseDocument(document)
+	return i.pdfium.FPDF_CloseDocument(document)
 }

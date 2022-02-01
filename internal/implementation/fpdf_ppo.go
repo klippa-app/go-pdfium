@@ -11,8 +11,8 @@ import (
 	"unsafe"
 )
 
-// ImportPages imports some pages from one PDF document to another one.
-func (p *PdfiumImplementation) ImportPages(request *requests.ImportPages) (*responses.ImportPages, error) {
+// FPDF_ImportPages imports some pages from one PDF document to another one.
+func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -45,11 +45,11 @@ func (p *PdfiumImplementation) ImportPages(request *requests.ImportPages) (*resp
 		return nil, errors.New("import of pages failed")
 	}
 
-	return &responses.ImportPages{}, nil
+	return &responses.FPDF_ImportPages{}, nil
 }
 
-// CopyViewerPreferences copies the viewer preferences from one PDF document to another
-func (p *PdfiumImplementation) CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error) {
+// FPDF_CopyViewerPreferences copies the viewer preferences from one PDF document to another
+func (p *PdfiumImplementation) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -76,5 +76,5 @@ func (p *PdfiumImplementation) CopyViewerPreferences(request *requests.CopyViewe
 		return nil, errors.New("import of pages failed")
 	}
 
-	return &responses.CopyViewerPreferences{}, nil
+	return &responses.FPDF_CopyViewerPreferences{}, nil
 }

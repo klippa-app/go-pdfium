@@ -43,48 +43,36 @@ type Pool interface {
 
 // Pdfium describes a Pdfium instance.
 type Pdfium interface {
+	// Start instance functions.
+
 	// NewDocumentFromBytes returns a pdfium Document from the given PDF bytes.
-	// This is a helper around OpenDocument.
-	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*references.Document, error)
+	// This is a helper around OpenDocument. This is a gateway to FPDF_LoadMemDocument.
+	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// NewDocumentFromFilePath returns a pdfium Document from the given PDF file path.
-	// This is a helper around OpenDocument.
-	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*references.Document, error)
+	// This is a helper around OpenDocument. This is a gateway to FPDF_LoadDocument.
+	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// NewDocumentFromReader returns a pdfium Document from the given PDF file reader.
 	// This is a helper around OpenDocument.
 	// This is only really efficient for single threaded usage, the multi-threaded
 	// usage will just load the file in memory because it can't transfer readers
 	// over gRPC. The single-threaded usage will actually efficiently walk over
-	// the PDF as it's being used by pdfium.
-	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*references.Document, error)
+	// the PDF as it's being used by pdfium. This is a gatweway to FPDF_LoadCustomDocument.
+	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
 
 	// OpenDocument returns a pdfium references for the given file data.
+	// This is a gateway to FPDF_LoadMemDocument, FPDF_LoadDocument and FPDF_LoadCustomDocument.
 	OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error)
 
-	// LoadPage loads a page and returns a reference.
-	LoadPage(request *requests.LoadPage) (*responses.LoadPage, error)
+	// Close closes the instance.
+	// It will close any unclosed documents.
+	// For multi-threaded it will give back the worker to the pool.
+	Close() error
 
-	// ClosePage closes a page that was loaded by LoadPage.
-	ClosePage(request *requests.ClosePage) (*responses.ClosePage, error)
+	// End instance functions.
 
-	// GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
-	GetFileVersion(request *requests.GetFileVersion) (*responses.GetFileVersion, error)
-
-	// GetDocPermissions returns the permission flags of the file.
-	GetDocPermissions(request *requests.GetDocPermissions) (*responses.GetDocPermissions, error)
-
-	// GetSecurityHandlerRevision returns the revision number of security handlers of the file.
-	GetSecurityHandlerRevision(request *requests.GetSecurityHandlerRevision) (*responses.GetSecurityHandlerRevision, error)
-
-	// GetPageCount returns the amount of pages for the references.
-	GetPageCount(request *requests.GetPageCount) (*responses.GetPageCount, error)
-
-	// GetPageMode references's page mode, which describes how the references should be displayed when opened.
-	GetPageMode(request *requests.GetPageMode) (*responses.GetPageMode, error)
-
-	// GetMetadata returns the requested metadata.
-	GetMetadata(request *requests.GetMetadata) (*responses.GetMetadata, error)
+	// Start text: text helpers
 
 	// GetPageText returns the text of a given page in plain text.
 	GetPageText(request *requests.GetPageText) (*responses.GetPageText, error)
@@ -93,14 +81,9 @@ type Pdfium interface {
 	// with coordinates and font information.
 	GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
 
-	// GetPageRotation returns the rotation of the given page.
-	GetPageRotation(request *requests.GetPageRotation) (*responses.GetPageRotation, error)
+	// End text: text helpers
 
-	// GetPageTransparency returns whether a page has transparency.
-	GetPageTransparency(request *requests.GetPageTransparency) (*responses.GetPageTransparency, error)
-
-	// FlattenPage makes annotations and form fields become part of the page contents itself
-	FlattenPage(request *requests.FlattenPage) (*responses.FlattenPage, error)
+	// Start render: render helpers
 
 	// RenderPageInDPI renders a given page in the given DPI.
 	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)
@@ -124,20 +107,74 @@ type Pdfium interface {
 	// and output the resulting image into a file.
 	RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error)
 
-	// ImportPages imports some pages from one PDF document to another one.
-	ImportPages(request *requests.ImportPages) (*responses.ImportPages, error)
+	// End render
 
-	// CopyViewerPreferences copies the viewer preferences from one PDF document to another
-	CopyViewerPreferences(request *requests.CopyViewerPreferences) (*responses.CopyViewerPreferences, error)
+	// Start fpdfview.h
 
-	// SetRotation sets the page rotation for a given page.
-	SetRotation(request *requests.SetRotation) (*responses.SetRotation, error)
+	// FPDF_CloseDocument closes the references, releases the resources.
+	FPDF_CloseDocument(request references.FPDF_DOCUMENT) error
 
-	// CloseDocument closes the references, releases the resources.
-	CloseDocument(request references.Document) error
+	// FPDF_LoadPage loads a page and returns a reference.
+	FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
 
-	// Close closes the instance.
-	// It will close any unclosed documents.
-	// For multi-threaded it will give back the worker to the pool.
-	Close() error
+	// FPDF_ClosePage closes a page that was loaded by LoadPage.
+	FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
+
+	// FPDF_GetFileVersion returns the numeric version of the file:  14 for 1.4, 15 for 1.5, ...
+	FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
+
+	// FPDF_GetDocPermissions returns the permission flags of the file.
+	FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
+
+	// FPDF_GetSecurityHandlerRevision returns the revision number of security handlers of the file.
+	FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
+
+	// FPDF_GetPageCount returns the amount of pages for the references.
+	FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
+
+	// End fpdfview.h
+
+	// Start fpdf_edit.h
+
+	// FPDFPage_SetRotation sets the page rotation for a given page.
+	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
+
+	// FPDFPage_GetRotation returns the rotation of the given page.
+	FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
+
+	// FPDFPage_HasTransparency returns whether a page has transparency.
+	FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
+
+	// End fpdf_edit.h
+
+	// Start fpdf_ppo.h
+
+	// FPDF_ImportPages imports some pages from one PDF document to another one.
+	FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
+
+	// FPDF_CopyViewerPreferences copies the viewer preferences from one PDF document to another
+	FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
+
+	// End fpdf_ppo.h
+
+	// Start fpdf_flatten.h
+
+	// FPDFPage_Flatten makes annotations and form fields become part of the page contents itself
+	FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
+
+	// End fpdf_flatten.h
+
+	// Start fpdf_ext.h
+
+	// FPDFDoc_GetPageMode returns the document's page mode, which describes how the references should be displayed when opened.
+	FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
+
+	// End fpdf_ext.h
+
+	// Start fpdf_doc.h
+
+	// FPDF_GetMetaText returns the requested metadata.
+	FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
+
+	// End fpdf_doc.h
 }

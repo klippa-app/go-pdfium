@@ -24,7 +24,7 @@ import (
 func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
 		Context("a normal PDF file", func() {
-			var doc references.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -42,7 +42,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.CloseDocument(doc)
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
 				Expect(err).To(BeNil())
 			})
 
@@ -1611,7 +1611,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 		})
 
 		Context("a PDF file that uses an alpha channel", func() {
-			var doc references.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
@@ -1629,7 +1629,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.CloseDocument(doc)
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
 				Expect(err).To(BeNil())
 			})
 
@@ -1655,7 +1655,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 		// This test is only here to test the closing of an opened page.
 		Context("a multipage PDF file", func() {
-			var doc references.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
@@ -1673,7 +1673,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.CloseDocument(doc)
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
 				Expect(err).To(BeNil())
 			})
 
@@ -1712,8 +1712,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 		})
 
 		Context("multiple PDF files", func() {
-			var doc references.Document
-			var doc2 references.Document
+			var doc references.FPDF_DOCUMENT
+			var doc2 references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
@@ -1744,10 +1744,10 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.CloseDocument(doc)
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
 				Expect(err).To(BeNil())
 
-				err = pdfiumContainer.CloseDocument(doc2)
+				err = pdfiumContainer.FPDF_CloseDocument(doc2)
 				Expect(err).To(BeNil())
 			})
 
