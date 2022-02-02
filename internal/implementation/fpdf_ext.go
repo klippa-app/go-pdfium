@@ -29,23 +29,26 @@ typedef struct GoPdfiumLocalTime {
 } GoPdfiumLocalTime;
 
 typedef const time_t ctime_t;
-extern GoPdfiumLocalTime* go_local_time_function_cb(ctime_t *curTime);
+extern GoPdfiumLocalTime go_local_time_function_cb(ctime_t *curTime);
 
 static inline struct tm* local_time_function_cb(const time_t *curTime) {
-	struct tm* local_time;
+	// Initialize a tm struct.
+	struct tm * local_time = localtime(curTime);
 
 	// For some reason I could not get the tm struct available in Go.
 	// So we have to do it like this.
-	GoPdfiumLocalTime* goLocalTime = go_local_time_function_cb(curTime);
-	local_time->tm_sec = goLocalTime->tm_sec;
-	local_time->tm_min = goLocalTime->tm_min;
-	local_time->tm_hour = goLocalTime->tm_hour;
-	local_time->tm_mday = goLocalTime->tm_mday;
-	local_time->tm_mon = goLocalTime->tm_mon;
-	local_time->tm_year = goLocalTime->tm_year;
-	local_time->tm_wday = goLocalTime->tm_wday;
-	local_time->tm_yday = goLocalTime->tm_yday;
-	local_time->tm_isdst = goLocalTime->tm_isdst;
+	GoPdfiumLocalTime goLocalTime = go_local_time_function_cb(curTime);
+
+	// Overwrite the tm struct values with the custom values.
+	local_time->tm_sec = goLocalTime.tm_sec;
+	local_time->tm_min = goLocalTime.tm_min;
+	local_time->tm_hour = goLocalTime.tm_hour;
+	local_time->tm_mday = goLocalTime.tm_mday;
+	local_time->tm_mon = goLocalTime.tm_mon;
+	local_time->tm_year = goLocalTime.tm_year;
+	local_time->tm_wday = goLocalTime.tm_wday;
+	local_time->tm_yday = goLocalTime.tm_yday;
+	local_time->tm_isdst = goLocalTime.tm_isdst;
 
 	return local_time;
 }
@@ -101,6 +104,8 @@ func (p *PdfiumImplementation) FSDK_SetUnSpObjProcessHandler(request *requests.F
 	// Set the Go callback through cgo.
 	C.UNSUPPORT_INFO_SET_CALLBACK(&handler)
 
+	C.FSDK_SetUnSpObjProcessHandler(&handler)
+
 	return &responses.FSDK_SetUnSpObjProcessHandler{}, nil
 }
 
@@ -108,14 +113,7 @@ var currentTimeHandler requests.SetTimeFunction
 
 //export go_time_function_cb
 func go_time_function_cb() C.time_t {
-	if currentTimeHandler != nil {
-		return C.time_t(currentTimeHandler())
-	}
-
-	result := C.time_t(0)
-	C.time(&result)
-
-	return result
+	return C.time_t(currentTimeHandler())
 }
 
 // FSDK_SetTimeFunction sets a replacement function for calls to time().
@@ -128,48 +126,32 @@ func (p *PdfiumImplementation) FSDK_SetTimeFunction(request *requests.FSDK_SetTi
 	if request.Function == nil {
 		C.FSDK_SetTimeFunction(nil)
 	} else {
+		currentTimeHandler = request.Function
 		C.FSDK_SetTimeFunction_SET_GO_METHOD()
 	}
 
-	return nil, nil
+	return &responses.FSDK_SetTimeFunction{}, nil
 }
 
 var currentLocalTimeHandler requests.SetLocaltimeFunction
 
 //export go_local_time_function_cb
-func go_local_time_function_cb(timer *C.ctime_t) *C.GoPdfiumLocalTime {
+func go_local_time_function_cb(timer *C.ctime_t) C.GoPdfiumLocalTime {
 	timeStruct := C.GoPdfiumLocalTime{}
 
-	if currentTimeHandler != nil {
-		// Convert from C to go.
-		localTime := currentLocalTimeHandler(int64(*timer))
-		timeStruct.tm_sec = C.int(localTime.TmSec)
-		timeStruct.tm_min = C.int(localTime.TmMin)
-		timeStruct.tm_hour = C.int(localTime.TmHour)
-		timeStruct.tm_mday = C.int(localTime.TmMday)
-		timeStruct.tm_mon = C.int(localTime.TmMon)
-		timeStruct.tm_year = C.int(localTime.TmYear)
-		timeStruct.tm_wday = C.int(localTime.TmWday)
-		timeStruct.tm_yday = C.int(localTime.TmYday)
-		timeStruct.tm_isdst = C.int(localTime.TmIsdst)
-	} else {
-		result := C.time_t(0)
-		C.time(&result)
+	// Convert from C to go.
+	localTime := currentLocalTimeHandler(int64(*timer))
+	timeStruct.tm_sec = C.int(localTime.TmSec)
+	timeStruct.tm_min = C.int(localTime.TmMin)
+	timeStruct.tm_hour = C.int(localTime.TmHour)
+	timeStruct.tm_mday = C.int(localTime.TmMday)
+	timeStruct.tm_mon = C.int(localTime.TmMon)
+	timeStruct.tm_year = C.int(localTime.TmYear)
+	timeStruct.tm_wday = C.int(localTime.TmWday)
+	timeStruct.tm_yday = C.int(localTime.TmYday)
+	timeStruct.tm_isdst = C.int(localTime.TmIsdst)
 
-		// Copy over real local time.
-		realLocalTime := C.localtime(&result)
-		timeStruct.tm_sec = realLocalTime.tm_sec
-		timeStruct.tm_min = realLocalTime.tm_min
-		timeStruct.tm_hour = realLocalTime.tm_hour
-		timeStruct.tm_mday = realLocalTime.tm_mday
-		timeStruct.tm_mon = realLocalTime.tm_mon
-		timeStruct.tm_year = realLocalTime.tm_year
-		timeStruct.tm_wday = realLocalTime.tm_wday
-		timeStruct.tm_yday = realLocalTime.tm_yday
-		timeStruct.tm_isdst = realLocalTime.tm_isdst
-	}
-
-	return (*C.GoPdfiumLocalTime)(&timeStruct)
+	return timeStruct
 }
 
 // FSDK_SetLocaltimeFunction sets a replacement function for calls to localtime().
@@ -182,8 +164,9 @@ func (p *PdfiumImplementation) FSDK_SetLocaltimeFunction(request *requests.FSDK_
 	if request.Function == nil {
 		C.FSDK_SetLocaltimeFunction(nil)
 	} else {
+		currentLocalTimeHandler = request.Function
 		C.FSDK_SetLocaltimeFunction_SET_GO_METHOD()
 	}
 
-	return nil, nil
+	return &responses.FSDK_SetLocaltimeFunction{}, nil
 }
