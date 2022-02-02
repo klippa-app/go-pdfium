@@ -16,12 +16,12 @@ func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPag
 	p.Lock()
 	defer p.Unlock()
 
-	nativeSourceDoc, err := p.getNativeDocument(request.Source)
+	sourceDocHandle, err := p.getDocumentHandle(request.Source)
 	if err != nil {
 		return nil, err
 	}
 
-	nativeDestinationDoc, err := p.getNativeDocument(request.Destination)
+	destinationDocHandle, err := p.getDocumentHandle(request.Destination)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPag
 		defer C.free(unsafe.Pointer(pageRange))
 	}
 
-	success := C.FPDF_ImportPages(nativeDestinationDoc.doc, nativeSourceDoc.doc, pageRange, C.int(request.Index))
+	success := C.FPDF_ImportPages(destinationDocHandle.handle, sourceDocHandle.handle, pageRange, C.int(request.Index))
 	if int(success) == 0 {
 		return nil, errors.New("import of pages failed")
 	}
@@ -45,17 +45,17 @@ func (p *PdfiumImplementation) FPDF_CopyViewerPreferences(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
-	nativeSourceDoc, err := p.getNativeDocument(request.Source)
+	sourceDocHandle, err := p.getDocumentHandle(request.Source)
 	if err != nil {
 		return nil, err
 	}
 
-	nativeDestinationDoc, err := p.getNativeDocument(request.Destination)
+	destinationDocHandle, err := p.getDocumentHandle(request.Destination)
 	if err != nil {
 		return nil, err
 	}
 
-	success := C.FPDF_CopyViewerPreferences(nativeDestinationDoc.doc, nativeSourceDoc.doc)
+	success := C.FPDF_CopyViewerPreferences(destinationDocHandle.handle, sourceDocHandle.handle)
 	if int(success) == 0 {
 		return nil, errors.New("import of pages failed")
 	}

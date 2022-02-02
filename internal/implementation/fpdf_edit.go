@@ -15,16 +15,16 @@ func (p *PdfiumImplementation) FPDF_CreateNewDocument(request *requests.FPDF_Cre
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc := &NativeDocument{}
+	documentHandle := &DocumentHandle{}
 	doc := C.FPDF_CreateNewDocument()
-	nativeDoc.doc = doc
+	documentHandle.handle = doc
 	documentRef := uuid.New()
-	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
-	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
-	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
+	documentHandle.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
+	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle
+	p.documentRefs[documentHandle.nativeRef] = documentHandle
 
 	return &responses.FPDF_CreateNewDocument{
-		Document: nativeDoc.nativeRef,
+		Document: documentHandle.nativeRef,
 	}, nil
 }
 
@@ -33,15 +33,15 @@ func (p *PdfiumImplementation) FPDFPage_GetRotation(request *requests.FPDFPage_G
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	rotation := C.FPDFPage_GetRotation(nativePage.page)
+	rotation := C.FPDFPage_GetRotation(pageHandle.handle)
 
 	return &responses.FPDFPage_GetRotation{
-		Page:         nativePage.index,
+		Page:         pageHandle.index,
 		PageRotation: responses.PageRotation(rotation),
 	}, nil
 }
@@ -51,12 +51,12 @@ func (p *PdfiumImplementation) FPDFPage_SetRotation(request *requests.FPDFPage_S
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	C.FPDFPage_SetRotation(nativePage.page, C.int(request.Rotate))
+	C.FPDFPage_SetRotation(pageHandle.handle, C.int(request.Rotate))
 
 	return &responses.FPDFPage_SetRotation{}, nil
 }
@@ -66,15 +66,15 @@ func (p *PdfiumImplementation) FPDFPage_HasTransparency(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	alpha := C.FPDFPage_HasTransparency(nativePage.page)
+	alpha := C.FPDFPage_HasTransparency(pageHandle.handle)
 
 	return &responses.FPDFPage_HasTransparency{
-		Page:            nativePage.index,
+		Page:            pageHandle.index,
 		HasTransparency: int(alpha) == 1,
 	}, nil
 }

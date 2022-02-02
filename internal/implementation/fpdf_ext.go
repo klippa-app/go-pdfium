@@ -13,12 +13,12 @@ func (p *PdfiumImplementation) FPDFDoc_GetPageMode(request *requests.FPDFDoc_Get
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	pageMode := C.FPDFDoc_GetPageMode(nativeDoc.doc)
+	pageMode := C.FPDFDoc_GetPageMode(documentHandle.handle)
 
 	return &responses.FPDFDoc_GetPageMode{
 		PageMode: responses.FPDFDoc_GetPageModeMode(pageMode),

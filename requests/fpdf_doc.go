@@ -25,3 +25,12 @@ type FPDFBookmark_Find struct {
 	Document references.FPDF_DOCUMENT
 	Title    string // The string for the bookmark title to be searched
 }
+
+type FPDFBookmark_GetDest struct {
+	Document references.FPDF_DOCUMENT
+	Bookmark references.FPDF_BOOKMARK
+}
+
+type FPDFBookmark_GetAction struct {
+	Bookmark references.FPDF_BOOKMARK
+}
