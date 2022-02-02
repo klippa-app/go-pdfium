@@ -353,4 +353,12 @@ type Pdfium interface {
 	FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
 
 	// End fpdf_save.h
+
+	// Start fpdf_catalog.h
+
+	// FPDFCatalog_IsTagged determines if the given document represents a tagged PDF.
+	// For the definition of tagged PDF, See (see 10.7 "Tagged PDF" in PDF Reference 1.7).
+	FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
+
+	// End fpdf_catalog.h
 }

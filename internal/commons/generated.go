@@ -21,6 +21,7 @@ type Pdfium interface {
     FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
     FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
     FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
+    FPDFCatalog_IsTagged(*requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
     FPDFDest_GetDestPageIndex(*requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
     FPDFDest_GetLocationInPage(*requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
     FPDFDest_GetView(*requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
@@ -176,6 +177,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_G
 func (g *PdfiumRPC) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error) {
 	resp := &responses.FPDFBookmark_GetTitle{}
 	err := g.client.Call("Plugin.FPDFBookmark_GetTitle", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
+	resp := &responses.FPDFCatalog_IsTagged{}
+	err := g.client.Call("Plugin.FPDFCatalog_IsTagged", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -875,6 +886,19 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBook
 func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) error {
 	var err error
 	implResp, err := s.Impl.FPDFBookmark_GetTitle(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged, resp *responses.FPDFCatalog_IsTagged) error {
+	var err error
+	implResp, err := s.Impl.FPDFCatalog_IsTagged(request)
 	if err != nil {
 		return err
 	}
