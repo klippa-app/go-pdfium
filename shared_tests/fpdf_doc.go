@@ -1,14 +1,13 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/requests"
-	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
-	"log"
 
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
+	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -496,8 +495,6 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 						Identifier: []byte{243, 65, 174, 101, 74, 119, 172, 213, 6, 90, 118, 69, 229, 150, 230, 230}, // Byte identifier
 					}))
 
-					log.Println(string(identifier.Identifier))
-
 					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
 						Document:   doc,
 						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
@@ -545,8 +542,6 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
 						Identifier: []byte("permanent non-hex"), // Text identifier
 					}))
-
-					log.Println(string(identifier.Identifier))
 
 					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
 						Document:   doc,
