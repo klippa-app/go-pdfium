@@ -24,12 +24,12 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	textPage := C.FPDFText_LoadPage(nativePage.page)
+	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
 	charData := make([]byte, (charsInPage+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
@@ -41,7 +41,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 	}
 
 	return &responses.GetPageText{
-		Page: nativePage.index,
+		Page: pageHandle.index,
 		Text: transformedText,
 	}, nil
 }
@@ -51,7 +51,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -75,13 +75,13 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	}
 
 	resp := &responses.GetPageTextStructured{
-		Page:              nativePage.index,
+		Page:              pageHandle.index,
 		Chars:             []*responses.GetPageTextStructuredChar{},
 		Rects:             []*responses.GetPageTextStructuredRect{},
 		PointToPixelRatio: pointToPixelRatio,
 	}
 
-	textPage := C.FPDFText_LoadPage(nativePage.page)
+	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {

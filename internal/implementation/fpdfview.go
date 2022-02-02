@@ -43,29 +43,29 @@ func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	pageObject := C.FPDF_LoadPage(nativeDoc.doc, C.int(request.Index))
+	pageObject := C.FPDF_LoadPage(documentHandle.handle, C.int(request.Index))
 	if pageObject == nil {
 		return nil, pdfium_errors.ErrPage
 	}
 
 	pageRef := uuid.New()
-	nativePage := &NativePage{
-		page:        pageObject,
+	pageHandle := &PageHandle{
+		handle:      pageObject,
 		index:       request.Index,
 		nativeRef:   references.FPDF_PAGE(pageRef.String()),
-		documentRef: nativeDoc.nativeRef,
+		documentRef: documentHandle.nativeRef,
 	}
 
-	nativeDoc.pageRefs[nativePage.nativeRef] = nativePage
-	p.pageRefs[nativePage.nativeRef] = nativePage
+	documentHandle.pageRefs[pageHandle.nativeRef] = pageHandle
+	p.pageRefs[pageHandle.nativeRef] = pageHandle
 
 	return &responses.FPDF_LoadPage{
-		Page: nativePage.nativeRef,
+		Page: pageHandle.nativeRef,
 	}, nil
 }
 
@@ -74,7 +74,7 @@ func (p *PdfiumImplementation) FPDF_ClosePage(request *requests.FPDF_ClosePage) 
 	p.Lock()
 	defer p.Unlock()
 
-	pageRef, err := p.getNativePage(request.Page)
+	pageRef, err := p.getPageHandle(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +83,11 @@ func (p *PdfiumImplementation) FPDF_ClosePage(request *requests.FPDF_ClosePage) 
 	delete(p.pageRefs, request.Page)
 
 	// Remove page reference from document.
-	nativeDoc, err := p.getNativeDocument(pageRef.documentRef)
+	documentHandle, err := p.getDocumentHandle(pageRef.documentRef)
 	if err != nil {
 		return nil, err
 	}
-	delete(nativeDoc.pageRefs, request.Page)
+	delete(documentHandle.pageRefs, request.Page)
 
 	return &responses.FPDF_ClosePage{}, nil
 }
@@ -97,14 +97,14 @@ func (p *PdfiumImplementation) FPDF_GetFileVersion(request *requests.FPDF_GetFil
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
 	fileVersion := C.int(0)
 
-	success := C.FPDF_GetFileVersion(nativeDoc.doc, &fileVersion)
+	success := C.FPDF_GetFileVersion(documentHandle.handle, &fileVersion)
 	if int(success) == 0 {
 		return nil, errors.New("could not get file version")
 	}
@@ -119,12 +119,12 @@ func (p *PdfiumImplementation) FPDF_GetDocPermissions(request *requests.FPDF_Get
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	permissions := C.FPDF_GetDocPermissions(nativeDoc.doc)
+	permissions := C.FPDF_GetDocPermissions(documentHandle.handle)
 
 	docPermissions := &responses.FPDF_GetDocPermissions{
 		DocPermissions: uint32(permissions),
@@ -168,12 +168,12 @@ func (p *PdfiumImplementation) FPDF_GetSecurityHandlerRevision(request *requests
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	securityHandlerRevision := C.FPDF_GetSecurityHandlerRevision(nativeDoc.doc)
+	securityHandlerRevision := C.FPDF_GetSecurityHandlerRevision(documentHandle.handle)
 
 	return &responses.FPDF_GetSecurityHandlerRevision{
 		SecurityHandlerRevision: int(securityHandlerRevision),
@@ -185,13 +185,13 @@ func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageC
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.FPDF_GetPageCount{
-		PageCount: int(C.FPDF_GetPageCount(nativeDoc.doc)),
+		PageCount: int(C.FPDF_GetPageCount(documentHandle.handle)),
 	}, nil
 }
 
@@ -200,15 +200,15 @@ func (p *PdfiumImplementation) FPDF_GetPageWidth(request *requests.FPDF_GetPageW
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	width := C.FPDF_GetPageWidth(nativePage.page)
+	width := C.FPDF_GetPageWidth(pageHandle.handle)
 
 	return &responses.FPDF_GetPageWidth{
-		Page:  nativePage.index,
+		Page:  pageHandle.index,
 		Width: float64(width),
 	}, nil
 }
@@ -218,15 +218,15 @@ func (p *PdfiumImplementation) FPDF_GetPageHeight(request *requests.FPDF_GetPage
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	height := C.FPDF_GetPageHeight(nativePage.page)
+	height := C.FPDF_GetPageHeight(pageHandle.handle)
 
 	return &responses.FPDF_GetPageHeight{
-		Page:   nativePage.index,
+		Page:   pageHandle.index,
 		Height: float64(height),
 	}, nil
 }
@@ -236,7 +236,7 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +244,7 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 	width := C.double(0)
 	height := C.double(0)
 
-	result := C.FPDF_GetPageSizeByIndex(nativeDoc.doc, C.int(request.Index), &width, &height)
+	result := C.FPDF_GetPageSizeByIndex(documentHandle.handle, C.int(request.Index), &width, &height)
 	if int(result) == 0 {
 		return nil, errors.New("Could not load page size by index")
 	}

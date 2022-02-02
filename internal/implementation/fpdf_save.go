@@ -74,7 +74,7 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -117,9 +117,9 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 
 	var success C.int
 	if request.FileVersion == 0 {
-		success = C.FPDF_SaveAsCopy(nativeDoc.doc, &writer, C.ulong(request.Flags))
+		success = C.FPDF_SaveAsCopy(documentHandle.handle, &writer, C.ulong(request.Flags))
 	} else {
-		success = C.FPDF_SaveWithVersion(nativeDoc.doc, &writer, C.ulong(request.Flags), C.int(request.FileVersion))
+		success = C.FPDF_SaveWithVersion(documentHandle.handle, &writer, C.ulong(request.Flags), C.int(request.FileVersion))
 	}
 
 	if int(success) == 0 {

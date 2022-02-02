@@ -65,7 +65,7 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 var Pdfium = &mainPdfium{
 	mutex:        &sync.Mutex{},
 	instanceRefs: map[int]*PdfiumImplementation{},
-	documentRefs: map[references.FPDF_DOCUMENT]*NativeDocument{},
+	documentRefs: map[references.FPDF_DOCUMENT]*DocumentHandle{},
 }
 
 var isInitialized = false
@@ -117,15 +117,26 @@ type mainPdfium struct {
 
 	// documentRefs keeps track of the opened documents for this process.
 	// we need this for document lookups and in case of closing the instance
-	documentRefs map[references.FPDF_DOCUMENT]*NativeDocument
+	documentRefs map[references.FPDF_DOCUMENT]*DocumentHandle
 }
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
-		logger:       p.logger,
-		documentRefs: map[references.FPDF_DOCUMENT]*NativeDocument{},
-		pageRefs:     map[references.FPDF_PAGE]*NativePage{},
-		bookmarkRefs: map[references.FPDF_BOOKMARK]*NativeBookmark{},
+		logger:         p.logger,
+		documentRefs:   map[references.FPDF_DOCUMENT]*DocumentHandle{},
+		pageRefs:       map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:   map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:       map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:     map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:       map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:   map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:  map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		bitmapRefs:     map[references.FPDF_BITMAP]*BitmapHandle{},
+		textPageRefs:   map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:  map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -139,17 +150,23 @@ type PdfiumImplementation struct {
 	// logger is for communication with the plugin.
 	logger hclog.Logger
 
-	// documentRefs keeps track of the opened documents for this instance.
-	// we need this for document lookups and in case of closing the instance
-	documentRefs map[references.FPDF_DOCUMENT]*NativeDocument
+	// lookup tables keeps track of the opened handles for this instance.
+	// we need this for handle lookups and in case of closing the instance
 
-	// pageRefs keeps track of the opened documents for this instance.
-	// we need this for document lookups and in case of closing the instance
-	pageRefs map[references.FPDF_PAGE]*NativePage
-
-	// pageRefs keeps track of the opened bookmarks for this instance.
-	// we need this for bookmark lookups and in case of closing the instance
-	bookmarkRefs map[references.FPDF_BOOKMARK]*NativeBookmark
+	documentRefs   map[references.FPDF_DOCUMENT]*DocumentHandle
+	pageRefs       map[references.FPDF_PAGE]*PageHandle
+	bookmarkRefs   map[references.FPDF_BOOKMARK]*BookmarkHandle
+	destRefs       map[references.FPDF_DEST]*DestHandle
+	actionRefs     map[references.FPDF_ACTION]*ActionHandle
+	linkRefs       map[references.FPDF_LINK]*LinkHandle
+	pageLinkRefs   map[references.FPDF_PAGELINK]*PageLinkHandle
+	schHandleRefs  map[references.FPDF_SCHHANDLE]*SchHandleHandle
+	textPageRefs   map[references.FPDF_TEXTPAGE]*TextPageHandle
+	pageRangeRefs  map[references.FPDF_PAGERANGE]*PageRangeHandle
+	pageObjectRefs map[references.FPDF_PAGEOBJECT]*PageObjectHandle
+	clipPathRefs   map[references.FPDF_CLIPPATH]*ClipPathHandle
+	formHandleRefs map[references.FPDF_FORMHANDLE]*FormHandleHandle
+	bitmapRefs     map[references.FPDF_BITMAP]*BitmapHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -176,9 +193,19 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		cPassword = C.CString(*request.Password)
 	}
 
-	nativeDoc := &NativeDocument{
-		pageRefs:     map[references.FPDF_PAGE]*NativePage{},
-		bookmarkRefs: map[references.FPDF_BOOKMARK]*NativeBookmark{},
+	nativeDoc := &DocumentHandle{
+		pageRefs:       map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:   map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:       map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:     map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:       map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:   map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:  map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		textPageRefs:   map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:  map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -250,7 +277,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		return nil, pdfiumError
 	}
 
-	nativeDoc.doc = doc
+	nativeDoc.handle = doc
 	nativeDoc.data = request.File
 	documentRef := uuid.New()
 	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
@@ -266,7 +293,7 @@ func (p *PdfiumImplementation) FPDF_CloseDocument(document references.FPDF_DOCUM
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDocument, err := p.getNativeDocument(document)
+	nativeDocument, err := p.getDocumentHandle(document)
 	if err != nil {
 		return err
 	}
@@ -299,9 +326,53 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.pageRefs, p.pageRefs[i].nativeRef)
 	}
 
-	// Remove bookmark refs, they don't have a close method.
+	// Remove refs, they don't have a close method.
 	for i := range p.bookmarkRefs {
 		delete(p.bookmarkRefs, i)
+	}
+
+	for i := range p.destRefs {
+		delete(p.destRefs, i)
+	}
+
+	for i := range p.actionRefs {
+		delete(p.actionRefs, i)
+	}
+
+	for i := range p.linkRefs {
+		delete(p.linkRefs, i)
+	}
+
+	for i := range p.pageLinkRefs {
+		delete(p.pageLinkRefs, i)
+	}
+
+	for i := range p.schHandleRefs {
+		delete(p.schHandleRefs, i)
+	}
+
+	for i := range p.bitmapRefs {
+		delete(p.bitmapRefs, i)
+	}
+
+	for i := range p.textPageRefs {
+		delete(p.textPageRefs, i)
+	}
+
+	for i := range p.pageRangeRefs {
+		delete(p.pageRangeRefs, i)
+	}
+
+	for i := range p.pageObjectRefs {
+		delete(p.pageObjectRefs, i)
+	}
+
+	for i := range p.clipPathRefs {
+		delete(p.clipPathRefs, i)
+	}
+
+	for i := range p.formHandleRefs {
+		delete(p.formHandleRefs, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
@@ -309,7 +380,7 @@ func (p *PdfiumImplementation) Close() error {
 	return nil
 }
 
-func (p *PdfiumImplementation) getNativeDocument(documentRef references.FPDF_DOCUMENT) (*NativeDocument, error) {
+func (p *PdfiumImplementation) getDocumentHandle(documentRef references.FPDF_DOCUMENT) (*DocumentHandle, error) {
 	if documentRef == "" {
 		return nil, errors.New("document not given")
 	}
@@ -318,10 +389,10 @@ func (p *PdfiumImplementation) getNativeDocument(documentRef references.FPDF_DOC
 		return val, nil
 	}
 
-	return nil, errors.New("could not find native doc instance, perhaps the doc was already closed or you tried to share documents between instances")
+	return nil, errors.New("could not find document handle, perhaps the doc was already closed or you tried to share documents between instances")
 }
 
-func (d *PdfiumImplementation) getNativePage(pageRef references.FPDF_PAGE) (*NativePage, error) {
+func (d *PdfiumImplementation) getPageHandle(pageRef references.FPDF_PAGE) (*PageHandle, error) {
 	if pageRef == "" {
 		return nil, errors.New("page not given")
 	}
@@ -330,10 +401,10 @@ func (d *PdfiumImplementation) getNativePage(pageRef references.FPDF_PAGE) (*Nat
 		return val, nil
 	}
 
-	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
+	return nil, errors.New("could not find page handle, perhaps the page was already closed or you tried to share pages between instances or documents")
 }
 
-func (d *PdfiumImplementation) getNativeBookmark(bookmarkRef references.FPDF_BOOKMARK) (*NativeBookmark, error) {
+func (d *PdfiumImplementation) getBookmarkHandle(bookmarkRef references.FPDF_BOOKMARK) (*BookmarkHandle, error) {
 	if bookmarkRef == "" {
 		return nil, errors.New("bookmark not given")
 	}
@@ -342,99 +413,5 @@ func (d *PdfiumImplementation) getNativeBookmark(bookmarkRef references.FPDF_BOO
 		return val, nil
 	}
 
-	return nil, errors.New("could not find native bookmark, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
-}
-
-type NativeDocument struct {
-	doc           C.FPDF_DOCUMENT
-	readSeekerRef unsafe.Pointer
-	currentPage   *NativePage
-	data          *[]byte                                      // Keep a reference to the data otherwise weird stuff happens
-	nativeRef     references.FPDF_DOCUMENT                     // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
-	pageRefs      map[references.FPDF_PAGE]*NativePage         // A lookup table for page references of this document.
-	bookmarkRefs  map[references.FPDF_BOOKMARK]*NativeBookmark // A lookup table for bookmark references of this document.
-}
-
-func (d *NativeDocument) getNativePage(pageRef references.FPDF_PAGE) (*NativePage, error) {
-	if pageRef == "" {
-		return nil, errors.New("page not given")
-	}
-
-	if val, ok := d.pageRefs[pageRef]; ok {
-		return val, nil
-	}
-
-	return nil, errors.New("could not find native page, perhaps the page was already closed or you tried to share pages between instances or documents")
-}
-
-func (d *NativeDocument) getNativeBookmark(bookmarkRef references.FPDF_BOOKMARK) (*NativeBookmark, error) {
-	if bookmarkRef == "" {
-		return nil, errors.New("bookmark not given")
-	}
-
-	if val, ok := d.bookmarkRefs[bookmarkRef]; ok {
-		return val, nil
-	}
-
-	return nil, errors.New("could not find native bookmark, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
-}
-
-// Close closes the internal references in FPDF
-func (d *NativeDocument) Close() error {
-	if d.doc == nil {
-		return errors.New("no current document")
-	}
-
-	if d.currentPage != nil {
-		d.currentPage.Close()
-		d.currentPage = nil
-	}
-
-	for i := range d.pageRefs {
-		d.pageRefs[i].Close()
-		delete(d.pageRefs, i)
-	}
-
-	// Remove bookmark refs, they don't have a close method.
-	for i := range d.bookmarkRefs {
-		delete(d.bookmarkRefs, i)
-	}
-
-	C.FPDF_CloseDocument(d.doc)
-	d.doc = nil
-
-	if d.readSeekerRef != nil {
-		C.free(d.readSeekerRef)
-		d.readSeekerRef = nil
-	}
-
-	// Remove reference to data.
-	if d.data != nil {
-		d.data = nil
-	}
-
-	delete(Pdfium.documentRefs, d.nativeRef)
-
-	return nil
-}
-
-type NativePage struct {
-	page        C.FPDF_PAGE
-	index       int
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
-}
-
-// Close closes the internal references in FPDF
-func (p *NativePage) Close() {
-	if p.page != nil {
-		C.FPDF_ClosePage(p.page)
-		p.page = nil
-	}
-}
-
-type NativeBookmark struct {
-	bookmark    C.FPDF_BOOKMARK
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_BOOKMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	return nil, errors.New("could not find bookmark handle, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
 }

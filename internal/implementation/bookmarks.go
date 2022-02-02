@@ -13,18 +13,18 @@ import (
 	"github.com/google/uuid"
 )
 
-func (p *PdfiumImplementation) registerBookMark(bookmark C.FPDF_BOOKMARK, nativeDocument *NativeDocument) *NativeBookmark {
+func (p *PdfiumImplementation) registerBookMark(bookmark C.FPDF_BOOKMARK, documentHandle *DocumentHandle) *BookmarkHandle {
 	bookmarkRef := uuid.New()
-	newNativeBookmark := &NativeBookmark{
-		bookmark:    bookmark,
+	bookmarkHandle := &BookmarkHandle{
+		handle:      bookmark,
 		nativeRef:   references.FPDF_BOOKMARK(bookmarkRef.String()),
-		documentRef: nativeDocument.nativeRef,
+		documentRef: documentHandle.nativeRef,
 	}
 
-	nativeDocument.bookmarkRefs[newNativeBookmark.nativeRef] = newNativeBookmark
-	p.bookmarkRefs[newNativeBookmark.nativeRef] = newNativeBookmark
+	documentHandle.bookmarkRefs[bookmarkHandle.nativeRef] = bookmarkHandle
+	p.bookmarkRefs[bookmarkHandle.nativeRef] = bookmarkHandle
 
-	return newNativeBookmark
+	return bookmarkHandle
 }
 
 // GetBookmarks returns all the bookmarks of a document.
@@ -32,17 +32,17 @@ func (p *PdfiumImplementation) GetBookmarks(request *requests.GetBookmarks) (*re
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	bookmark := C.FPDFBookmark_GetFirstChild(nativeDoc.doc, nil)
+	bookmark := C.FPDFBookmark_GetFirstChild(documentHandle.handle, nil)
 	if bookmark == nil {
 		return &responses.GetBookmarks{}, nil
 	}
 
-	bookMarks, err := getBookMarkChildren(p, nativeDoc, bookmark)
+	bookMarks, err := getBookMarkChildren(p, documentHandle, bookmark)
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +52,12 @@ func (p *PdfiumImplementation) GetBookmarks(request *requests.GetBookmarks) (*re
 	}, nil
 }
 
-func getBookMarkChildren(p *PdfiumImplementation, nativeDoc *NativeDocument, bookmark C.FPDF_BOOKMARK) ([]responses.GetBookmarksBookmark, error) {
+func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle, bookmark C.FPDF_BOOKMARK) ([]responses.GetBookmarksBookmark, error) {
 	bookmarks := []C.FPDF_BOOKMARK{bookmark}
 
 	currentSibling := bookmark
 	for {
-		newSibling := C.FPDFBookmark_GetNextSibling(nativeDoc.doc, currentSibling)
+		newSibling := C.FPDFBookmark_GetNextSibling(documentHandle.handle, currentSibling)
 		if newSibling == nil {
 			break
 		}
@@ -72,9 +72,9 @@ func getBookMarkChildren(p *PdfiumImplementation, nativeDoc *NativeDocument, boo
 		respBookmark := responses.GetBookmarksBookmark{
 			Children: []responses.GetBookmarksBookmark{},
 		}
-		child := C.FPDFBookmark_GetFirstChild(nativeDoc.doc, bookmarks[i])
+		child := C.FPDFBookmark_GetFirstChild(documentHandle.handle, bookmarks[i])
 		if child != nil {
-			myChildren, err := getBookMarkChildren(p, nativeDoc, child)
+			myChildren, err := getBookMarkChildren(p, documentHandle, child)
 			if err != nil {
 				return nil, err
 			}
@@ -82,16 +82,16 @@ func getBookMarkChildren(p *PdfiumImplementation, nativeDoc *NativeDocument, boo
 			respBookmark.Children = myChildren
 		}
 
-		nativeBookmark := p.registerBookMark(bookmarks[i], nativeDoc)
+		bookmarkHandle := p.registerBookMark(bookmarks[i], documentHandle)
 
 		// First get the title length.
-		titleSize := C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, C.NULL, 0)
+		titleSize := C.FPDFBookmark_GetTitle(bookmarkHandle.handle, C.NULL, 0)
 		if titleSize == 0 {
 			return nil, errors.New("Could not get title")
 		}
 
 		charData := make([]byte, titleSize)
-		C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+		C.FPDFBookmark_GetTitle(bookmarkHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
 		transformedText, err := p.transformUTF16LEToUTF8(charData)
 		if err != nil {
@@ -99,7 +99,7 @@ func getBookMarkChildren(p *PdfiumImplementation, nativeDoc *NativeDocument, boo
 		}
 
 		respBookmark.Title = transformedText
-		respBookmark.Reference = nativeBookmark.nativeRef
+		respBookmark.Reference = bookmarkHandle.nativeRef
 
 		resp = append(resp, respBookmark)
 	}

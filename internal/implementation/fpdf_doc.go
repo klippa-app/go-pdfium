@@ -18,7 +18,7 @@ func (p *PdfiumImplementation) FPDF_GetMetaText(request *requests.FPDF_GetMetaTe
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -27,13 +27,13 @@ func (p *PdfiumImplementation) FPDF_GetMetaText(request *requests.FPDF_GetMetaTe
 	defer C.free(unsafe.Pointer(cstr))
 
 	// First get the metadata length.
-	metaSize := C.FPDF_GetMetaText(nativeDoc.doc, cstr, C.NULL, 0)
+	metaSize := C.FPDF_GetMetaText(documentHandle.handle, cstr, C.NULL, 0)
 	if metaSize == 0 {
 		return nil, errors.New("Could not get metadata")
 	}
 
 	charData := make([]byte, metaSize)
-	C.FPDF_GetMetaText(nativeDoc.doc, cstr, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+	C.FPDF_GetMetaText(documentHandle.handle, cstr, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -51,27 +51,27 @@ func (p *PdfiumImplementation) FPDFBookmark_GetFirstChild(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
 	var parentBookMark C.FPDF_BOOKMARK
 	if request.Bookmark != nil {
-		nativeBookmark, err := p.getNativeBookmark(*request.Bookmark)
+		bookmarkHandle, err := p.getBookmarkHandle(*request.Bookmark)
 		if err != nil {
 			return nil, err
 		}
 
-		parentBookMark = nativeBookmark.bookmark
+		parentBookMark = bookmarkHandle.handle
 	}
 
-	bookmark := C.FPDFBookmark_GetFirstChild(nativeDoc.doc, parentBookMark)
+	bookmark := C.FPDFBookmark_GetFirstChild(documentHandle.handle, parentBookMark)
 	if bookmark == nil {
 		return &responses.FPDFBookmark_GetFirstChild{}, nil
 	}
 
-	newNativeBookmark := p.registerBookMark(bookmark, nativeDoc)
+	newNativeBookmark := p.registerBookMark(bookmark, documentHandle)
 
 	return &responses.FPDFBookmark_GetFirstChild{
 		Bookmark: &newNativeBookmark.nativeRef,
@@ -83,22 +83,22 @@ func (p *PdfiumImplementation) FPDFBookmark_GetNextSibling(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
 
-	nativeBookmark, err := p.getNativeBookmark(request.Bookmark)
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
 	if err != nil {
 		return nil, err
 	}
 
-	bookmark := C.FPDFBookmark_GetNextSibling(nativeDoc.doc, nativeBookmark.bookmark)
+	bookmark := C.FPDFBookmark_GetNextSibling(documentHandle.handle, bookmarkHandle.handle)
 	if bookmark == nil {
 		return &responses.FPDFBookmark_GetNextSibling{}, nil
 	}
 
-	newNativeBookmark := p.registerBookMark(bookmark, nativeDoc)
+	newNativeBookmark := p.registerBookMark(bookmark, documentHandle)
 
 	return &responses.FPDFBookmark_GetNextSibling{
 		Bookmark: &newNativeBookmark.nativeRef,
@@ -110,19 +110,19 @@ func (p *PdfiumImplementation) FPDFBookmark_GetTitle(request *requests.FPDFBookm
 	p.Lock()
 	defer p.Unlock()
 
-	nativeBookmark, err := p.getNativeBookmark(request.Bookmark)
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
 	if err != nil {
 		return nil, err
 	}
 
 	// First get the title length.
-	titleSize := C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, C.NULL, 0)
+	titleSize := C.FPDFBookmark_GetTitle(bookmarkHandle.handle, C.NULL, 0)
 	if titleSize == 0 {
 		return nil, errors.New("Could not get title")
 	}
 
 	charData := make([]byte, titleSize)
-	C.FPDFBookmark_GetTitle(nativeBookmark.bookmark, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+	C.FPDFBookmark_GetTitle(bookmarkHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -139,7 +139,7 @@ func (p *PdfiumImplementation) FPDFBookmark_Find(request *requests.FPDFBookmark_
 	p.Lock()
 	defer p.Unlock()
 
-	nativeDoc, err := p.getNativeDocument(request.Document)
+	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -153,14 +153,61 @@ func (p *PdfiumImplementation) FPDFBookmark_Find(request *requests.FPDFBookmark_
 		return nil, err
 	}
 
-	bookmark := C.FPDFBookmark_Find(nativeDoc.doc, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedText[0])))
+	bookmark := C.FPDFBookmark_Find(documentHandle.handle, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedText[0])))
 	if bookmark == nil {
 		return &responses.FPDFBookmark_Find{}, nil
 	}
 
-	newNativeBookmark := p.registerBookMark(bookmark, nativeDoc)
+	newNativeBookmark := p.registerBookMark(bookmark, documentHandle)
 
 	return &responses.FPDFBookmark_Find{
 		Bookmark: &newNativeBookmark.nativeRef,
+	}, nil
+}
+
+// FPDFBookmark_GetDest returns the destination associated with a bookmark item.
+// If the returned destination is nil, none is associated to the bookmark item.
+func (p *PdfiumImplementation) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	bookmark := C.FPDFBookmark_GetDest(documentHandle.handle, bookmarkHandle.handle)
+	if bookmark == nil {
+		return &responses.FPDFBookmark_GetDest{}, nil
+	}
+
+	return &responses.FPDFBookmark_GetDest{
+		//Bookmark: &newNativeBookmark.nativeRef,
+	}, nil
+}
+
+// FPDFBookmark_GetAction returns the action associated with a bookmark item.
+// If the returned action is nil, you should try FPDFBookmark_GetDest.
+func (p *PdfiumImplementation) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	bookmark := C.FPDFBookmark_GetAction(bookmarkHandle.handle)
+	if bookmark == nil {
+		return &responses.FPDFBookmark_GetAction{}, nil
+	}
+
+	return &responses.FPDFBookmark_GetAction{
+		//Bookmark: &newNativeBookmark.nativeRef,
 	}, nil
 }

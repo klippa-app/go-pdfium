@@ -24,15 +24,15 @@ import (
 // getPageSize returns the points size of a page given the pdfium page index.
 // One point is 1/72 inch (around 0.3528 mm).
 func (p *PdfiumImplementation) getPageSize(page requests.Page) (int, float64, float64, error) {
-	nativePage, err := p.loadPage(page)
+	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, 0, 0, err
 	}
 
-	imgWidth := C.FPDF_GetPageWidth(nativePage.page)
-	imgHeight := C.FPDF_GetPageHeight(nativePage.page)
+	imgWidth := C.FPDF_GetPageWidth(pageHandle.handle)
+	imgHeight := C.FPDF_GetPageHeight(pageHandle.handle)
 
-	return nativePage.index, float64(imgWidth), float64(imgHeight), nil
+	return pageHandle.index, float64(imgWidth), float64(imgHeight), nil
 }
 
 // getPageSizeInPixels returns the pixel size of a page given the page index and DPI.
@@ -326,12 +326,12 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 
 // renderPage renders a specific page in a specific size on a bitmap.
 func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int) (int, error) {
-	nativePage, err := p.loadPage(page)
+	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, err
 	}
 
-	alpha := C.FPDFPage_HasTransparency(nativePage.page)
+	alpha := C.FPDFPage_HasTransparency(pageHandle.handle)
 
 	// White
 	fillColor := 0xFFFFFFFF
@@ -347,9 +347,9 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, nativePage.page, 0, C.int(offset), C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
+	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
 
-	return nativePage.index, nil
+	return pageHandle.index, nil
 }
 
 func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {

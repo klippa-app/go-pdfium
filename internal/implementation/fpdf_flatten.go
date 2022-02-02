@@ -13,15 +13,15 @@ func (p *PdfiumImplementation) FPDFPage_Flatten(request *requests.FPDFPage_Flatt
 	p.Lock()
 	defer p.Unlock()
 
-	nativePage, err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	flattenPageResult := C.FPDFPage_Flatten(nativePage.page, C.int(request.Usage))
+	flattenPageResult := C.FPDFPage_Flatten(pageHandle.handle, C.int(request.Usage))
 
 	return &responses.FPDFPage_Flatten{
-		Page:   nativePage.index,
+		Page:   pageHandle.index,
 		Result: responses.FPDFPage_FlattenResult(flattenPageResult),
 	}, nil
 }

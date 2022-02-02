@@ -22,3 +22,12 @@ type FPDFBookmark_GetTitle struct {
 type FPDFBookmark_Find struct {
 	Bookmark *references.FPDF_BOOKMARK // Reference to the found bookmark item. nil if the title can't be found.
 }
+
+type FPDFBookmark_GetDest struct {
+	Document references.FPDF_DOCUMENT
+	Bookmark references.FPDF_BOOKMARK
+}
+
+type FPDFBookmark_GetAction struct {
+	Bookmark references.FPDF_BOOKMARK
+}
