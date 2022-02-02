@@ -28,3 +28,37 @@ const (
 	FPDF_PAGE_ROTATION_180_CW FPDF_PAGE_ROTATION = 2 // 2: rotate 180 degrees in clockwise direction.
 	FPDF_PAGE_ROTATION_270_CW FPDF_PAGE_ROTATION = 3 // 3: rotate 270 degrees in clockwise direction.
 )
+
+// View destination fit types. See pdfmark reference v9, page 48.
+type FPDF_PDFDEST_VIEW uint32
+
+const (
+	FPDF_PDFDEST_VIEW_UNKNOWN_MODE FPDF_PDFDEST_VIEW = 0
+	FPDF_PDFDEST_VIEW_XYZ          FPDF_PDFDEST_VIEW = 1
+	FPDF_PDFDEST_VIEW_FIT          FPDF_PDFDEST_VIEW = 2
+	FPDF_PDFDEST_VIEW_FITH         FPDF_PDFDEST_VIEW = 3
+	FPDF_PDFDEST_VIEW_FITV         FPDF_PDFDEST_VIEW = 4
+	FPDF_PDFDEST_VIEW_FITR         FPDF_PDFDEST_VIEW = 5
+	FPDF_PDFDEST_VIEW_FITB         FPDF_PDFDEST_VIEW = 6
+	FPDF_PDFDEST_VIEW_FITBH        FPDF_PDFDEST_VIEW = 7
+	FPDF_PDFDEST_VIEW_FITBV        FPDF_PDFDEST_VIEW = 8
+)
+
+// Additional-action types of page object
+type FPDF_PAGE_AACTION uint32
+
+const (
+	FPDF_PAGE_AACTION_OPEN  FPDF_PAGE_AACTION = 0 // OPEN (/O) -- An action to be performed when the page is opened
+	FPDF_PAGE_AACTION_CLOSE FPDF_PAGE_AACTION = 1 // CLOSE (/C) -- An action to be performed when the page is closed
+)
+
+// Additional actions type of document
+type FPDF_DOC_AACTION uint32
+
+const (
+	FPDF_DOC_AACTION_WC FPDF_DOC_AACTION = 0x10 // WC, before closing document, JavaScript action.
+	FPDF_DOC_AACTION_WS FPDF_DOC_AACTION = 0x11 // WS before saving document, JavaScript action.
+	FPDF_DOC_AACTION_DS FPDF_DOC_AACTION = 0x12 // DS, after saving document, JavaScript action.
+	FPDF_DOC_AACTION_WP FPDF_DOC_AACTION = 0x13 // WP, before printing document, JavaScript action.
+	FPDF_DOC_AACTION_DP FPDF_DOC_AACTION = 0x14 // DP, after printing document, JavaScript action.
+)

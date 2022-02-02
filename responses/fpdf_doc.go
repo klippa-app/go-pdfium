@@ -3,6 +3,7 @@ package responses
 import (
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
+	"github.com/klippa-app/go-pdfium/structs"
 )
 
 type FPDFBookmark_GetFirstChild struct {
@@ -62,4 +63,61 @@ type FPDF_GetMetaText struct {
 type FPDF_GetPageLabel struct {
 	Page  int
 	Label string
+}
+
+type FPDFDest_GetView struct {
+	DestView enums.FPDF_PDFDEST_VIEW
+	Params   []float32
+}
+
+type FPDFDest_GetLocationInPage struct {
+	X    *float32
+	Y    *float32
+	Zoom *float32
+}
+
+type FPDFLink_GetLinkAtPoint struct {
+	Link *references.FPDF_LINK // Reference to the found link. nil if not found.
+}
+
+type FPDFLink_GetLinkZOrderAtPoint struct {
+	ZOrder int // the Z-order of the link, or -1 if no link found at the given point. Larger Z-order numbers are closer to the front.
+}
+
+type FPDFLink_GetDest struct {
+	// Dest is a handle to the destination, or nil if there is no destination
+	// associated with the link. In this case, you should call FPDFLink_GetAction()
+	// to retrieve the action associated with a link.
+	Dest *references.FPDF_DEST
+}
+
+type FPDFLink_GetAction struct {
+	// Action is a handle to the action associated to a link, or nil if no action.
+	Action *references.FPDF_ACTION
+}
+
+type FPDFLink_Enumerate struct {
+	NextStartPos *int
+	Link         *references.FPDF_LINK
+}
+
+type FPDFLink_GetAnnot struct {
+	Annotation *references.FPDF_ANNOTATION
+}
+
+type FPDFLink_GetAnnotRect struct {
+	Rect *structs.FPDF_FS_RECTF // The rectangle for the link.
+}
+
+type FPDFLink_CountQuadPoints struct {
+	Count int
+}
+
+type FPDFLink_GetQuadPoints struct {
+	Points *structs.FPDF_FS_QUADPOINTSF
+}
+
+type FPDF_GetPageAAction struct {
+	AAType *enums.FPDF_PAGE_AACTION
+	Action *references.FPDF_ACTION
 }

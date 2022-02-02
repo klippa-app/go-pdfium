@@ -44,3 +44,6 @@ type FPDF_CLIPPATH string
 
 // FPDF_FORMHANDLE is an internal reference to a C.FPDF_FORMHANDLE handle.
 type FPDF_FORMHANDLE string
+
+// FPDF_ANNOTATION is an internal reference to a C.FPDF_ANNOTATION handle.
+type FPDF_ANNOTATION string

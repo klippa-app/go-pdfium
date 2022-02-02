@@ -254,6 +254,50 @@ type Pdfium interface {
 	// FPDF_GetPageLabel returns the label for the given page.
 	FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error)
 
+	// FPDFDest_GetView returns the view (fit type) for a given dest.
+	// Experimental API.
+	FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
+
+	// FPDFDest_GetLocationInPage returns the (x, y, zoom) location of dest in the destination page, if the
+	// destination is in [page /XYZ x y zoom] syntax.
+	FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
+
+	// FPDFLink_GetLinkAtPoint finds a link at a point on a page.
+	// You can convert coordinates from screen coordinates to page coordinates using
+	// FPDF_DeviceToPage().
+	FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint) (*responses.FPDFLink_GetLinkAtPoint, error)
+
+	// FPDFLink_GetLinkZOrderAtPoint finds the Z-order of link at a point on a page.
+	// You can convert coordinates from screen coordinates to page coordinates using
+	// FPDF_DeviceToPage().
+	FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint) (*responses.FPDFLink_GetLinkZOrderAtPoint, error)
+
+	// FPDFLink_GetDest returns the destination info for a link.
+	FPDFLink_GetDest(request *requests.FPDFLink_GetDest) (*responses.FPDFLink_GetDest, error)
+
+	// FPDFLink_GetAction returns the action info for a link
+	FPDFLink_GetAction(request *requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error)
+
+	// FPDFLink_Enumerate Enumerates all the link annotations in a page.
+	FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error)
+
+	// FPDFLink_GetAnnot returns a FPDF_ANNOTATION object for a link.
+	// Experimental API.
+	FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error)
+
+	// FPDFLink_GetAnnotRect returns the count of quadrilateral points to the link.
+	FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect) (*responses.FPDFLink_GetAnnotRect, error)
+
+	// FPDFLink_CountQuadPoints returns the count of quadrilateral points to the link.
+	FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error)
+
+	// FPDFLink_GetQuadPoints returns the quadrilateral points for the specified quad index in the link.
+	FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints) (*responses.FPDFLink_GetQuadPoints, error)
+
+	// FPDF_GetPageAAction returns an additional-action from page.
+	// Experimental API
+	FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error)
+
 	// End fpdf_doc.h
 
 	// Start fpdf_save.h

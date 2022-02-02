@@ -10,6 +10,7 @@ import (
 	"encoding/ascii85"
 	"errors"
 	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/structs"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -416,5 +417,324 @@ func (p *PdfiumImplementation) FPDF_GetPageLabel(request *requests.FPDF_GetPageL
 	return &responses.FPDF_GetPageLabel{
 		Page:  request.Page,
 		Label: transformedText,
+	}, nil
+}
+
+// FPDFDest_GetView returns the view (fit type) for a given dest.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	destHandle, err := p.getDestHandle(request.Dest)
+	if err != nil {
+		return nil, err
+	}
+
+	numParams := C.ulong(0)
+	params := make([]C.FS_FLOAT, 4, 4)
+
+	destView := C.FPDFDest_GetView(destHandle.handle, &numParams, (*C.FS_FLOAT)(unsafe.Pointer(&params[0])))
+	resParams := make([]float32, int(numParams), int(numParams))
+	if int(numParams) > 0 {
+		for i := range resParams {
+			resParams[i] = float32(params[i])
+		}
+	}
+
+	return &responses.FPDFDest_GetView{
+		DestView: enums.FPDF_PDFDEST_VIEW(destView),
+		Params:   resParams,
+	}, nil
+}
+
+// FPDFDest_GetLocationInPage returns the (x, y, zoom) location of dest in the destination page, if the
+// destination is in [page /XYZ x y zoom] syntax.
+func (p *PdfiumImplementation) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	destHandle, err := p.getDestHandle(request.Dest)
+	if err != nil {
+		return nil, err
+	}
+
+	hasXVal := C.FPDF_BOOL(0)
+	hasYVal := C.FPDF_BOOL(0)
+	hasZoomVal := C.FPDF_BOOL(0)
+
+	x := C.FS_FLOAT(0)
+	y := C.FS_FLOAT(0)
+	zoom := C.FS_FLOAT(0)
+
+	success := C.FPDFDest_GetLocationInPage(destHandle.handle, &hasXVal, &hasYVal, &hasZoomVal, &x, &y, &zoom)
+	if int(success) == 0 {
+		return nil, errors.New("could not successfully read the /XYZ value")
+	}
+
+	resp := &responses.FPDFDest_GetLocationInPage{}
+
+	if int(hasXVal) == 1 {
+		xVal := float32(x)
+		resp.X = &xVal
+	}
+
+	if int(hasYVal) == 1 {
+		yVal := float32(y)
+		resp.Y = &yVal
+	}
+
+	if int(hasZoomVal) == 1 {
+		zoomVal := float32(zoom)
+		resp.Zoom = &zoomVal
+	}
+
+	return resp, nil
+}
+
+// FPDFLink_GetLinkAtPoint finds a link at a point on a page.
+// You can convert coordinates from screen coordinates to page coordinates using
+// FPDF_DeviceToPage().
+func (p *PdfiumImplementation) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint) (*responses.FPDFLink_GetLinkAtPoint, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	link := C.FPDFLink_GetLinkAtPoint(pageHandle.handle, C.double(request.X), C.double(request.Y))
+	if link == nil {
+		return &responses.FPDFLink_GetLinkAtPoint{}, nil
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	linkHandle := p.registerLink(link, documentHandle)
+
+	return &responses.FPDFLink_GetLinkAtPoint{
+		Link: &linkHandle.nativeRef,
+	}, nil
+}
+
+// FPDFLink_GetLinkZOrderAtPoint finds the Z-order of link at a point on a page.
+// You can convert coordinates from screen coordinates to page coordinates using
+// FPDF_DeviceToPage().
+func (p *PdfiumImplementation) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint) (*responses.FPDFLink_GetLinkZOrderAtPoint, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	zOrder := C.FPDFLink_GetLinkZOrderAtPoint(pageHandle.handle, C.double(request.X), C.double(request.Y))
+
+	return &responses.FPDFLink_GetLinkZOrderAtPoint{
+		ZOrder: int(zOrder),
+	}, nil
+}
+
+// FPDFLink_GetDest returns the destination info for a link.
+func (p *PdfiumImplementation) FPDFLink_GetDest(request *requests.FPDFLink_GetDest) (*responses.FPDFLink_GetDest, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	dest := C.FPDFLink_GetDest(documentHandle.handle, linkHandle.handle)
+	if dest == nil {
+		return &responses.FPDFLink_GetDest{}, nil
+	}
+
+	destHandle := p.registerDest(dest, documentHandle)
+
+	return &responses.FPDFLink_GetDest{
+		Dest: &destHandle.nativeRef,
+	}, nil
+}
+
+// FPDFLink_GetAction returns the action info for a link
+func (p *PdfiumImplementation) FPDFLink_GetAction(request *requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	action := C.FPDFLink_GetAction(linkHandle.handle)
+	if action == nil {
+		return &responses.FPDFLink_GetAction{}, nil
+	}
+
+	documentHandle, err := p.getDocumentHandle(linkHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	actionHandle := p.registerAction(action, documentHandle)
+
+	return &responses.FPDFLink_GetAction{
+		Action: &actionHandle.nativeRef,
+	}, nil
+}
+
+// FPDFLink_Enumerate Enumerates all the link annotations in a page.
+func (p *PdfiumImplementation) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	var link C.FPDF_LINK
+	startPos := C.int(request.StartPos)
+
+	success := C.FPDFLink_Enumerate(pageHandle.handle, &startPos, &link)
+	if int(success) == 0 {
+		return &responses.FPDFLink_Enumerate{}, nil
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	linkHandle := p.registerLink(link, documentHandle)
+
+	nextStartPos := int(startPos)
+	return &responses.FPDFLink_Enumerate{
+		NextStartPos: &nextStartPos,
+		Link:         &linkHandle.nativeRef,
+	}, nil
+}
+
+// FPDFLink_GetAnnot returns a FPDF_ANNOTATION object for a link.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	annotation := C.FPDFLink_GetAnnot(pageHandle.handle, linkHandle.handle)
+	if annotation == nil {
+		return &responses.FPDFLink_GetAnnot{}, nil
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle := p.registerAnnotation(annotation, documentHandle)
+
+	return &responses.FPDFLink_GetAnnot{
+		Annotation: &annotationHandle.nativeRef,
+	}, nil
+}
+
+// FPDFLink_GetAnnotRect returns the count of quadrilateral points to the link.
+func (p *PdfiumImplementation) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect) (*responses.FPDFLink_GetAnnotRect, error) {
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	var rect C.FS_RECTF
+
+	success := C.FPDFLink_GetAnnotRect(linkHandle.handle, &rect)
+	if int(success) == 0 {
+		return &responses.FPDFLink_GetAnnotRect{}, nil
+	}
+
+	return &responses.FPDFLink_GetAnnotRect{
+		Rect: &structs.FPDF_FS_RECTF{
+			Left:   float32(rect.left),
+			Top:    float32(rect.top),
+			Right:  float32(rect.right),
+			Bottom: float32(rect.bottom),
+		},
+	}, nil
+}
+
+// FPDFLink_CountQuadPoints returns the count of quadrilateral points to the link.
+func (p *PdfiumImplementation) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error) {
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFLink_CountQuadPoints(linkHandle.handle)
+
+	return &responses.FPDFLink_CountQuadPoints{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFLink_GetQuadPoints returns the quadrilateral points for the specified quad index in the link.
+func (p *PdfiumImplementation) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints) (*responses.FPDFLink_GetQuadPoints, error) {
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	var quadPoints C.FS_QUADPOINTSF
+
+	success := C.FPDFLink_GetQuadPoints(linkHandle.handle, C.int(request.QuadIndex), &quadPoints)
+	if int(success) == 0 {
+		return &responses.FPDFLink_GetQuadPoints{}, nil
+	}
+
+	return &responses.FPDFLink_GetQuadPoints{
+		Points: &structs.FPDF_FS_QUADPOINTSF{
+			X1: float32(quadPoints.x1),
+			Y1: float32(quadPoints.y1),
+			X2: float32(quadPoints.x2),
+			Y2: float32(quadPoints.y2),
+			X3: float32(quadPoints.x3),
+			Y3: float32(quadPoints.y3),
+			X4: float32(quadPoints.x4),
+			Y4: float32(quadPoints.y4),
+		},
+	}, nil
+}
+
+// FPDF_GetPageAAction returns an additional-action from page.
+// Experimental API
+func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	action := C.FPDF_GetPageAAction(pageHandle.handle, C.int(request.AAType))
+	if action == nil {
+		return &responses.FPDF_GetPageAAction{}, nil
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	actionHandle := p.registerAction(action, documentHandle)
+
+	return &responses.FPDF_GetPageAAction{
+		AAType: &request.AAType,
+		Action: &actionHandle.nativeRef,
 	}, nil
 }
