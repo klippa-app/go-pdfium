@@ -10,11 +10,53 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (i *pdfiumInstance) FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFAction_GetDest(request)
+}
+
+func (i *pdfiumInstance) FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFAction_GetFilePath(request)
+}
+
+func (i *pdfiumInstance) FPDFAction_GetType(request *requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFAction_GetType(request)
+}
+
+func (i *pdfiumInstance) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFAction_GetURIPath(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDFBookmark_Find(request)
+}
+
+func (i *pdfiumInstance) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFBookmark_GetAction(request)
+}
+
+func (i *pdfiumInstance) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFBookmark_GetDest(request)
 }
 
 func (i *pdfiumInstance) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error) {
@@ -36,6 +78,13 @@ func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_Ge
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDFBookmark_GetTitle(request)
+}
+
+func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFDest_GetDestPageIndex(request)
 }
 
 func (i *pdfiumInstance) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
@@ -101,6 +150,13 @@ func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPer
 	return i.pdfium.FPDF_GetDocPermissions(request)
 }
 
+func (i *pdfiumInstance) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_GetFileIdentifier(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -134,6 +190,13 @@ func (i *pdfiumInstance) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDF_GetPageHeight(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_GetPageLabel(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error) {

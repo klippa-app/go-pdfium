@@ -5,6 +5,7 @@ package implementation
 import "C"
 import (
 	"github.com/google/uuid"
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -42,7 +43,7 @@ func (p *PdfiumImplementation) FPDFPage_GetRotation(request *requests.FPDFPage_G
 
 	return &responses.FPDFPage_GetRotation{
 		Page:         pageHandle.index,
-		PageRotation: responses.PageRotation(rotation),
+		PageRotation: enums.FPDF_PAGE_ROTATION(rotation),
 	}, nil
 }
 

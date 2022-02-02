@@ -415,3 +415,27 @@ func (d *PdfiumImplementation) getBookmarkHandle(bookmarkRef references.FPDF_BOO
 
 	return nil, errors.New("could not find bookmark handle, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
 }
+
+func (d *PdfiumImplementation) getDestHandle(destRef references.FPDF_DEST) (*DestHandle, error) {
+	if destRef == "" {
+		return nil, errors.New("dest not given")
+	}
+
+	if val, ok := d.destRefs[destRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find dest handle, perhaps the dest was already closed or you tried to share dests between instances or documents")
+}
+
+func (d *PdfiumImplementation) getActionHandle(actionRef references.FPDF_ACTION) (*ActionHandle, error) {
+	if actionRef == "" {
+		return nil, errors.New("action not given")
+	}
+
+	if val, ok := d.actionRefs[actionRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find action handle, perhaps the action was already closed or you tried to share actions between instances or documents")
+}

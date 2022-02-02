@@ -11,10 +11,17 @@ import (
 
 type Pdfium interface {
     Ping() (string, error)
+    FPDFAction_GetDest(*requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error)
+    FPDFAction_GetFilePath(*requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
+    FPDFAction_GetType(*requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error)
+    FPDFAction_GetURIPath(*requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error)
     FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
+    FPDFBookmark_GetAction(*requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
+    FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
     FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
     FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
     FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
+    FPDFDest_GetDestPageIndex(*requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
     FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
     FPDFPage_Flatten(*requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
     FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
@@ -24,11 +31,13 @@ type Pdfium interface {
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
     FPDF_CreateNewDocument(*requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
     FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
+    FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
     FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
     FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
     FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
     FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
     FPDF_GetPageHeight(*requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
+    FPDF_GetPageLabel(*requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error)
     FPDF_GetPageSizeByIndex(*requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
     FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
@@ -54,9 +63,69 @@ type Pdfium interface {
 }
 
 
+func (g *PdfiumRPC) FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error) {
+	resp := &responses.FPDFAction_GetDest{}
+	err := g.client.Call("Plugin.FPDFAction_GetDest", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error) {
+	resp := &responses.FPDFAction_GetFilePath{}
+	err := g.client.Call("Plugin.FPDFAction_GetFilePath", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAction_GetType(request *requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error) {
+	resp := &responses.FPDFAction_GetType{}
+	err := g.client.Call("Plugin.FPDFAction_GetType", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error) {
+	resp := &responses.FPDFAction_GetURIPath{}
+	err := g.client.Call("Plugin.FPDFAction_GetURIPath", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error) {
 	resp := &responses.FPDFBookmark_Find{}
 	err := g.client.Call("Plugin.FPDFBookmark_Find", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error) {
+	resp := &responses.FPDFBookmark_GetAction{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error) {
+	resp := &responses.FPDFBookmark_GetDest{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetDest", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +156,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_G
 func (g *PdfiumRPC) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error) {
 	resp := &responses.FPDFBookmark_GetTitle{}
 	err := g.client.Call("Plugin.FPDFBookmark_GetTitle", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error) {
+	resp := &responses.FPDFDest_GetDestPageIndex{}
+	err := g.client.Call("Plugin.FPDFDest_GetDestPageIndex", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -184,6 +263,16 @@ func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissi
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
+	resp := &responses.FPDF_GetFileIdentifier{}
+	err := g.client.Call("Plugin.FPDF_GetFileIdentifier", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	resp := &responses.FPDF_GetFileVersion{}
 	err := g.client.Call("Plugin.FPDF_GetFileVersion", request, resp)
@@ -227,6 +316,16 @@ func (g *PdfiumRPC) FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*res
 func (g *PdfiumRPC) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error) {
 	resp := &responses.FPDF_GetPageHeight{}
 	err := g.client.Call("Plugin.FPDF_GetPageHeight", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error) {
+	resp := &responses.FPDF_GetPageLabel{}
+	err := g.client.Call("Plugin.FPDF_GetPageLabel", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -436,9 +535,87 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 
 
 
+func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDest, resp *responses.FPDFAction_GetDest) error {
+	var err error
+	implResp, err := s.Impl.FPDFAction_GetDest(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath, resp *responses.FPDFAction_GetFilePath) error {
+	var err error
+	implResp, err := s.Impl.FPDFAction_GetFilePath(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAction_GetType(request *requests.FPDFAction_GetType, resp *responses.FPDFAction_GetType) error {
+	var err error
+	implResp, err := s.Impl.FPDFAction_GetType(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath, resp *responses.FPDFAction_GetURIPath) error {
+	var err error
+	implResp, err := s.Impl.FPDFAction_GetURIPath(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find, resp *responses.FPDFBookmark_Find) error {
 	var err error
 	implResp, err := s.Impl.FPDFBookmark_Find(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction, resp *responses.FPDFBookmark_GetAction) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_GetAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest, resp *responses.FPDFBookmark_GetDest) error {
+	var err error
+	implResp, err := s.Impl.FPDFBookmark_GetDest(request)
 	if err != nil {
 		return err
 	}
@@ -478,6 +655,19 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBook
 func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) error {
 	var err error
 	implResp, err := s.Impl.FPDFBookmark_GetTitle(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex, resp *responses.FPDFDest_GetDestPageIndex) error {
+	var err error
+	implResp, err := s.Impl.FPDFDest_GetDestPageIndex(request)
 	if err != nil {
 		return err
 	}
@@ -605,6 +795,19 @@ func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPe
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier, resp *responses.FPDF_GetFileIdentifier) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetFileIdentifier(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion, resp *responses.FPDF_GetFileVersion) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetFileVersion(request)
@@ -660,6 +863,19 @@ func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount,
 func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight, resp *responses.FPDF_GetPageHeight) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetPageHeight(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel, resp *responses.FPDF_GetPageLabel) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageLabel(request)
 	if err != nil {
 		return err
 	}

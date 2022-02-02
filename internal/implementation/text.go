@@ -222,7 +222,7 @@ func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, 
 		return "", err
 	}
 
-	// Remove null terminator
+	// Remove NULL terminator.
 	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
 
 	return string(decoded), nil

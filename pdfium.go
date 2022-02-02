@@ -153,10 +153,13 @@ type Pdfium interface {
 	// FPDF_GetPageCount returns the amount of pages for the references.
 	FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
 
+	// FPDF_GetPageWidth returns the width of a page.
 	FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
 
+	// FPDF_GetPageHeight returns the height of a page.
 	FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
 
+	// FPDF_GetPageSizeByIndex returns the size of a page by the page index.
 	FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
 
 	// End fpdfview.h
@@ -203,9 +206,6 @@ type Pdfium interface {
 
 	// Start fpdf_doc.h
 
-	// FPDF_GetMetaText returns the requested metadata.
-	FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
-
 	// FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
 	FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 
@@ -217,6 +217,42 @@ type Pdfium interface {
 
 	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
 	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
+
+	// FPDFBookmark_GetDest returns the destination associated with a bookmark item.
+	// If the returned destination is nil, none is associated to the bookmark item.
+	FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
+
+	// FPDFBookmark_GetAction returns the action associated with a bookmark item.
+	// If the returned action is nil, you should try FPDFBookmark_GetDest.
+	FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
+
+	// FPDFAction_GetType returns the action associated with a bookmark item.
+	FPDFAction_GetType(request *requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error)
+
+	// FPDFAction_GetDest returns the destination of a specific go-to or remote-goto action.
+	// Only action with type PDF_ACTION_ACTION_GOTO and PDF_ACTION_ACTION_REMOTEGOTO can have destination data.
+	// In case of remote goto action, the application should first use function FPDFAction_GetFilePath to get file path, then load that particular document, and use its document handle to call this function.
+	FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error)
+
+	// FPDFAction_GetFilePath returns the file path from a remote goto or launch action.
+	// Only works on actions that have the type FPDF_ACTION_ACTION_REMOTEGOTO or FPDF_ACTION_ACTION_LAUNCH.
+	FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
+
+	// FPDFAction_GetURIPath returns the URI path from a URI action.
+	FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error)
+
+	// FPDFDest_GetDestPageIndex returns the page index from destination data.
+	FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
+
+	// FPDF_GetFileIdentifier Get the file identifier defined in the trailer of a document.
+	// Experimental API.
+	FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
+
+	// FPDF_GetMetaText returns the requested metadata.
+	FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
+
+	// FPDF_GetPageLabel returns the label for the given page.
+	FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error)
 
 	// End fpdf_doc.h
 

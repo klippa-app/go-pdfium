@@ -41,12 +41,3 @@ type GetPageSizeInPixels struct {
 	Page Page
 	DPI  int // The DPI to calculate the size for.
 }
-
-type PageRotation int
-
-const (
-	PageRotationNone  PageRotation = 0 // 0: no rotation.
-	PageRotation90CW  PageRotation = 1 // 1: rotate 90 degrees in clockwise direction.
-	PageRotation180CW PageRotation = 2 // 2: rotate 180 degrees in clockwise direction.
-	PageRotation270CW PageRotation = 3 // 3: rotate 270 degrees in clockwise direction.
-)

@@ -1,9 +1,11 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
+	"log"
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/references"
@@ -276,6 +278,333 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 					})
 					Expect(err).To(BeNil())
 					Expect(bookmark).To(Equal(&responses.FPDFBookmark_Find{}))
+				})
+			})
+		})
+
+		Context("a PDF file with no page labels", func() {
+			var doc references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/about_blank.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+			})
+
+			When("FPDF_GetPageLabel is called", func() {
+				It("returns the correct page label", func() {
+					pageLabel, err := pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     0,
+					})
+					Expect(err).To(MatchError("Could not get label"))
+					Expect(pageLabel).To(BeNil())
+				})
+			})
+		})
+
+		Context("a PDF file with page labels", func() {
+			var doc references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/page_labels.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+			})
+
+			When("FPDF_GetPageLabel is called", func() {
+				It("returns the correct page label", func() {
+					pageLabel, err := pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     -2,
+					})
+					Expect(err).To(MatchError("Could not get label"))
+					Expect(pageLabel).To(BeNil())
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     -1,
+					})
+					Expect(err).To(MatchError("Could not get label"))
+					Expect(pageLabel).To(BeNil())
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     0,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  0,
+						Label: "i",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     1,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  1,
+						Label: "ii",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     2,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  2,
+						Label: "1",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     3,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  3,
+						Label: "2",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     4,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  4,
+						Label: "zzA",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     5,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  5,
+						Label: "zzB",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     6,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageLabel).To(Equal(&responses.FPDF_GetPageLabel{
+						Page:  6,
+						Label: "",
+					}))
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     7,
+					})
+					Expect(err).To(MatchError("Could not get label"))
+					Expect(pageLabel).To(BeNil())
+
+					pageLabel, err = pdfiumContainer.FPDF_GetPageLabel(&requests.FPDF_GetPageLabel{
+						Document: doc,
+						Page:     8,
+					})
+					Expect(err).To(MatchError("Could not get label"))
+					Expect(pageLabel).To(BeNil())
+				})
+			})
+		})
+
+		Context("a PDF file with a non-text identifier", func() {
+			var doc references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/split_streams.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+			})
+
+			When("FPDF_GetFileIdentifier is called with an invalid type", func() {
+				It("should return an error", func() {
+					identifier, err := pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: -1,
+					})
+					Expect(err).To(MatchError("invalid file id type given"))
+					Expect(identifier).To(BeNil())
+
+					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: 2,
+					})
+					Expect(err).To(MatchError("invalid file id type given"))
+					Expect(identifier).To(BeNil())
+				})
+			})
+
+			When("FPDF_GetFileIdentifier is called with a valid type", func() {
+				It("returns the correct identifier", func() {
+					identifier, err := pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+						Identifier: []byte{243, 65, 174, 101, 74, 119, 172, 213, 6, 90, 118, 69, 229, 150, 230, 230}, // Byte identifier
+					}))
+
+					log.Println(string(identifier.Identifier))
+
+					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+						Identifier: []byte{188, 55, 41, 138, 63, 135, 244, 121, 34, 155, 206, 153, 124, 167, 145, 247}, // Byte identifier
+					}))
+				})
+			})
+		})
+
+		Context("a PDF file with a text identifier", func() {
+			var doc references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/non_hex_file_id.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+			})
+
+			When("FPDF_GetFileIdentifier is called with a valid type", func() {
+				It("returns the correct identifier", func() {
+					identifier, err := pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+						Identifier: []byte("permanent non-hex"), // Text identifier
+					}))
+
+					log.Println(string(identifier.Identifier))
+
+					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+						Identifier: []byte("changing non-hex"), // Text identifier
+					}))
+				})
+			})
+		})
+
+		Context("a PDF file without identifier", func() {
+			var doc references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/hello_world.pdf")
+				Expect(err).To(BeNil())
+				if err != nil {
+					return
+				}
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				if err != nil {
+					return
+				}
+
+				doc = *newDoc
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+			})
+
+			When("FPDF_GetFileIdentifier is called with a valid type", func() {
+				It("returns a nil identifier", func() {
+					identifier, err := pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+						Identifier: nil,
+					}))
+
+					identifier, err = pdfiumContainer.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+						Document:   doc,
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					})
+					Expect(err).To(BeNil())
+					Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+						FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+						Identifier: nil,
+					}))
 				})
 			})
 		})

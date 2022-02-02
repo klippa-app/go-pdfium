@@ -1,6 +1,7 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
@@ -81,8 +82,45 @@ func RunBookmarksTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix s
 					Expect(bookmarks).To(Not(BeNil()))
 
 					if bookmarks.Bookmarks != nil {
-						Expect(bookmarks.Bookmarks).To(ContainElement(MatchFields(IgnoreExtras, Fields{"Title": Equal("A Good Beginning"), "Children": HaveLen(0)})))
-						Expect(bookmarks.Bookmarks).To(ContainElement(MatchFields(IgnoreExtras, Fields{"Title": Equal("A Good Ending"), "Children": HaveLen(0)})))
+						Expect(bookmarks.Bookmarks).To(HaveLen(2))
+
+						if len(bookmarks.Bookmarks) == 2 {
+							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
+								"Reference": Not(BeNil()),
+								"Title":     Equal("A Good Beginning"),
+								"Action":    Not(BeNil()),
+								"Children":  HaveLen(0),
+								"Dest":      BeNil(),
+							})))
+
+							if bookmarks.Bookmarks[0].Action != nil {
+								Expect(*bookmarks.Bookmarks[0].Action).To(MatchAllFields(Fields{
+									"Reference": Not(BeNil()),
+									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
+									"Dest":      BeNil(),
+									"FilePath":  BeNil(),
+									"URIPath":   BeNil(),
+								}))
+							}
+
+							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
+								"Reference": Not(BeNil()),
+								"Title":     Equal("A Good Ending"),
+								"Children":  HaveLen(0),
+								"Action":    Not(BeNil()),
+								"Dest":      BeNil(),
+							})))
+
+							if bookmarks.Bookmarks[1].Action != nil {
+								Expect(*bookmarks.Bookmarks[1].Action).To(MatchAllFields(Fields{
+									"Reference": Not(BeNil()),
+									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
+									"Dest":      BeNil(),
+									"FilePath":  BeNil(),
+									"URIPath":   BeNil(),
+								}))
+							}
+						}
 					}
 				})
 			})
