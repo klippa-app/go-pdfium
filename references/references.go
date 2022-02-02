@@ -47,3 +47,6 @@ type FPDF_FORMHANDLE string
 
 // FPDF_ANNOTATION is an internal reference to a C.FPDF_ANNOTATION handle.
 type FPDF_ANNOTATION string
+
+// FPDF_XOBJECT is an internal reference to a C.FPDF_XOBJECT handle.
+type FPDF_XOBJECT string

@@ -235,3 +235,8 @@ type AnnotationHandle struct {
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_ANNOTATION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
+
+type XObjectHandle struct {
+	handle    C.FPDF_XOBJECT
+	nativeRef references.FPDF_XOBJECT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}

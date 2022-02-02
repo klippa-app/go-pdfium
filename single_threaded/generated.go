@@ -206,6 +206,13 @@ func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*resp
 	return i.pdfium.FPDF_ClosePage(request)
 }
 
+func (i *pdfiumInstance) FPDF_CloseXObject(request *requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_CloseXObject(request)
+}
+
 func (i *pdfiumInstance) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -304,6 +311,13 @@ func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_
 	return i.pdfium.FPDF_GetSecurityHandlerRevision(request)
 }
 
+func (i *pdfiumInstance) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_ImportNPagesToOne(request)
+}
+
 func (i *pdfiumInstance) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -311,11 +325,32 @@ func (i *pdfiumInstance) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*
 	return i.pdfium.FPDF_ImportPages(request)
 }
 
+func (i *pdfiumInstance) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_ImportPagesByIndex(request)
+}
+
 func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDF_LoadPage(request)
+}
+
+func (i *pdfiumInstance) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_NewFormObjectFromXObject(request)
+}
+
+func (i *pdfiumInstance) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_NewXObjectFromPage(request)
 }
 
 func (i *pdfiumInstance) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error) {
