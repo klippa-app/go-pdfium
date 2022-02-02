@@ -15,3 +15,12 @@ const (
 type FPDFDoc_GetPageMode struct {
 	PageMode FPDFDoc_GetPageModeMode // The document's page mode, which describes how the document should be displayed when opened.
 }
+
+type FSDK_SetUnSpObjProcessHandler struct {
+}
+
+type FSDK_SetTimeFunction struct {
+}
+
+type FSDK_SetLocaltimeFunction struct {
+}

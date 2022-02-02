@@ -63,6 +63,9 @@ type Pdfium interface {
     FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
     FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
     FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
+    FSDK_SetLocaltimeFunction(*requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error)
+    FSDK_SetTimeFunction(*requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
+    FSDK_SetUnSpObjProcessHandler(*requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
     GetBookmarks(*requests.GetBookmarks) (*responses.GetBookmarks, error)
     GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
@@ -593,6 +596,36 @@ func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion)
 func (g *PdfiumRPC) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
 	resp := &responses.FPDF_SetSandBoxPolicy{}
 	err := g.client.Call("Plugin.FPDF_SetSandBoxPolicy", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error) {
+	resp := &responses.FSDK_SetLocaltimeFunction{}
+	err := g.client.Call("Plugin.FSDK_SetLocaltimeFunction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error) {
+	resp := &responses.FSDK_SetTimeFunction{}
+	err := g.client.Call("Plugin.FSDK_SetTimeFunction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error) {
+	resp := &responses.FSDK_SetUnSpObjProcessHandler{}
+	err := g.client.Call("Plugin.FSDK_SetUnSpObjProcessHandler", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1388,6 +1421,45 @@ func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVe
 func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy, resp *responses.FPDF_SetSandBoxPolicy) error {
 	var err error
 	implResp, err := s.Impl.FPDF_SetSandBoxPolicy(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction, resp *responses.FSDK_SetLocaltimeFunction) error {
+	var err error
+	implResp, err := s.Impl.FSDK_SetLocaltimeFunction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction, resp *responses.FSDK_SetTimeFunction) error {
+	var err error
+	implResp, err := s.Impl.FSDK_SetTimeFunction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler, resp *responses.FSDK_SetUnSpObjProcessHandler) error {
+	var err error
+	implResp, err := s.Impl.FSDK_SetUnSpObjProcessHandler(request)
 	if err != nil {
 		return err
 	}
