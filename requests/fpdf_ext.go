@@ -18,7 +18,7 @@ type FSDK_SetUnSpObjProcessHandler struct {
 type SetTimeFunction func() int64
 
 type FSDK_SetTimeFunction struct {
-	Function *SetTimeFunction // Alternate implementation of time(), or nil to restore to actual time() call itself.
+	Function SetTimeFunction // Alternate implementation of time(), or nil to restore to actual time() call itself.
 }
 
 type SetLocaltime struct {
@@ -36,5 +36,5 @@ type SetLocaltime struct {
 type SetLocaltimeFunction func(int64) SetLocaltime
 
 type FSDK_SetLocaltimeFunction struct {
-	Function *SetLocaltimeFunction // Alternate implementation of localtime(), or nil to restore to actual localtime() call itself.
+	Function SetLocaltimeFunction // Alternate implementation of localtime(), or nil to restore to actual localtime() call itself.
 }
