@@ -138,6 +138,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		xObjectRefs:    map[references.FPDF_XOBJECT]*XObjectHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -169,6 +170,7 @@ type PdfiumImplementation struct {
 	formHandleRefs map[references.FPDF_FORMHANDLE]*FormHandleHandle
 	bitmapRefs     map[references.FPDF_BITMAP]*BitmapHandle
 	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
+	xObjectRefs    map[references.FPDF_XOBJECT]*XObjectHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -382,6 +384,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.annotationRefs, i)
 	}
 
+	for i := range p.xObjectRefs {
+		delete(p.xObjectRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -457,4 +463,16 @@ func (d *PdfiumImplementation) getLinkHandle(linkRef references.FPDF_LINK) (*Lin
 	}
 
 	return nil, errors.New("could not find link handle, perhaps the link was already closed or you tried to share links between instances or documents")
+}
+
+func (d *PdfiumImplementation) getXObjectHandle(xObject references.FPDF_XOBJECT) (*XObjectHandle, error) {
+	if xObject == "" {
+		return nil, errors.New("xObject not given")
+	}
+
+	if val, ok := d.xObjectRefs[xObject]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find xObject handle, perhaps the xObject was already closed or you tried to share xObjects between instances or documents")
 }

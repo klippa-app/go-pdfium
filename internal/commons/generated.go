@@ -39,6 +39,7 @@ type Pdfium interface {
     FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
     FPDFPage_SetRotation(*requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
     FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
+    FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
     FPDF_CreateNewDocument(*requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
     FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
@@ -53,8 +54,12 @@ type Pdfium interface {
     FPDF_GetPageSizeByIndex(*requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
     FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
+    FPDF_ImportNPagesToOne(*requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
+    FPDF_ImportPagesByIndex(*requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error)
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
+    FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
+    FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
     FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
     FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
     FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
@@ -355,6 +360,16 @@ func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_CloseXObject(request *requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error) {
+	resp := &responses.FPDF_CloseXObject{}
+	err := g.client.Call("Plugin.FPDF_CloseXObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error) {
 	resp := &responses.FPDF_CopyViewerPreferences{}
 	err := g.client.Call("Plugin.FPDF_CopyViewerPreferences", request, resp)
@@ -495,6 +510,16 @@ func (g *PdfiumRPC) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSe
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error) {
+	resp := &responses.FPDF_ImportNPagesToOne{}
+	err := g.client.Call("Plugin.FPDF_ImportNPagesToOne", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error) {
 	resp := &responses.FPDF_ImportPages{}
 	err := g.client.Call("Plugin.FPDF_ImportPages", request, resp)
@@ -505,9 +530,39 @@ func (g *PdfiumRPC) FPDF_ImportPages(request *requests.FPDF_ImportPages) (*respo
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error) {
+	resp := &responses.FPDF_ImportPagesByIndex{}
+	err := g.client.Call("Plugin.FPDF_ImportPagesByIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	resp := &responses.FPDF_LoadPage{}
 	err := g.client.Call("Plugin.FPDF_LoadPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
+	resp := &responses.FPDF_NewFormObjectFromXObject{}
+	err := g.client.Call("Plugin.FPDF_NewFormObjectFromXObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error) {
+	resp := &responses.FPDF_NewXObjectFromPage{}
+	err := g.client.Call("Plugin.FPDF_NewXObjectFromPage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1031,6 +1086,19 @@ func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp 
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_CloseXObject(request *requests.FPDF_CloseXObject, resp *responses.FPDF_CloseXObject) error {
+	var err error
+	implResp, err := s.Impl.FPDF_CloseXObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences, resp *responses.FPDF_CopyViewerPreferences) error {
 	var err error
 	implResp, err := s.Impl.FPDF_CopyViewerPreferences(request)
@@ -1213,6 +1281,19 @@ func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne, resp *responses.FPDF_ImportNPagesToOne) error {
+	var err error
+	implResp, err := s.Impl.FPDF_ImportNPagesToOne(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, resp *responses.FPDF_ImportPages) error {
 	var err error
 	implResp, err := s.Impl.FPDF_ImportPages(request)
@@ -1226,9 +1307,48 @@ func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, r
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesByIndex, resp *responses.FPDF_ImportPagesByIndex) error {
+	var err error
+	implResp, err := s.Impl.FPDF_ImportPagesByIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) error {
 	var err error
 	implResp, err := s.Impl.FPDF_LoadPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject, resp *responses.FPDF_NewFormObjectFromXObject) error {
+	var err error
+	implResp, err := s.Impl.FPDF_NewFormObjectFromXObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFromPage, resp *responses.FPDF_NewXObjectFromPage) error {
+	var err error
+	implResp, err := s.Impl.FPDF_NewXObjectFromPage(request)
 	if err != nil {
 		return err
 	}
