@@ -12,15 +12,6 @@ type NewPage struct {
 	Page references.FPDF_PAGE
 }
 
-type PageRotation int
-
-const (
-	PageRotationNone  PageRotation = 0 // 0: no rotation.
-	PageRotation90CW  PageRotation = 1 // 1: rotate 90 degrees in clockwise direction.
-	PageRotation180CW PageRotation = 2 // 2: rotate 180 degrees in clockwise direction.
-	PageRotation270CW PageRotation = 3 // 3: rotate 270 degrees in clockwise direction.
-)
-
 type GetPageSize struct {
 	Page   int     // The page this size came from (0-index based).
 	Width  float64 // The width of the page in points. One point is 1/72 inch (around 0.3528 mm).

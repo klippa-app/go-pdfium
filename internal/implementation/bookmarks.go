@@ -4,16 +4,19 @@ package implementation
 // #include "fpdf_doc.h"
 import "C"
 import (
+	"encoding/ascii85"
 	"errors"
+	"github.com/klippa-app/go-pdfium/enums"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-	"unsafe"
 
 	"github.com/google/uuid"
 )
 
-func (p *PdfiumImplementation) registerBookMark(bookmark C.FPDF_BOOKMARK, documentHandle *DocumentHandle) *BookmarkHandle {
+func (p *PdfiumImplementation) registerBookmark(bookmark C.FPDF_BOOKMARK, documentHandle *DocumentHandle) *BookmarkHandle {
 	bookmarkRef := uuid.New()
 	bookmarkHandle := &BookmarkHandle{
 		handle:      bookmark,
@@ -42,7 +45,7 @@ func (p *PdfiumImplementation) GetBookmarks(request *requests.GetBookmarks) (*re
 		return &responses.GetBookmarks{}, nil
 	}
 
-	bookMarks, err := getBookMarkChildren(p, documentHandle, bookmark)
+	bookMarks, err := p.getBookMarkChildren(documentHandle, bookmark)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +55,7 @@ func (p *PdfiumImplementation) GetBookmarks(request *requests.GetBookmarks) (*re
 	}, nil
 }
 
-func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle, bookmark C.FPDF_BOOKMARK) ([]responses.GetBookmarksBookmark, error) {
+func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandle, bookmark C.FPDF_BOOKMARK) ([]responses.GetBookmarksBookmark, error) {
 	bookmarks := []C.FPDF_BOOKMARK{bookmark}
 
 	currentSibling := bookmark
@@ -74,7 +77,7 @@ func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle
 		}
 		child := C.FPDFBookmark_GetFirstChild(documentHandle.handle, bookmarks[i])
 		if child != nil {
-			myChildren, err := getBookMarkChildren(p, documentHandle, child)
+			myChildren, err := p.getBookMarkChildren(documentHandle, child)
 			if err != nil {
 				return nil, err
 			}
@@ -82,7 +85,7 @@ func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle
 			respBookmark.Children = myChildren
 		}
 
-		bookmarkHandle := p.registerBookMark(bookmarks[i], documentHandle)
+		bookmarkHandle := p.registerBookmark(bookmarks[i], documentHandle)
 
 		// First get the title length.
 		titleSize := C.FPDFBookmark_GetTitle(bookmarkHandle.handle, C.NULL, 0)
@@ -98,6 +101,75 @@ func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle
 			return nil, err
 		}
 
+		action := C.FPDFBookmark_GetAction(bookmarkHandle.handle)
+		if action == nil {
+			actionHandle := p.registerAction(action, documentHandle)
+			actionType := C.FPDFAction_GetType(actionHandle.handle)
+
+			respBookmark.Action = &responses.GetBookmarksAction{
+				Reference: actionHandle.nativeRef,
+				Type:      enums.FPDF_ACTION_ACTION(actionType),
+			}
+
+			if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_GOTO {
+				dest := C.FPDFAction_GetDest(documentHandle.handle, actionHandle.handle)
+				if dest != nil {
+					destHandle := p.registerDest(dest, documentHandle)
+
+					destData, err := p.getDestData(documentHandle, destHandle)
+					if err != nil {
+						return nil, err
+					}
+
+					respBookmark.Action.Dest = destData
+				}
+			} else if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_LAUNCH || respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_REMOTEGOTO {
+				// First get the file path length.
+				filePathLength := C.FPDFAction_GetFilePath(actionHandle.handle, C.NULL, 0)
+				if filePathLength == 0 {
+					return nil, errors.New("Could not get file path")
+				}
+
+				charData := make([]byte, filePathLength)
+				// FPDFAction_GetFilePath returns the data in UTF-8, no conversion needed.
+				C.FPDFAction_GetFilePath(actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+
+				filePathString := string(charData)
+				respBookmark.Action.FilePath = &filePathString
+			} else if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_URI {
+				// First get the uri path length.
+				uriPathLength := C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, C.NULL, 0)
+				if uriPathLength == 0 {
+					return nil, errors.New("Could not get uri path")
+				}
+
+				charData := make([]byte, uriPathLength)
+				C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+
+				// Convert 7-bit ASCII to UTF-8.
+				dst := make([]byte, uriPathLength, uriPathLength)
+				_, _, err = ascii85.Decode(dst, charData, true)
+				if err != nil {
+					return nil, err
+				}
+
+				uriPathString := string(dst)
+				respBookmark.Action.URIPath = &uriPathString
+			}
+		}
+
+		dest := C.FPDFBookmark_GetDest(documentHandle.handle, bookmarkHandle.handle)
+		if dest != nil {
+			destHandle := p.registerDest(dest, documentHandle)
+
+			destData, err := p.getDestData(documentHandle, destHandle)
+			if err != nil {
+				return nil, err
+			}
+
+			respBookmark.Dest = destData
+		}
+
 		respBookmark.Title = transformedText
 		respBookmark.Reference = bookmarkHandle.nativeRef
 
@@ -105,4 +177,13 @@ func getBookMarkChildren(p *PdfiumImplementation, documentHandle *DocumentHandle
 	}
 
 	return resp, nil
+}
+
+func (p *PdfiumImplementation) getDestData(documentHandle *DocumentHandle, destHandle *DestHandle) (*responses.GetBookmarksDest, error) {
+	pageIndex := C.FPDFDest_GetDestPageIndex(documentHandle.handle, destHandle.handle)
+
+	return &responses.GetBookmarksDest{
+		Reference: destHandle.nativeRef,
+		PageIndex: int(pageIndex),
+	}, nil
 }
