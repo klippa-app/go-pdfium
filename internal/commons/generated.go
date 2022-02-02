@@ -22,7 +22,18 @@ type Pdfium interface {
     FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
     FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
     FPDFDest_GetDestPageIndex(*requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
+    FPDFDest_GetLocationInPage(*requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
+    FPDFDest_GetView(*requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
     FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
+    FPDFLink_CountQuadPoints(*requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error)
+    FPDFLink_Enumerate(*requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error)
+    FPDFLink_GetAction(*requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error)
+    FPDFLink_GetAnnot(*requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error)
+    FPDFLink_GetAnnotRect(*requests.FPDFLink_GetAnnotRect) (*responses.FPDFLink_GetAnnotRect, error)
+    FPDFLink_GetDest(*requests.FPDFLink_GetDest) (*responses.FPDFLink_GetDest, error)
+    FPDFLink_GetLinkAtPoint(*requests.FPDFLink_GetLinkAtPoint) (*responses.FPDFLink_GetLinkAtPoint, error)
+    FPDFLink_GetLinkZOrderAtPoint(*requests.FPDFLink_GetLinkZOrderAtPoint) (*responses.FPDFLink_GetLinkZOrderAtPoint, error)
+    FPDFLink_GetQuadPoints(*requests.FPDFLink_GetQuadPoints) (*responses.FPDFLink_GetQuadPoints, error)
     FPDFPage_Flatten(*requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
     FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
     FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
@@ -35,6 +46,7 @@ type Pdfium interface {
     FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
     FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
     FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
+    FPDF_GetPageAAction(*requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error)
     FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
     FPDF_GetPageHeight(*requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
     FPDF_GetPageLabel(*requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error)
@@ -173,9 +185,119 @@ func (g *PdfiumRPC) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDest
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error) {
+	resp := &responses.FPDFDest_GetLocationInPage{}
+	err := g.client.Call("Plugin.FPDFDest_GetLocationInPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error) {
+	resp := &responses.FPDFDest_GetView{}
+	err := g.client.Call("Plugin.FPDFDest_GetView", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
 	resp := &responses.FPDFDoc_GetPageMode{}
 	err := g.client.Call("Plugin.FPDFDoc_GetPageMode", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error) {
+	resp := &responses.FPDFLink_CountQuadPoints{}
+	err := g.client.Call("Plugin.FPDFLink_CountQuadPoints", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error) {
+	resp := &responses.FPDFLink_Enumerate{}
+	err := g.client.Call("Plugin.FPDFLink_Enumerate", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetAction(request *requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error) {
+	resp := &responses.FPDFLink_GetAction{}
+	err := g.client.Call("Plugin.FPDFLink_GetAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error) {
+	resp := &responses.FPDFLink_GetAnnot{}
+	err := g.client.Call("Plugin.FPDFLink_GetAnnot", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect) (*responses.FPDFLink_GetAnnotRect, error) {
+	resp := &responses.FPDFLink_GetAnnotRect{}
+	err := g.client.Call("Plugin.FPDFLink_GetAnnotRect", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetDest(request *requests.FPDFLink_GetDest) (*responses.FPDFLink_GetDest, error) {
+	resp := &responses.FPDFLink_GetDest{}
+	err := g.client.Call("Plugin.FPDFLink_GetDest", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint) (*responses.FPDFLink_GetLinkAtPoint, error) {
+	resp := &responses.FPDFLink_GetLinkAtPoint{}
+	err := g.client.Call("Plugin.FPDFLink_GetLinkAtPoint", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint) (*responses.FPDFLink_GetLinkZOrderAtPoint, error) {
+	resp := &responses.FPDFLink_GetLinkZOrderAtPoint{}
+	err := g.client.Call("Plugin.FPDFLink_GetLinkZOrderAtPoint", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints) (*responses.FPDFLink_GetQuadPoints, error) {
+	resp := &responses.FPDFLink_GetQuadPoints{}
+	err := g.client.Call("Plugin.FPDFLink_GetQuadPoints", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -296,6 +418,16 @@ func (g *PdfiumRPC) FPDF_GetLastError(request *requests.FPDF_GetLastError) (*res
 func (g *PdfiumRPC) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error) {
 	resp := &responses.FPDF_GetMetaText{}
 	err := g.client.Call("Plugin.FPDF_GetMetaText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
+	resp := &responses.FPDF_GetPageAAction{}
+	err := g.client.Call("Plugin.FPDF_GetPageAAction", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -678,9 +810,152 @@ func (s *PdfiumRPCServer) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_G
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage, resp *responses.FPDFDest_GetLocationInPage) error {
+	var err error
+	implResp, err := s.Impl.FPDFDest_GetLocationInPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDest_GetView(request *requests.FPDFDest_GetView, resp *responses.FPDFDest_GetView) error {
+	var err error
+	implResp, err := s.Impl.FPDFDest_GetView(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) error {
 	var err error
 	implResp, err := s.Impl.FPDFDoc_GetPageMode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints, resp *responses.FPDFLink_CountQuadPoints) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_CountQuadPoints(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate, resp *responses.FPDFLink_Enumerate) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_Enumerate(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetAction(request *requests.FPDFLink_GetAction, resp *responses.FPDFLink_GetAction) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot, resp *responses.FPDFLink_GetAnnot) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetAnnot(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect, resp *responses.FPDFLink_GetAnnotRect) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetAnnotRect(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetDest(request *requests.FPDFLink_GetDest, resp *responses.FPDFLink_GetDest) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetDest(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint, resp *responses.FPDFLink_GetLinkAtPoint) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetLinkAtPoint(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint, resp *responses.FPDFLink_GetLinkZOrderAtPoint) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetLinkZOrderAtPoint(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints, resp *responses.FPDFLink_GetQuadPoints) error {
+	var err error
+	implResp, err := s.Impl.FPDFLink_GetQuadPoints(request)
 	if err != nil {
 		return err
 	}
@@ -837,6 +1112,19 @@ func (s *PdfiumRPCServer) FPDF_GetLastError(request *requests.FPDF_GetLastError,
 func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, resp *responses.FPDF_GetMetaText) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetMetaText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction, resp *responses.FPDF_GetPageAAction) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetPageAAction(request)
 	if err != nil {
 		return err
 	}

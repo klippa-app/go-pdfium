@@ -137,6 +137,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
 		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -167,6 +168,7 @@ type PdfiumImplementation struct {
 	clipPathRefs   map[references.FPDF_CLIPPATH]*ClipPathHandle
 	formHandleRefs map[references.FPDF_FORMHANDLE]*FormHandleHandle
 	bitmapRefs     map[references.FPDF_BITMAP]*BitmapHandle
+	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -206,6 +208,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
 		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -375,6 +378,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.formHandleRefs, i)
 	}
 
+	for i := range p.annotationRefs {
+		delete(p.annotationRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -438,4 +445,16 @@ func (d *PdfiumImplementation) getActionHandle(actionRef references.FPDF_ACTION)
 	}
 
 	return nil, errors.New("could not find action handle, perhaps the action was already closed or you tried to share actions between instances or documents")
+}
+
+func (d *PdfiumImplementation) getLinkHandle(linkRef references.FPDF_LINK) (*LinkHandle, error) {
+	if linkRef == "" {
+		return nil, errors.New("link not given")
+	}
+
+	if val, ok := d.linkRefs[linkRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find link handle, perhaps the link was already closed or you tried to share links between instances or documents")
 }

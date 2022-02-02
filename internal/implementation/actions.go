@@ -1,17 +1,17 @@
 package implementation
 
 // #cgo pkg-config: pdfium
-// #include "fpdfview.h"
+// #include "fpdf_doc.h"
 import "C"
 import (
 	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerAction(dest C.FPDF_ACTION, documentHandle *DocumentHandle) *ActionHandle {
+func (p *PdfiumImplementation) registerAction(action C.FPDF_ACTION, documentHandle *DocumentHandle) *ActionHandle {
 	ref := uuid.New()
 	handle := &ActionHandle{
-		handle:      dest,
+		handle:      action,
 		nativeRef:   references.FPDF_ACTION(ref.String()),
 		documentRef: documentHandle.nativeRef,
 	}

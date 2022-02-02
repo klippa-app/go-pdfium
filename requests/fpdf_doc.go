@@ -70,3 +70,60 @@ type FPDF_GetPageLabel struct {
 	Document references.FPDF_DOCUMENT
 	Page     int // The page number (0-index based).
 }
+
+type FPDFDest_GetView struct {
+	Dest references.FPDF_DEST
+}
+
+type FPDFDest_GetLocationInPage struct {
+	Dest references.FPDF_DEST
+}
+
+type FPDFLink_GetLinkAtPoint struct {
+	Page Page
+	X    float64
+	Y    float64
+}
+
+type FPDFLink_GetLinkZOrderAtPoint struct {
+	Page Page
+	X    float64
+	Y    float64
+}
+
+type FPDFLink_GetDest struct {
+	Document references.FPDF_DOCUMENT
+	Link     references.FPDF_LINK
+}
+
+type FPDFLink_GetAction struct {
+	Link references.FPDF_LINK
+}
+
+type FPDFLink_Enumerate struct {
+	Page     Page
+	StartPos int
+}
+
+type FPDFLink_GetAnnot struct {
+	Page Page
+	Link references.FPDF_LINK
+}
+
+type FPDFLink_GetAnnotRect struct {
+	Link references.FPDF_LINK
+}
+
+type FPDFLink_CountQuadPoints struct {
+	Link references.FPDF_LINK
+}
+
+type FPDFLink_GetQuadPoints struct {
+	Link      references.FPDF_LINK
+	QuadIndex int
+}
+
+type FPDF_GetPageAAction struct {
+	Page   Page
+	AAType enums.FPDF_PAGE_AACTION
+}
