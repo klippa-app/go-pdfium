@@ -374,6 +374,27 @@ func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBox
 	return i.worker.plugin.FPDF_SetSandBoxPolicy(request)
 }
 
+func (i *pdfiumInstance) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FSDK_SetLocaltimeFunction(request)
+}
+
+func (i *pdfiumInstance) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FSDK_SetTimeFunction(request)
+}
+
+func (i *pdfiumInstance) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FSDK_SetUnSpObjProcessHandler(request)
+}
+
 func (i *pdfiumInstance) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

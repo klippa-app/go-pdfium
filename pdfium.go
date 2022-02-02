@@ -224,6 +224,20 @@ type Pdfium interface {
 	// FPDFDoc_GetPageMode returns the document's page mode, which describes how the references should be displayed when opened.
 	FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
 
+	// FSDK_SetUnSpObjProcessHandler set ups an unsupported object handler.
+	// Since callbacks can't be transferred between processes in gRPC, you can only use this in single-threaded mode.
+	FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
+
+	// FSDK_SetTimeFunction sets a replacement function for calls to time().
+	// This API is intended to be used only for testing, thus may cause PDFium to behave poorly in production environments.
+	// Since callbacks can't be transferred between processes in gRPC, you can only use this in single-threaded mode.
+	FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
+
+	// FSDK_SetLocaltimeFunction sets a replacement function for calls to localtime().
+	// This API is intended to be used only for testing, thus may cause PDFium to behave poorly in production environments.
+	// Since callbacks can't be transferred between processes in gRPC, you can only use this in single-threaded mode.
+	FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error)
+
 	// End fpdf_ext.h
 
 	// Start fpdf_doc.h
