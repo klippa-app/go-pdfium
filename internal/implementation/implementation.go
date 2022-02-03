@@ -139,6 +139,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		xObjectRefs:    map[references.FPDF_XOBJECT]*XObjectHandle{},
+		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -171,6 +172,7 @@ type PdfiumImplementation struct {
 	bitmapRefs     map[references.FPDF_BITMAP]*BitmapHandle
 	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
 	xObjectRefs    map[references.FPDF_XOBJECT]*XObjectHandle
+	signatureRefs  map[references.FPDF_SIGNATURE]*SignatureHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -211,6 +213,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -388,6 +391,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.xObjectRefs, i)
 	}
 
+	for i := range p.signatureRefs {
+		delete(p.signatureRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -475,4 +482,16 @@ func (d *PdfiumImplementation) getXObjectHandle(xObject references.FPDF_XOBJECT)
 	}
 
 	return nil, errors.New("could not find xObject handle, perhaps the xObject was already closed or you tried to share xObjects between instances or documents")
+}
+
+func (d *PdfiumImplementation) getSignatureHandle(signature references.FPDF_SIGNATURE) (*SignatureHandle, error) {
+	if signature == "" {
+		return nil, errors.New("signature not given")
+	}
+
+	if val, ok := d.signatureRefs[signature]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find signature handle, perhaps the signature was already closed or you tried to share signatures between instances or documents")
 }
