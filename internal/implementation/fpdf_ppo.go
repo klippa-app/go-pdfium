@@ -61,7 +61,7 @@ func (p *PdfiumImplementation) FPDF_CopyViewerPreferences(request *requests.FPDF
 
 	success := C.FPDF_CopyViewerPreferences(destinationDocHandle.handle, sourceDocHandle.handle)
 	if int(success) == 0 {
-		return nil, errors.New("import of pages failed")
+		return nil, errors.New("copy of viewer preferences failed")
 	}
 
 	return &responses.FPDF_CopyViewerPreferences{}, nil
@@ -84,8 +84,7 @@ func (p *PdfiumImplementation) FPDF_ImportPagesByIndex(request *requests.FPDF_Im
 	}
 
 	var pageIndices *C.int
-
-	if request.PageIndices != nil || len(request.PageIndices) == 0 {
+	if request.PageIndices != nil && len(request.PageIndices) > 0 {
 		params := make([]C.int, len(request.PageIndices), len(request.PageIndices))
 		for i := range params {
 			params[i] = C.int(request.PageIndices[i])
@@ -99,7 +98,7 @@ func (p *PdfiumImplementation) FPDF_ImportPagesByIndex(request *requests.FPDF_Im
 		return nil, errors.New("import of pages failed")
 	}
 
-	return nil, nil
+	return &responses.FPDF_ImportPagesByIndex{}, nil
 }
 
 // FPDF_ImportNPagesToOne creates a new document from source document. The pages of source document will be

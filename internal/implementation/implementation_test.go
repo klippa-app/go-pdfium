@@ -1,12 +1,14 @@
 package implementation_test
 
 import (
+	"time"
+
 	"github.com/klippa-app/go-pdfium/internal/implementation"
 	"github.com/klippa-app/go-pdfium/shared_tests"
 	"github.com/klippa-app/go-pdfium/single_threaded"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("Implementation", func() {
