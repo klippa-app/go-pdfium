@@ -1,13 +1,12 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
-
-	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/references"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -96,36 +95,36 @@ func RunBookmarksTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix s
 
 						if len(bookmarks.Bookmarks) == 2 {
 							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
-								"Reference": Not(BeNil()),
-								"Title":     Equal("A Good Beginning"),
-								"Action":    Not(BeNil()),
-								"Children":  HaveLen(0),
-								"Dest":      BeNil(),
+								"Reference":  Not(BeNil()),
+								"Title":      Equal("A Good Beginning"),
+								"ActionInfo": Not(BeNil()),
+								"DestInfo":   BeNil(),
+								"Children":   HaveLen(0),
 							})))
 
-							if bookmarks.Bookmarks[0].Action != nil {
-								Expect(*bookmarks.Bookmarks[0].Action).To(MatchAllFields(Fields{
+							if bookmarks.Bookmarks[0].ActionInfo != nil {
+								Expect(*bookmarks.Bookmarks[0].ActionInfo).To(MatchAllFields(Fields{
 									"Reference": Not(BeNil()),
 									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
-									"Dest":      BeNil(),
+									"DestInfo":  BeNil(),
 									"FilePath":  BeNil(),
 									"URIPath":   BeNil(),
 								}))
 							}
 
 							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
-								"Reference": Not(BeNil()),
-								"Title":     Equal("A Good Ending"),
-								"Children":  HaveLen(0),
-								"Action":    Not(BeNil()),
-								"Dest":      BeNil(),
+								"Reference":  Not(BeNil()),
+								"Title":      Equal("A Good Ending"),
+								"ActionInfo": Not(BeNil()),
+								"DestInfo":   BeNil(),
+								"Children":   HaveLen(0),
 							})))
 
-							if bookmarks.Bookmarks[1].Action != nil {
-								Expect(*bookmarks.Bookmarks[1].Action).To(MatchAllFields(Fields{
+							if bookmarks.Bookmarks[1].ActionInfo != nil {
+								Expect(*bookmarks.Bookmarks[1].ActionInfo).To(MatchAllFields(Fields{
 									"Reference": Not(BeNil()),
 									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
-									"Dest":      BeNil(),
+									"DestInfo":  BeNil(),
 									"FilePath":  BeNil(),
 									"URIPath":   BeNil(),
 								}))
