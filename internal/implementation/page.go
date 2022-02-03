@@ -43,8 +43,9 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*PageHandle, error)
 	}
 
 	nativePage := &PageHandle{
-		handle: pageObject,
-		index:  page.ByIndex.Index,
+		handle:      pageObject,
+		index:       page.ByIndex.Index,
+		documentRef: documentHandle.nativeRef,
 	}
 
 	documentHandle.currentPage = nativePage
