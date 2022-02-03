@@ -58,7 +58,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 		// FPDFAction_GetFilePath returns the data in UTF-8, no conversion needed.
 		C.FPDFAction_GetFilePath(actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
-		filePathString := string(charData[:filePathLength]) // Take of NULL terminator
+		filePathString := string(charData[:filePathLength-1]) // Take of NULL terminator
 		actionInfo.FilePath = &filePathString
 	} else if actionInfo.Type == enums.FPDF_ACTION_ACTION_URI {
 		// First get the uri path length.

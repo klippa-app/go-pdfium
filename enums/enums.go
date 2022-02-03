@@ -45,7 +45,7 @@ const (
 )
 
 // Additional-action types of page object
-type FPDF_PAGE_AACTION uint32
+type FPDF_PAGE_AACTION int
 
 const (
 	FPDF_PAGE_AACTION_OPEN  FPDF_PAGE_AACTION = 0 // OPEN (/O) -- An action to be performed when the page is opened
@@ -53,7 +53,7 @@ const (
 )
 
 // Additional actions type of document
-type FPDF_DOC_AACTION uint32
+type FPDF_DOC_AACTION int
 
 const (
 	FPDF_DOC_AACTION_WC FPDF_DOC_AACTION = 0x10 // WC, before closing document, JavaScript action.

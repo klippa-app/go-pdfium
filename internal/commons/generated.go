@@ -78,7 +78,9 @@ type Pdfium interface {
     FSDK_SetLocaltimeFunction(*requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error)
     FSDK_SetTimeFunction(*requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
     FSDK_SetUnSpObjProcessHandler(*requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
+    GetActionInfo(*requests.GetActionInfo) (*responses.GetActionInfo, error)
     GetBookmarks(*requests.GetBookmarks) (*responses.GetBookmarks, error)
+    GetDestInfo(*requests.GetDestInfo) (*responses.GetDestInfo, error)
     GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
@@ -765,9 +767,29 @@ func (g *PdfiumRPC) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSp
 	return resp, nil
 }
 
+func (g *PdfiumRPC) GetActionInfo(request *requests.GetActionInfo) (*responses.GetActionInfo, error) {
+	resp := &responses.GetActionInfo{}
+	err := g.client.Call("Plugin.GetActionInfo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
 	resp := &responses.GetBookmarks{}
 	err := g.client.Call("Plugin.GetBookmarks", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetDestInfo(request *requests.GetDestInfo) (*responses.GetDestInfo, error) {
+	resp := &responses.GetDestInfo{}
+	err := g.client.Call("Plugin.GetDestInfo", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1758,9 +1780,35 @@ func (s *PdfiumRPCServer) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_S
 	return nil
 }
 
+func (s *PdfiumRPCServer) GetActionInfo(request *requests.GetActionInfo, resp *responses.GetActionInfo) error {
+	var err error
+	implResp, err := s.Impl.GetActionInfo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *responses.GetBookmarks) error {
 	var err error
 	implResp, err := s.Impl.GetBookmarks(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *responses.GetDestInfo) error {
+	var err error
+	implResp, err := s.Impl.GetDestInfo(request)
 	if err != nil {
 		return err
 	}
