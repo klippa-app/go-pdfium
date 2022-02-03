@@ -74,7 +74,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetContents(request *requests.FP
 	C.FPDFSignatureObj_GetContents(signatureHandle.handle, unsafe.Pointer(&signatureData[0]), C.ulong(len(signatureData)))
 
 	return &responses.FPDFSignatureObj_GetContents{
-		Contents: &signatureData,
+		Contents: signatureData,
 	}, nil
 }
 
@@ -106,7 +106,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetByteRange(request *requests.F
 	}
 
 	return &responses.FPDFSignatureObj_GetByteRange{
-		ByteRange: &byteRangeValues,
+		ByteRange: byteRangeValues,
 	}, nil
 }
 

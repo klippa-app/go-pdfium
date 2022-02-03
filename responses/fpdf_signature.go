@@ -12,11 +12,11 @@ type FPDF_GetSignatureObject struct {
 }
 
 type FPDFSignatureObj_GetContents struct {
-	Contents *[]byte // For public-key signatures, Contents is either a DER-encoded PKCS#1 binary or a DER-encoded PKCS#7 binary. nil when no content.
+	Contents []byte // For public-key signatures, Contents is either a DER-encoded PKCS#1 binary or a DER-encoded PKCS#7 binary. nil when no content.
 }
 
 type FPDFSignatureObj_GetByteRange struct {
-	ByteRange *[]int // ByteRange is an array of pairs of integers (starting byte offset, length in bytes) that describes the exact byte range for the digest calculation. nil when no byte range.
+	ByteRange []int // ByteRange is an array of pairs of integers (starting byte offset, length in bytes) that describes the exact byte range for the digest calculation. nil when no byte range.
 }
 
 type FPDFSignatureObj_GetSubFilter struct {

@@ -397,4 +397,39 @@ type Pdfium interface {
 	FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error)
 
 	// End fpdf_signature.h
+
+	// Start fpdf_sysfontinfo.h
+
+	// FPDF_GetDefaultTTFMap returns the the default character set to TT Font name map. The map is an array of FPDF_CharsetFontMap structs
+	FPDF_GetDefaultTTFMap(request *requests.FPDF_GetDefaultTTFMap) (*responses.FPDF_GetDefaultTTFMap, error)
+
+	// FPDF_AddInstalledFont add a system font to the list in PDFium.
+	FPDF_AddInstalledFont(request *requests.FPDF_AddInstalledFont) (*responses.FPDF_AddInstalledFont, error)
+
+	// FPDF_SetSystemFontInfo set the system font info interface into PDFium.
+	FPDF_SetSystemFontInfo(request *requests.FPDF_SetSystemFontInfo) (*responses.FPDF_SetSystemFontInfo, error)
+
+	// FPDF_GetDefaultSystemFontInfo gets the default system font info interface for current platform.
+	FPDF_GetDefaultSystemFontInfo(request *requests.FPDF_GetDefaultSystemFontInfo) (*responses.FPDF_GetDefaultSystemFontInfo, error)
+
+	// FPDF_FreeDefaultSystemFontInfo frees a default system font info interface.
+	FPDF_FreeDefaultSystemFontInfo(request *requests.FPDF_FreeDefaultSystemFontInfo) (*responses.FPDF_FreeDefaultSystemFontInfo, error)
+
+	// End fpdf_sysfontinfo.h
+
+	// Start fpdf_thumbnail.h
+
+	// FPDFPage_GetDecodedThumbnailData returns the decoded data from the thumbnail of the given page if it exists.
+	// Experimental API.
+	FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData) (*responses.FPDFPage_GetDecodedThumbnailData, error)
+
+	// FPDFPage_GetRawThumbnailData returns the raw data from the thumbnail of the given page if it exists.
+	// Experimental API.
+	FPDFPage_GetRawThumbnailData(request *requests.FPDFPage_GetRawThumbnailData) (*responses.FPDFPage_GetRawThumbnailData, error)
+
+	// FPDFPage_GetThumbnailAsBitmap returns the thumbnail of the given page as a FPDF_BITMAP.
+	// Experimental API.
+	FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPage_GetThumbnailAsBitmap) (*responses.FPDFPage_GetThumbnailAsBitmap, error)
+
+	// End fpdf_thumbnail.h
 }
