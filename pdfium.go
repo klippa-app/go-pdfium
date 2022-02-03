@@ -398,25 +398,6 @@ type Pdfium interface {
 
 	// End fpdf_signature.h
 
-	// Start fpdf_sysfontinfo.h
-
-	// FPDF_GetDefaultTTFMap returns the the default character set to TT Font name map. The map is an array of FPDF_CharsetFontMap structs
-	FPDF_GetDefaultTTFMap(request *requests.FPDF_GetDefaultTTFMap) (*responses.FPDF_GetDefaultTTFMap, error)
-
-	// FPDF_AddInstalledFont add a system font to the list in PDFium.
-	FPDF_AddInstalledFont(request *requests.FPDF_AddInstalledFont) (*responses.FPDF_AddInstalledFont, error)
-
-	// FPDF_SetSystemFontInfo set the system font info interface into PDFium.
-	FPDF_SetSystemFontInfo(request *requests.FPDF_SetSystemFontInfo) (*responses.FPDF_SetSystemFontInfo, error)
-
-	// FPDF_GetDefaultSystemFontInfo gets the default system font info interface for current platform.
-	FPDF_GetDefaultSystemFontInfo(request *requests.FPDF_GetDefaultSystemFontInfo) (*responses.FPDF_GetDefaultSystemFontInfo, error)
-
-	// FPDF_FreeDefaultSystemFontInfo frees a default system font info interface.
-	FPDF_FreeDefaultSystemFontInfo(request *requests.FPDF_FreeDefaultSystemFontInfo) (*responses.FPDF_FreeDefaultSystemFontInfo, error)
-
-	// End fpdf_sysfontinfo.h
-
 	// Start fpdf_thumbnail.h
 
 	// FPDFPage_GetDecodedThumbnailData returns the decoded data from the thumbnail of the given page if it exists.

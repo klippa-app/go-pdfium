@@ -269,13 +269,6 @@ func (i *pdfiumInstance) FPDFSignatureObj_GetTime(request *requests.FPDFSignatur
 	return i.worker.plugin.FPDFSignatureObj_GetTime(request)
 }
 
-func (i *pdfiumInstance) FPDF_AddInstalledFont(request *requests.FPDF_AddInstalledFont) (*responses.FPDF_AddInstalledFont, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.FPDF_AddInstalledFont(request)
-}
-
 func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -302,27 +295,6 @@ func (i *pdfiumInstance) FPDF_CreateNewDocument(request *requests.FPDF_CreateNew
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDF_CreateNewDocument(request)
-}
-
-func (i *pdfiumInstance) FPDF_FreeDefaultSystemFontInfo(request *requests.FPDF_FreeDefaultSystemFontInfo) (*responses.FPDF_FreeDefaultSystemFontInfo, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.FPDF_FreeDefaultSystemFontInfo(request)
-}
-
-func (i *pdfiumInstance) FPDF_GetDefaultSystemFontInfo(request *requests.FPDF_GetDefaultSystemFontInfo) (*responses.FPDF_GetDefaultSystemFontInfo, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.FPDF_GetDefaultSystemFontInfo(request)
-}
-
-func (i *pdfiumInstance) FPDF_GetDefaultTTFMap(request *requests.FPDF_GetDefaultTTFMap) (*responses.FPDF_GetDefaultTTFMap, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.FPDF_GetDefaultTTFMap(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
@@ -484,13 +456,6 @@ func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBox
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDF_SetSandBoxPolicy(request)
-}
-
-func (i *pdfiumInstance) FPDF_SetSystemFontInfo(request *requests.FPDF_SetSystemFontInfo) (*responses.FPDF_SetSystemFontInfo, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-	return i.worker.plugin.FPDF_SetSystemFontInfo(request)
 }
 
 func (i *pdfiumInstance) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error) {
