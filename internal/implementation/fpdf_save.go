@@ -95,12 +95,7 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 			return nil, err
 		}
 		currentWriter = newFile
-	} else if request.FilePath != nil {
-		newFile, err := os.Create(*request.FilePath)
-		if err != nil {
-			return nil, err
-		}
-		currentWriter = newFile
+		curFile = newFile
 	} else {
 		fileBuf = &bytes.Buffer{}
 		currentWriter = fileBuf
