@@ -246,7 +246,7 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 
 	result := C.FPDF_GetPageSizeByIndex(documentHandle.handle, C.int(request.Index), &width, &height)
 	if int(result) == 0 {
-		return nil, errors.New("Could not load page size by index")
+		return nil, errors.New("could not load page size by index")
 	}
 
 	return &responses.FPDF_GetPageSizeByIndex{
