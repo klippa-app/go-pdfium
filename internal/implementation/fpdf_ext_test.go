@@ -67,7 +67,7 @@ var _ = Describe("fpdf_ext", func() {
 						{Tag: "Producer", Value: ""},
 						{
 							Tag:   "CreationDate",
-							Value: "D:19700102111736",
+							Value: "D:19700102101736",
 						},
 						{Tag: "ModDate", Value: ""},
 					},
