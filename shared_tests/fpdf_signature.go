@@ -156,7 +156,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureContent).To(Equal(&responses.FPDFSignatureObj_GetContents{
-						Contents: &[]byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
+						Contents: []byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
 							0x86, 0xF7, 0x0D, 0x01, 0x07, 0x02, 0xA0,
 							0x80, 0x30, 0x80, 0x02, 0x01, 0x01},
 					}))
@@ -168,7 +168,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureByteRange).To(Equal(&responses.FPDFSignatureObj_GetByteRange{
-						ByteRange: &[]int{0, 10, 30, 10},
+						ByteRange: []int{0, 10, 30, 10},
 					}))
 				})
 
@@ -266,7 +266,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureContent).To(Equal(&responses.FPDFSignatureObj_GetContents{
-						Contents: &[]byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
+						Contents: []byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
 							0x86, 0xF7, 0x0D, 0x01, 0x07, 0x02, 0xA0,
 							0x80, 0x30, 0x80, 0x02, 0x01, 0x01},
 					}))
@@ -278,7 +278,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureByteRange).To(Equal(&responses.FPDFSignatureObj_GetByteRange{
-						ByteRange: &[]int{0, 10, 30, 10},
+						ByteRange: []int{0, 10, 30, 10},
 					}))
 				})
 
@@ -374,7 +374,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureContent).To(Equal(&responses.FPDFSignatureObj_GetContents{
-						Contents: &[]byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
+						Contents: []byte{0x30, 0x80, 0x06, 0x09, 0x2A, 0x86, 0x48,
 							0x86, 0xF7, 0x0D, 0x01, 0x07, 0x02, 0xA0,
 							0x80, 0x30, 0x80, 0x02, 0x01, 0x01},
 					}))
@@ -386,7 +386,7 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 					})
 					Expect(err).To(BeNil())
 					Expect(signatureByteRange).To(Equal(&responses.FPDFSignatureObj_GetByteRange{
-						ByteRange: &[]int{0, 10, 30, 10},
+						ByteRange: []int{0, 10, 30, 10},
 					}))
 				})
 
