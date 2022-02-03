@@ -15,6 +15,46 @@ import (
 
 func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("fpdf_doc", func() {
+		Context("no document", func() {
+			When("is opened", func() {
+				It("returns an error when getting the page metadata", func() {
+					FPDF_GetMetaText, err := pdfiumContainer.FPDF_GetMetaText(&requests.FPDF_GetMetaText{
+						Tag: "Creator",
+					})
+					Expect(err).To(MatchError("document not given"))
+					Expect(FPDF_GetMetaText).To(BeNil())
+				})
+
+				It("returns an error when calling FPDFBookmark_GetFirstChild", func() {
+					FPDFBookmark_GetFirstChild, err := pdfiumContainer.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(FPDFBookmark_GetFirstChild).To(BeNil())
+				})
+
+				It("returns an error when calling FPDFBookmark_GetNextSibling", func() {
+					FPDFBookmark_GetNextSibling, err := pdfiumContainer.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(FPDFBookmark_GetNextSibling).To(BeNil())
+				})
+
+				It("returns an error when calling FPDFBookmark_Find", func() {
+					FPDFBookmark_Find, err := pdfiumContainer.FPDFBookmark_Find(&requests.FPDFBookmark_Find{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(FPDFBookmark_Find).To(BeNil())
+				})
+			})
+		})
+
+		Context("no bookmark", func() {
+			When("is given", func() {
+				It("returns an error when calling FPDFBookmark_GetTitle", func() {
+					FPDFBookmark_GetTitle, err := pdfiumContainer.FPDFBookmark_GetTitle(&requests.FPDFBookmark_GetTitle{})
+					Expect(err).To(MatchError("bookmark not given"))
+					Expect(FPDFBookmark_GetTitle).To(BeNil())
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
 			var doc references.FPDF_DOCUMENT
 

@@ -14,6 +14,16 @@ import (
 
 func RunfpdfCatalogTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("fpdf_catalog", func() {
+		Context("no document", func() {
+			When("is opened", func() {
+				It("returns an error when getting the document tagged status", func() {
+					isTagged, err := pdfiumContainer.FPDFCatalog_IsTagged(&requests.FPDFCatalog_IsTagged{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(isTagged).To(BeNil())
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
 			var doc references.FPDF_DOCUMENT
 

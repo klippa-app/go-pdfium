@@ -17,6 +17,38 @@ import (
 
 func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
+		Context("no references", func() {
+			When("is given", func() {
+				Context("GetPageText()", func() {
+					It("returns an error", func() {
+						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageText).To(BeNil())
+					})
+				})
+
+				Context("GetPageTextStructured()", func() {
+					It("returns an error", func() {
+						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageTextStructured).To(BeNil())
+					})
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
 			var doc references.FPDF_DOCUMENT
 

@@ -23,6 +23,111 @@ import (
 
 func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
+		Context("no document", func() {
+			When("is opened", func() {
+				Context("GetPageSize()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfiumContainer.GetPageSize(&requests.GetPageSize{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("GetPageSizeInPixels()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							DPI: 100,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							DPI: 300,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
+							Pages: []requests.RenderPageInDPI{
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Index: 0,
+										},
+									},
+									DPI: 300,
+								},
+							},
+							Padding: 50,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInPixels()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							Width:  2000,
+							Height: 2000,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPagesInPixels()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
+							Pages: []requests.RenderPageInPixels{
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Index: 0,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+							},
+							Padding: 50,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
 			var doc references.FPDF_DOCUMENT
 
