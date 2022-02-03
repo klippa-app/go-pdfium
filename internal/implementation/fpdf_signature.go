@@ -6,7 +6,6 @@ package implementation
 */
 import "C"
 import (
-	"encoding/ascii85"
 	"errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -68,14 +67,14 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetContents(request *requests.FP
 	// First get the signature length.
 	signatureSize := C.FPDFSignatureObj_GetContents(signatureHandle.handle, C.NULL, 0)
 	if signatureSize == 0 {
-		return nil, errors.New("could not get signature contents")
+		return &responses.FPDFSignatureObj_GetContents{}, nil
 	}
 
 	signatureData := make([]byte, signatureSize)
 	C.FPDFSignatureObj_GetContents(signatureHandle.handle, unsafe.Pointer(&signatureData[0]), C.ulong(len(signatureData)))
 
 	return &responses.FPDFSignatureObj_GetContents{
-		Signature: signatureData,
+		Contents: &signatureData,
 	}, nil
 }
 
@@ -95,14 +94,19 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetByteRange(request *requests.F
 	// First get the signature length.
 	byteRangeSize := C.FPDFSignatureObj_GetByteRange(signatureHandle.handle, nullBuffer, 0)
 	if byteRangeSize == 0 {
-		return nil, errors.New("could not get byte range")
+		return &responses.FPDFSignatureObj_GetByteRange{}, nil
 	}
 
-	byteRangeData := make([]byte, byteRangeSize)
+	byteRangeData := make([]C.int, byteRangeSize)
 	C.FPDFSignatureObj_GetByteRange(signatureHandle.handle, (*C.int)(unsafe.Pointer(&byteRangeData[0])), C.ulong(len(byteRangeData)))
 
+	byteRangeValues := make([]int, byteRangeSize)
+	for i := range byteRangeData {
+		byteRangeValues[i] = int(byteRangeData[i])
+	}
+
 	return &responses.FPDFSignatureObj_GetByteRange{
-		ByteRange: byteRangeData,
+		ByteRange: &byteRangeValues,
 	}, nil
 }
 
@@ -122,21 +126,15 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetSubFilter(request *requests.F
 	// First get the signature length.
 	subFilterLength := C.FPDFSignatureObj_GetSubFilter(signatureHandle.handle, nullBuffer, 0)
 	if subFilterLength == 0 {
-		return nil, errors.New("could not get subfilter")
+		return &responses.FPDFSignatureObj_GetSubFilter{}, nil
 	}
 
 	subFilterData := make([]byte, subFilterLength)
 	C.FPDFSignatureObj_GetSubFilter(signatureHandle.handle, (*C.char)(unsafe.Pointer(&subFilterData[0])), C.ulong(len(subFilterData)))
 
-	// Convert 7-bit ASCII to UTF-8.
-	dst := make([]byte, subFilterLength, subFilterLength)
-	_, _, err = ascii85.Decode(dst, subFilterData, true)
-	if err != nil {
-		return nil, err
-	}
-
+	subFilterString := string(subFilterData[:subFilterLength-1]) // Remove NULL terminator.
 	return &responses.FPDFSignatureObj_GetSubFilter{
-		SubFilter: string(dst),
+		SubFilter: &subFilterString,
 	}, nil
 }
 
@@ -154,7 +152,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetReason(request *requests.FPDF
 	// First get the reason length.
 	reasonLength := C.FPDFSignatureObj_GetReason(signatureHandle.handle, C.NULL, 0)
 	if reasonLength == 0 {
-		return nil, errors.New("could not get reason")
+		return &responses.FPDFSignatureObj_GetReason{}, nil
 	}
 
 	reasonData := make([]byte, reasonLength)
@@ -166,7 +164,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetReason(request *requests.FPDF
 	}
 
 	return &responses.FPDFSignatureObj_GetReason{
-		Reason: transformedText,
+		Reason: &transformedText,
 	}, nil
 }
 
@@ -186,21 +184,16 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetTime(request *requests.FPDFSi
 	// First get the time length.
 	timeLength := C.FPDFSignatureObj_GetTime(signatureHandle.handle, nullBuffer, 0)
 	if timeLength == 0 {
-		return nil, errors.New("could not get time")
+		return &responses.FPDFSignatureObj_GetTime{}, nil
 	}
 
 	timeData := make([]byte, timeLength)
 	C.FPDFSignatureObj_GetTime(signatureHandle.handle, (*C.char)(unsafe.Pointer(&timeData[0])), C.ulong(len(timeData)))
 
-	// Convert 7-bit ASCII to UTF-8.
-	dst := make([]byte, timeLength, timeLength)
-	_, _, err = ascii85.Decode(dst, timeData, true)
-	if err != nil {
-		return nil, err
-	}
+	timeString := string(timeData[:timeLength-1]) // Remove NULL terminator.
 
 	return &responses.FPDFSignatureObj_GetTime{
-		Time: string(dst),
+		Time: &timeString,
 	}, nil
 }
 
