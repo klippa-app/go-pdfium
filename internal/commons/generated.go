@@ -39,6 +39,12 @@ type Pdfium interface {
     FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
     FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
     FPDFPage_SetRotation(*requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
+    FPDFSignatureObj_GetByteRange(*requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error)
+    FPDFSignatureObj_GetContents(*requests.FPDFSignatureObj_GetContents) (*responses.FPDFSignatureObj_GetContents, error)
+    FPDFSignatureObj_GetDocMDPPermission(*requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error)
+    FPDFSignatureObj_GetReason(*requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error)
+    FPDFSignatureObj_GetSubFilter(*requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error)
+    FPDFSignatureObj_GetTime(*requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error)
     FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
     FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
@@ -55,6 +61,8 @@ type Pdfium interface {
     FPDF_GetPageSizeByIndex(*requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
     FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
     FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
+    FPDF_GetSignatureCount(*requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error)
+    FPDF_GetSignatureObject(*requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error)
     FPDF_ImportNPagesToOne(*requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
     FPDF_ImportPagesByIndex(*requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error)
@@ -364,6 +372,66 @@ func (g *PdfiumRPC) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation)
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error) {
+	resp := &responses.FPDFSignatureObj_GetByteRange{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetByteRange", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents) (*responses.FPDFSignatureObj_GetContents, error) {
+	resp := &responses.FPDFSignatureObj_GetContents{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetContents", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error) {
+	resp := &responses.FPDFSignatureObj_GetDocMDPPermission{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetDocMDPPermission", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error) {
+	resp := &responses.FPDFSignatureObj_GetReason{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetReason", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error) {
+	resp := &responses.FPDFSignatureObj_GetSubFilter{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetSubFilter", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error) {
+	resp := &responses.FPDFSignatureObj_GetTime{}
+	err := g.client.Call("Plugin.FPDFSignatureObj_GetTime", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	resp := &responses.FPDF_ClosePage{}
 	err := g.client.Call("Plugin.FPDF_ClosePage", request, resp)
@@ -517,6 +585,26 @@ func (g *PdfiumRPC) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*res
 func (g *PdfiumRPC) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error) {
 	resp := &responses.FPDF_GetSecurityHandlerRevision{}
 	err := g.client.Call("Plugin.FPDF_GetSecurityHandlerRevision", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error) {
+	resp := &responses.FPDF_GetSignatureCount{}
+	err := g.client.Call("Plugin.FPDF_GetSignatureCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error) {
+	resp := &responses.FPDF_GetSignatureObject{}
+	err := g.client.Call("Plugin.FPDF_GetSignatureObject", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1130,6 +1218,84 @@ func (s *PdfiumRPCServer) FPDFPage_SetRotation(request *requests.FPDFPage_SetRot
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange, resp *responses.FPDFSignatureObj_GetByteRange) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetByteRange(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents, resp *responses.FPDFSignatureObj_GetContents) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetContents(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission, resp *responses.FPDFSignatureObj_GetDocMDPPermission) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetDocMDPPermission(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason, resp *responses.FPDFSignatureObj_GetReason) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetReason(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter, resp *responses.FPDFSignatureObj_GetSubFilter) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetSubFilter(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime, resp *responses.FPDFSignatureObj_GetTime) error {
+	var err error
+	implResp, err := s.Impl.FPDFSignatureObj_GetTime(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) error {
 	var err error
 	implResp, err := s.Impl.FPDF_ClosePage(request)
@@ -1328,6 +1494,32 @@ func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth,
 func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision, resp *responses.FPDF_GetSecurityHandlerRevision) error {
 	var err error
 	implResp, err := s.Impl.FPDF_GetSecurityHandlerRevision(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount, resp *responses.FPDF_GetSignatureCount) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetSignatureCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject, resp *responses.FPDF_GetSignatureObject) error {
+	var err error
+	implResp, err := s.Impl.FPDF_GetSignatureObject(request)
 	if err != nil {
 		return err
 	}

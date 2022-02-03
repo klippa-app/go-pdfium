@@ -50,3 +50,6 @@ type FPDF_ANNOTATION string
 
 // FPDF_XOBJECT is an internal reference to a C.FPDF_XOBJECT handle.
 type FPDF_XOBJECT string
+
+// FPDF_SIGNATURE is an internal reference to a C.FPDF_SIGNATURE handle.
+type FPDF_SIGNATURE string

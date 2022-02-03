@@ -206,6 +206,48 @@ func (i *pdfiumInstance) FPDFPage_SetRotation(request *requests.FPDFPage_SetRota
 	return i.pdfium.FPDFPage_SetRotation(request)
 }
 
+func (i *pdfiumInstance) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetByteRange(request)
+}
+
+func (i *pdfiumInstance) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents) (*responses.FPDFSignatureObj_GetContents, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetContents(request)
+}
+
+func (i *pdfiumInstance) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetDocMDPPermission(request)
+}
+
+func (i *pdfiumInstance) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetReason(request)
+}
+
+func (i *pdfiumInstance) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetSubFilter(request)
+}
+
+func (i *pdfiumInstance) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFSignatureObj_GetTime(request)
+}
+
 func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -316,6 +358,20 @@ func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDF_GetSecurityHandlerRevision(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_GetSignatureCount(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDF_GetSignatureObject(request)
 }
 
 func (i *pdfiumInstance) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error) {

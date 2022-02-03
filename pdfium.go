@@ -361,4 +361,40 @@ type Pdfium interface {
 	FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
 
 	// End fpdf_catalog.h
+
+	// Start fpdf_signature.h
+
+	// FPDF_GetSignatureCount returns the total number of signatures in the document.
+	// Experimental API.
+	FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error)
+
+	// FPDF_GetSignatureObject returns the Nth signature of the document.
+	// Experimental API.
+	FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error)
+
+	// FPDFSignatureObj_GetContents returns the contents of a signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents) (*responses.FPDFSignatureObj_GetContents, error)
+
+	// FPDFSignatureObj_GetByteRange returns the byte range of a signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error)
+
+	// FPDFSignatureObj_GetSubFilter returns the encoding of the value of a signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error)
+
+	// FPDFSignatureObj_GetReason returns the reason (comment) of the signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error)
+
+	// FPDFSignatureObj_GetTime returns the time of signing of a signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error)
+
+	// FPDFSignatureObj_GetDocMDPPermission returns the DocMDP permission of a signature object.
+	// Experimental API.
+	FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error)
+
+	// End fpdf_signature.h
 }
