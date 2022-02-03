@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-func RunBookmarksTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
+func RunBookmarkTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("bookmarks", func() {
 		Context("no document", func() {
 			When("is opened", func() {
@@ -89,48 +89,38 @@ func RunBookmarksTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix s
 					})
 					Expect(err).To(BeNil())
 					Expect(bookmarks).To(Not(BeNil()))
+					Expect(bookmarks.Bookmarks).To(HaveLen(2))
+					Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
+						"Reference":  Not(BeNil()),
+						"Title":      Equal("A Good Beginning"),
+						"ActionInfo": Not(BeNil()),
+						"DestInfo":   BeNil(),
+						"Children":   HaveLen(0),
+					})))
 
-					if bookmarks.Bookmarks != nil {
-						Expect(bookmarks.Bookmarks).To(HaveLen(2))
+					Expect(*bookmarks.Bookmarks[0].ActionInfo).To(MatchAllFields(Fields{
+						"Reference": Not(BeNil()),
+						"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
+						"DestInfo":  BeNil(),
+						"FilePath":  BeNil(),
+						"URIPath":   BeNil(),
+					}))
 
-						if len(bookmarks.Bookmarks) == 2 {
-							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
-								"Reference":  Not(BeNil()),
-								"Title":      Equal("A Good Beginning"),
-								"ActionInfo": Not(BeNil()),
-								"DestInfo":   BeNil(),
-								"Children":   HaveLen(0),
-							})))
+					Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
+						"Reference":  Not(BeNil()),
+						"Title":      Equal("A Good Ending"),
+						"ActionInfo": Not(BeNil()),
+						"DestInfo":   BeNil(),
+						"Children":   HaveLen(0),
+					})))
 
-							if bookmarks.Bookmarks[0].ActionInfo != nil {
-								Expect(*bookmarks.Bookmarks[0].ActionInfo).To(MatchAllFields(Fields{
-									"Reference": Not(BeNil()),
-									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
-									"DestInfo":  BeNil(),
-									"FilePath":  BeNil(),
-									"URIPath":   BeNil(),
-								}))
-							}
-
-							Expect(bookmarks.Bookmarks).To(ContainElement(MatchAllFields(Fields{
-								"Reference":  Not(BeNil()),
-								"Title":      Equal("A Good Ending"),
-								"ActionInfo": Not(BeNil()),
-								"DestInfo":   BeNil(),
-								"Children":   HaveLen(0),
-							})))
-
-							if bookmarks.Bookmarks[1].ActionInfo != nil {
-								Expect(*bookmarks.Bookmarks[1].ActionInfo).To(MatchAllFields(Fields{
-									"Reference": Not(BeNil()),
-									"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
-									"DestInfo":  BeNil(),
-									"FilePath":  BeNil(),
-									"URIPath":   BeNil(),
-								}))
-							}
-						}
-					}
+					Expect(*bookmarks.Bookmarks[1].ActionInfo).To(MatchAllFields(Fields{
+						"Reference": Not(BeNil()),
+						"Type":      Equal(enums.FPDF_ACTION_ACTION_UNSUPPORTED),
+						"DestInfo":  BeNil(),
+						"FilePath":  BeNil(),
+						"URIPath":   BeNil(),
+					}))
 				})
 			})
 		})

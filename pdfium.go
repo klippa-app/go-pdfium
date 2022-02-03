@@ -116,12 +116,26 @@ type Pdfium interface {
 
 	// End render
 
-	// Start bookmarks: bookmark helpers
+	// Start bookmark: bookmark helpers
 
 	// GetBookmarks returns all the bookmarks of a document.
 	GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error)
 
-	// End bookmarks
+	// End bookmark
+
+	// Start action: action helpers
+
+	// GetActionInfo returns all the information of an action.
+	GetActionInfo(request *requests.GetActionInfo) (*responses.GetActionInfo, error)
+
+	// End action
+
+	// Start action: dest helpers
+
+	// GetDestInfo returns all the information of a dest.
+	GetDestInfo(request *requests.GetDestInfo) (*responses.GetDestInfo, error)
+
+	// End dest
 
 	// Start fpdfview.h
 

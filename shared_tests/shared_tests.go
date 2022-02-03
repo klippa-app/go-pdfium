@@ -10,7 +10,8 @@ func RunTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	// Set ENV to ensure resulting values.
 	os.Setenv("TZ", "UTC")
 
-	RunBookmarksTests(pdfiumContainer, testsPath, prefix)
+	RunBookmarkTests(pdfiumContainer, testsPath, prefix)
+	RunActionTests(pdfiumContainer, testsPath, prefix)
 	RunfpdfDocTests(pdfiumContainer, testsPath, prefix)
 	RunfpdfCatalogTests(pdfiumContainer, testsPath, prefix)
 	RunfpdfSignatureTests(pdfiumContainer, testsPath, prefix)

@@ -492,6 +492,9 @@ func (p *PdfiumImplementation) FPDFDest_GetLocationInPage(request *requests.FPDF
 // You can convert coordinates from screen coordinates to page coordinates using
 // FPDF_DeviceToPage().
 func (p *PdfiumImplementation) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint) (*responses.FPDFLink_GetLinkAtPoint, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err

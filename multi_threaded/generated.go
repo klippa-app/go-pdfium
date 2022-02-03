@@ -479,11 +479,25 @@ func (i *pdfiumInstance) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_Se
 	return i.worker.plugin.FSDK_SetUnSpObjProcessHandler(request)
 }
 
+func (i *pdfiumInstance) GetActionInfo(request *requests.GetActionInfo) (*responses.GetActionInfo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.GetActionInfo(request)
+}
+
 func (i *pdfiumInstance) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.GetBookmarks(request)
+}
+
+func (i *pdfiumInstance) GetDestInfo(request *requests.GetDestInfo) (*responses.GetDestInfo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.GetDestInfo(request)
 }
 
 func (i *pdfiumInstance) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
