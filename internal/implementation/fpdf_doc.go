@@ -7,7 +7,6 @@ import "C"
 
 import (
 	"bytes"
-	"encoding/ascii85"
 	"errors"
 	"unsafe"
 
@@ -252,15 +251,17 @@ func (p *PdfiumImplementation) FPDFAction_GetFilePath(request *requests.FPDFActi
 	// First get the file path length.
 	filePathLength := C.FPDFAction_GetFilePath(actionHandle.handle, C.NULL, 0)
 	if filePathLength == 0 {
-		return nil, errors.New("Could not get file path")
+		return &responses.FPDFAction_GetFilePath{}, nil
 	}
 
 	charData := make([]byte, filePathLength)
 	// FPDFAction_GetFilePath returns the data in UTF-8, no conversion needed.
 	C.FPDFAction_GetFilePath(actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
+	filePath := string(charData[:filePathLength-1]) // Remove NULL terminator
+
 	return &responses.FPDFAction_GetFilePath{
-		FilePath: string(charData),
+		FilePath: &filePath,
 	}, nil
 }
 
@@ -282,24 +283,16 @@ func (p *PdfiumImplementation) FPDFAction_GetURIPath(request *requests.FPDFActio
 	// First get the uri path length.
 	uriPathLength := C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, C.NULL, 0)
 	if uriPathLength == 0 {
-		return nil, errors.New("Could not get uri path")
+		return &responses.FPDFAction_GetURIPath{}, nil
 	}
 
 	charData := make([]byte, uriPathLength)
 	C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
-	// Do we really have to decode this?
-	// Doing so results in odd strings.
-
-	// Convert 7-bit ASCII to UTF-8.
-	dst := make([]byte, uriPathLength, uriPathLength)
-	_, _, err = ascii85.Decode(dst, charData, true)
-	if err != nil {
-		return nil, err
-	}
+	uriPath := string(charData[:uriPathLength-1]) // Remove NULL terminator
 
 	return &responses.FPDFAction_GetURIPath{
-		URIPath: string(dst),
+		URIPath: &uriPath,
 	}, nil
 }
 

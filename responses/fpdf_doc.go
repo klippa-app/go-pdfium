@@ -39,11 +39,11 @@ type FPDFAction_GetDest struct {
 }
 
 type FPDFAction_GetFilePath struct {
-	FilePath string
+	FilePath *string // nil when not set
 }
 
 type FPDFAction_GetURIPath struct {
-	URIPath string
+	URIPath *string // nil when not set
 }
 
 type FPDFDest_GetDestPageIndex struct {
