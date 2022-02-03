@@ -48,14 +48,10 @@ type Pdfium interface {
     FPDFSignatureObj_GetReason(*requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error)
     FPDFSignatureObj_GetSubFilter(*requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error)
     FPDFSignatureObj_GetTime(*requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error)
-    FPDF_AddInstalledFont(*requests.FPDF_AddInstalledFont) (*responses.FPDF_AddInstalledFont, error)
     FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
     FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
     FPDF_CreateNewDocument(*requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
-    FPDF_FreeDefaultSystemFontInfo(*requests.FPDF_FreeDefaultSystemFontInfo) (*responses.FPDF_FreeDefaultSystemFontInfo, error)
-    FPDF_GetDefaultSystemFontInfo(*requests.FPDF_GetDefaultSystemFontInfo) (*responses.FPDF_GetDefaultSystemFontInfo, error)
-    FPDF_GetDefaultTTFMap(*requests.FPDF_GetDefaultTTFMap) (*responses.FPDF_GetDefaultTTFMap, error)
     FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
     FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
     FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
@@ -79,7 +75,6 @@ type Pdfium interface {
     FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
     FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
     FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
-    FPDF_SetSystemFontInfo(*requests.FPDF_SetSystemFontInfo) (*responses.FPDF_SetSystemFontInfo, error)
     FSDK_SetLocaltimeFunction(*requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error)
     FSDK_SetTimeFunction(*requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
     FSDK_SetUnSpObjProcessHandler(*requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
@@ -470,16 +465,6 @@ func (g *PdfiumRPC) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_
 	return resp, nil
 }
 
-func (g *PdfiumRPC) FPDF_AddInstalledFont(request *requests.FPDF_AddInstalledFont) (*responses.FPDF_AddInstalledFont, error) {
-	resp := &responses.FPDF_AddInstalledFont{}
-	err := g.client.Call("Plugin.FPDF_AddInstalledFont", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
 func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	resp := &responses.FPDF_ClosePage{}
 	err := g.client.Call("Plugin.FPDF_ClosePage", request, resp)
@@ -513,36 +498,6 @@ func (g *PdfiumRPC) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewer
 func (g *PdfiumRPC) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
 	resp := &responses.FPDF_CreateNewDocument{}
 	err := g.client.Call("Plugin.FPDF_CreateNewDocument", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) FPDF_FreeDefaultSystemFontInfo(request *requests.FPDF_FreeDefaultSystemFontInfo) (*responses.FPDF_FreeDefaultSystemFontInfo, error) {
-	resp := &responses.FPDF_FreeDefaultSystemFontInfo{}
-	err := g.client.Call("Plugin.FPDF_FreeDefaultSystemFontInfo", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) FPDF_GetDefaultSystemFontInfo(request *requests.FPDF_GetDefaultSystemFontInfo) (*responses.FPDF_GetDefaultSystemFontInfo, error) {
-	resp := &responses.FPDF_GetDefaultSystemFontInfo{}
-	err := g.client.Call("Plugin.FPDF_GetDefaultSystemFontInfo", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) FPDF_GetDefaultTTFMap(request *requests.FPDF_GetDefaultTTFMap) (*responses.FPDF_GetDefaultTTFMap, error) {
-	resp := &responses.FPDF_GetDefaultTTFMap{}
-	err := g.client.Call("Plugin.FPDF_GetDefaultTTFMap", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -773,16 +728,6 @@ func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion)
 func (g *PdfiumRPC) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
 	resp := &responses.FPDF_SetSandBoxPolicy{}
 	err := g.client.Call("Plugin.FPDF_SetSandBoxPolicy", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) FPDF_SetSystemFontInfo(request *requests.FPDF_SetSystemFontInfo) (*responses.FPDF_SetSystemFontInfo, error) {
-	resp := &responses.FPDF_SetSystemFontInfo{}
-	err := g.client.Call("Plugin.FPDF_SetSystemFontInfo", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1423,19 +1368,6 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetTime(request *requests.FPDFSignatu
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_AddInstalledFont(request *requests.FPDF_AddInstalledFont, resp *responses.FPDF_AddInstalledFont) error {
-	var err error
-	implResp, err := s.Impl.FPDF_AddInstalledFont(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
 func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) error {
 	var err error
 	implResp, err := s.Impl.FPDF_ClosePage(request)
@@ -1478,45 +1410,6 @@ func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_Copy
 func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument, resp *responses.FPDF_CreateNewDocument) error {
 	var err error
 	implResp, err := s.Impl.FPDF_CreateNewDocument(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_FreeDefaultSystemFontInfo(request *requests.FPDF_FreeDefaultSystemFontInfo, resp *responses.FPDF_FreeDefaultSystemFontInfo) error {
-	var err error
-	implResp, err := s.Impl.FPDF_FreeDefaultSystemFontInfo(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_GetDefaultSystemFontInfo(request *requests.FPDF_GetDefaultSystemFontInfo, resp *responses.FPDF_GetDefaultSystemFontInfo) error {
-	var err error
-	implResp, err := s.Impl.FPDF_GetDefaultSystemFontInfo(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_GetDefaultTTFMap(request *requests.FPDF_GetDefaultTTFMap, resp *responses.FPDF_GetDefaultTTFMap) error {
-	var err error
-	implResp, err := s.Impl.FPDF_GetDefaultTTFMap(request)
 	if err != nil {
 		return err
 	}
@@ -1816,19 +1709,6 @@ func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVe
 func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy, resp *responses.FPDF_SetSandBoxPolicy) error {
 	var err error
 	implResp, err := s.Impl.FPDF_SetSandBoxPolicy(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_SetSystemFontInfo(request *requests.FPDF_SetSystemFontInfo, resp *responses.FPDF_SetSystemFontInfo) error {
-	var err error
-	implResp, err := s.Impl.FPDF_SetSystemFontInfo(request)
 	if err != nil {
 		return err
 	}
