@@ -16,6 +16,16 @@ import (
 
 func RunBookmarksTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("bookmarks", func() {
+		Context("no document", func() {
+			When("is opened", func() {
+				It("returns an error when calling GetBookmarks", func() {
+					GetBookmarks, err := pdfiumContainer.GetBookmarks(&requests.GetBookmarks{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(GetBookmarks).To(BeNil())
+				})
+			})
+		})
+
 		Context("a PDF file with no bookmarks", func() {
 			var doc references.FPDF_DOCUMENT
 
