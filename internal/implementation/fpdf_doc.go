@@ -288,6 +288,9 @@ func (p *PdfiumImplementation) FPDFAction_GetURIPath(request *requests.FPDFActio
 	charData := make([]byte, uriPathLength)
 	C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
+	// Do we really have to decode this?
+	// Doing so results in odd strings.
+
 	// Convert 7-bit ASCII to UTF-8.
 	dst := make([]byte, uriPathLength, uriPathLength)
 	_, _, err = ascii85.Decode(dst, charData, true)
