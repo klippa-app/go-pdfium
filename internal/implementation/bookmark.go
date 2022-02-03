@@ -4,9 +4,7 @@ package implementation
 // #include "fpdf_doc.h"
 import "C"
 import (
-	"encoding/ascii85"
 	"errors"
-	"github.com/klippa-app/go-pdfium/enums"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/references"
@@ -104,70 +102,24 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 		action := C.FPDFBookmark_GetAction(bookmarkHandle.handle)
 		if action == nil {
 			actionHandle := p.registerAction(action, documentHandle)
-			actionType := C.FPDFAction_GetType(actionHandle.handle)
-
-			respBookmark.Action = &responses.GetBookmarksAction{
-				Reference: actionHandle.nativeRef,
-				Type:      enums.FPDF_ACTION_ACTION(actionType),
+			actionInfo, err := p.getActionInfo(actionHandle, documentHandle)
+			if err != nil {
+				return nil, err
 			}
 
-			if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_GOTO {
-				dest := C.FPDFAction_GetDest(documentHandle.handle, actionHandle.handle)
-				if dest != nil {
-					destHandle := p.registerDest(dest, documentHandle)
-
-					destData, err := p.getDestData(documentHandle, destHandle)
-					if err != nil {
-						return nil, err
-					}
-
-					respBookmark.Action.Dest = destData
-				}
-			} else if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_LAUNCH || respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_REMOTEGOTO {
-				// First get the file path length.
-				filePathLength := C.FPDFAction_GetFilePath(actionHandle.handle, C.NULL, 0)
-				if filePathLength == 0 {
-					return nil, errors.New("Could not get file path")
-				}
-
-				charData := make([]byte, filePathLength)
-				// FPDFAction_GetFilePath returns the data in UTF-8, no conversion needed.
-				C.FPDFAction_GetFilePath(actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
-
-				filePathString := string(charData)
-				respBookmark.Action.FilePath = &filePathString
-			} else if respBookmark.Action.Type == enums.FPDF_ACTION_ACTION_URI {
-				// First get the uri path length.
-				uriPathLength := C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, C.NULL, 0)
-				if uriPathLength == 0 {
-					return nil, errors.New("Could not get uri path")
-				}
-
-				charData := make([]byte, uriPathLength)
-				C.FPDFAction_GetURIPath(documentHandle.handle, actionHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
-
-				// Convert 7-bit ASCII to UTF-8.
-				dst := make([]byte, uriPathLength, uriPathLength)
-				_, _, err = ascii85.Decode(dst, charData, true)
-				if err != nil {
-					return nil, err
-				}
-
-				uriPathString := string(dst)
-				respBookmark.Action.URIPath = &uriPathString
-			}
+			respBookmark.ActionInfo = actionInfo
 		}
 
 		dest := C.FPDFBookmark_GetDest(documentHandle.handle, bookmarkHandle.handle)
 		if dest != nil {
 			destHandle := p.registerDest(dest, documentHandle)
 
-			destData, err := p.getDestData(documentHandle, destHandle)
+			destInfo, err := p.getDestInfo(destHandle, documentHandle)
 			if err != nil {
 				return nil, err
 			}
 
-			respBookmark.Dest = destData
+			respBookmark.DestInfo = destInfo
 		}
 
 		respBookmark.Title = transformedText
@@ -177,13 +129,4 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 	}
 
 	return resp, nil
-}
-
-func (p *PdfiumImplementation) getDestData(documentHandle *DocumentHandle, destHandle *DestHandle) (*responses.GetBookmarksDest, error) {
-	pageIndex := C.FPDFDest_GetDestPageIndex(documentHandle.handle, destHandle.handle)
-
-	return &responses.GetBookmarksDest{
-		Reference: destHandle.nativeRef,
-		PageIndex: int(pageIndex),
-	}, nil
 }
