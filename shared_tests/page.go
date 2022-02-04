@@ -187,7 +187,7 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 							ByReference: &fakeReference,
 						},
 					})
-					Expect(err).To(MatchError("page reference can't be empty"))
+					Expect(err).To(Not(BeNil()))
 					Expect(pageTransparency).To(BeNil())
 				})
 			})
