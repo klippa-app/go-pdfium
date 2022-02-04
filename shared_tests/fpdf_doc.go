@@ -80,6 +80,12 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 					Expect(err).To(MatchError("document not given"))
 					Expect(FPDFLink_GetDest).To(BeNil())
 				})
+
+				It("returns an error when calling GetMetaData", func() {
+					GetMetaData, err := pdfiumContainer.GetMetaData(&requests.GetMetaData{})
+					Expect(err).To(MatchError("document not given"))
+					Expect(GetMetaData).To(BeNil())
+				})
 			})
 		})
 
