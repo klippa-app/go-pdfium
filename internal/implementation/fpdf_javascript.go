@@ -69,6 +69,14 @@ func (p *PdfiumImplementation) FPDFDoc_CloseJavaScriptAction(request *requests.F
 	}
 
 	C.FPDFDoc_CloseJavaScriptAction(javaScriptActionHandle.handle)
+	delete(p.javaScriptActionRefs, javaScriptActionHandle.nativeRef)
+
+	documentHandle, err := p.getDocumentHandle(javaScriptActionHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	delete(documentHandle.javaScriptActionRefs, javaScriptActionHandle.nativeRef)
 
 	return &responses.FPDFDoc_CloseJavaScriptAction{}, nil
 }
