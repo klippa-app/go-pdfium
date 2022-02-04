@@ -43,6 +43,8 @@
 * Useful helpers to make your life easier:
     * Get all document metadata
     * Get all document bookmarks
+    * Get all document attachments
+    * Get all document JavaScript actions
     * Get plain text of a page
     * Get structured text of a page (text, angle, position, size, font information)
     * Render 1 or multiple pages from 1 or multiple documents into a Go `image.Image` using either DPI or pixel size
