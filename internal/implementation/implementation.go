@@ -122,25 +122,26 @@ type mainPdfium struct {
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
-		logger:         p.logger,
-		documentRefs:   map[references.FPDF_DOCUMENT]*DocumentHandle{},
-		pageRefs:       map[references.FPDF_PAGE]*PageHandle{},
-		bookmarkRefs:   map[references.FPDF_BOOKMARK]*BookmarkHandle{},
-		destRefs:       map[references.FPDF_DEST]*DestHandle{},
-		actionRefs:     map[references.FPDF_ACTION]*ActionHandle{},
-		linkRefs:       map[references.FPDF_LINK]*LinkHandle{},
-		pageLinkRefs:   map[references.FPDF_PAGELINK]*PageLinkHandle{},
-		schHandleRefs:  map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
-		bitmapRefs:     map[references.FPDF_BITMAP]*BitmapHandle{},
-		textPageRefs:   map[references.FPDF_TEXTPAGE]*TextPageHandle{},
-		pageRangeRefs:  map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
-		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
-		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
-		xObjectRefs:    map[references.FPDF_XOBJECT]*XObjectHandle{},
-		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
-		attachmentRefs: map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		logger:               p.logger,
+		documentRefs:         map[references.FPDF_DOCUMENT]*DocumentHandle{},
+		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:             map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		bitmapRefs:           map[references.FPDF_BITMAP]*BitmapHandle{},
+		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		xObjectRefs:          map[references.FPDF_XOBJECT]*XObjectHandle{},
+		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -157,24 +158,25 @@ type PdfiumImplementation struct {
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
 
-	documentRefs   map[references.FPDF_DOCUMENT]*DocumentHandle
-	pageRefs       map[references.FPDF_PAGE]*PageHandle
-	bookmarkRefs   map[references.FPDF_BOOKMARK]*BookmarkHandle
-	destRefs       map[references.FPDF_DEST]*DestHandle
-	actionRefs     map[references.FPDF_ACTION]*ActionHandle
-	linkRefs       map[references.FPDF_LINK]*LinkHandle
-	pageLinkRefs   map[references.FPDF_PAGELINK]*PageLinkHandle
-	schHandleRefs  map[references.FPDF_SCHHANDLE]*SchHandleHandle
-	textPageRefs   map[references.FPDF_TEXTPAGE]*TextPageHandle
-	pageRangeRefs  map[references.FPDF_PAGERANGE]*PageRangeHandle
-	pageObjectRefs map[references.FPDF_PAGEOBJECT]*PageObjectHandle
-	clipPathRefs   map[references.FPDF_CLIPPATH]*ClipPathHandle
-	formHandleRefs map[references.FPDF_FORMHANDLE]*FormHandleHandle
-	bitmapRefs     map[references.FPDF_BITMAP]*BitmapHandle
-	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
-	xObjectRefs    map[references.FPDF_XOBJECT]*XObjectHandle
-	signatureRefs  map[references.FPDF_SIGNATURE]*SignatureHandle
-	attachmentRefs map[references.FPDF_ATTACHMENT]*AttachmentHandle
+	documentRefs         map[references.FPDF_DOCUMENT]*DocumentHandle
+	pageRefs             map[references.FPDF_PAGE]*PageHandle
+	bookmarkRefs         map[references.FPDF_BOOKMARK]*BookmarkHandle
+	destRefs             map[references.FPDF_DEST]*DestHandle
+	actionRefs           map[references.FPDF_ACTION]*ActionHandle
+	linkRefs             map[references.FPDF_LINK]*LinkHandle
+	pageLinkRefs         map[references.FPDF_PAGELINK]*PageLinkHandle
+	schHandleRefs        map[references.FPDF_SCHHANDLE]*SchHandleHandle
+	textPageRefs         map[references.FPDF_TEXTPAGE]*TextPageHandle
+	pageRangeRefs        map[references.FPDF_PAGERANGE]*PageRangeHandle
+	pageObjectRefs       map[references.FPDF_PAGEOBJECT]*PageObjectHandle
+	clipPathRefs         map[references.FPDF_CLIPPATH]*ClipPathHandle
+	formHandleRefs       map[references.FPDF_FORMHANDLE]*FormHandleHandle
+	bitmapRefs           map[references.FPDF_BITMAP]*BitmapHandle
+	annotationRefs       map[references.FPDF_ANNOTATION]*AnnotationHandle
+	xObjectRefs          map[references.FPDF_XOBJECT]*XObjectHandle
+	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
+	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
+	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -202,21 +204,22 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}
 
 	nativeDoc := &DocumentHandle{
-		pageRefs:       map[references.FPDF_PAGE]*PageHandle{},
-		bookmarkRefs:   map[references.FPDF_BOOKMARK]*BookmarkHandle{},
-		destRefs:       map[references.FPDF_DEST]*DestHandle{},
-		actionRefs:     map[references.FPDF_ACTION]*ActionHandle{},
-		linkRefs:       map[references.FPDF_LINK]*LinkHandle{},
-		pageLinkRefs:   map[references.FPDF_PAGELINK]*PageLinkHandle{},
-		schHandleRefs:  map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
-		textPageRefs:   map[references.FPDF_TEXTPAGE]*TextPageHandle{},
-		pageRangeRefs:  map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs: map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:   map[references.FPDF_CLIPPATH]*ClipPathHandle{},
-		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
-		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
-		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
-		attachmentRefs: map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:             map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -402,6 +405,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.attachmentRefs, i)
 	}
 
+	for i := range p.javaScriptActionRefs {
+		delete(p.javaScriptActionRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -513,4 +520,16 @@ func (d *PdfiumImplementation) getAttachmentHandle(attachment references.FPDF_AT
 	}
 
 	return nil, errors.New("could not find attachment handle, perhaps the attachment was already closed or you tried to share attachments between instances or documents")
+}
+
+func (d *PdfiumImplementation) getJavaScriptActionHandle(javaScriptAction references.FPDF_JAVASCRIPT_ACTION) (*JavaScriptActionHandle, error) {
+	if javaScriptAction == "" {
+		return nil, errors.New("javaScriptAction not given")
+	}
+
+	if val, ok := d.javaScriptActionRefs[javaScriptAction]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find javaScriptAction handle, perhaps the javaScriptAction was already closed or you tried to share javaScriptActions between instances or documents")
 }

@@ -488,4 +488,28 @@ type Pdfium interface {
 	FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
 
 	// End fpdf_attachment.h
+
+	// Start fpdf_javascript.h
+
+	// FPDFDoc_GetJavaScriptActionCount returns the number of JavaScript actions in the given document.
+	// Experimental API.
+	FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount) (*responses.FPDFDoc_GetJavaScriptActionCount, error)
+
+	// FPDFDoc_GetJavaScriptAction returns the JavaScript action at the given index in the given document.
+	// Experimental API.
+	FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction) (*responses.FPDFDoc_GetJavaScriptAction, error)
+
+	// FPDFDoc_CloseJavaScriptAction closes a loaded FPDF_JAVASCRIPT_ACTION object.
+	// Experimental API.
+	FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction) (*responses.FPDFDoc_CloseJavaScriptAction, error)
+
+	// FPDFJavaScriptAction_GetName returns the name from the javascript handle.
+	// Experimental API.
+	FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName) (*responses.FPDFJavaScriptAction_GetName, error)
+
+	// FPDFJavaScriptAction_GetScript returns the script from the javascript handle
+	// Experimental API.
+	FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error)
+
+	// End fpdf_javascript.h
 }

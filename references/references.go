@@ -56,3 +56,6 @@ type FPDF_SIGNATURE string
 
 // FPDF_ATTACHMENT is an internal reference to a C.FPDF_ATTACHMENT handle.
 type FPDF_ATTACHMENT string
+
+// FPDF_JAVASCRIPT_ACTION is an internal reference to a C.FPDF_JAVASCRIPT_ACTION handle.
+type FPDF_JAVASCRIPT_ACTION string

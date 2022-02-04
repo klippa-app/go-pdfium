@@ -33,10 +33,15 @@ type Pdfium interface {
     FPDFDest_GetLocationInPage(*requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
     FPDFDest_GetView(*requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
     FPDFDoc_AddAttachment(*requests.FPDFDoc_AddAttachment) (*responses.FPDFDoc_AddAttachment, error)
+    FPDFDoc_CloseJavaScriptAction(*requests.FPDFDoc_CloseJavaScriptAction) (*responses.FPDFDoc_CloseJavaScriptAction, error)
     FPDFDoc_DeleteAttachment(*requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error)
     FPDFDoc_GetAttachment(*requests.FPDFDoc_GetAttachment) (*responses.FPDFDoc_GetAttachment, error)
     FPDFDoc_GetAttachmentCount(*requests.FPDFDoc_GetAttachmentCount) (*responses.FPDFDoc_GetAttachmentCount, error)
+    FPDFDoc_GetJavaScriptAction(*requests.FPDFDoc_GetJavaScriptAction) (*responses.FPDFDoc_GetJavaScriptAction, error)
+    FPDFDoc_GetJavaScriptActionCount(*requests.FPDFDoc_GetJavaScriptActionCount) (*responses.FPDFDoc_GetJavaScriptActionCount, error)
     FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
+    FPDFJavaScriptAction_GetName(*requests.FPDFJavaScriptAction_GetName) (*responses.FPDFJavaScriptAction_GetName, error)
+    FPDFJavaScriptAction_GetScript(*requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error)
     FPDFLink_CountQuadPoints(*requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error)
     FPDFLink_Enumerate(*requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error)
     FPDFLink_GetAction(*requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error)
@@ -328,6 +333,16 @@ func (g *PdfiumRPC) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachmen
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction) (*responses.FPDFDoc_CloseJavaScriptAction, error) {
+	resp := &responses.FPDFDoc_CloseJavaScriptAction{}
+	err := g.client.Call("Plugin.FPDFDoc_CloseJavaScriptAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error) {
 	resp := &responses.FPDFDoc_DeleteAttachment{}
 	err := g.client.Call("Plugin.FPDFDoc_DeleteAttachment", request, resp)
@@ -358,9 +373,49 @@ func (g *PdfiumRPC) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAtta
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction) (*responses.FPDFDoc_GetJavaScriptAction, error) {
+	resp := &responses.FPDFDoc_GetJavaScriptAction{}
+	err := g.client.Call("Plugin.FPDFDoc_GetJavaScriptAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount) (*responses.FPDFDoc_GetJavaScriptActionCount, error) {
+	resp := &responses.FPDFDoc_GetJavaScriptActionCount{}
+	err := g.client.Call("Plugin.FPDFDoc_GetJavaScriptActionCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
 	resp := &responses.FPDFDoc_GetPageMode{}
 	err := g.client.Call("Plugin.FPDFDoc_GetPageMode", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName) (*responses.FPDFJavaScriptAction_GetName, error) {
+	resp := &responses.FPDFJavaScriptAction_GetName{}
+	err := g.client.Call("Plugin.FPDFJavaScriptAction_GetName", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error) {
+	resp := &responses.FPDFJavaScriptAction_GetScript{}
+	err := g.client.Call("Plugin.FPDFJavaScriptAction_GetScript", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1316,6 +1371,19 @@ func (s *PdfiumRPCServer) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAtt
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction, resp *responses.FPDFDoc_CloseJavaScriptAction) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_CloseJavaScriptAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment, resp *responses.FPDFDoc_DeleteAttachment) error {
 	var err error
 	implResp, err := s.Impl.FPDFDoc_DeleteAttachment(request)
@@ -1355,9 +1423,61 @@ func (s *PdfiumRPCServer) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_G
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction, resp *responses.FPDFDoc_GetJavaScriptAction) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_GetJavaScriptAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount, resp *responses.FPDFDoc_GetJavaScriptActionCount) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_GetJavaScriptActionCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) error {
 	var err error
 	implResp, err := s.Impl.FPDFDoc_GetPageMode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName, resp *responses.FPDFJavaScriptAction_GetName) error {
+	var err error
+	implResp, err := s.Impl.FPDFJavaScriptAction_GetName(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript, resp *responses.FPDFJavaScriptAction_GetScript) error {
+	var err error
+	implResp, err := s.Impl.FPDFJavaScriptAction_GetScript(request)
 	if err != nil {
 		return err
 	}
