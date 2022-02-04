@@ -140,6 +140,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		xObjectRefs:    map[references.FPDF_XOBJECT]*XObjectHandle{},
 		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs: map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -173,6 +174,7 @@ type PdfiumImplementation struct {
 	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
 	xObjectRefs    map[references.FPDF_XOBJECT]*XObjectHandle
 	signatureRefs  map[references.FPDF_SIGNATURE]*SignatureHandle
+	attachmentRefs map[references.FPDF_ATTACHMENT]*AttachmentHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -214,6 +216,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		formHandleRefs: map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs: map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		signatureRefs:  map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs: map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -395,6 +398,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.signatureRefs, i)
 	}
 
+	for i := range p.attachmentRefs {
+		delete(p.attachmentRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -494,4 +501,16 @@ func (d *PdfiumImplementation) getSignatureHandle(signature references.FPDF_SIGN
 	}
 
 	return nil, errors.New("could not find signature handle, perhaps the signature was already closed or you tried to share signatures between instances or documents")
+}
+
+func (d *PdfiumImplementation) getAttachmentHandle(attachment references.FPDF_ATTACHMENT) (*AttachmentHandle, error) {
+	if attachment == "" {
+		return nil, errors.New("attachment not given")
+	}
+
+	if val, ok := d.attachmentRefs[attachment]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find attachment handle, perhaps the attachment was already closed or you tried to share attachments between instances or documents")
 }

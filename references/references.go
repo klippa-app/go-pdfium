@@ -53,3 +53,6 @@ type FPDF_XOBJECT string
 
 // FPDF_SIGNATURE is an internal reference to a C.FPDF_SIGNATURE handle.
 type FPDF_SIGNATURE string
+
+// FPDF_ATTACHMENT is an internal reference to a C.FPDF_ATTACHMENT handle.
+type FPDF_ATTACHMENT string

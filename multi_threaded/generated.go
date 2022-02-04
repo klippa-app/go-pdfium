@@ -38,6 +38,55 @@ func (i *pdfiumInstance) FPDFAction_GetURIPath(request *requests.FPDFAction_GetU
 	return i.worker.plugin.FPDFAction_GetURIPath(request)
 }
 
+func (i *pdfiumInstance) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_GetFile(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_GetName(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_GetStringValue(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_GetValueType(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_HasKey(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_SetFile(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFAttachment_SetStringValue(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -106,6 +155,34 @@ func (i *pdfiumInstance) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDFDest_GetView(request)
+}
+
+func (i *pdfiumInstance) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachment) (*responses.FPDFDoc_AddAttachment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFDoc_AddAttachment(request)
+}
+
+func (i *pdfiumInstance) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFDoc_DeleteAttachment(request)
+}
+
+func (i *pdfiumInstance) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAttachment) (*responses.FPDFDoc_GetAttachment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFDoc_GetAttachment(request)
+}
+
+func (i *pdfiumInstance) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAttachmentCount) (*responses.FPDFDoc_GetAttachmentCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFDoc_GetAttachmentCount(request)
 }
 
 func (i *pdfiumInstance) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {

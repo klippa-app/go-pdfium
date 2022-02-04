@@ -36,6 +36,7 @@ type DocumentHandle struct {
 	formHandleRefs map[references.FPDF_FORMHANDLE]*FormHandleHandle
 	annotationRefs map[references.FPDF_ANNOTATION]*AnnotationHandle
 	signatureRefs  map[references.FPDF_SIGNATURE]*SignatureHandle
+	attachmentRefs map[references.FPDF_ATTACHMENT]*AttachmentHandle
 }
 
 func (d *DocumentHandle) getPageHandle(pageRef references.FPDF_PAGE) (*PageHandle, error) {
@@ -129,6 +130,10 @@ func (d *DocumentHandle) Close() error {
 
 	for i := range d.signatureRefs {
 		delete(d.signatureRefs, i)
+	}
+
+	for i := range d.attachmentRefs {
+		delete(d.attachmentRefs, i)
 	}
 
 	C.FPDF_CloseDocument(d.handle)
@@ -250,4 +255,10 @@ type SignatureHandle struct {
 	handle      C.FPDF_SIGNATURE
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_SIGNATURE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type AttachmentHandle struct {
+	handle      C.FPDF_ATTACHMENT
+	documentRef references.FPDF_DOCUMENT
+	nativeRef   references.FPDF_ATTACHMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }

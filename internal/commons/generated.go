@@ -15,6 +15,13 @@ type Pdfium interface {
     FPDFAction_GetFilePath(*requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
     FPDFAction_GetType(*requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error)
     FPDFAction_GetURIPath(*requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error)
+    FPDFAttachment_GetFile(*requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
+    FPDFAttachment_GetName(*requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error)
+    FPDFAttachment_GetStringValue(*requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error)
+    FPDFAttachment_GetValueType(*requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error)
+    FPDFAttachment_HasKey(*requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error)
+    FPDFAttachment_SetFile(*requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error)
+    FPDFAttachment_SetStringValue(*requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error)
     FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
     FPDFBookmark_GetAction(*requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
     FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
@@ -25,6 +32,10 @@ type Pdfium interface {
     FPDFDest_GetDestPageIndex(*requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
     FPDFDest_GetLocationInPage(*requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
     FPDFDest_GetView(*requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
+    FPDFDoc_AddAttachment(*requests.FPDFDoc_AddAttachment) (*responses.FPDFDoc_AddAttachment, error)
+    FPDFDoc_DeleteAttachment(*requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error)
+    FPDFDoc_GetAttachment(*requests.FPDFDoc_GetAttachment) (*responses.FPDFDoc_GetAttachment, error)
+    FPDFDoc_GetAttachmentCount(*requests.FPDFDoc_GetAttachmentCount) (*responses.FPDFDoc_GetAttachmentCount, error)
     FPDFDoc_GetPageMode(*requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error)
     FPDFLink_CountQuadPoints(*requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error)
     FPDFLink_Enumerate(*requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error)
@@ -137,6 +148,76 @@ func (g *PdfiumRPC) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPat
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error) {
+	resp := &responses.FPDFAttachment_GetFile{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetFile", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error) {
+	resp := &responses.FPDFAttachment_GetName{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetName", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error) {
+	resp := &responses.FPDFAttachment_GetStringValue{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetStringValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error) {
+	resp := &responses.FPDFAttachment_GetValueType{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetValueType", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error) {
+	resp := &responses.FPDFAttachment_HasKey{}
+	err := g.client.Call("Plugin.FPDFAttachment_HasKey", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error) {
+	resp := &responses.FPDFAttachment_SetFile{}
+	err := g.client.Call("Plugin.FPDFAttachment_SetFile", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error) {
+	resp := &responses.FPDFAttachment_SetStringValue{}
+	err := g.client.Call("Plugin.FPDFAttachment_SetStringValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error) {
 	resp := &responses.FPDFBookmark_Find{}
 	err := g.client.Call("Plugin.FPDFBookmark_Find", request, resp)
@@ -230,6 +311,46 @@ func (g *PdfiumRPC) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLoc
 func (g *PdfiumRPC) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error) {
 	resp := &responses.FPDFDest_GetView{}
 	err := g.client.Call("Plugin.FPDFDest_GetView", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachment) (*responses.FPDFDoc_AddAttachment, error) {
+	resp := &responses.FPDFDoc_AddAttachment{}
+	err := g.client.Call("Plugin.FPDFDoc_AddAttachment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error) {
+	resp := &responses.FPDFDoc_DeleteAttachment{}
+	err := g.client.Call("Plugin.FPDFDoc_DeleteAttachment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAttachment) (*responses.FPDFDoc_GetAttachment, error) {
+	resp := &responses.FPDFDoc_GetAttachment{}
+	err := g.client.Call("Plugin.FPDFDoc_GetAttachment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAttachmentCount) (*responses.FPDFDoc_GetAttachmentCount, error) {
+	resp := &responses.FPDFDoc_GetAttachmentCount{}
+	err := g.client.Call("Plugin.FPDFDoc_GetAttachmentCount", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -961,6 +1082,97 @@ func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_Get
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile, resp *responses.FPDFAttachment_GetFile) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_GetFile(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetName, resp *responses.FPDFAttachment_GetName) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_GetName(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue, resp *responses.FPDFAttachment_GetStringValue) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_GetStringValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType, resp *responses.FPDFAttachment_GetValueType) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_GetValueType(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey, resp *responses.FPDFAttachment_HasKey) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_HasKey(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile, resp *responses.FPDFAttachment_SetFile) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_SetFile(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue, resp *responses.FPDFAttachment_SetStringValue) error {
+	var err error
+	implResp, err := s.Impl.FPDFAttachment_SetStringValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find, resp *responses.FPDFBookmark_Find) error {
 	var err error
 	implResp, err := s.Impl.FPDFBookmark_Find(request)
@@ -1081,6 +1293,58 @@ func (s *PdfiumRPCServer) FPDFDest_GetLocationInPage(request *requests.FPDFDest_
 func (s *PdfiumRPCServer) FPDFDest_GetView(request *requests.FPDFDest_GetView, resp *responses.FPDFDest_GetView) error {
 	var err error
 	implResp, err := s.Impl.FPDFDest_GetView(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachment, resp *responses.FPDFDoc_AddAttachment) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_AddAttachment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment, resp *responses.FPDFDoc_DeleteAttachment) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_DeleteAttachment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAttachment, resp *responses.FPDFDoc_GetAttachment) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_GetAttachment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAttachmentCount, resp *responses.FPDFDoc_GetAttachmentCount) error {
+	var err error
+	implResp, err := s.Impl.FPDFDoc_GetAttachmentCount(request)
 	if err != nil {
 		return err
 	}
