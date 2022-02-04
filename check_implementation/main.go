@@ -31,9 +31,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	methodCount := 0
+	implementedCount := 0
 	for _, item := range items {
 		if !item.IsDir() {
 			if strings.HasSuffix(item.Name(), ".h") {
+				// Skip fpdf_sysfontinfo.h
+				if item.Name() == "fpdf_sysfontinfo.h" {
+					continue
+				}
+
 				file, err := os.Open(pdfiumFolder + "/include/" + item.Name())
 				if err != nil {
 					log.Fatal(err)
@@ -56,8 +63,11 @@ func main() {
 						methodParts := strings.SplitN(method, "(", 2)
 						method = methodParts[0]
 
+						methodCount++
 						if _, ok := implementedMethods[method]; !ok {
 							fmt.Println(method)
+						} else {
+							implementedCount++
 						}
 					}
 				}
@@ -70,4 +80,6 @@ func main() {
 			}
 		}
 	}
+
+	log.Printf("Methods to implement: %d, methods implemented: %d, progress: %f", methodCount, implementedCount, (float64(implementedCount)/float64(methodCount))*100)
 }
