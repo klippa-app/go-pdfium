@@ -164,6 +164,13 @@ func (i *pdfiumInstance) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAtta
 	return i.pdfium.FPDFDoc_AddAttachment(request)
 }
 
+func (i *pdfiumInstance) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction) (*responses.FPDFDoc_CloseJavaScriptAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFDoc_CloseJavaScriptAction(request)
+}
+
 func (i *pdfiumInstance) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment) (*responses.FPDFDoc_DeleteAttachment, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -185,11 +192,39 @@ func (i *pdfiumInstance) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_Ge
 	return i.pdfium.FPDFDoc_GetAttachmentCount(request)
 }
 
+func (i *pdfiumInstance) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction) (*responses.FPDFDoc_GetJavaScriptAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFDoc_GetJavaScriptAction(request)
+}
+
+func (i *pdfiumInstance) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount) (*responses.FPDFDoc_GetJavaScriptActionCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFDoc_GetJavaScriptActionCount(request)
+}
+
 func (i *pdfiumInstance) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 	return i.pdfium.FPDFDoc_GetPageMode(request)
+}
+
+func (i *pdfiumInstance) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName) (*responses.FPDFJavaScriptAction_GetName, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFJavaScriptAction_GetName(request)
+}
+
+func (i *pdfiumInstance) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.pdfium.FPDFJavaScriptAction_GetScript(request)
 }
 
 func (i *pdfiumInstance) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error) {
