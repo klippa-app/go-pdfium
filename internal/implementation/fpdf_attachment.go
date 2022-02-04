@@ -294,13 +294,15 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 	bufLen := C.ulong(0)
 	getFileSizeSuccess := C.FPDFAttachment_GetFile(attachmentHandle.handle, C.NULL, 0, &bufLen)
 	if int(getFileSizeSuccess) == 0 {
-		return nil, errors.New("Could not get file size")
+		return &responses.FPDFAttachment_GetFile{
+			Contents: nil,
+		}, nil
 	}
 
 	fileData := make([]byte, bufLen)
 	getFileSuccess := C.FPDFAttachment_GetFile(attachmentHandle.handle, unsafe.Pointer(&fileData[0]), C.ulong(bufLen), &bufLen)
 	if int(getFileSuccess) == 0 {
-		return nil, errors.New("Could not get file")
+		return nil, errors.New("could not get file")
 	}
 
 	return &responses.FPDFAttachment_GetFile{

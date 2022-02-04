@@ -49,5 +49,5 @@ type FPDFAttachment_GetStringValue struct {
 type FPDFAttachment_SetFile struct{}
 
 type FPDFAttachment_GetFile struct {
-	Contents []byte
+	Contents []byte // nil when not found.
 }
