@@ -20,17 +20,17 @@ var poolRefs = map[string]*pdfiumPool{}
 // Every pool will keep track of its own instances and the documents that
 // belong to those instances. When you close it, it will clean up the resources
 // of that pool. Underwater every pool/instance uses the same mutex to ensure
-// thread safety in pdfium across pools/instances/documents.
+// thread safety in PDFium across pools/instances/documents.
 func Init() pdfium.Pool {
 	singleThreadedMutex.Lock()
 	defer singleThreadedMutex.Unlock()
 
-	// Init the pdfium library.
+	// Init the PDFium library.
 	implementation.InitLibrary()
 
 	poolRef := uuid.New()
 
-	// Create a new pdfium pool
+	// Create a new PDFium pool
 	pool := &pdfiumPool{
 		poolRef:      poolRef.String(),
 		instanceRefs: map[string]*pdfiumInstance{},
@@ -49,7 +49,7 @@ type pdfiumPool struct {
 	lock         *sync.Mutex
 }
 
-// GetInstance will return a unique pdfium instance that keeps track of its
+// GetInstance will return a unique PDFium instance that keeps track of its
 // own documents. When you close it, it will clean up all resources of this
 // instance.
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
@@ -104,7 +104,7 @@ type pdfiumInstance struct {
 	lock        *sync.Mutex
 }
 
-// NewDocumentFromBytes creates a new pdfium references from a byte array.
+// NewDocumentFromBytes creates a new PDFium references from a byte array.
 func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
@@ -126,7 +126,7 @@ func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDo
 	return &doc.Document, nil
 }
 
-// NewDocumentFromFilePath creates a new pdfium references from a file path.
+// NewDocumentFromFilePath creates a new PDFium references from a file path.
 func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
@@ -148,7 +148,7 @@ func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium
 	return &doc.Document, nil
 }
 
-// NewDocumentFromReader creates a new pdfium references from a reader.
+// NewDocumentFromReader creates a new PDFium references from a reader.
 func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
@@ -170,7 +170,7 @@ func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, o
 	return &doc.Document, nil
 }
 
-// Close will close the instance and will clean up the underlying pdfium resources
+// Close will close the instance and will clean up the underlying PDFium resources
 // by calling i.pdfium.Close().
 func (i *pdfiumInstance) Close() error {
 	i.lock.Lock()

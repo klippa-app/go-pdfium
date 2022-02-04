@@ -60,7 +60,7 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 	return C.int(readBytes)
 }
 
-// Pdfium is a container so that we can always only have 1 instance of pdfium
+// Pdfium is a container so that we can always only have 1 instance of PDFium
 // per process. We need this so that we can guarantee thread safety.
 var Pdfium = &mainPdfium{
 	mutex:        &sync.Mutex{},
@@ -251,7 +251,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		// Keep track of the allocated memory to free it later on.
 		nativeDoc.readSeekerRef = readSeekerAlloc
 
-		// Create a pdfium file access struct.
+		// Create a PDFium file access struct.
 		readerStruct := C.FPDF_FILEACCESS{}
 		readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
 		readerStruct.m_Param = readSeekerAlloc

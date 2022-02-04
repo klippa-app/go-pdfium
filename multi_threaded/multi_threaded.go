@@ -155,7 +155,7 @@ func Init(config Config) pdfium.Pool {
 
 	poolRef := uuid.New()
 
-	// Create a new pdfium pool.
+	// Create a new PDFium pool.
 	newPool := &pdfiumPool{
 		poolRef:      poolRef.String(),
 		instanceRefs: map[string]*pdfiumInstance{},
@@ -228,7 +228,7 @@ type pdfiumInstance struct {
 	lock        *sync.Mutex
 }
 
-// NewDocumentFromBytes creates a new pdfium references from a byte array.
+// NewDocumentFromBytes creates a new PDFium document from a byte array.
 // This will automatically select a worker and keep it for you until you execute
 // the close method on the references.
 func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
@@ -252,7 +252,7 @@ func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDo
 	return &doc.Document, nil
 }
 
-// NewDocumentFromFilePath creates a new pdfium references from a file path.
+// NewDocumentFromFilePath creates a new PDFium document from a file path.
 func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {
@@ -274,7 +274,7 @@ func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium
 	return &doc.Document, nil
 }
 
-// NewDocumentFromReader creates a new pdfium references from a reader.
+// NewDocumentFromReader creates a new PDFium document from a reader.
 func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
 	i.lock.Lock()
 	if i.closed {

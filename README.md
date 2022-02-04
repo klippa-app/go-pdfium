@@ -8,7 +8,7 @@
 
 [build-url]:https://github.com/klippa-app/go-pdfium/actions
 
-:rocket: *Easy to use PDF library using Go and pdfium* :rocket:
+:rocket: *Easy to use PDF library using Go and PDFium* :rocket:
 
 **A fast, multi-threaded and easy to use PDF library for Go applications.**
 
@@ -16,18 +16,30 @@
 
 * Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
 * This library will handle all complicated cgo gymnastics for you
-* Almost all pdfium methods exposed through Go, no cgo required
-    * pdfium instance configuration (sandbox policy, fonts)
+* The goal is to implement all PDFium public API methods, current progress: 20%
+* Current PDFium methods exposed, no cgo required
+    * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
     * Document info (metadata, page count, render mode, PDF version, permissions, security handler revision)
     * Page info (size, transparency)
     * Rendering (through bitmap)
     * Creation (create new documents and pages)
     * Editing (rotating, import pages from another document, copy view preferences from another document, flattening)
-    * Form filling
-    * Text handling (extract, search)
     * Bookmarks / Links / Weblinks
     * Document saving (to bytes, path or io.Writer)
+    * JavaScript actions
+    * Thumbnails
+    * Attachments
+* Methods to be implemented:
+    * Form filling
+    * Text handling (extract, search)
+    * Bitmap handling
+    * Named destinations
+    * Transformations (page boxes, clip paths)
+    * Annotations
+    * Document loading through data availability
+    * Progressive rendering
+    * Struct trees
 * Useful helpers to make your life easier:
     * Get all document metadata
     * Get all document bookmarks
@@ -39,37 +51,37 @@
     * Get the point to pixel ratio when rendering or extracting text (to determine the positions when rendering into an
       image)
 
-## pdfium
+## PDFium
 
-This project uses the pdfium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
+This project uses the PDFium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents.
 
 ## Single/Multi-threading
 
-Since pdfium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
+Since PDFium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
 make it multithreaded by calling it from Go's subroutines.
 
-This library allows you to call pdfium in a single or multi-threaded way.
+This library allows you to call PDFium in a single or multi-threaded way.
 
 We have implemented multi-threading this using [HashiCorp's Go Plugin System](https://github.com/hashicorp/go-plugin),
-which allows us launch separate pdfium worker processes, and then route the requests through the different workers. This
-also makes it a bit more safe to use pdfium, as it's less likely to segfaults or corrupt your main Go application. The
+which allows us launch separate PDFium worker processes, and then route the requests through the different workers. This
+also makes it a bit more safe to use PDFium, as it's less likely to segfaults or corrupt your main Go application. The
 Plugin system provides the communication between the processes using gRPC, however, when implementing this library, you
 won't really see anything of that. From the outside it will look like normal Go code. The inter-process communication
 does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the
-pdfium workers.
+PDFium workers.
 
-Single-threading works by directly calling the pdfium library from the same process. Single-threaded might be preferred
+Single-threading works by directly calling the PDFium library from the same process. Single-threaded might be preferred
 if the caller is managing the workers themselves and does not want the overhead of another process. Be aware that since
-pdfium is C++, we can't handle segfaults caused by pdfium, which may cause your process to be killed. So using this
+PDFium is C++, we can't handle segfaults caused by PDFium, which may cause your process to be killed. So using this
 library in the multi-threaded way, with only 1 worker, can still have some benefits, since it can automatically recover
 from things like segfaults.
 
 Both the single-threaded and multi-threaded implementation are thread/subroutine safe, this has been guaranteed by
-locking the instance that's doing your work while it's doing pdfium operations. New operations will wait until the lock
+locking the instance that's doing your work while it's doing PDFium operations. New operations will wait until the lock
 becomes available again.
 
-**Be aware that pdfium could use quite some memory depending on the size of the PDF and the requests that you do, so be
+**Be aware that PDFium could use quite some memory depending on the size of the PDF and the requests that you do, so be
 aware of the amount of workers that you configure.**
 
 ### `io.ReadSeeker` and `io.Writer`
@@ -84,11 +96,11 @@ matter.
 
 ## Prerequisites
 
-To use this Go library, you will need the actual pdfium library to run it and have it available through pkgconfig.
+To use this Go library, you will need the actual PDFium library to run it and have it available through pkgconfig.
 
 ### Get the library
 
-You can try to compile pdfium yourself, but you can also use pre-compiled binaries, for example
+You can try to compile PDFium yourself, but you can also use pre-compiled binaries, for example
 from: https://github.com/bblanchon/pdfium-binaries/releases
 
 If you use a pre-compiled library, make sure to extract it somewhere logical, for example /opt/pdfium.
@@ -102,8 +114,8 @@ prefix={path}
 libdir={path}/lib
 includedir={path}/include
 
-Name: pdfium
-Description: pdfium
+Name: PDFium
+Description: PDFium
 Version: 4849
 Requires:
 
@@ -150,7 +162,7 @@ var pool pdfium.Pool
 var instance pdfium.Pdfium
 
 func init() {
-	// Init the pdfium library and return the instance to open documents.
+	// Init the PDFium library and return the instance to open documents.
 	pool = single_threaded.Init()
 
 	var err error
@@ -165,7 +177,7 @@ func init() {
 
 #### Worker package
 
-This package has to be named main to make it available as a binary. The plugin system will use this to start new pdfium
+This package has to be named main to make it available as a binary. The plugin system will use this to start new PDFium
 workers. Example:
 
 `pdfium/worker/main.go`
@@ -184,8 +196,8 @@ func main() {
 
 #### Worker configuration
 
-To actually start workers, you will have to init the pdfium library somewhere, this also allows you to dynamically start
-workers when needed. The best location to add this is in the `init()` of a package that is going to call the pdfium
+To actually start workers, you will have to init the PDFium library somewhere, this also allows you to dynamically start
+workers when needed. The best location to add this is in the `init()` of a package that is going to call the PDFium
 library. Example:
 
 `pdfium/renderer/renderer.go`
@@ -205,7 +217,7 @@ var pool pdfium.Pool
 var instance pdfium.Pdfium
 
 func init() {
-	// Init the pdfium library and return the instance to open documents.
+	// Init the PDFium library and return the instance to open documents.
 	// You can tweak these configs to your need. Be aware that workers can use quite some memory.
 	pool = multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
@@ -310,7 +322,7 @@ func renderPage(filePath string, page int, output string) error {
 		return err
 	}
 
-	// Open the PDF using pdfium (and claim a worker)
+	// Open the PDF using PDFium (and claim a worker)
 	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return err
