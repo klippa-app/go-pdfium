@@ -1,15 +1,14 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/responses"
-	"io/ioutil"
-
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
 )
 
 func RunfpdfAttachmentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
@@ -241,6 +240,47 @@ func RunfpdfAttachmentTests(pdfiumContainer pdfium.Pdfium, testsPath string, pre
 				Expect(err).To(BeNil())
 				Expect(FPDFDoc_GetAttachmentCount).To(Equal(&responses.FPDFDoc_GetAttachmentCount{
 					AttachmentCount: 2,
+				}))
+			})
+
+			It("returns the correct attachments", func() {
+				GetAttachments, err := pdfiumContainer.GetAttachments(&requests.GetAttachments{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(GetAttachments).To(Not(BeNil()))
+				Expect(GetAttachments.Attachments).To(Not(BeNil()))
+				Expect(GetAttachments.Attachments).To(HaveLen(2))
+				Expect(GetAttachments.Attachments[0].Name).To(Equal("1.txt"))
+				Expect(GetAttachments.Attachments[0].Content).To(Equal([]byte("test")))
+				Expect(GetAttachments.Attachments[0].Values).To(Equal([]responses.AttachmentValue{
+					{Key: "Size", ValueType: 2, StringValue: ""},
+					{
+						Key:         "CreationDate",
+						ValueType:   3,
+						StringValue: "D:20170712214438-07'00'",
+					},
+					{
+						Key:         "CheckSum",
+						ValueType:   3,
+						StringValue: "<098F6BCD4621D373CADE4E832627B4F6>",
+					},
+				}))
+
+				Expect(GetAttachments.Attachments[1].Name).To(Equal("attached.pdf"))
+				Expect(GetAttachments.Attachments[1].Content).To(HaveLen(5869))
+				Expect(GetAttachments.Attachments[1].Values).To(Equal([]responses.AttachmentValue{
+					{Key: "Size", ValueType: 2, StringValue: ""},
+					{
+						Key:         "CreationDate",
+						ValueType:   3,
+						StringValue: "D:20170712214443-07'00'",
+					},
+					{
+						Key:         "CheckSum",
+						ValueType:   3,
+						StringValue: "<72AFCDDEDF554DDA63C0C88E06F1CE18>",
+					},
 				}))
 			})
 
