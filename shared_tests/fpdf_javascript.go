@@ -133,6 +133,25 @@ func RunfpdfJavaScriptTests(pdfiumContainer pdfium.Pdfium, testsPath string, pre
 				}))
 			})
 
+			It("returns the correct javascript actions", func() {
+				GetJavaScriptActions, err := pdfiumContainer.GetJavaScriptActions(&requests.GetJavaScriptActions{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(GetJavaScriptActions).To(Equal(&responses.GetJavaScriptActions{
+					JavaScriptActions: []responses.JavaScriptAction{
+						{
+							Name:   "normal",
+							Script: "app.alert(\"ping\");",
+						},
+						{
+							Name:   "no_type",
+							Script: "app.alert(\"pong\");",
+						},
+					},
+				}))
+			})
+
 			When("the first javascript action has been loaded", func() {
 				var javaScriptAction references.FPDF_JAVASCRIPT_ACTION
 				BeforeEach(func() {

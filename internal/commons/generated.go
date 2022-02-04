@@ -95,8 +95,10 @@ type Pdfium interface {
     FSDK_SetTimeFunction(*requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
     FSDK_SetUnSpObjProcessHandler(*requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
     GetActionInfo(*requests.GetActionInfo) (*responses.GetActionInfo, error)
+    GetAttachments(*requests.GetAttachments) (*responses.GetAttachments, error)
     GetBookmarks(*requests.GetBookmarks) (*responses.GetBookmarks, error)
     GetDestInfo(*requests.GetDestInfo) (*responses.GetDestInfo, error)
+    GetJavaScriptActions(*requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error)
     GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
     GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
     GetPageSizeInPixels(*requests.GetPageSizeInPixels) (*responses.GetPageSizeInPixels, error)
@@ -953,6 +955,16 @@ func (g *PdfiumRPC) GetActionInfo(request *requests.GetActionInfo) (*responses.G
 	return resp, nil
 }
 
+func (g *PdfiumRPC) GetAttachments(request *requests.GetAttachments) (*responses.GetAttachments, error) {
+	resp := &responses.GetAttachments{}
+	err := g.client.Call("Plugin.GetAttachments", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
 	resp := &responses.GetBookmarks{}
 	err := g.client.Call("Plugin.GetBookmarks", request, resp)
@@ -966,6 +978,16 @@ func (g *PdfiumRPC) GetBookmarks(request *requests.GetBookmarks) (*responses.Get
 func (g *PdfiumRPC) GetDestInfo(request *requests.GetDestInfo) (*responses.GetDestInfo, error) {
 	resp := &responses.GetDestInfo{}
 	err := g.client.Call("Plugin.GetDestInfo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetJavaScriptActions(request *requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error) {
+	resp := &responses.GetJavaScriptActions{}
+	err := g.client.Call("Plugin.GetJavaScriptActions", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2177,6 +2199,19 @@ func (s *PdfiumRPCServer) GetActionInfo(request *requests.GetActionInfo, resp *r
 	return nil
 }
 
+func (s *PdfiumRPCServer) GetAttachments(request *requests.GetAttachments, resp *responses.GetAttachments) error {
+	var err error
+	implResp, err := s.Impl.GetAttachments(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *responses.GetBookmarks) error {
 	var err error
 	implResp, err := s.Impl.GetBookmarks(request)
@@ -2193,6 +2228,19 @@ func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *res
 func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *responses.GetDestInfo) error {
 	var err error
 	implResp, err := s.Impl.GetDestInfo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetJavaScriptActions(request *requests.GetJavaScriptActions, resp *responses.GetJavaScriptActions) error {
+	var err error
+	implResp, err := s.Impl.GetJavaScriptActions(request)
 	if err != nil {
 		return err
 	}

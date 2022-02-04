@@ -598,6 +598,13 @@ func (i *pdfiumInstance) GetActionInfo(request *requests.GetActionInfo) (*respon
 	return i.worker.plugin.GetActionInfo(request)
 }
 
+func (i *pdfiumInstance) GetAttachments(request *requests.GetAttachments) (*responses.GetAttachments, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.GetAttachments(request)
+}
+
 func (i *pdfiumInstance) GetBookmarks(request *requests.GetBookmarks) (*responses.GetBookmarks, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -610,6 +617,13 @@ func (i *pdfiumInstance) GetDestInfo(request *requests.GetDestInfo) (*responses.
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.GetDestInfo(request)
+}
+
+func (i *pdfiumInstance) GetJavaScriptActions(request *requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.GetJavaScriptActions(request)
 }
 
 func (i *pdfiumInstance) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {

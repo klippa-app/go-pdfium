@@ -489,6 +489,14 @@ type Pdfium interface {
 
 	// End fpdf_attachment.h
 
+	// Start attachment: attachment helpers
+
+	// GetAttachments returns all the attachments of a document.
+	// Experimental API.
+	GetAttachments(request *requests.GetAttachments) (*responses.GetAttachments, error)
+
+	// End attachment
+
 	// Start fpdf_javascript.h
 
 	// FPDFDoc_GetJavaScriptActionCount returns the number of JavaScript actions in the given document.
@@ -512,4 +520,12 @@ type Pdfium interface {
 	FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error)
 
 	// End fpdf_javascript.h
+
+	// start javascript_action: javascript action helper
+
+	// GetJavaScriptActions returns all the JavaScript Actions of a document.
+	// Experimental API.
+	GetJavaScriptActions(request *requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error)
+
+	// End javascript_action
 }
