@@ -178,6 +178,41 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					}))
 				})
 			})
+
+			When("the page transparency is requested by a wrong page reference", func() {
+				It("loadPage returns an error", func() {
+					fakeReference := references.FPDF_PAGE("")
+					pageTransparency, err := pdfiumContainer.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
+						Page: requests.Page{
+							ByReference: &fakeReference,
+						},
+					})
+					Expect(err).To(MatchError("page reference can't be empty"))
+					Expect(pageTransparency).To(BeNil())
+				})
+			})
+
+			When("the page transparency is requested by page reference", func() {
+				It("returns the correct transparency", func() {
+					FPDF_LoadPage, err := pdfiumContainer.FPDF_LoadPage(&requests.FPDF_LoadPage{
+						Document: doc,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_LoadPage).To(Not(BeNil()))
+					Expect(FPDF_LoadPage.Page).To(Not(BeNil()))
+
+					pageTransparency, err := pdfiumContainer.FPDFPage_HasTransparency(&requests.FPDFPage_HasTransparency{
+						Page: requests.Page{
+							ByReference: &FPDF_LoadPage.Page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(pageTransparency).To(Equal(&responses.FPDFPage_HasTransparency{
+						HasTransparency: true,
+					}))
+				})
+			})
 		})
 	})
 }
