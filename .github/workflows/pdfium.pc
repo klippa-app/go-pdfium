@@ -2,8 +2,8 @@ prefix=/opt/pdfium
 libdir=/opt/pdfium/lib
 includedir=/opt/pdfium/include
 
-Name: pdfium
-Description: pdfium
+Name: PDFium
+Description: PDFium
 Version: 4320
 Requires:
 

@@ -15,7 +15,7 @@ var pool pdfium.Pool
 var instance pdfium.Pdfium
 
 func init() {
-	// Init the pdfium library and return the instance to open documents.
+	// Init the PDFium library and return the instance to open documents.
 	// You can tweak these configs to your need. Be aware that workers can use quite some memory.
 	pool = multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
@@ -51,7 +51,7 @@ func getPageCount(filePath string) (int, error) {
 		return 0, err
 	}
 
-	// Open the PDF using pdfium (and claim a worker)
+	// Open the PDF using PDFium (and claim a worker)
 	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err

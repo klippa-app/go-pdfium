@@ -21,7 +21,7 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-// getPageSize returns the points size of a page given the pdfium page index.
+// getPageSize returns the points size of a page given the PDFium page index.
 // One point is 1/72 inch (around 0.3528 mm).
 func (p *PdfiumImplementation) getPageSize(page requests.Page) (int, float64, float64, error) {
 	pageHandle, err := p.loadPage(page)
@@ -290,7 +290,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
 
 	// Create a device independent bitmap to the external buffer by passing a
-	// pointer to the first pixel, pdfium will do the rest.
+	// pointer to the first pixel, PDFium will do the rest.
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))

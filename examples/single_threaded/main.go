@@ -15,7 +15,7 @@ var pool pdfium.Pool
 var instance pdfium.Pdfium
 
 func init() {
-	// Init the pdfium library and return the instance to open documents.
+	// Init the PDFium library and return the instance to open documents.
 	pool = single_threaded.Init()
 
 	var err error
@@ -42,7 +42,7 @@ func getPageCount(filePath string) (int, error) {
 		return 0, err
 	}
 
-	// Open the PDF using pdfium (and claim a worker)
+	// Open the PDF using PDFium (and claim a worker)
 	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
 	if err != nil {
 		return 0, err
