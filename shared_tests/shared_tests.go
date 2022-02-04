@@ -22,6 +22,7 @@ func RunTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	RunfpdfViewTests(pdfiumContainer, testsPath, prefix)
 	RunfpdfSaveTests(pdfiumContainer, testsPath, prefix)
 	RunfpdfPpoTests(pdfiumContainer, testsPath, prefix)
+	RunfpdfAttachmentTests(pdfiumContainer, testsPath, prefix)
 	RunRenderTests(pdfiumContainer, testsPath, prefix)
 	RunDocumentTests(pdfiumContainer, testsPath, prefix)
 	RunTextTests(pdfiumContainer, testsPath, prefix)
