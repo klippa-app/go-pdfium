@@ -1544,7 +1544,6 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 	return resp, nil
 }
 
-
 func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDest, resp *responses.FPDFAction_GetDest) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
