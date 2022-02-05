@@ -51,6 +51,7 @@ func go_writer_cb(pThis *C.FPDF_FILEWRITE, pData *C.cvoid_t, size C.ulong) C.int
 func (p *PdfiumImplementation) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error) {
 	// These methods are basically the same. We switch between
 	// FPDF_SaveAsCopy and FPDF_SaveWithVersion in the implementation of FPDF_SaveWithVersion.
+	// Don't lock here, FPDF_SaveWithVersion does it for us.
 	resp, err := p.FPDF_SaveWithVersion(&requests.FPDF_SaveWithVersion{
 		Flags:       request.Flags,
 		Document:    request.Document,
