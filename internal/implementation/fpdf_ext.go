@@ -83,6 +83,9 @@ func (p *PdfiumImplementation) FPDFDoc_GetPageMode(request *requests.FPDFDoc_Get
 
 var currentUnsupportedObjectHandler requests.UnSpObjProcessHandler
 
+// We need to keep around a reference so that it won't get GC'ed.
+var currentUnsupportedObjectHandlerStruct C.UNSUPPORT_INFO
+
 //export go_un_sp_obj_cb
 func go_un_sp_obj_cb(pThis *C.UNSUPPORT_INFO, nType C.int) {
 	if currentUnsupportedObjectHandler != nil {
@@ -98,13 +101,13 @@ func (p *PdfiumImplementation) FSDK_SetUnSpObjProcessHandler(request *requests.F
 
 	currentUnsupportedObjectHandler = request.UnSpObjProcessHandler
 
-	handler := C.UNSUPPORT_INFO{}
-	handler.version = 1
+	currentUnsupportedObjectHandlerStruct = C.UNSUPPORT_INFO{}
+	currentUnsupportedObjectHandlerStruct.version = 1
 
 	// Set the Go callback through cgo.
-	C.UNSUPPORT_INFO_SET_CALLBACK(&handler)
+	C.UNSUPPORT_INFO_SET_CALLBACK(&currentUnsupportedObjectHandlerStruct)
 
-	C.FSDK_SetUnSpObjProcessHandler(&handler)
+	C.FSDK_SetUnSpObjProcessHandler(&currentUnsupportedObjectHandlerStruct)
 
 	return &responses.FSDK_SetUnSpObjProcessHandler{}, nil
 }
