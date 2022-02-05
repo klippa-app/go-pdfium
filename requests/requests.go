@@ -10,7 +10,7 @@ type OpenDocument struct {
 	File           *[]byte // A reference to the file data.
 	FilePath       *string // A path to a PDF file.
 	FileReader     io.ReadSeeker
-	FileReaderSize int
+	FileReaderSize int64
 	Password       *string // The password of the document.
 }
 

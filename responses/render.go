@@ -26,6 +26,22 @@ type RenderPages struct {
 	Height int               // The height of the rendered image.
 }
 
+type RenderPageInPixels struct {
+	Result RenderPage
+}
+
+type RenderPagesInPixels struct {
+	Result RenderPages
+}
+
+type RenderPageInDPI struct {
+	Result RenderPage
+}
+
+type RenderPagesInDPI struct {
+	Result RenderPages
+}
+
 type RenderToFile struct {
 	Pages             []RenderPagesPage // Information about the rendered pages inside this image.
 	ImageBytes        *[]byte           // The byte array of the rendered file when OutputTarget is RenderToFileOutputTargetBytes.
