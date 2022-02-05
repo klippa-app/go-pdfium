@@ -15,16 +15,6 @@ import (
 var _ = BeforeSuite(func() {
 	implementation.InitLibrary()
 
-	When("pinged", func() {
-		It("pongs", func() {
-			pdfium := implementation.Pdfium.GetInstance()
-			resp, err := pdfium.Ping()
-			Expect(err).To(BeNil())
-			Expect(resp).To(Equal("Pong"))
-			pdfium.Close()
-		})
-	})
-
 	// Set ENV to ensure resulting values.
 	err := os.Setenv("TZ", "UTC")
 	Expect(err).To(BeNil())
@@ -48,5 +38,15 @@ var _ = AfterSuite(func() {
 })
 
 var _ = Describe("Implementation", func() {
+	When("pinged", func() {
+		It("pongs", func() {
+			pdfium := implementation.Pdfium.GetInstance()
+			resp, err := pdfium.Ping()
+			Expect(err).To(BeNil())
+			Expect(resp).To(Equal("Pong"))
+			pdfium.Close()
+		})
+	})
+
 	shared_tests.Import()
 })
