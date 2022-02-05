@@ -26,10 +26,15 @@ jobs:
           sudo rm pdfium-linux-x64.tgz
           sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
 
-      - name: Test
+      - name: Test all packages
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test $(go list -v ./... | grep -v "/examples/" | grep -v "/shared_tests" | grep -v "internal/commons" | grep -v "code_generation") -coverprofile=coverage.out -covermode=atomic
+          go test ./... -coverprofile=coverage.out -covermode=atomic
+
+      - name: Test implementation for coverage
+        run: |
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
+          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2

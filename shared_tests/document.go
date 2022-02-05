@@ -1,29 +1,28 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/errors"
-	"github.com/klippa-app/go-pdfium/references"
 	"io/ioutil"
 	"os"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
-	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
+var _ = Describe("document", func() {
 	Describe("FPDF_LoadMemDocument", func() {
 		Context("a normal PDF file with 1 page", func() {
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
+				pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 					Data: &pdfData,
 				})
 				Expect(err).To(BeNil())
@@ -32,7 +31,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			AfterEach(func() {
-				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 					Document: doc,
 				})
 				Expect(err).To(BeNil())
@@ -41,7 +40,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			When("is opened", func() {
 				It("returns the correct file version", func() {
-					fileVersion, err := pdfiumContainer.FPDF_GetFileVersion(&requests.FPDF_GetFileVersion{
+					fileVersion, err := PdfiumInstance.FPDF_GetFileVersion(&requests.FPDF_GetFileVersion{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -51,7 +50,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct references permissions", func() {
-					docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+					docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -71,7 +70,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct security handler revision", func() {
-					securityHandlerRevision, err := pdfiumContainer.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
+					securityHandlerRevision, err := PdfiumInstance.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -81,7 +80,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page count", func() {
-					pageCount, err := pdfiumContainer.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+					pageCount, err := PdfiumInstance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -91,7 +90,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				It("returns the correct page mode", func() {
-					pageMode, err := pdfiumContainer.FPDFDoc_GetPageMode(&requests.FPDFDoc_GetPageMode{
+					pageMode, err := PdfiumInstance.FPDFDoc_GetPageMode(&requests.FPDFDoc_GetPageMode{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -106,10 +105,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
+				pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 					Data: &pdfData,
 				})
 				Expect(err).To(BeNil())
@@ -118,7 +117,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			AfterEach(func() {
-				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 					Document: doc,
 				})
 				Expect(err).To(BeNil())
@@ -127,7 +126,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := pdfiumContainer.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+					pageCount, err := PdfiumInstance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -139,10 +138,16 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a password protected PDF file", func() {
-			pdfData, _ := ioutil.ReadFile(testsPath + "/testdata/password_test123.pdf")
+			var pdfData []byte
+			BeforeEach(func() {
+				var err error
+				pdfData, err = ioutil.ReadFile(TestDataPath + "/testdata/password_test123.pdf")
+				Expect(err).To(BeNil())
+			})
+
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
-					doc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					doc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data: &pdfData,
 					})
 					Expect(err).To(MatchError(errors.ErrPassword.Error()))
@@ -152,7 +157,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			When("is opened with the wrong password", func() {
 				It("returns the password error", func() {
 					wrongPassword := "test"
-					doc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					doc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &wrongPassword,
 					})
@@ -163,13 +168,13 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			When("is opened with the correct password", func() {
 				It("does not return an error", func() {
 					pdfPassword := "test123"
-					doc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					doc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -184,8 +189,8 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				filePath := testsPath + "/testdata/test.pdf"
-				newDoc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+				filePath := TestDataPath + "/testdata/test.pdf"
+				newDoc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 					Path: &filePath,
 				})
 				Expect(err).To(BeNil())
@@ -194,7 +199,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			AfterEach(func() {
-				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 					Document: doc,
 				})
 				Expect(err).To(BeNil())
@@ -203,7 +208,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := pdfiumContainer.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+					pageCount, err := PdfiumInstance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -218,8 +223,8 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				filePath := testsPath + "/testdata/test_multipage.pdf"
-				newDoc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+				filePath := TestDataPath + "/testdata/test_multipage.pdf"
+				newDoc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 					Path: &filePath,
 				})
 				Expect(err).To(BeNil())
@@ -228,7 +233,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 
 			AfterEach(func() {
-				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 					Document: doc,
 				})
 				Expect(err).To(BeNil())
@@ -237,7 +242,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			When("is opened", func() {
 				It("returns the correct page count", func() {
-					pageCount, err := pdfiumContainer.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+					pageCount, err := PdfiumInstance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -249,10 +254,13 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a password protected PDF file", func() {
-			filePath := testsPath + "/testdata/password_test123.pdf"
+			var filePath string
+			BeforeEach(func() {
+				filePath = TestDataPath + "/testdata/password_test123.pdf"
+			})
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
-					doc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+					doc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 						Path: &filePath,
 					})
 					Expect(err).To(MatchError(errors.ErrPassword.Error()))
@@ -262,7 +270,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			When("is opened with the wrong password", func() {
 				It("returns the password error", func() {
 					wrongPassword := "test"
-					doc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+					doc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 						Path:     &filePath,
 						Password: &wrongPassword,
 					})
@@ -273,13 +281,13 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			When("is opened with the correct password", func() {
 				It("does not return an error", func() {
 					pdfPassword := "test123"
-					doc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+					doc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 						Path:     &filePath,
 						Password: &pdfPassword,
 					})
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -289,10 +297,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		})
 
 		Context("a non-existent file", func() {
-			filePath := testsPath + "/testdata/i_dont_exist.pdf"
+			filePath := TestDataPath + "/testdata/i_dont_exist.pdf"
 			When("is opened", func() {
 				It("returns the file error", func() {
-					doc, err := pdfiumContainer.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
+					doc, err := PdfiumInstance.FPDF_LoadDocument(&requests.FPDF_LoadDocument{
 						Path: &filePath,
 					})
 					Expect(err).To(MatchError(errors.ErrFile.Error()))
@@ -306,13 +314,13 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		Context("a password protected PDF file", func() {
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
-					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
+					file, err := os.Open(TestDataPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
 
 					fileStat, err := file.Stat()
 					Expect(err).To(BeNil())
 
-					doc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					doc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
 						Reader: file,
 						Size:   fileStat.Size(),
 					})
@@ -323,7 +331,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 			When("is opened with the wrong password", func() {
 				It("returns the password error", func() {
-					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
+					file, err := os.Open(TestDataPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
 
 					fileStat, err := file.Stat()
@@ -331,7 +339,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 					wrongPassword := "test"
 
-					doc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					doc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
 						Reader:   file,
 						Size:     fileStat.Size(),
 						Password: &wrongPassword,
@@ -343,14 +351,14 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 			When("is opened with the correct password", func() {
 				It("does not return an error", func() {
-					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
+					file, err := os.Open(TestDataPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
 
 					fileStat, err := file.Stat()
 					Expect(err).To(BeNil())
 
 					pdfPassword := "test123"
-					doc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					doc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
 						Reader:   file,
 						Size:     fileStat.Size(),
 						Password: &pdfPassword,
@@ -358,7 +366,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					Expect(err).To(BeNil())
 					Expect(doc).To(Not(BeNil()))
 
-					fileVersion, err := pdfiumContainer.FPDF_GetFileVersion(&requests.FPDF_GetFileVersion{
+					fileVersion, err := PdfiumInstance.FPDF_GetFileVersion(&requests.FPDF_GetFileVersion{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -366,7 +374,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						FileVersion: 15,
 					}))
 
-					docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+					docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -384,7 +392,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						PrintDocumentAsFaithfulDigitalCopy:  true,
 					}))
 
-					securityHandlerRevision, err := pdfiumContainer.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
+					securityHandlerRevision, err := PdfiumInstance.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -392,7 +400,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						SecurityHandlerRevision: 3,
 					}))
 
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc.Document,
 					})
 					Expect(err).To(BeNil())
@@ -407,10 +415,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -420,7 +428,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -429,7 +437,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -455,10 +463,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -468,7 +476,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -477,7 +485,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -505,10 +513,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -518,7 +526,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -527,7 +535,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -553,10 +561,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -566,7 +574,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -575,7 +583,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -603,10 +611,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -616,7 +624,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -625,7 +633,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -651,10 +659,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -664,7 +672,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -673,7 +681,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -701,10 +709,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -714,7 +722,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -723,7 +731,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -749,10 +757,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -762,7 +770,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -771,7 +779,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -799,10 +807,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -812,7 +820,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -821,7 +829,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -847,10 +855,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -860,7 +868,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -869,7 +877,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -897,10 +905,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -910,7 +918,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -919,7 +927,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -945,10 +953,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -958,7 +966,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -967,7 +975,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -995,10 +1003,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1008,7 +1016,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1017,7 +1025,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1043,10 +1051,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1056,7 +1064,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1065,7 +1073,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1093,10 +1101,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1106,7 +1114,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1115,7 +1123,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1141,10 +1149,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1154,7 +1162,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1163,7 +1171,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1191,10 +1199,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1204,7 +1212,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1213,7 +1221,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1239,10 +1247,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1252,7 +1260,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1261,7 +1269,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1289,10 +1297,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1302,7 +1310,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1311,7 +1319,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1337,10 +1345,10 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
+					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
 
-					newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data:     &pdfData,
 						Password: &pdfPassword,
 					})
@@ -1350,7 +1358,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				})
 
 				AfterEach(func() {
-					FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 						Document: doc,
 					})
 					Expect(err).To(BeNil())
@@ -1359,7 +1367,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 				When("is opened", func() {
 					It("returns the correct permission", func() {
-						docPermissions, err := pdfiumContainer.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
+						docPermissions, err := PdfiumInstance.FPDF_GetDocPermissions(&requests.FPDF_GetDocPermissions{
 							Document: doc,
 						})
 						Expect(err).To(BeNil())
@@ -1381,4 +1389,4 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			})
 		})
 	})
-}
+})

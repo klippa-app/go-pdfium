@@ -1,6 +1,7 @@
 package implementation_test
 
 import (
+	"os"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/internal/implementation"
@@ -11,9 +12,32 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Implementation", func() {
+var _ = BeforeSuite(func() {
 	implementation.InitLibrary()
 
+	// Set ENV to ensure resulting values.
+	err := os.Setenv("TZ", "UTC")
+	Expect(err).To(BeNil())
+
+	pool := single_threaded.Init()
+	shared_tests.PdfiumPool = pool
+
+	instance, err := pool.GetInstance(time.Second * 30)
+	Expect(err).To(BeNil())
+	shared_tests.PdfiumInstance = instance
+	shared_tests.TestDataPath = "../../shared_tests"
+	shared_tests.TestType = "internal"
+})
+
+var _ = AfterSuite(func() {
+	err := shared_tests.PdfiumInstance.Close()
+	Expect(err).To(BeNil())
+
+	err = shared_tests.PdfiumPool.Close()
+	Expect(err).To(BeNil())
+})
+
+var _ = Describe("Implementation", func() {
 	When("pinged", func() {
 		It("pongs", func() {
 			pdfium := implementation.Pdfium.GetInstance()
@@ -24,12 +48,5 @@ var _ = Describe("Implementation", func() {
 		})
 	})
 
-	pool := single_threaded.Init()
-	instance, err := pool.GetInstance(time.Second * 30)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
-
-	shared_tests.RunTests(instance, "../../shared_tests", "internal")
+	shared_tests.Import()
 })
