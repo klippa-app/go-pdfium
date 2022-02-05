@@ -25,17 +25,14 @@ jobs:
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4849/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
           sudo rm pdfium-linux-x64.tgz
           sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
-
       - name: Test all packages
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test ./... -coverprofile=coverage.out -covermode=atomic
-
+          go test ./...
       - name: Test implementation for coverage
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic
-
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
