@@ -8,6 +8,8 @@ import "C"
 import (
 	"bytes"
 	"errors"
+	"github.com/google/uuid"
+	"github.com/klippa-app/go-pdfium/references"
 	"io/ioutil"
 	"math"
 	"unsafe"
@@ -19,47 +21,67 @@ import (
 	"golang.org/x/text/transform"
 )
 
+func (p *PdfiumImplementation) registerTextPage(attachment C.FPDF_TEXTPAGE, documentHandle *DocumentHandle) *TextPageHandle {
+	ref := uuid.New()
+	handle := &TextPageHandle{
+		handle:      attachment,
+		nativeRef:   references.FPDF_TEXTPAGE(ref.String()),
+		documentRef: documentHandle.nativeRef,
+	}
+
+	documentHandle.textPageRefs[handle.nativeRef] = handle
+	p.textPageRefs[handle.nativeRef] = handle
+
+	return handle
+}
+
+func (p *PdfiumImplementation) registerPageLink(pageLink C.FPDF_PAGELINK, documentHandle *DocumentHandle) *PageLinkHandle {
+	ref := uuid.New()
+	handle := &PageLinkHandle{
+		handle:      pageLink,
+		nativeRef:   references.FPDF_PAGELINK(ref.String()),
+		documentRef: documentHandle.nativeRef,
+	}
+
+	documentHandle.pageLinkRefs[handle.nativeRef] = handle
+	p.pageLinkRefs[handle.nativeRef] = handle
+
+	return handle
+}
+
 // GetPageText returns the text of a page
-func (p *Pdfium) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
+func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
 	p.Lock()
 	defer p.Unlock()
 
-	if p.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	textPage := C.FPDFText_LoadPage(p.currentPage)
+	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
 	charData := make([]byte, (charsInPage+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
 	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
 	C.FPDFText_ClosePage(textPage)
 
-	transformedText, err := p.transformUTF16LEText(charData[0 : charsWritten*2])
+	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.GetPageText{
-		Page: request.Page,
+		Page: pageHandle.index,
 		Text: transformedText,
 	}, nil
 }
 
 // GetPageTextStructured returns the text of a page in a structured way
-func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
+func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
 	p.Lock()
 	defer p.Unlock()
 
-	if p.currentDoc == nil {
-		return nil, errors.New("no current document")
-	}
-
-	err := p.loadPage(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -67,14 +89,14 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	pointToPixelRatio := float64(0)
 	if request.PixelPositions.Calculate {
 		if request.PixelPositions.DPI > 0 {
-			_, _, pointToPixelRatio, err = p.getPageSizeInPixels(request.Page, request.PixelPositions.DPI)
+			_, _, _, pointToPixelRatio, err = p.getPageSizeInPixels(request.Page, request.PixelPositions.DPI)
 			if err != nil {
 				return nil, err
 			}
 		} else if request.PixelPositions.Width == 0 && request.PixelPositions.Height == 0 {
 			return nil, errors.New("no DPI or resolution given to calculate pixel positions")
 		} else {
-			_, _, ratio, err := p.calculateRenderImageSize(request.Page, request.PixelPositions.Width, request.PixelPositions.Height)
+			_, _, _, ratio, err := p.calculateRenderImageSize(request.Page, request.PixelPositions.Width, request.PixelPositions.Height)
 			if err != nil {
 				return nil, err
 			}
@@ -83,13 +105,13 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	}
 
 	resp := &responses.GetPageTextStructured{
-		Page:              request.Page,
+		Page:              pageHandle.index,
 		Chars:             []*responses.GetPageTextStructuredChar{},
 		Rects:             []*responses.GetPageTextStructuredRect{},
 		PointToPixelRatio: pointToPixelRatio,
 	}
 
-	textPage := C.FPDFText_LoadPage(p.currentPage)
+	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
@@ -103,7 +125,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 			charData := make([]byte, 4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
 			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
 
-			transformedText, err := p.transformUTF16LEText(charData[0 : (charsWritten)*2])
+			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : (charsWritten)*2])
 			if err != nil {
 				return nil, err
 			}
@@ -152,7 +174,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 
 			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
 
-			transformedText, err := p.transformUTF16LEText(charData[0 : charsWritten*2])
+			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 			if err != nil {
 				return nil, err
 			}
@@ -192,7 +214,7 @@ func (p *Pdfium) GetPageTextStructured(request *requests.GetPageTextStructured) 
 	return resp, nil
 }
 
-func (p *Pdfium) getFontInformation(textPage C.FPDF_TEXTPAGE, charIndex int) *responses.FontInformation {
+func (p *PdfiumImplementation) getFontInformation(textPage C.FPDF_TEXTPAGE, charIndex int) *responses.FontInformation {
 	fontSize := C.FPDFText_GetFontSize(textPage, C.int(charIndex))
 	fontWeight := C.FPDFText_GetFontWeight(textPage, C.int(charIndex))
 	fontFlags := C.int(0)
@@ -220,7 +242,7 @@ func (p *Pdfium) getFontInformation(textPage C.FPDF_TEXTPAGE, charIndex int) *re
 	}
 }
 
-func (p *Pdfium) transformUTF16LEText(charData []byte) (string, error) {
+func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
 	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
 	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
@@ -230,10 +252,22 @@ func (p *Pdfium) transformUTF16LEText(charData []byte) (string, error) {
 		return "", err
 	}
 
-	// Remove null terminator
+	// Remove NULL terminator.
 	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
 
 	return string(decoded), nil
+}
+
+func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
+	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
+
+	output := &bytes.Buffer{}
+	unicodeWriter := transform.NewWriter(output, utf16bom)
+	unicodeWriter.Write([]byte(text))
+	unicodeWriter.Close()
+
+	return output.Bytes(), nil
 }
 
 func convertPointPositions(pointPositions responses.CharPosition, ratio float64) *responses.CharPosition {

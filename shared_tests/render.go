@@ -13,6 +13,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -22,34 +23,140 @@ import (
 
 func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
+		Context("no document", func() {
+			When("is opened", func() {
+				Context("GetPageSize()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfiumContainer.GetPageSize(&requests.GetPageSize{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("GetPageSizeInPixels()", func() {
+					It("returns an error", func() {
+						pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							DPI: 100,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageSize).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							DPI: 300,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInDPI()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
+							Pages: []requests.RenderPageInDPI{
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Index: 0,
+										},
+									},
+									DPI: 300,
+								},
+							},
+							Padding: 50,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPageInPixels()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+							Width:  2000,
+							Height: 2000,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+
+				Context("RenderPagesInPixels()", func() {
+					It("returns an error", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
+							Pages: []requests.RenderPageInPixels{
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Index: 0,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+							},
+							Padding: 50,
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(renderedPage).To(BeNil())
+					})
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
-			var doc pdfium.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				Context("when an invalid page is given", func() {
 					Context("GetPageSize()", func() {
 						It("returns an error", func() {
-							pageSize, err := doc.GetPageSize(&requests.GetPageSize{
-								Page: 1,
+							pageSize, err := pdfiumContainer.GetPageSize(&requests.GetPageSize{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageSize).To(BeNil())
@@ -58,9 +165,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 					Context("GetPageSizeInPixels()", func() {
 						It("returns an error", func() {
-							pageSize, err := doc.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-								Page: 1,
-								DPI:  100,
+							pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
+								DPI: 100,
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageSize).To(BeNil())
@@ -69,9 +182,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 					Context("RenderPageInDPI()", func() {
 						It("returns an error", func() {
-							renderedPage, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-								Page: 1,
-								DPI:  300,
+							renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
+								DPI: 300,
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(renderedPage).To(BeNil())
@@ -80,11 +199,17 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 					Context("RenderPagesInDPI()", func() {
 						It("returns an error", func() {
-							renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+							renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 								Pages: []requests.RenderPageInDPI{
 									{
-										Page: 1,
-										DPI:  300,
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    1,
+											},
+										},
+										DPI: 300,
 									},
 								},
 								Padding: 50,
@@ -96,8 +221,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 					Context("RenderPageInPixels()", func() {
 						It("returns an error", func() {
-							renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-								Page:   1,
+							renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
 								Width:  2000,
 								Height: 2000,
 							})
@@ -109,10 +240,16 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 				Context("RenderPagesInPixels()", func() {
 					It("returns an error", func() {
-						renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 							Pages: []requests.RenderPageInPixels{
 								{
-									Page:   1,
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    1,
+										},
+									},
 									Width:  2000,
 									Height: 2000,
 								},
@@ -127,8 +264,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				Context("when the page size is requested", func() {
 					Context("in points", func() {
 						It("returns the correct amount of points", func() {
-							pageSize, err := doc.GetPageSize(&requests.GetPageSize{
-								Page: 0,
+							pageSize, err := pdfiumContainer.GetPageSize(&requests.GetPageSize{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
 							})
 							Expect(err).To(BeNil())
 							Expect(pageSize).To(Equal(&responses.GetPageSize{
@@ -141,8 +284,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("in pixels", func() {
 						Context("with no DPI", func() {
 							It("returns an error", func() {
-								pageSize, err := doc.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-									Page: 0,
+								pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 								})
 								Expect(err).To(MatchError("no DPI given"))
 								Expect(pageSize).To(BeNil())
@@ -151,9 +300,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("width DPI 100", func() {
 							It("returns the right amount of pixels and point to pixel ratio", func() {
-								pageSize, err := doc.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-									Page: 0,
-									DPI:  100,
+								pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 100,
 								})
 								Expect(err).To(BeNil())
 								Expect(pageSize).To(Equal(&responses.GetPageSizeInPixels{
@@ -166,9 +321,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("width DPI 300", func() {
 							It("returns the right amount of pixels and point to pixel ratio", func() {
-								pageSize, err := doc.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
-									Page: 0,
-									DPI:  300,
+								pageSize, err := pdfiumContainer.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 300,
 								})
 								Expect(err).To(BeNil())
 								Expect(pageSize).To(Equal(&responses.GetPageSizeInPixels{
@@ -185,8 +346,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("in points", func() {
 						Context("with no DPI", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-									Page: 0,
+								renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 								})
 								Expect(err).To(MatchError("no DPI given"))
 								Expect(renderedPage).To(BeNil())
@@ -195,9 +362,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("width DPI 100", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-									Page: 0,
-									DPI:  100,
+								renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 100,
 								})
 								Expect(err).To(BeNil())
 								compareRenderHash(renderedPage, &responses.RenderPage{
@@ -212,9 +385,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("width DPI 300", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-									Page: 0,
-									DPI:  300,
+								renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 300,
 								})
 								Expect(err).To(BeNil())
 								compareRenderHash(renderedPage, &responses.RenderPage{
@@ -231,8 +410,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("in pixels", func() {
 						Context("with no width or height given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-									Page: 0,
+								renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 								})
 								Expect(err).To(MatchError("no width or height given"))
 								Expect(renderedPage).To(BeNil())
@@ -241,8 +426,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with only the width given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-									Page:  0,
+								renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									Width: 2000,
 								})
 
@@ -259,8 +450,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with only the height given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-									Page:   0,
+								renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									Height: 2000,
 								})
 
@@ -278,8 +475,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with both the width and height given", func() {
 							Context("and the width and height being equal", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-										Page:   0,
+									renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  2000,
 										Height: 2000,
 									})
@@ -296,8 +499,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							})
 							Context("and the width being larger than the height", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-										Page:   0,
+									renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  4000,
 										Height: 2000,
 									})
@@ -315,8 +524,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 							Context("and the height being larger than the width", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPageInPixels(&requests.RenderPageInPixels{
-										Page:   0,
+									renderedPage, err := pdfiumContainer.RenderPageInPixels(&requests.RenderPageInPixels{
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  2000,
 										Height: 4000,
 									})
@@ -339,7 +554,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("in points", func() {
 						Context("with no pages given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{},
 								})
 								Expect(err).To(MatchError("no pages given"))
@@ -349,13 +564,25 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with no DPI", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 										},
 										{
-											Page: 0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 										},
 									},
 								})
@@ -366,15 +593,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with DPI 100", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  100,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 100,
 										},
 										{
-											Page: 0,
-											DPI:  100,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 100,
 										},
 									},
 								})
@@ -406,15 +645,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with DPI 300", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  300,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 300,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 300,
 										},
 									},
 								})
@@ -446,15 +697,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with different DPI per page", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  200,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 200,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 300,
 										},
 									},
 								})
@@ -486,15 +749,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with padding between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								renderedPage, err := pdfiumContainer.RenderPagesInDPI(&requests.RenderPagesInDPI{
 									Pages: []requests.RenderPageInDPI{
 										{
-											Page: 0,
-											DPI:  300,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 300,
 										},
 										{
-											Page: 0,
-											DPI:  300,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 300,
 										},
 									},
 									Padding: 50,
@@ -529,7 +804,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("in pixels", func() {
 						Context("with no pages given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{},
 								})
 								Expect(err).To(MatchError("no pages given"))
@@ -538,13 +813,25 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						})
 						Context("with no width or height given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page: 0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 										},
 										{
-											Page: 0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 										},
 									},
 								})
@@ -555,14 +842,26 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with only the width given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:  0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width: 2000,
 										},
 										{
-											Page:  0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width: 2000,
 										},
 									},
@@ -596,14 +895,26 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with only the height given", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Height: 2000,
 										},
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Height: 2000,
 										},
 									},
@@ -638,15 +949,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("with both the width and height given", func() {
 							Context("and the width and height being equal", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 2000,
 											},
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 2000,
 											},
@@ -680,15 +1003,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 							})
 							Context("and the width being larger than the height", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  4000,
 												Height: 2000,
 											},
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  4000,
 												Height: 2000,
 											},
@@ -723,15 +1058,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 							Context("and the height being larger than the width", func() {
 								It("returns the right image, point to pixel ratio and resolution", func() {
-									renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+									renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 4000,
 											},
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 4000,
 											},
@@ -767,14 +1114,26 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with the width being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:  0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width: 2000,
 										},
 										{
-											Page:  0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width: 1500,
 										},
 									},
@@ -808,14 +1167,26 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with the height being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Height: 2000,
 										},
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Height: 1500,
 										},
 									},
@@ -849,15 +1220,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with the width and height being different between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  1500,
 											Height: 1500,
 										},
@@ -892,15 +1275,27 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with padding between pages", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
-								renderedPage, err := doc.RenderPagesInPixels(&requests.RenderPagesInPixels{
+								renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
 									Pages: []requests.RenderPageInPixels{
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 										{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
@@ -938,12 +1333,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					Context("and directly rendered to a file", func() {
 						Context("with no output target given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderToFile(&requests.RenderToFile{
+								renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
 									RenderPagesInPixels: &requests.RenderPagesInPixels{
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 2000,
 											},
@@ -957,12 +1358,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with no output format given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderToFile(&requests.RenderToFile{
+								renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									RenderPagesInPixels: &requests.RenderPagesInPixels{
 										Pages: []requests.RenderPageInPixels{
 											{
-												Page:   0,
+
+												Page: requests.Page{
+													ByIndex: &requests.PageByIndex{
+														Document: doc,
+														Index:    0,
+													},
+												},
 												Width:  2000,
 												Height: 2000,
 											},
@@ -976,7 +1383,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 						Context("with no render operation given", func() {
 							It("returns an error", func() {
-								renderedPage, err := doc.RenderToFile(&requests.RenderToFile{
+								renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
 								})
@@ -992,12 +1399,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetBytes,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPageInPixels: &requests.RenderPageInPixels{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1026,19 +1439,31 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										RenderPagesInPixels: &requests.RenderPagesInPixels{
 											Pages: []requests.RenderPageInPixels{
 												{
-													Page:   0,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
 													Width:  2000,
 													Height: 2000,
 												},
 												{
-													Page:   0,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
 													Width:  2000,
 													Height: 2000,
 												},
 											},
 										},
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1074,11 +1499,17 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetBytes,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPageInDPI: &requests.RenderPageInDPI{
-											Page: 0,
-											DPI:  200,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 200,
 										},
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1107,17 +1538,29 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										RenderPagesInDPI: &requests.RenderPagesInDPI{
 											Pages: []requests.RenderPageInDPI{
 												{
-													Page: 0,
-													DPI:  200,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
+													DPI: 200,
 												},
 												{
-													Page: 0,
-													DPI:  200,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
+													DPI: 200,
 												},
 											},
 										},
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1154,12 +1597,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
 									RenderPageInPixels: &requests.RenderPageInPixels{
-										Page:   0,
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  2000,
 										Height: 2000,
 									},
 								}
-								renderedFile, err := doc.RenderToFile(request)
+								renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 								Expect(err).To(BeNil())
 								compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1186,12 +1635,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									OutputFormat: requests.RenderToFileOutputFormatPNG,
 									RenderPageInPixels: &requests.RenderPageInPixels{
-										Page:   0,
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  2000,
 										Height: 2000,
 									},
 								}
-								renderedFile, err := doc.RenderToFile(request)
+								renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 								Expect(err).To(BeNil())
 								compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1218,12 +1673,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									OutputTarget: requests.RenderToFileOutputTargetBytes,
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
 									RenderPageInPixels: &requests.RenderPageInPixels{
-										Page:   0,
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
 										Width:  2000,
 										Height: 2000,
 									},
 								}
-								renderedFile, err := doc.RenderToFile(request)
+								renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 								Expect(err).To(BeNil())
 								compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1251,13 +1712,19 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetFile,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPageInPixels: &requests.RenderPageInPixels{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 										TargetFilePath: "/file/path/that/is/invalid",
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 									Expect(err).To(MatchError("open /file/path/that/is/invalid: no such file or directory"))
 									Expect(renderedFile).To(BeNil())
 								})
@@ -1269,13 +1736,19 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetFile,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPageInPixels: &requests.RenderPageInPixels{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 										TargetFilePath: "/tmp/render_file_testpdf_filepath",
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1304,12 +1777,18 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										OutputTarget: requests.RenderToFileOutputTargetFile,
 										OutputFormat: requests.RenderToFileOutputFormatJPG,
 										RenderPageInPixels: &requests.RenderPageInPixels{
-											Page:   0,
+
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
 											Width:  2000,
 											Height: 2000,
 										},
 									}
-									renderedFile, err := doc.RenderToFile(request)
+									renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 									Expect(err).To(BeNil())
 									compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1334,11 +1813,17 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Context("while rendering to jpg", func() {
 									Context("with a max filesize that is unreasonable", func() {
 										It("returns an error", func() {
-											renderedPage, err := doc.RenderToFile(&requests.RenderToFile{
+											renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 												OutputTarget: requests.RenderToFileOutputTargetBytes,
 												OutputFormat: requests.RenderToFileOutputFormatJPG,
 												RenderPageInPixels: &requests.RenderPageInPixels{
-													Page:   0,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
 													Width:  2000,
 													Height: 2000,
 												},
@@ -1354,13 +1839,19 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 												OutputTarget: requests.RenderToFileOutputTargetBytes,
 												OutputFormat: requests.RenderToFileOutputFormatJPG,
 												RenderPageInPixels: &requests.RenderPageInPixels{
-													Page:   0,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
 													Width:  2000,
 													Height: 2000,
 												},
 												MaxFileSize: 60000, // 60 kb
 											}
-											renderedFile, err := doc.RenderToFile(request)
+											renderedFile, err := pdfiumContainer.RenderToFile(request)
 
 											Expect(err).To(BeNil())
 											compareFileHash(request, renderedFile, &responses.RenderToFile{
@@ -1388,11 +1879,17 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Context("while rendering to png", func() {
 									Context("with a max filesize that is over the rendered size", func() {
 										It("returns an error", func() {
-											renderedPage, err := doc.RenderToFile(&requests.RenderToFile{
+											renderedPage, err := pdfiumContainer.RenderToFile(&requests.RenderToFile{
 												OutputTarget: requests.RenderToFileOutputTargetBytes,
 												OutputFormat: requests.RenderToFileOutputFormatPNG,
 												RenderPageInPixels: &requests.RenderPageInPixels{
-													Page:   0,
+
+													Page: requests.Page{
+														ByIndex: &requests.PageByIndex{
+															Document: doc,
+															Index:    0,
+														},
+													},
 													Width:  2000,
 													Height: 2000,
 												},
@@ -1411,32 +1908,34 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 		})
 
 		Context("a PDF file that uses an alpha channel", func() {
-			var doc pdfium.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("it is rendered", func() {
 				It("returns the right image", func() {
-					renderedPage, err := doc.RenderPageInDPI(&requests.RenderPageInDPI{
-						Page: 0,
-						DPI:  200,
+					renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
+
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						DPI: 200,
 					})
 
 					Expect(err).To(BeNil())
@@ -1451,33 +1950,35 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 		// This test is only here to test the closing of an opened page.
 		Context("a multipage PDF file", func() {
-			var doc pdfium.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				Context("when another page is loaded after the first one", func() {
 					Context("GetPageSize()", func() {
 						It("returns the correct size for both pages", func() {
-							pageSize, err := doc.GetPageSize(&requests.GetPageSize{
-								Page: 0,
+							pageSize, err := pdfiumContainer.GetPageSize(&requests.GetPageSize{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
 							})
 							Expect(err).To(BeNil())
 							Expect(pageSize).To(Equal(&responses.GetPageSize{
@@ -1485,8 +1986,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								Height: 841.8897094726562,
 							}))
 
-							pageSize, err = doc.GetPageSize(&requests.GetPageSize{
-								Page: 1,
+							pageSize, err = pdfiumContainer.GetPageSize(&requests.GetPageSize{
+
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
 							})
 							Expect(err).To(BeNil())
 							Expect(pageSize).To(Equal(&responses.GetPageSize{
@@ -1499,15 +2006,118 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				})
 			})
 		})
+
+		Context("multiple PDF files", func() {
+			var doc references.FPDF_DOCUMENT
+			var doc2 references.FPDF_DOCUMENT
+
+			BeforeEach(func() {
+				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
+				Expect(err).To(BeNil())
+
+				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				Expect(err).To(BeNil())
+
+				doc = *newDoc
+
+				pdfData2, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
+				Expect(err).To(BeNil())
+
+				newDoc2, err := pdfiumContainer.NewDocumentFromBytes(&pdfData2)
+				Expect(err).To(BeNil())
+
+				doc2 = *newDoc2
+			})
+
+			AfterEach(func() {
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
+
+				err = pdfiumContainer.FPDF_CloseDocument(doc2)
+				Expect(err).To(BeNil())
+			})
+
+			When("are opened", func() {
+				Context("when another document is rendered after the first one", func() {
+					It("returns the right image, point to pixel ratio and resolution", func() {
+						renderedPage, err := pdfiumContainer.RenderPagesInPixels(&requests.RenderPagesInPixels{
+							Pages: []requests.RenderPageInPixels{
+								{
+
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc2,
+											Index:    0,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+								{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc2,
+											Index:    1,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+							},
+							Padding: 50,
+						})
+
+						Expect(err).To(BeNil())
+						compareRenderHashForPages(renderedPage, &responses.RenderPages{
+							Width:  1415,
+							Height: 6100,
+							Pages: []responses.RenderPagesPage{
+								{
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 0,
+								},
+								{
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 2050,
+								},
+								{
+									Page:              1,
+									PointToPixelRatio: 2.375608084404265,
+									Width:             1415,
+									Height:            2000,
+									X:                 0,
+									Y:                 4100,
+								},
+							},
+						}, testsPath+"/testdata/render_"+prefix+"_testpdf_multiple_pdf_combined")
+						Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
+						Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(6100))
+					})
+				})
+			})
+		})
 	})
 }
 
 func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *responses.RenderPage, testName string) {
 	err := writePrerenderedImage(testName, renderedPage.Image)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -1520,19 +2130,14 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 	Expect(copiedPage).To(Equal(expectedPage))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedPage.Image); err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	err = enc.Encode(renderedPage.Image.Pix)
+	Expect(err).To(BeNil())
 
 	hasher.Write(buf.Bytes())
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
@@ -1541,10 +2146,7 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 
 func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPage *responses.RenderPages, testName string) {
 	err := writePrerenderedImage(testName, renderedPages.Image)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -1557,17 +2159,12 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 	Expect(copiedPage).To(Equal(expectedPage))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedPages.Image); err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	err = enc.Encode(renderedPages.Image.Pix)
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 	hasher.Write(buf.Bytes())
@@ -1577,10 +2174,7 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 
 func compareFileHash(request *requests.RenderToFile, renderedFile *responses.RenderToFile, expectedFile *responses.RenderToFile, testName string) {
 	err := writePrerenderedFile(testName, request, renderedFile)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -1593,10 +2187,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	Expect(copiedFile).To(Equal(expectedFile))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 
@@ -1610,11 +2201,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 			defer os.Remove(renderedFile.ImagePath)
 		}
 		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
-
+		Expect(err).To(BeNil())
 		hasher.Write(fileContent)
 	}
 
@@ -1624,61 +2211,43 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	if strings.Contains(testName, "_single_") {
 		// Compare the single variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
 
 		// Compare the single variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	} else if strings.Contains(testName, "_multi_") {
 		// Compare the multi variant to the single variant.
 		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_single_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
 		// Compare the multi variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	} else if strings.Contains(testName, "_internal_") {
 		// Compare the internal variant to the single variant.
 		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_single_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
 		// Compare the internal variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
 	}
 }
 
 func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
-	return nil // Comment this in case of updating pdfium versions and rendering has changed.
+	return nil // Comment this in case of updating PDFium versions and rendering has changed.
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedImage); err != nil {
+	if err := enc.Encode(renderedImage.Pix); err != nil {
 		return err
 	}
 
@@ -1705,7 +2274,7 @@ func writePrerenderedImage(testName string, renderedImage *image.RGBA) error {
 }
 
 func writePrerenderedFile(testName string, request *requests.RenderToFile, renderedFile *responses.RenderToFile) error {
-	return nil // Comment this in case of updating pdfium versions and rendering has changed.
+	return nil // Comment this in case of updating PDFium versions and rendering has changed.
 
 	var fileBytes []byte
 

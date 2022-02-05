@@ -4,17 +4,20 @@
 package commons
 
 import (
+	"fmt"
+
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
 type Pdfium interface {
-	Ping() (string, error)
-	OpenDocument(*requests.OpenDocument) error
+    Ping() (string, error)
 {{- range $method := .Methods }}
     {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}
-	Close() error
+    FPDF_CloseDocument(references.FPDF_DOCUMENT) error
+    Close() error
 }
 
 {{ range $method := .Methods }}
@@ -30,8 +33,13 @@ func (g *PdfiumRPC) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*
 {{end}}
 
 {{ range $method := .Methods }}
-func (s *PdfiumRPCServer) {{ $method.Name }}(request *requests.{{ $method.Input }}, resp *responses.{{ $method.Output }}) error {
-	var err error
+func (s *PdfiumRPCServer) {{ $method.Name }}(request *requests.{{ $method.Input }}, resp *responses.{{ $method.Output }}) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.{{ $method.Name }}(request)
 	if err != nil {
 		return err
