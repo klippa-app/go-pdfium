@@ -2,13 +2,16 @@ package implementation
 
 import (
 	"errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"io"
 	"sync"
 	"unsafe"
 
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/go-hclog"
 )
 
@@ -57,40 +60,171 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 	return C.int(readBytes)
 }
 
-// Here is the real implementation of Pdfium
-type Pdfium struct {
-	// C data
-	currentDoc    C.FPDF_DOCUMENT
-	currentPage   C.FPDF_PAGE
-	readSeekerRef unsafe.Pointer
-
-	logger            hclog.Logger
-	mutex             sync.Mutex
-	currentPageNumber *int    // Remember which page is currently loaded in the page variable.
-	data              *[]byte // Keep a reference to the data otherwise weird stuff happens
+// Pdfium is a container so that we can always only have 1 instance of PDFium
+// per process. We need this so that we can guarantee thread safety.
+var Pdfium = &mainPdfium{
+	mutex:        &sync.Mutex{},
+	instanceRefs: map[int]*PdfiumImplementation{},
+	documentRefs: map[references.FPDF_DOCUMENT]*DocumentHandle{},
 }
 
-func (p *Pdfium) Ping() (string, error) {
+var isInitialized = false
+
+// InitLibrary loads the actual C++ library.
+func InitLibrary() {
+	Pdfium.mutex.Lock()
+	defer Pdfium.mutex.Unlock()
+
+	// Only initialize when we aren't already.
+	if isInitialized {
+		return
+	}
+
+	C.FPDF_InitLibrary()
+	isInitialized = true
+}
+
+// DestroyLibrary unloads the actual C++ library.
+// If any documents were loaded, it closes them.
+func DestroyLibrary() {
+	Pdfium.mutex.Lock()
+	defer Pdfium.mutex.Unlock()
+
+	// Only destroy when we're initialized.
+	if !isInitialized {
+		return
+	}
+
+	for i := range Pdfium.instanceRefs {
+		Pdfium.instanceRefs[i].Close()
+		delete(Pdfium.instanceRefs, Pdfium.instanceRefs[i].instanceRef)
+	}
+
+	C.FPDF_DestroyLibrary()
+	isInitialized = false
+}
+
+// Here is the real implementation of Pdfium
+type mainPdfium struct {
+	// logger is for communication with the plugin.
+	logger hclog.Logger
+
+	// mutex will ensure thread safety.
+	mutex *sync.Mutex
+
+	// instance keeps track of the opened instances for this process.
+	instanceRefs map[int]*PdfiumImplementation
+
+	// documentRefs keeps track of the opened documents for this process.
+	// we need this for document lookups and in case of closing the instance
+	documentRefs map[references.FPDF_DOCUMENT]*DocumentHandle
+}
+
+func (p *mainPdfium) GetInstance() *PdfiumImplementation {
+	newInstance := &PdfiumImplementation{
+		logger:               p.logger,
+		documentRefs:         map[references.FPDF_DOCUMENT]*DocumentHandle{},
+		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:             map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		bitmapRefs:           map[references.FPDF_BITMAP]*BitmapHandle{},
+		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		xObjectRefs:          map[references.FPDF_XOBJECT]*XObjectHandle{},
+		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
+		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
+	}
+
+	newInstance.instanceRef = len(p.instanceRefs)
+	p.instanceRefs[newInstance.instanceRef] = newInstance
+
+	return newInstance
+}
+
+// Here is the real implementation of Pdfium
+type PdfiumImplementation struct {
+	// logger is for communication with the plugin.
+	logger hclog.Logger
+
+	// lookup tables keeps track of the opened handles for this instance.
+	// we need this for handle lookups and in case of closing the instance
+
+	documentRefs         map[references.FPDF_DOCUMENT]*DocumentHandle
+	pageRefs             map[references.FPDF_PAGE]*PageHandle
+	bookmarkRefs         map[references.FPDF_BOOKMARK]*BookmarkHandle
+	destRefs             map[references.FPDF_DEST]*DestHandle
+	actionRefs           map[references.FPDF_ACTION]*ActionHandle
+	linkRefs             map[references.FPDF_LINK]*LinkHandle
+	pageLinkRefs         map[references.FPDF_PAGELINK]*PageLinkHandle
+	schHandleRefs        map[references.FPDF_SCHHANDLE]*SchHandleHandle
+	textPageRefs         map[references.FPDF_TEXTPAGE]*TextPageHandle
+	pageRangeRefs        map[references.FPDF_PAGERANGE]*PageRangeHandle
+	pageObjectRefs       map[references.FPDF_PAGEOBJECT]*PageObjectHandle
+	clipPathRefs         map[references.FPDF_CLIPPATH]*ClipPathHandle
+	formHandleRefs       map[references.FPDF_FORMHANDLE]*FormHandleHandle
+	bitmapRefs           map[references.FPDF_BITMAP]*BitmapHandle
+	annotationRefs       map[references.FPDF_ANNOTATION]*AnnotationHandle
+	xObjectRefs          map[references.FPDF_XOBJECT]*XObjectHandle
+	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
+	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
+	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
+	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
+
+	// We need to keep track of our own instance.
+	instanceRef int
+}
+
+func (p *PdfiumImplementation) Ping() (string, error) {
 	return "Pong", nil
 }
 
-func (p *Pdfium) Lock() {
-	p.mutex.Lock()
+func (p *PdfiumImplementation) Lock() {
+	Pdfium.mutex.Lock()
 }
 
-func (p *Pdfium) Unlock() {
-	p.mutex.Unlock()
+func (p *PdfiumImplementation) Unlock() {
+	Pdfium.mutex.Unlock()
 }
 
-func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
+func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()
 
 	var cPassword *C.char
 	if request.Password != nil {
 		cPassword = C.CString(*request.Password)
+		defer C.free(unsafe.Pointer(cPassword))
 	}
 
+	nativeDoc := &DocumentHandle{
+		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:             map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
+		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
+	}
 	var doc C.FPDF_DOCUMENT
 
 	if request.File != nil {
@@ -106,7 +240,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 			cPassword)
 	} else if request.FileReader != nil {
 		if request.FileReaderSize == 0 {
-			return errors.New("FileReaderSize should be given when FileReader is set")
+			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
 		// Allocate memory on C heap. we send the io.ReadSeeker address in this pointer.
@@ -119,9 +253,9 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		a[0] = &(*(*io.ReadSeeker)(unsafe.Pointer(&request.FileReader)))
 
 		// Keep track of the allocated memory to free it later on.
-		p.readSeekerRef = readSeekerAlloc
+		nativeDoc.readSeekerRef = readSeekerAlloc
 
-		// Create a pdfium file access struct.
+		// Create a PDFium file access struct.
 		readerStruct := C.FPDF_FILEACCESS{}
 		readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
 		readerStruct.m_Param = readSeekerAlloc
@@ -133,7 +267,7 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 			&readerStruct,
 			cPassword)
 	} else {
-		return errors.New("No file given")
+		return nil, errors.New("No file given")
 	}
 
 	if doc == nil {
@@ -158,49 +292,288 @@ func (p *Pdfium) OpenDocument(request *requests.OpenDocument) error {
 		default:
 			pdfiumError = pdfium_errors.ErrUnexpected
 		}
-		return pdfiumError
+		return nil, pdfiumError
 	}
 
-	p.currentDoc = doc
-	p.data = request.File
-	return nil
+	nativeDoc.handle = doc
+	nativeDoc.data = request.File
+	documentRef := uuid.New()
+	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
+	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
+	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
+
+	return &responses.OpenDocument{
+		Document: nativeDoc.nativeRef,
+	}, nil
 }
 
-// Close closes the internal references in FPDF
-func (p *Pdfium) Close() error {
+func (p *PdfiumImplementation) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
 	p.Lock()
 	defer p.Unlock()
 
-	if p.currentDoc == nil {
-		return errors.New("no current document")
+	nativeDocument, err := p.getDocumentHandle(document)
+	if err != nil {
+		return err
 	}
 
-	if p.currentPageNumber != nil {
-		C.FPDF_ClosePage(p.currentPage)
-		p.currentPage = nil
-		p.currentPageNumber = nil
+	err = nativeDocument.Close()
+	if err != nil {
+		return err
 	}
-	C.FPDF_CloseDocument(p.currentDoc)
-	p.currentDoc = nil
 
-	if p.readSeekerRef != nil {
-		C.free(p.readSeekerRef)
-		p.readSeekerRef = nil
-	}
+	delete(p.documentRefs, nativeDocument.nativeRef)
 
 	return nil
 }
 
-var globalMutex = &sync.Mutex{}
+func (p *PdfiumImplementation) Close() error {
+	p.Lock()
+	defer p.Unlock()
 
-func InitLibrary() {
-	globalMutex.Lock()
-	C.FPDF_InitLibrary()
-	globalMutex.Unlock()
+	for i := range p.documentRefs {
+		err := p.documentRefs[i].Close()
+		if err != nil {
+			return err
+		}
+
+		delete(p.documentRefs, p.documentRefs[i].nativeRef)
+	}
+
+	for i := range p.pageRefs {
+		// Already closed by the document close.
+		delete(p.pageRefs, p.pageRefs[i].nativeRef)
+	}
+
+	// Remove refs, they don't have a close method.
+	for i := range p.bookmarkRefs {
+		delete(p.bookmarkRefs, i)
+	}
+
+	for i := range p.destRefs {
+		delete(p.destRefs, i)
+	}
+
+	for i := range p.actionRefs {
+		delete(p.actionRefs, i)
+	}
+
+	for i := range p.linkRefs {
+		delete(p.linkRefs, i)
+	}
+
+	for i := range p.pageLinkRefs {
+		delete(p.pageLinkRefs, i)
+	}
+
+	for i := range p.schHandleRefs {
+		delete(p.schHandleRefs, i)
+	}
+
+	for i := range p.bitmapRefs {
+		delete(p.bitmapRefs, i)
+	}
+
+	for i := range p.textPageRefs {
+		delete(p.textPageRefs, i)
+	}
+
+	for i := range p.pageRangeRefs {
+		delete(p.pageRangeRefs, i)
+	}
+
+	for i := range p.pageObjectRefs {
+		delete(p.pageObjectRefs, i)
+	}
+
+	for i := range p.clipPathRefs {
+		delete(p.clipPathRefs, i)
+	}
+
+	for i := range p.formHandleRefs {
+		delete(p.formHandleRefs, i)
+	}
+
+	for i := range p.annotationRefs {
+		delete(p.annotationRefs, i)
+	}
+
+	for i := range p.xObjectRefs {
+		delete(p.xObjectRefs, i)
+	}
+
+	for i := range p.signatureRefs {
+		delete(p.signatureRefs, i)
+	}
+
+	for i := range p.attachmentRefs {
+		delete(p.attachmentRefs, i)
+	}
+
+	for i := range p.javaScriptActionRefs {
+		delete(p.javaScriptActionRefs, i)
+	}
+
+	for i := range p.searchRefs {
+		delete(p.searchRefs, i)
+	}
+
+	delete(Pdfium.instanceRefs, p.instanceRef)
+
+	return nil
 }
 
-func DestroyLibrary() {
-	globalMutex.Lock()
-	C.FPDF_DestroyLibrary()
-	globalMutex.Unlock()
+func (p *PdfiumImplementation) getDocumentHandle(documentRef references.FPDF_DOCUMENT) (*DocumentHandle, error) {
+	if documentRef == "" {
+		return nil, errors.New("document not given")
+	}
+
+	if val, ok := p.documentRefs[documentRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find document handle, perhaps the doc was already closed or you tried to share documents between instances")
+}
+
+func (d *PdfiumImplementation) getPageHandle(pageRef references.FPDF_PAGE) (*PageHandle, error) {
+	if pageRef == "" {
+		return nil, errors.New("page not given")
+	}
+
+	if val, ok := d.pageRefs[pageRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find page handle, perhaps the page was already closed or you tried to share pages between instances or documents")
+}
+
+func (d *PdfiumImplementation) getBookmarkHandle(bookmarkRef references.FPDF_BOOKMARK) (*BookmarkHandle, error) {
+	if bookmarkRef == "" {
+		return nil, errors.New("bookmark not given")
+	}
+
+	if val, ok := d.bookmarkRefs[bookmarkRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find bookmark handle, perhaps the bookmark was already closed or you tried to share bookmarks between instances or documents")
+}
+
+func (d *PdfiumImplementation) getDestHandle(destRef references.FPDF_DEST) (*DestHandle, error) {
+	if destRef == "" {
+		return nil, errors.New("dest not given")
+	}
+
+	if val, ok := d.destRefs[destRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find dest handle, perhaps the dest was already closed or you tried to share dests between instances or documents")
+}
+
+func (d *PdfiumImplementation) getActionHandle(actionRef references.FPDF_ACTION) (*ActionHandle, error) {
+	if actionRef == "" {
+		return nil, errors.New("action not given")
+	}
+
+	if val, ok := d.actionRefs[actionRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find action handle, perhaps the action was already closed or you tried to share actions between instances or documents")
+}
+
+func (d *PdfiumImplementation) getLinkHandle(linkRef references.FPDF_LINK) (*LinkHandle, error) {
+	if linkRef == "" {
+		return nil, errors.New("link not given")
+	}
+
+	if val, ok := d.linkRefs[linkRef]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find link handle, perhaps the link was already closed or you tried to share links between instances or documents")
+}
+
+func (d *PdfiumImplementation) getXObjectHandle(xObject references.FPDF_XOBJECT) (*XObjectHandle, error) {
+	if xObject == "" {
+		return nil, errors.New("xObject not given")
+	}
+
+	if val, ok := d.xObjectRefs[xObject]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find xObject handle, perhaps the xObject was already closed or you tried to share xObjects between instances or documents")
+}
+
+func (d *PdfiumImplementation) getSignatureHandle(signature references.FPDF_SIGNATURE) (*SignatureHandle, error) {
+	if signature == "" {
+		return nil, errors.New("signature not given")
+	}
+
+	if val, ok := d.signatureRefs[signature]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find signature handle, perhaps the signature was already closed or you tried to share signatures between instances or documents")
+}
+
+func (d *PdfiumImplementation) getAttachmentHandle(attachment references.FPDF_ATTACHMENT) (*AttachmentHandle, error) {
+	if attachment == "" {
+		return nil, errors.New("attachment not given")
+	}
+
+	if val, ok := d.attachmentRefs[attachment]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find attachment handle, perhaps the attachment was already closed or you tried to share attachments between instances or documents")
+}
+
+func (d *PdfiumImplementation) getJavaScriptActionHandle(javaScriptAction references.FPDF_JAVASCRIPT_ACTION) (*JavaScriptActionHandle, error) {
+	if javaScriptAction == "" {
+		return nil, errors.New("javaScriptAction not given")
+	}
+
+	if val, ok := d.javaScriptActionRefs[javaScriptAction]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find javaScriptAction handle, perhaps the javaScriptAction was already closed or you tried to share javaScriptActions between instances or documents")
+}
+
+func (p *PdfiumImplementation) getTextPageHandle(textPage references.FPDF_TEXTPAGE) (*TextPageHandle, error) {
+	if textPage == "" {
+		return nil, errors.New("textPage not given")
+	}
+
+	if val, ok := p.textPageRefs[textPage]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find textPage handle, perhaps the textPage was already closed or you tried to share textPages between instances")
+}
+
+func (p *PdfiumImplementation) getSearchHandle(search references.FPDF_SCHHANDLE) (*SearchHandle, error) {
+	if search == "" {
+		return nil, errors.New("search not given")
+	}
+
+	if val, ok := p.searchRefs[search]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find search handle, perhaps the search was already closed or you tried to share searchs between instances")
+}
+
+func (p *PdfiumImplementation) getPageLinkHandle(pageLink references.FPDF_PAGELINK) (*PageLinkHandle, error) {
+	if pageLink == "" {
+		return nil, errors.New("pageLink not given")
+	}
+
+	if val, ok := p.pageLinkRefs[pageLink]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageLink handle, perhaps the pageLink was already closed or you tried to share pageLinks between instances")
 }

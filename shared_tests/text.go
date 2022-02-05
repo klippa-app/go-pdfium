@@ -7,6 +7,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -16,34 +17,67 @@ import (
 
 func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
 	Describe("Render", func() {
+		Context("no references", func() {
+			When("is given", func() {
+				Context("GetPageText()", func() {
+					It("returns an error", func() {
+						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageText).To(BeNil())
+					})
+				})
+
+				Context("GetPageTextStructured()", func() {
+					It("returns an error", func() {
+						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Index: 0,
+								},
+							},
+						})
+						Expect(err).To(MatchError("document not given"))
+						Expect(pageTextStructured).To(BeNil())
+					})
+				})
+			})
+		})
+
 		Context("a normal PDF file", func() {
-			var doc pdfium.Document
+			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
-				doc = newDoc
+				doc = *newDoc
 			})
 
 			AfterEach(func() {
-				doc.Close()
+				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				Expect(err).To(BeNil())
 			})
 
 			When("is opened", func() {
 				Context("when an invalid page is given", func() {
 					Context("GetPageText()", func() {
 						It("returns an error", func() {
-							pageText, err := doc.GetPageText(&requests.GetPageText{
-								Page: 1,
+							pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageText).To(BeNil())
@@ -52,8 +86,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 					Context("GetPageTextStructured()", func() {
 						It("returns an error", func() {
-							pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-								Page: 1,
+							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    1,
+									},
+								},
 							})
 							Expect(err).To(MatchError(errors.ErrPage.Error()))
 							Expect(pageTextStructured).To(BeNil())
@@ -63,8 +102,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 				Context("when the page text is requested", func() {
 					It("returns the correct text", func() {
-						pageText, err := doc.GetPageText(&requests.GetPageText{
-							Page: 0,
+						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
+							},
 						})
 						Expect(err).To(BeNil())
 						Expect(pageText).To(Equal(&responses.GetPageText{
@@ -75,8 +119,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 				Context("when the structured page text is requested", func() {
 					It("returns the correct structured text", func() {
-						pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-							Page: 0,
+						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    0,
+								},
+							},
 						})
 
 						Expect(err).To(BeNil())
@@ -86,8 +135,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 					Context("when PixelPositions is enabled", func() {
 						Context("with no DPI and no pixels", func() {
 							It("returns an error", func() {
-								pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: 0,
+								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
 									},
@@ -99,8 +153,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 						Context("with DPI", func() {
 							It("returns the correct calculations", func() {
-								pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: 0,
+								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
 										DPI:       300,
@@ -113,8 +172,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 						Context("with pixels", func() {
 							It("returns the correct calculations", func() {
-								pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: 0,
+								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
 										Width:     3000,
@@ -130,8 +194,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 					Context("when PixelPositions is enabled", func() {
 						It("returns the correct font information", func() {
-							pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-								Page:                   0,
+							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
 								CollectFontInformation: true,
 							})
 							Expect(err).To(BeNil())
@@ -140,8 +209,13 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 
 						Context("and PixelPositions is enabled", func() {
 							It("returns the correct font information", func() {
-								pageTextStructured, err := doc.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page:                   0,
+								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
 									CollectFontInformation: true,
 									PixelPositions: requests.GetPageTextStructuredPixelPositions{
 										Calculate: true,
@@ -176,7 +250,7 @@ func loadStructuredText(path string, resp *responses.GetPageTextStructured) *res
 }
 
 func writeStructuredText(path string, resp *responses.GetPageTextStructured) error {
-	return nil // Comment this in case of updating pdfium versions and output has changed.
+	return nil // Comment this in case of updating PDFium versions and output has changed.
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)

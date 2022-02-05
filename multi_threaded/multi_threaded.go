@@ -4,14 +4,17 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/commons"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 
 	"github.com/hashicorp/go-hclog"
@@ -38,17 +41,22 @@ type Command struct {
 	Args    []string
 }
 
-type multiThreadedPdfiumContainer struct {
-	workerPool *pool.ObjectPool
+type pdfiumPool struct {
+	workerPool   *pool.ObjectPool
+	instanceRefs map[string]*pdfiumInstance
+	poolRef      string
+	closed       bool
+	lock         *sync.Mutex
 }
 
-var container *multiThreadedPdfiumContainer
+var poolRefs = map[string]*pdfiumPool{}
+var multiThreadedMutex = &sync.Mutex{}
 
-func Init(config Config) pdfium.Pdfium {
-	if container != nil {
-		return container
-	}
-
+// Init will return a multi-threaded pool.
+// It will launch a new worker for every requested instance as long as the limits
+// allow it. If the pool has been exhausted. It will wait until a worker becomes
+// available. So it's important that you close instances when you're done with them.
+func Init(config Config) pdfium.Pool {
 	// Create an hclog.Logger
 	logger := hclog.New(&hclog.LoggerOptions{
 		Name:   "plugin",
@@ -142,68 +150,157 @@ func Init(config Config) pdfium.Pdfium {
 		TestOnCreate:       true,
 	}
 
-	// Create a new pdfium container and make sure we only have 1 container.
-	container = &multiThreadedPdfiumContainer{
-		workerPool: p,
+	multiThreadedMutex.Lock()
+	defer multiThreadedMutex.Unlock()
+
+	poolRef := uuid.New()
+
+	// Create a new PDFium pool.
+	newPool := &pdfiumPool{
+		poolRef:      poolRef.String(),
+		instanceRefs: map[string]*pdfiumInstance{},
+		lock:         &sync.Mutex{},
+		workerPool:   p,
 	}
 
-	container.workerPool.PreparePool(goctx.Background())
+	poolRefs[newPool.poolRef] = newPool
 
-	return container
+	return newPool
 }
 
-// NewDocumentFromBytes creates a new pdfium document from a byte array.
-// This will automatically select a worker and keep it for you until you execute
-// the close method on the document.
-func (c *multiThreadedPdfiumContainer) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
-	selectedWorker, err := c.getWorker()
-	if err != nil {
-		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
+func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	if p.closed {
+		return nil, errors.New("pool is closed")
 	}
 
-	newDocument := pdfiumDocument{}
-	newDocument.worker = selectedWorker
+	timeoutCtx, cancel := goctx.WithTimeout(goctx.Background(), timeout)
+	defer cancel()
+	workerObject, err := p.workerPool.BorrowObject(timeoutCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	newInstance := &pdfiumInstance{
+		worker: workerObject.(*worker),
+		lock:   &sync.Mutex{},
+	}
+
+	instanceRef := uuid.New()
+	newInstance.instanceRef = instanceRef.String()
+	newInstance.pool = p
+	p.instanceRefs[newInstance.instanceRef] = newInstance
+
+	return newInstance, nil
+}
+
+func (p *pdfiumPool) Close() (err error) {
+	if p.closed {
+		return errors.New("pool is already closed")
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "Close", panicError)
+		}
+	}()
+
+	// Close all instances
+	for i := range p.instanceRefs {
+		p.instanceRefs[i].Close()
+		delete(p.instanceRefs, i)
+	}
+
+	multiThreadedMutex.Lock()
+	delete(poolRefs, p.poolRef)
+	multiThreadedMutex.Unlock()
+
+	// Close the underlying pool.
+	p.workerPool.Close(goctx.Background())
+
+	return nil
+}
+
+type pdfiumInstance struct {
+	worker      *worker
+	pool        *pdfiumPool
+	instanceRef string
+	closed      bool
+	lock        *sync.Mutex
+}
+
+// NewDocumentFromBytes creates a new PDFium document from a byte array.
+// This will automatically select a worker and keep it for you until you execute
+// the close method on the references.
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
+	}
+	i.lock.Unlock()
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromBytes", panicError)
+		}
+	}()
 
 	openDocRequest := &requests.OpenDocument{File: file}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	err = newDocument.worker.plugin.OpenDocument(openDocRequest)
+	newDoc, err := i.worker.plugin.OpenDocument(openDocRequest)
 	if err != nil {
-		newDocument.Close()
 		return nil, err
 	}
 
-	return &newDocument, nil
+	return &newDoc.Document, nil
 }
 
-// NewDocumentFromFilePath creates a new pdfium document from a file path.
-func (c *multiThreadedPdfiumContainer) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
-	selectedWorker, err := c.getWorker()
-	if err != nil {
-		return nil, fmt.Errorf("Could not get worker: %s", err.Error())
+// NewDocumentFromFilePath creates a new PDFium document from a file path.
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
 	}
+	i.lock.Unlock()
 
-	newDocument := pdfiumDocument{}
-	newDocument.worker = selectedWorker
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromFilePath", panicError)
+		}
+	}()
 
 	openDocRequest := &requests.OpenDocument{FilePath: &filePath}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	err = newDocument.worker.plugin.OpenDocument(openDocRequest)
+	newDoc, err := i.worker.plugin.OpenDocument(openDocRequest)
 	if err != nil {
-		newDocument.Close()
 		return nil, err
 	}
 
-	return &newDocument, nil
+	return &newDoc.Document, nil
 }
 
-// NewDocumentFromReader creates a new pdfium document from a reader.
-func (c *multiThreadedPdfiumContainer) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (pdfium.Document, error) {
+// NewDocumentFromReader creates a new PDFium document from a reader.
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
+	i.lock.Lock()
+	if i.closed {
+		i.lock.Unlock()
+		return nil, errors.New("instance is closed")
+	}
+	i.lock.Unlock()
+
 	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
 	// To make it support the full interface, we just complete read the file into memory.
 	fileData, err := ioutil.ReadAll(reader)
@@ -211,31 +308,45 @@ func (c *multiThreadedPdfiumContainer) NewDocumentFromReader(reader io.ReadSeeke
 		return nil, err
 	}
 
-	return c.NewDocumentFromBytes(&fileData, opts...)
+	return i.NewDocumentFromBytes(&fileData, opts...)
 }
 
-func (c *multiThreadedPdfiumContainer) getWorker() (*worker, error) {
-	timeout, cancel := goctx.WithTimeout(goctx.Background(), time.Second*30)
-	defer cancel()
-	workerObject, err := c.workerPool.BorrowObject(timeout)
-	if err != nil {
-		return nil, err
+func (i *pdfiumInstance) Close() (err error) {
+	i.lock.Lock()
+
+	if i.closed {
+		i.lock.Unlock()
+		return errors.New("instance is already closed")
 	}
 
-	return workerObject.(*worker), nil
-}
-
-type pdfiumDocument struct {
-	worker *worker
-}
-
-func (d *pdfiumDocument) Close() {
 	defer func() {
-		container.workerPool.ReturnObject(goctx.Background(), d.worker)
-		d.worker = nil
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "Close", panicError)
+		}
 	}()
 
-	d.worker.plugin.Close()
+	defer func() {
+		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
+		i.worker = nil
+		delete(i.pool.instanceRefs, i.instanceRef)
+		i.pool = nil
+		i.closed = true
+		i.lock.Unlock()
+	}()
 
-	return
+	return i.worker.plugin.Close()
+}
+
+func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) (err error) {
+	if i.closed {
+		return errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseDocument", panicError)
+		}
+	}()
+
+	return i.worker.plugin.FPDF_CloseDocument(document)
 }

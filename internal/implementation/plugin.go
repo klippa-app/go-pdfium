@@ -18,16 +18,14 @@ func StartPlugin() {
 		JSONFormat: true,
 	})
 
-	pdfium := &Pdfium{
-		logger: logger,
-	}
+	Pdfium.logger = logger
+
+	pdfium := Pdfium.GetInstance()
 
 	// pluginMap is the map of plugins we can dispense.
 	var pluginMap = map[string]plugin.Plugin{
 		"pdfium": &commons.PdfiumPlugin{Impl: pdfium},
 	}
-
-	logger.Debug("message from plugin", "foo", "bar")
 
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: handshakeConfig,
