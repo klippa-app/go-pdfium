@@ -1,16 +1,22 @@
 package multi_threaded_test
 
 import (
+	"github.com/klippa-app/go-pdfium/multi_threaded"
+	"log"
+	"os"
 	"time"
 
-	"github.com/klippa-app/go-pdfium/multi_threaded"
 	"github.com/klippa-app/go-pdfium/shared_tests"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Multi Threaded", func() {
+var _ = BeforeSuite(func() {
+	// Set ENV to ensure resulting values.
+	err := os.Setenv("TZ", "UTC")
+	Expect(err).To(BeNil())
+
 	pool := multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
@@ -21,10 +27,28 @@ var _ = Describe("Multi Threaded", func() {
 		},
 	})
 
+	shared_tests.PdfiumPool = pool
+
 	instance, err := pool.GetInstance(time.Second * 30)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
-	shared_tests.RunTests(instance, "../shared_tests", "multi")
+	Expect(err).To(BeNil())
+
+	shared_tests.PdfiumInstance = instance
+	shared_tests.TestDataPath = "../shared_tests"
+	shared_tests.TestType = "multi"
+})
+
+var _ = AfterSuite(func() {
+	err := shared_tests.PdfiumInstance.Close()
+	Expect(err).To(BeNil())
+
+	log.Println("Closed instance")
+
+	err = shared_tests.PdfiumPool.Close()
+	Expect(err).To(BeNil())
+
+	log.Println("Closed pool")
+})
+
+var _ = Describe("Multi Threaded", func() {
+	shared_tests.Import()
 })
