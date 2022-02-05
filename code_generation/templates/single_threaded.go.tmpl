@@ -16,11 +16,11 @@ func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }
 		return nil, errors.New("instance is closed")
 	}
 
-    defer func() {
-        if panicError := recover(); panicError != nil {
-            err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
-        }
-    }()
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
+		}
+	}()
 
 	return i.pdfium.{{ $method.Name }}(request)
 }
