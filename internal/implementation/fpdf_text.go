@@ -398,12 +398,8 @@ func (p *PdfiumImplementation) FPDFText_GetCharIndexAtPos(request *requests.FPDF
 		return nil, errors.New("could not get char index at pos")
 	}
 
-	if charIndex == -1 {
-		return &responses.FPDFText_GetCharIndexAtPos{}, nil
-	}
-
 	return &responses.FPDFText_GetCharIndexAtPos{
-		CharIndex: &charIndex,
+		CharIndex: charIndex,
 	}, nil
 }
 
