@@ -1,6 +1,6 @@
 # go-pdfium
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/klippa-app/go-pdfium/pdfium.svg)](https://pkg.go.dev/github.com/klippa-app/go-pdfium/pdfium)
+[![Go Reference](https://pkg.go.dev/badge/github.com/klippa-app/go-pdfium/pdfium.svg)](https://pkg.go.dev/github.com/klippa-app/go-pdfium)
 [![Build Status][build-status]][build-url]
 [![codecov](https://codecov.io/gh/klippa-app/go-pdfium/branch/main/graph/badge.svg?token=WoIlW9RbfH)](https://codecov.io/gh/klippa-app/go-pdfium)
 
@@ -270,19 +270,19 @@ func getPageCount(filePath string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-  
-    // Open the PDF using PDFium (and claim a worker)
-    doc, err := instance.OpenDocument(&requests.OpenDocument{
-        File: &pdfBytes,
-    })
-    if err != nil {
-        return 0, err
-    }
-  
-    // Always close the document, this will release its resources.
-    defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
-        Document: doc.Document,
-    })
+
+	// Open the PDF using PDFium (and claim a worker)
+	doc, err := instance.OpenDocument(&requests.OpenDocument{
+		File: &pdfBytes,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	// Always close the document, this will release its resources.
+	defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+		Document: doc.Document,
+	})
 
 	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 		Document: doc,
@@ -328,18 +328,18 @@ func renderPage(filePath string, page int, output string) error {
 		return err
 	}
 
-    // Open the PDF using PDFium (and claim a worker)
-    doc, err := instance.OpenDocument(&requests.OpenDocument{
-      File: &pdfBytes,
-    })
-    if err != nil {
+	// Open the PDF using PDFium (and claim a worker)
+	doc, err := instance.OpenDocument(&requests.OpenDocument{
+		File: &pdfBytes,
+	})
+	if err != nil {
         return err
     }
 
-    // Always close the document, this will release its resources.
-    defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
-        Document: doc.Document,
-    })
+	// Always close the document, this will release its resources.
+	defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+		Document: doc.Document,
+	})
 
 	// Render the page in DPI 200.
 	pageRender, err := instance.RenderPageInDPI(&requests.RenderPageInDPI{
