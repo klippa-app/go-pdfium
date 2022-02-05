@@ -897,21 +897,21 @@ func (i *pdfiumInstance) FPDF_LoadCustomDocument(request *requests.FPDF_LoadCust
 	}
 
 	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
-    // To make it support the full interface, we just completely read the file into memory.
-    fileData, err := ioutil.ReadAll(request.Reader)
-    if err != nil {
-        return nil, err
-    }
+	// To make it support the full interface, we just completely read the file into memory.
+	fileData, err := ioutil.ReadAll(request.Reader)
+	if err != nil {
+		return nil, err
+	}
 
-    doc, err := i.OpenDocument(&requests.OpenDocument{
-        File:     &fileData,
-        Password: request.Password,
-    })
-    if err != nil {
-        return nil, err
-    }
+	doc, err := i.OpenDocument(&requests.OpenDocument{
+		File:     &fileData,
+		Password: request.Password,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-    return &responses.FPDF_LoadCustomDocument{Document: doc.Document}, nil
+	return &responses.FPDF_LoadCustomDocument{Document: doc.Document}, nil
 }
 
 func (i *pdfiumInstance) FPDF_LoadDocument(request *requests.FPDF_LoadDocument) (*responses.FPDF_LoadDocument, error) {
