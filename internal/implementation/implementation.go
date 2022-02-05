@@ -142,6 +142,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
 		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
+		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -177,6 +178,7 @@ type PdfiumImplementation struct {
 	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
 	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
 	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
+	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -220,6 +222,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
 		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
+		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -409,6 +412,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.javaScriptActionRefs, i)
 	}
 
+	for i := range p.searchRefs {
+		delete(p.searchRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -532,4 +539,40 @@ func (d *PdfiumImplementation) getJavaScriptActionHandle(javaScriptAction refere
 	}
 
 	return nil, errors.New("could not find javaScriptAction handle, perhaps the javaScriptAction was already closed or you tried to share javaScriptActions between instances or documents")
+}
+
+func (p *PdfiumImplementation) getTextPageHandle(textPage references.FPDF_TEXTPAGE) (*TextPageHandle, error) {
+	if textPage == "" {
+		return nil, errors.New("textPage not given")
+	}
+
+	if val, ok := p.textPageRefs[textPage]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find textPage handle, perhaps the textPage was already closed or you tried to share textPages between instances")
+}
+
+func (p *PdfiumImplementation) getSearchHandle(search references.FPDF_SCHHANDLE) (*SearchHandle, error) {
+	if search == "" {
+		return nil, errors.New("search not given")
+	}
+
+	if val, ok := p.searchRefs[search]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find search handle, perhaps the search was already closed or you tried to share searchs between instances")
+}
+
+func (p *PdfiumImplementation) getPageLinkHandle(pageLink references.FPDF_PAGELINK) (*PageLinkHandle, error) {
+	if pageLink == "" {
+		return nil, errors.New("pageLink not given")
+	}
+
+	if val, ok := p.pageLinkRefs[pageLink]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageLink handle, perhaps the pageLink was already closed or you tried to share pageLinks between instances")
 }

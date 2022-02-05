@@ -227,11 +227,32 @@ func (i *pdfiumInstance) FPDFJavaScriptAction_GetScript(request *requests.FPDFJa
 	return i.worker.plugin.FPDFJavaScriptAction_GetScript(request)
 }
 
+func (i *pdfiumInstance) FPDFLink_CloseWebLinks(request *requests.FPDFLink_CloseWebLinks) (*responses.FPDFLink_CloseWebLinks, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_CloseWebLinks(request)
+}
+
 func (i *pdfiumInstance) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints) (*responses.FPDFLink_CountQuadPoints, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDFLink_CountQuadPoints(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_CountRects(request *requests.FPDFLink_CountRects) (*responses.FPDFLink_CountRects, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_CountRects(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_CountWebLinks(request *requests.FPDFLink_CountWebLinks) (*responses.FPDFLink_CountWebLinks, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_CountWebLinks(request)
 }
 
 func (i *pdfiumInstance) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate) (*responses.FPDFLink_Enumerate, error) {
@@ -288,6 +309,34 @@ func (i *pdfiumInstance) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQu
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDFLink_GetQuadPoints(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_GetRect(request *requests.FPDFLink_GetRect) (*responses.FPDFLink_GetRect, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_GetRect(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_GetTextRange(request *requests.FPDFLink_GetTextRange) (*responses.FPDFLink_GetTextRange, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_GetTextRange(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_GetURL(request *requests.FPDFLink_GetURL) (*responses.FPDFLink_GetURL, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_GetURL(request)
+}
+
+func (i *pdfiumInstance) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadWebLinks) (*responses.FPDFLink_LoadWebLinks, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFLink_LoadWebLinks(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error) {
@@ -379,6 +428,188 @@ func (i *pdfiumInstance) FPDFSignatureObj_GetTime(request *requests.FPDFSignatur
 		return nil, errors.New("instance is closed")
 	}
 	return i.worker.plugin.FPDFSignatureObj_GetTime(request)
+}
+
+func (i *pdfiumInstance) FPDFText_ClosePage(request *requests.FPDFText_ClosePage) (*responses.FPDFText_ClosePage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_ClosePage(request)
+}
+
+func (i *pdfiumInstance) FPDFText_CountChars(request *requests.FPDFText_CountChars) (*responses.FPDFText_CountChars, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_CountChars(request)
+}
+
+func (i *pdfiumInstance) FPDFText_CountRects(request *requests.FPDFText_CountRects) (*responses.FPDFText_CountRects, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_CountRects(request)
+}
+
+func (i *pdfiumInstance) FPDFText_FindClose(request *requests.FPDFText_FindClose) (*responses.FPDFText_FindClose, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_FindClose(request)
+}
+
+func (i *pdfiumInstance) FPDFText_FindNext(request *requests.FPDFText_FindNext) (*responses.FPDFText_FindNext, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_FindNext(request)
+}
+
+func (i *pdfiumInstance) FPDFText_FindPrev(request *requests.FPDFText_FindPrev) (*responses.FPDFText_FindPrev, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_FindPrev(request)
+}
+
+func (i *pdfiumInstance) FPDFText_FindStart(request *requests.FPDFText_FindStart) (*responses.FPDFText_FindStart, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_FindStart(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetBoundedText(request *requests.FPDFText_GetBoundedText) (*responses.FPDFText_GetBoundedText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetBoundedText(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetCharAngle(request *requests.FPDFText_GetCharAngle) (*responses.FPDFText_GetCharAngle, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetCharAngle(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetCharBox(request *requests.FPDFText_GetCharBox) (*responses.FPDFText_GetCharBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetCharBox(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_GetCharIndexAtPos) (*responses.FPDFText_GetCharIndexAtPos, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetCharIndexAtPos(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin) (*responses.FPDFText_GetCharOrigin, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetCharOrigin(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor) (*responses.FPDFText_GetFillColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetFillColor(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetFontInfo(request *requests.FPDFText_GetFontInfo) (*responses.FPDFText_GetFontInfo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetFontInfo(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetFontSize(request *requests.FPDFText_GetFontSize) (*responses.FPDFText_GetFontSize, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetFontSize(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetFontWeight(request *requests.FPDFText_GetFontWeight) (*responses.FPDFText_GetFontWeight, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetFontWeight(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetLooseCharBox(request *requests.FPDFText_GetLooseCharBox) (*responses.FPDFText_GetLooseCharBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetLooseCharBox(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetMatrix(request *requests.FPDFText_GetMatrix) (*responses.FPDFText_GetMatrix, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetRect(request *requests.FPDFText_GetRect) (*responses.FPDFText_GetRect, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetRect(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetSchCount(request *requests.FPDFText_GetSchCount) (*responses.FPDFText_GetSchCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetSchCount(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetSchResultIndex(request *requests.FPDFText_GetSchResultIndex) (*responses.FPDFText_GetSchResultIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetSchResultIndex(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetStrokeColor(request *requests.FPDFText_GetStrokeColor) (*responses.FPDFText_GetStrokeColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetStrokeColor(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetText(request *requests.FPDFText_GetText) (*responses.FPDFText_GetText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetText(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetTextRenderMode(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_GetUnicode(request)
+}
+
+func (i *pdfiumInstance) FPDFText_LoadPage(request *requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+	return i.worker.plugin.FPDFText_LoadPage(request)
 }
 
 func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {

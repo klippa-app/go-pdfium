@@ -8,6 +8,8 @@ import "C"
 import (
 	"bytes"
 	"errors"
+	"github.com/google/uuid"
+	"github.com/klippa-app/go-pdfium/references"
 	"io/ioutil"
 	"math"
 	"unsafe"
@@ -18,6 +20,34 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
+
+func (p *PdfiumImplementation) registerTextPage(attachment C.FPDF_TEXTPAGE, documentHandle *DocumentHandle) *TextPageHandle {
+	ref := uuid.New()
+	handle := &TextPageHandle{
+		handle:      attachment,
+		nativeRef:   references.FPDF_TEXTPAGE(ref.String()),
+		documentRef: documentHandle.nativeRef,
+	}
+
+	documentHandle.textPageRefs[handle.nativeRef] = handle
+	p.textPageRefs[handle.nativeRef] = handle
+
+	return handle
+}
+
+func (p *PdfiumImplementation) registerPageLink(pageLink C.FPDF_PAGELINK, documentHandle *DocumentHandle) *PageLinkHandle {
+	ref := uuid.New()
+	handle := &PageLinkHandle{
+		handle:      pageLink,
+		nativeRef:   references.FPDF_PAGELINK(ref.String()),
+		documentRef: documentHandle.nativeRef,
+	}
+
+	documentHandle.pageLinkRefs[handle.nativeRef] = handle
+	p.pageLinkRefs[handle.nativeRef] = handle
+
+	return handle
+}
 
 // GetPageText returns the text of a page
 func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {

@@ -38,6 +38,7 @@ type DocumentHandle struct {
 	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
 	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
 	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
+	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
 }
 
 func (d *DocumentHandle) getPageHandle(pageRef references.FPDF_PAGE) (*PageHandle, error) {
@@ -139,6 +140,10 @@ func (d *DocumentHandle) Close() error {
 
 	for i := range d.javaScriptActionRefs {
 		delete(d.javaScriptActionRefs, i)
+	}
+
+	for i := range d.searchRefs {
+		delete(d.searchRefs, i)
 	}
 
 	C.FPDF_CloseDocument(d.handle)
@@ -272,4 +277,10 @@ type JavaScriptActionHandle struct {
 	handle      C.FPDF_JAVASCRIPT_ACTION
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_JAVASCRIPT_ACTION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type SearchHandle struct {
+	handle      C.FPDF_SCHHANDLE
+	documentRef references.FPDF_DOCUMENT
+	nativeRef   references.FPDF_SCHHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
