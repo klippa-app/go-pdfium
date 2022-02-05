@@ -530,9 +530,8 @@ func RunfpdfTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						Y:        793,
 					})
 					Expect(err).To(BeNil())
-					expectedChar := 0
 					Expect(FPDFText_GetCharIndexAtPos).To(Equal(&responses.FPDFText_GetCharIndexAtPos{
-						CharIndex: &expectedChar,
+						CharIndex: 0,
 					}))
 				})
 
@@ -543,7 +542,9 @@ func RunfpdfTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 						Y:        2,
 					})
 					Expect(err).To(BeNil())
-					Expect(FPDFText_GetCharIndexAtPos).To(Equal(&responses.FPDFText_GetCharIndexAtPos{}))
+					Expect(FPDFText_GetCharIndexAtPos).To(Equal(&responses.FPDFText_GetCharIndexAtPos{
+						CharIndex: -1,
+					}))
 				})
 
 				It("returns the correct page text", func() {

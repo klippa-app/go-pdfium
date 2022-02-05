@@ -87,7 +87,7 @@ type FPDFText_GetCharOrigin struct {
 	Y     float64
 }
 type FPDFText_GetCharIndexAtPos struct {
-	CharIndex *int // nil when not found
+	CharIndex int // -1 when not found
 }
 
 type FPDFText_GetText struct {
