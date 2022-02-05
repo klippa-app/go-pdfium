@@ -206,8 +206,6 @@ func RunfpdfAttachmentTests(pdfiumContainer pdfium.Pdfium, testsPath string, pre
 		})
 
 		Context("a PDF file with attachments", func() {
-			// @todo: fix me, this file segfaults sometimes
-			return
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
