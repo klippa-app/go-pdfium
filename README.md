@@ -16,13 +16,14 @@
 
 * Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
 * This library will handle all complicated cgo gymnastics for you
-* The goal is to implement all PDFium public API methods, current progress: 20%
+* The goal is to implement all PDFium public API methods, current progress: 30%
 * Current PDFium methods exposed, no cgo required
     * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
     * Document info (metadata, page count, render mode, PDF version, permissions, security handler revision)
     * Page info (size, transparency)
     * Rendering (through bitmap)
+    * Text handling (extract, search, text size/color/font information)
     * Creation (create new documents and pages)
     * Editing (rotating, import pages from another document, copy view preferences from another document, flattening)
     * Bookmarks / Links / Weblinks
@@ -32,7 +33,6 @@
     * Attachments
 * Methods to be implemented:
     * Form filling
-    * Text handling (extract, search)
     * Bitmap handling
     * Named destinations
     * Transformations (page boxes, clip paths)
