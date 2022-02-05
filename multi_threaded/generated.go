@@ -579,6 +579,14 @@ func (i *pdfiumInstance) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_G
 	return i.worker.plugin.FPDFText_GetCharIndexAtPos(request)
 }
 
+func (i *pdfiumInstance) FPDFText_GetCharIndexFromTextIndex(request *requests.FPDFText_GetCharIndexFromTextIndex) (*responses.FPDFText_GetCharIndexFromTextIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_GetCharIndexFromTextIndex(request)
+}
+
 func (i *pdfiumInstance) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin) (*responses.FPDFText_GetCharOrigin, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -673,6 +681,14 @@ func (i *pdfiumInstance) FPDFText_GetText(request *requests.FPDFText_GetText) (*
 	}
 
 	return i.worker.plugin.FPDFText_GetText(request)
+}
+
+func (i *pdfiumInstance) FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_GetTextIndexFromCharIndex(request)
 }
 
 func (i *pdfiumInstance) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
