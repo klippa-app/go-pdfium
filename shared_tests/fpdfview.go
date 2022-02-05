@@ -82,15 +82,21 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
+				newDoc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					Reader: file,
+					Size:   fileStat.Size(),
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("is opened", func() {
@@ -221,15 +227,21 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
+				newDoc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					Reader: file,
+					Size:   fileStat.Size(),
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 				file.Close()
 			})
 
@@ -268,15 +280,21 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
+				newDoc, err := pdfiumContainer.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+					Reader: file,
+					Size:   fileStat.Size(),
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 				file.Close()
 			})
 

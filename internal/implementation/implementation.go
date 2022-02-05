@@ -228,10 +228,20 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	var doc C.FPDF_DOCUMENT
 
 	if request.File != nil {
-		doc = C.FPDF_LoadMemDocument(
-			unsafe.Pointer(&((*request.File)[0])),
-			C.int(len(*request.File)),
-			cPassword)
+		fileData := *request.File
+
+		// If larger than INT_MAX, use FPDF_LoadMemDocument64
+		if len(fileData) > 2147483647 {
+			doc = C.FPDF_LoadMemDocument64(
+				unsafe.Pointer(&(fileData[0])),
+				C.ulong(len(fileData)),
+				cPassword)
+		} else {
+			doc = C.FPDF_LoadMemDocument(
+				unsafe.Pointer(&(fileData[0])),
+				C.int(len(fileData)),
+				cPassword)
+		}
 	} else if request.FilePath != nil {
 		filePath := C.CString(*request.FilePath)
 		defer C.free(unsafe.Pointer(filePath))
@@ -305,25 +315,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	return &responses.OpenDocument{
 		Document: nativeDoc.nativeRef,
 	}, nil
-}
-
-func (p *PdfiumImplementation) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
-	p.Lock()
-	defer p.Unlock()
-
-	nativeDocument, err := p.getDocumentHandle(document)
-	if err != nil {
-		return err
-	}
-
-	err = nativeDocument.Close()
-	if err != nil {
-		return err
-	}
-
-	delete(p.documentRefs, nativeDocument.nativeRef)
-
-	return nil
 }
 
 func (p *PdfiumImplementation) Close() error {

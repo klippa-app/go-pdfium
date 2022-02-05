@@ -270,15 +270,19 @@ func getPageCount(filePath string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	// Open the PDF using pdfium (and claim a worker)
-	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
-	if err != nil {
-		return 0, err
-	}
-
-	// Always close the document, this will release the worker and it's resources
-	defer doc.Close()
+  
+    // Open the PDF using PDFium (and claim a worker)
+    doc, err := instance.OpenDocument(&requests.OpenDocument{
+        File: &pdfBytes,
+    })
+    if err != nil {
+        return 0, err
+    }
+  
+    // Always close the document, this will release its resources.
+    defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+        Document: doc.Document,
+    })
 
 	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
 		Document: doc,
@@ -324,14 +328,18 @@ func renderPage(filePath string, page int, output string) error {
 		return err
 	}
 
-	// Open the PDF using PDFium (and claim a worker)
-	doc, err := instance.NewDocumentFromBytes(&pdfBytes)
-	if err != nil {
-		return err
-	}
+    // Open the PDF using PDFium (and claim a worker)
+    doc, err := instance.OpenDocument(&requests.OpenDocument{
+      File: &pdfBytes,
+    })
+    if err != nil {
+        return err
+    }
 
-	// Always close the document, this will release the worker and it's resources
-	defer doc.Close()
+    // Always close the document, this will release its resources.
+    defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+        Document: doc.Document,
+    })
 
 	// Render the page in DPI 200.
 	pageRender, err := instance.RenderPageInDPI(&requests.RenderPageInDPI{

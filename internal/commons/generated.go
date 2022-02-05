@@ -6,7 +6,6 @@ package commons
 import (
 	"fmt"
 
-	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -99,6 +98,7 @@ type Pdfium interface {
     FPDFText_GetTextRenderMode(*requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
     FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
     FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
+    FPDF_CloseDocument(*requests.FPDF_CloseDocument) (*responses.FPDF_CloseDocument, error)
     FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
     FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
     FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
@@ -120,6 +120,10 @@ type Pdfium interface {
     FPDF_ImportNPagesToOne(*requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error)
     FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
     FPDF_ImportPagesByIndex(*requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error)
+    FPDF_LoadCustomDocument(*requests.FPDF_LoadCustomDocument) (*responses.FPDF_LoadCustomDocument, error)
+    FPDF_LoadDocument(*requests.FPDF_LoadDocument) (*responses.FPDF_LoadDocument, error)
+    FPDF_LoadMemDocument(*requests.FPDF_LoadMemDocument) (*responses.FPDF_LoadMemDocument, error)
+    FPDF_LoadMemDocument64(*requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
     FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
     FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
     FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
@@ -140,12 +144,11 @@ type Pdfium interface {
     GetPageText(*requests.GetPageText) (*responses.GetPageText, error)
     GetPageTextStructured(*requests.GetPageTextStructured) (*responses.GetPageTextStructured, error)
     OpenDocument(*requests.OpenDocument) (*responses.OpenDocument, error)
-    RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPage, error)
-    RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPage, error)
-    RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPages, error)
-    RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPages, error)
+    RenderPageInDPI(*requests.RenderPageInDPI) (*responses.RenderPageInDPI, error)
+    RenderPageInPixels(*requests.RenderPageInPixels) (*responses.RenderPageInPixels, error)
+    RenderPagesInDPI(*requests.RenderPagesInDPI) (*responses.RenderPagesInDPI, error)
+    RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, error)
     RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
-    FPDF_CloseDocument(references.FPDF_DOCUMENT) error
     Close() error
 }
 
@@ -1010,6 +1013,16 @@ func (g *PdfiumRPC) FPDFText_LoadPage(request *requests.FPDFText_LoadPage) (*res
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (*responses.FPDF_CloseDocument, error) {
+	resp := &responses.FPDF_CloseDocument{}
+	err := g.client.Call("Plugin.FPDF_CloseDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_ClosePage(request *requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error) {
 	resp := &responses.FPDF_ClosePage{}
 	err := g.client.Call("Plugin.FPDF_ClosePage", request, resp)
@@ -1220,6 +1233,46 @@ func (g *PdfiumRPC) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesBy
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_LoadCustomDocument(request *requests.FPDF_LoadCustomDocument) (*responses.FPDF_LoadCustomDocument, error) {
+	resp := &responses.FPDF_LoadCustomDocument{}
+	err := g.client.Call("Plugin.FPDF_LoadCustomDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_LoadDocument(request *requests.FPDF_LoadDocument) (*responses.FPDF_LoadDocument, error) {
+	resp := &responses.FPDF_LoadDocument{}
+	err := g.client.Call("Plugin.FPDF_LoadDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_LoadMemDocument(request *requests.FPDF_LoadMemDocument) (*responses.FPDF_LoadMemDocument, error) {
+	resp := &responses.FPDF_LoadMemDocument{}
+	err := g.client.Call("Plugin.FPDF_LoadMemDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error) {
+	resp := &responses.FPDF_LoadMemDocument64{}
+	err := g.client.Call("Plugin.FPDF_LoadMemDocument64", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error) {
 	resp := &responses.FPDF_LoadPage{}
 	err := g.client.Call("Plugin.FPDF_LoadPage", request, resp)
@@ -1420,8 +1473,8 @@ func (g *PdfiumRPC) OpenDocument(request *requests.OpenDocument) (*responses.Ope
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
-	resp := &responses.RenderPage{}
+func (g *PdfiumRPC) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPageInDPI, error) {
+	resp := &responses.RenderPageInDPI{}
 	err := g.client.Call("Plugin.RenderPageInDPI", request, resp)
 	if err != nil {
 		return nil, err
@@ -1430,8 +1483,8 @@ func (g *PdfiumRPC) RenderPageInDPI(request *requests.RenderPageInDPI) (*respons
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
-	resp := &responses.RenderPage{}
+func (g *PdfiumRPC) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPageInPixels, error) {
+	resp := &responses.RenderPageInPixels{}
 	err := g.client.Call("Plugin.RenderPageInPixels", request, resp)
 	if err != nil {
 		return nil, err
@@ -1440,8 +1493,8 @@ func (g *PdfiumRPC) RenderPageInPixels(request *requests.RenderPageInPixels) (*r
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
-	resp := &responses.RenderPages{}
+func (g *PdfiumRPC) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPagesInDPI, error) {
+	resp := &responses.RenderPagesInDPI{}
 	err := g.client.Call("Plugin.RenderPagesInDPI", request, resp)
 	if err != nil {
 		return nil, err
@@ -1450,8 +1503,8 @@ func (g *PdfiumRPC) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*respo
 	return resp, nil
 }
 
-func (g *PdfiumRPC) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
-	resp := &responses.RenderPages{}
+func (g *PdfiumRPC) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, error) {
+	resp := &responses.RenderPagesInPixels{}
 	err := g.client.Call("Plugin.RenderPagesInPixels", request, resp)
 	if err != nil {
 		return nil, err
@@ -3020,6 +3073,24 @@ func (s *PdfiumRPCServer) FPDFText_LoadPage(request *requests.FPDFText_LoadPage,
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_CloseDocument(request *requests.FPDF_CloseDocument, resp *responses.FPDF_CloseDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseDocument", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDF_CloseDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
@@ -3398,6 +3469,78 @@ func (s *PdfiumRPCServer) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportP
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_LoadCustomDocument(request *requests.FPDF_LoadCustomDocument, resp *responses.FPDF_LoadCustomDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadCustomDocument", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDF_LoadCustomDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_LoadDocument(request *requests.FPDF_LoadDocument, resp *responses.FPDF_LoadDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadDocument", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDF_LoadDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_LoadMemDocument(request *requests.FPDF_LoadMemDocument, resp *responses.FPDF_LoadMemDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadMemDocument", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDF_LoadMemDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64, resp *responses.FPDF_LoadMemDocument64) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadMemDocument64", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDF_LoadMemDocument64(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
@@ -3758,7 +3901,7 @@ func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *res
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, resp *responses.RenderPage) (err error) {
+func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, resp *responses.RenderPageInDPI) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
             err = fmt.Errorf("panic occurred in %s: %v", "RenderPageInDPI", panicError)
@@ -3776,7 +3919,7 @@ func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, res
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixels, resp *responses.RenderPage) (err error) {
+func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixels, resp *responses.RenderPageInPixels) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
             err = fmt.Errorf("panic occurred in %s: %v", "RenderPageInPixels", panicError)
@@ -3794,7 +3937,7 @@ func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixel
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, resp *responses.RenderPages) (err error) {
+func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, resp *responses.RenderPagesInDPI) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
             err = fmt.Errorf("panic occurred in %s: %v", "RenderPagesInDPI", panicError)
@@ -3812,7 +3955,7 @@ func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPixels, resp *responses.RenderPages) (err error) {
+func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPixels, resp *responses.RenderPagesInPixels) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
             err = fmt.Errorf("panic occurred in %s: %v", "RenderPagesInPixels", panicError)

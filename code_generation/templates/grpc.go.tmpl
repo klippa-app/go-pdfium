@@ -6,7 +6,6 @@ package commons
 import (
 	"fmt"
 
-	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -16,7 +15,6 @@ type Pdfium interface {
 {{- range $method := .Methods }}
     {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}
-    FPDF_CloseDocument(references.FPDF_DOCUMENT) error
     Close() error
 }
 
