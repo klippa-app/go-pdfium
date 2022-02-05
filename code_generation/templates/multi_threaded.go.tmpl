@@ -4,8 +4,8 @@
 package multi_threaded
 
 import (
-    "errors"
-    "io/ioutil"
+	"errors"
+	"io/ioutil"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
