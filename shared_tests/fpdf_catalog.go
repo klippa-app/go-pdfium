@@ -30,14 +30,9 @@ func RunfpdfCatalogTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -66,14 +61,9 @@ func RunfpdfCatalogTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/tagged_table.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})

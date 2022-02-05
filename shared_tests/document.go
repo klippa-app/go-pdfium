@@ -22,14 +22,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -108,14 +103,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -174,9 +164,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test.pdf")
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -204,9 +192,7 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 
 			BeforeEach(func() {
 				newDoc, err := pdfiumContainer.NewDocumentFromFilePath(testsPath + "/testdata/test_multipage.pdf")
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -276,14 +262,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				It("returns the password error", func() {
 					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
+
 					fileStat, err := file.Stat()
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					doc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
 					Expect(err).To(MatchError(errors.ErrPassword.Error()))
@@ -294,14 +275,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				It("returns the password error", func() {
 					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
+
 					fileStat, err := file.Stat()
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					wrongPassword := "test"
 					doc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()), pdfium.OpenDocumentWithPasswordOption(wrongPassword))
@@ -313,14 +289,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 				It("does not return an error", func() {
 					file, err := os.Open(testsPath + "/testdata/password_test123.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
+
 					fileStat, err := file.Stat()
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					pdfPassword := "test123"
 					doc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()), pdfium.OpenDocumentWithPasswordOption(pdfPassword))
@@ -375,14 +346,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -422,14 +388,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -471,14 +432,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -518,14 +474,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -567,14 +518,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -614,14 +560,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -663,14 +604,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -710,14 +646,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -759,14 +690,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -806,14 +732,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -855,14 +776,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -902,14 +818,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -951,14 +862,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -998,14 +904,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1047,14 +948,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1094,14 +990,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1143,14 +1034,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1190,14 +1076,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1239,14 +1120,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "test123"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})
@@ -1286,14 +1162,9 @@ func RunDocumentTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 					pdfPassword := "123test"
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData, pdfium.OpenDocumentWithPasswordOption(pdfPassword))
-					if err != nil {
-						return
-					}
+					Expect(err).To(BeNil())
 
 					doc = *newDoc
 				})

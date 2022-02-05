@@ -227,14 +227,9 @@ func RunfpdfTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -760,14 +755,9 @@ func RunfpdfTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/weblinks.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})

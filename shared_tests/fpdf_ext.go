@@ -166,16 +166,10 @@ func RunfpdfExtTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 				It("reports the unsupported objects to the handler", func() {
 					pdfData, err := ioutil.ReadFile(testsPath + "/testdata/unsupported_feature.pdf")
 					Expect(err).To(BeNil())
-					if err != nil {
-						return
-					}
 
 					newDoc, err := pdfiumContainer.OpenDocument(&requests.OpenDocument{
 						File: &pdfData,
 					})
-					if err != nil {
-						return
-					}
 					Expect(err).To(BeNil())
 					Expect(newDoc).To(Not(BeNil()))
 					Expect(lastReportedUnsupportedObject).To(Equal(enums.FPDF_UNSP_DOC_PORTABLECOLLECTION))
