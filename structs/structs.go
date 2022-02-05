@@ -17,3 +17,12 @@ type FPDF_FS_QUADPOINTSF struct {
 	X4 float32
 	Y4 float32
 }
+
+type FPDF_FS_MATRIX struct {
+	A float32
+	B float32
+	C float32
+	D float32
+	E float32
+	F float32
+}
