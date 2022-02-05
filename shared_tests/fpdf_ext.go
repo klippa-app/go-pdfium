@@ -41,6 +41,10 @@ var _ = Describe("fpdf_ext", func() {
 		})
 
 		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Multi-threaded usage does not support setting callbacks")
+			}
+
 			resp, err := PdfiumInstance.FSDK_SetTimeFunction(&requests.FSDK_SetTimeFunction{
 				Function: nil,
 			})
@@ -106,6 +110,10 @@ var _ = Describe("fpdf_ext", func() {
 		})
 
 		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Multi-threaded usage does not support setting callbacks")
+			}
+
 			resp, err := PdfiumInstance.FSDK_SetLocaltimeFunction(&requests.FSDK_SetLocaltimeFunction{
 				Function: nil,
 			})
@@ -162,6 +170,10 @@ var _ = Describe("fpdf_ext", func() {
 		})
 
 		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Multi-threaded usage does not support setting callbacks")
+			}
+
 			resp, err := PdfiumInstance.FSDK_SetUnSpObjProcessHandler(&requests.FSDK_SetUnSpObjProcessHandler{
 				UnSpObjProcessHandler: nil,
 			})
