@@ -83,6 +83,7 @@ type Pdfium interface {
     FPDFText_GetCharAngle(*requests.FPDFText_GetCharAngle) (*responses.FPDFText_GetCharAngle, error)
     FPDFText_GetCharBox(*requests.FPDFText_GetCharBox) (*responses.FPDFText_GetCharBox, error)
     FPDFText_GetCharIndexAtPos(*requests.FPDFText_GetCharIndexAtPos) (*responses.FPDFText_GetCharIndexAtPos, error)
+    FPDFText_GetCharIndexFromTextIndex(*requests.FPDFText_GetCharIndexFromTextIndex) (*responses.FPDFText_GetCharIndexFromTextIndex, error)
     FPDFText_GetCharOrigin(*requests.FPDFText_GetCharOrigin) (*responses.FPDFText_GetCharOrigin, error)
     FPDFText_GetFillColor(*requests.FPDFText_GetFillColor) (*responses.FPDFText_GetFillColor, error)
     FPDFText_GetFontInfo(*requests.FPDFText_GetFontInfo) (*responses.FPDFText_GetFontInfo, error)
@@ -95,6 +96,7 @@ type Pdfium interface {
     FPDFText_GetSchResultIndex(*requests.FPDFText_GetSchResultIndex) (*responses.FPDFText_GetSchResultIndex, error)
     FPDFText_GetStrokeColor(*requests.FPDFText_GetStrokeColor) (*responses.FPDFText_GetStrokeColor, error)
     FPDFText_GetText(*requests.FPDFText_GetText) (*responses.FPDFText_GetText, error)
+    FPDFText_GetTextIndexFromCharIndex(*requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
     FPDFText_GetTextRenderMode(*requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
     FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
     FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
@@ -863,6 +865,16 @@ func (g *PdfiumRPC) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_GetCha
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFText_GetCharIndexFromTextIndex(request *requests.FPDFText_GetCharIndexFromTextIndex) (*responses.FPDFText_GetCharIndexFromTextIndex, error) {
+	resp := &responses.FPDFText_GetCharIndexFromTextIndex{}
+	err := g.client.Call("Plugin.FPDFText_GetCharIndexFromTextIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin) (*responses.FPDFText_GetCharOrigin, error) {
 	resp := &responses.FPDFText_GetCharOrigin{}
 	err := g.client.Call("Plugin.FPDFText_GetCharOrigin", request, resp)
@@ -976,6 +988,16 @@ func (g *PdfiumRPC) FPDFText_GetStrokeColor(request *requests.FPDFText_GetStroke
 func (g *PdfiumRPC) FPDFText_GetText(request *requests.FPDFText_GetText) (*responses.FPDFText_GetText, error) {
 	resp := &responses.FPDFText_GetText{}
 	err := g.client.Call("Plugin.FPDFText_GetText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error) {
+	resp := &responses.FPDFText_GetTextIndexFromCharIndex{}
+	err := g.client.Call("Plugin.FPDFText_GetTextIndexFromCharIndex", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2803,6 +2825,24 @@ func (s *PdfiumRPCServer) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFText_GetCharIndexFromTextIndex(request *requests.FPDFText_GetCharIndexFromTextIndex, resp *responses.FPDFText_GetCharIndexFromTextIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetCharIndexFromTextIndex", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDFText_GetCharIndexFromTextIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin, resp *responses.FPDFText_GetCharOrigin) (err error) {
 	defer func() {
         if panicError := recover(); panicError != nil {
@@ -3009,6 +3049,24 @@ func (s *PdfiumRPCServer) FPDFText_GetText(request *requests.FPDFText_GetText, r
     }()
 
 	implResp, err := s.Impl.FPDFText_GetText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex, resp *responses.FPDFText_GetTextIndexFromCharIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetTextIndexFromCharIndex", panicError)
+        }
+    }()
+
+	implResp, err := s.Impl.FPDFText_GetTextIndexFromCharIndex(request)
 	if err != nil {
 		return err
 	}

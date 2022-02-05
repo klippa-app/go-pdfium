@@ -540,7 +540,7 @@ type Pdfium interface {
 
 	// End javascript_action
 
-	// Start fpdf_test.h
+	// Start fpdf_text.h
 
 	// FPDFText_LoadPage returns a handle to the text page information structure.
 	// Application must call FPDFText_ClosePage to release the text page
@@ -665,5 +665,17 @@ type Pdfium interface {
 	// FPDFLink_CloseWebLinks releases resources used by weblink feature.
 	FPDFLink_CloseWebLinks(request *requests.FPDFLink_CloseWebLinks) (*responses.FPDFLink_CloseWebLinks, error)
 
-	// fpdf_text.h
+	// End fpdf_text.h
+
+	// Start fpdf_searchex.h
+
+	// FPDFText_GetCharIndexFromTextIndex returns the character index in the text page internal character list.
+	// Where the character index is an index of the text returned from FPDFText_GetText().
+	FPDFText_GetCharIndexFromTextIndex(request *requests.FPDFText_GetCharIndexFromTextIndex) (*responses.FPDFText_GetCharIndexFromTextIndex, error)
+
+	// FPDFText_GetTextIndexFromCharIndex returns the text index in the text page internal character list.
+	// Where the text index is an index of the character in the internal character list.
+	FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
+
+	// End fpdf_searchex.h
 }
