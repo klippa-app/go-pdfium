@@ -22,15 +22,20 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("is opened", func() {
@@ -141,15 +146,20 @@ func RunPageTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("the page transparency is requested", func() {

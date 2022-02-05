@@ -1,6 +1,30 @@
 package requests
 
-import "github.com/klippa-app/go-pdfium/references"
+import (
+	"github.com/klippa-app/go-pdfium/references"
+	"io"
+)
+
+type FPDF_LoadDocument struct {
+	Path     *string // A path to a PDF file.
+	Password *string // The password of the document.
+}
+
+type FPDF_LoadMemDocument struct {
+	Data     *[]byte // A reference to the file data.
+	Password *string // The password of the document.
+}
+
+type FPDF_LoadMemDocument64 struct {
+	Data     *[]byte // A reference to the file data.
+	Password *string // The password of the document.
+}
+
+type FPDF_LoadCustomDocument struct {
+	Reader   io.ReadSeeker
+	Size     int64
+	Password *string // The password of the document.
+}
 
 type FPDF_GetLastError struct{}
 

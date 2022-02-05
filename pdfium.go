@@ -1,8 +1,6 @@
 package pdfium
 
 import (
-	"github.com/klippa-app/go-pdfium/references"
-	"io"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -45,24 +43,8 @@ type Pool interface {
 type Pdfium interface {
 	// Start instance functions.
 
-	// NewDocumentFromBytes returns a PDFium Document from the given PDF bytes.
-	// This is a helper around OpenDocument and gateway to FPDF_LoadMemDocument.
-	NewDocumentFromBytes(file *[]byte, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
-
-	// NewDocumentFromFilePath returns a PDFium Document from the given PDF file path.
-	// This is a helper around OpenDocument and a gateway to FPDF_LoadDocument.
-	NewDocumentFromFilePath(filePath string, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
-
-	// NewDocumentFromReader returns a PDFium Document from the given PDF file reader.
-	// This is a helper around OpenDocument and a gatweway to FPDF_LoadCustomDocument.
-	// This is only really efficient for single threaded usage, the multi-threaded
-	// usage will just load the file in memory because it can't transfer readers
-	// over gRPC. The single-threaded usage will actually efficiently walk over
-	// the PDF as it's being used by PDFium.
-	NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...NewDocumentOption) (*references.FPDF_DOCUMENT, error)
-
 	// OpenDocument returns a PDFium references for the given file data.
-	// This is a gateway to FPDF_LoadMemDocument, FPDF_LoadDocument and FPDF_LoadCustomDocument.
+	// This is a gateway to FPDF_LoadMemDocument, FPDF_LoadMemDocument64, FPDF_LoadDocument and FPDF_LoadCustomDocument.
 	OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error)
 
 	// Close closes the instance.
@@ -93,16 +75,16 @@ type Pdfium interface {
 	// Start render: render helpers
 
 	// RenderPageInDPI renders a given page in the given DPI.
-	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error)
+	RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPageInDPI, error)
 
 	// RenderPagesInDPI renders the given pages in the given DPI.
-	RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error)
+	RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPagesInDPI, error)
 
 	// RenderPageInPixels renders a given page in the given pixel size.
-	RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error)
+	RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPageInPixels, error)
 
 	// RenderPagesInPixels renders the given pages in the given pixel sizes.
-	RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error)
+	RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, error)
 
 	// GetPageSize returns the size of the page in points.
 	GetPageSize(request *requests.GetPageSize) (*responses.GetPageSize, error)
@@ -139,15 +121,44 @@ type Pdfium interface {
 
 	// Start fpdfview.h
 
+	// FPDF_LoadDocument opens and load a PDF document from a file path.
+	// Loaded document can be closed by FPDF_CloseDocument().
+	// If this function fails, you can use FPDF_GetLastError() to retrieve
+	// the reason why it failed.
+	FPDF_LoadDocument(request *requests.FPDF_LoadDocument) (*responses.FPDF_LoadDocument, error)
+
+	// FPDF_LoadMemDocument opens and load a PDF document from memory.
+	// Loaded document can be closed by FPDF_CloseDocument().
+	// If this function fails, you can use FPDF_GetLastError() to retrieve
+	// the reason why it failed.
+	FPDF_LoadMemDocument(request *requests.FPDF_LoadMemDocument) (*responses.FPDF_LoadMemDocument, error)
+
+	// FPDF_LoadMemDocument64 opens and load a PDF document from memory.
+	// Loaded document can be closed by FPDF_CloseDocument().
+	// If this function fails, you can use FPDF_GetLastError() to retrieve
+	// the reason why it failed.
+	FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
+
+	// FPDF_LoadCustomDocument loads a PDF document from a custom access descriptor.
+	// This is implemented as an io.ReadSeeker in go-pdfium.
+	// This is only really efficient for single threaded usage, the multi-threaded
+	// usage will just load the file in memory because it can't transfer readers
+	// over gRPC. The single-threaded usage will actually efficiently walk over
+	// the PDF as it's being used by PDFium.
+	// Loaded document can be closed by FPDF_CloseDocument().
+	// If this function fails, you can use FPDF_GetLastError() to retrieve
+	// the reason why it failed.
+	FPDF_LoadCustomDocument(request *requests.FPDF_LoadCustomDocument) (*responses.FPDF_LoadCustomDocument, error)
+
+	// FPDF_CloseDocument closes the references, releases the resources.
+	FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (*responses.FPDF_CloseDocument, error)
+
 	// FPDF_GetLastError returns the last error code of a PDFium function, which is just called.
 	// Usually, this function is called after a PDFium function returns, in order to check the error code of the previous PDFium function.
 	FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 
 	// FPDF_SetSandBoxPolicy set the policy for the sandbox environment.
 	FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
-
-	// FPDF_CloseDocument closes the references, releases the resources.
-	FPDF_CloseDocument(request references.FPDF_DOCUMENT) error
 
 	// FPDF_LoadPage loads a page and returns a reference.
 	FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)

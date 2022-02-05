@@ -37,15 +37,20 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("GetActionInfo is called without an action", func() {
@@ -76,10 +81,12 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/launch_action.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 
 				pageLink, err := pdfiumContainer.FPDFLink_GetLinkAtPoint(&requests.FPDFLink_GetLinkAtPoint{
 					Page: requests.Page{
@@ -98,8 +105,11 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			Context("A launch action is loaded", func() {
@@ -143,10 +153,12 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/uri_action.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 
 				pageLink, err := pdfiumContainer.FPDFLink_GetLinkAtPoint(&requests.FPDFLink_GetLinkAtPoint{
 					Page: requests.Page{
@@ -165,8 +177,11 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			Context("A uri action is loaded", func() {
@@ -210,10 +225,12 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/goto_action.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 
 				pageLink, err := pdfiumContainer.FPDFLink_GetLinkAtPoint(&requests.FPDFLink_GetLinkAtPoint{
 					Page: requests.Page{
@@ -232,8 +249,11 @@ func RunActionTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			Context("A goto action is loaded", func() {

@@ -5,21 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"sync"
 	"time"
 
-	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/internal/commons"
-	"github.com/klippa-app/go-pdfium/references"
-	"github.com/klippa-app/go-pdfium/requests"
-
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	pool "github.com/jolestar/go-commons-pool/v2"
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/internal/commons"
 )
 
 type worker struct {
@@ -234,83 +229,6 @@ type pdfiumInstance struct {
 	lock        *sync.Mutex
 }
 
-// NewDocumentFromBytes creates a new PDFium document from a byte array.
-// This will automatically select a worker and keep it for you until you execute
-// the close method on the references.
-func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
-	i.lock.Lock()
-	if i.closed {
-		i.lock.Unlock()
-		return nil, errors.New("instance is closed")
-	}
-	i.lock.Unlock()
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromBytes", panicError)
-		}
-	}()
-
-	openDocRequest := &requests.OpenDocument{File: file}
-	for _, opt := range opts {
-		opt.AlterOpenDocumentRequest(openDocRequest)
-	}
-
-	newDoc, err := i.worker.plugin.OpenDocument(openDocRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	return &newDoc.Document, nil
-}
-
-// NewDocumentFromFilePath creates a new PDFium document from a file path.
-func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
-	i.lock.Lock()
-	if i.closed {
-		i.lock.Unlock()
-		return nil, errors.New("instance is closed")
-	}
-	i.lock.Unlock()
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromFilePath", panicError)
-		}
-	}()
-
-	openDocRequest := &requests.OpenDocument{FilePath: &filePath}
-	for _, opt := range opts {
-		opt.AlterOpenDocumentRequest(openDocRequest)
-	}
-
-	newDoc, err := i.worker.plugin.OpenDocument(openDocRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	return &newDoc.Document, nil
-}
-
-// NewDocumentFromReader creates a new PDFium document from a reader.
-func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
-	i.lock.Lock()
-	if i.closed {
-		i.lock.Unlock()
-		return nil, errors.New("instance is closed")
-	}
-	i.lock.Unlock()
-
-	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
-	// To make it support the full interface, we just complete read the file into memory.
-	fileData, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	return i.NewDocumentFromBytes(&fileData, opts...)
-}
-
 func (i *pdfiumInstance) Close() (err error) {
 	i.lock.Lock()
 
@@ -335,18 +253,4 @@ func (i *pdfiumInstance) Close() (err error) {
 	}()
 
 	return i.worker.plugin.Close()
-}
-
-func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) (err error) {
-	if i.closed {
-		return errors.New("instance is closed")
-	}
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseDocument", panicError)
-		}
-	}()
-
-	return i.worker.plugin.FPDF_CloseDocument(document)
 }

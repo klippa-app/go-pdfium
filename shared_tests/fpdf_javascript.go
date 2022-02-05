@@ -55,15 +55,20 @@ func RunfpdfJavaScriptTests(pdfiumContainer pdfium.Pdfium, testsPath string, pre
 				Expect(err).To(BeNil())
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			It("returns no an javascript action count of 0", func() {
@@ -103,15 +108,20 @@ func RunfpdfJavaScriptTests(pdfiumContainer pdfium.Pdfium, testsPath string, pre
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/js.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			It("returns the correct javascript action count", func() {

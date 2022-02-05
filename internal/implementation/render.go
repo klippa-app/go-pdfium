@@ -88,7 +88,7 @@ func (p *PdfiumImplementation) GetPageSizeInPixels(request *requests.GetPageSize
 }
 
 // RenderPageInDPI renders a specific page in a specific dpi, the result is an image.
-func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPage, error) {
+func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPageInDPI, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -114,17 +114,19 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 		return nil, err
 	}
 
-	return &responses.RenderPage{
-		Page:              index,
-		Image:             result.Image,
-		PointToPixelRatio: pointToPixelRatio,
-		Width:             widthInPixels,
-		Height:            heightInPixels,
+	return &responses.RenderPageInDPI{
+		Result: responses.RenderPage{
+			Page:              index,
+			Image:             result.Image,
+			PointToPixelRatio: pointToPixelRatio,
+			Width:             widthInPixels,
+			Height:            heightInPixels,
+		},
 	}, nil
 }
 
 // RenderPagesInDPI renders a list of pages in a specific dpi, the result is an image.
-func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPages, error) {
+func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPagesInDPI, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -151,7 +153,14 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 		}
 	}
 
-	return p.renderPages(pages, request.Padding)
+	result, err := p.renderPages(pages, request.Padding)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.RenderPagesInDPI{
+		Result: *result,
+	}, nil
 }
 
 func (p *PdfiumImplementation) calculateRenderImageSize(page requests.Page, width, height int) (int, int, int, float64, error) {
@@ -193,7 +202,7 @@ func (p *PdfiumImplementation) calculateRenderImageSize(page requests.Page, widt
 // RenderPageInPixels renders a specific page in a specific pixel size, the result is an image.
 // The given resolution is a maximum, we automatically calculate either the width or the height
 // to make sure it stays withing the maximum resolution.
-func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPage, error) {
+func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPageInPixels, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -219,19 +228,21 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 		return nil, err
 	}
 
-	return &responses.RenderPage{
-		Page:              index,
-		Image:             result.Image,
-		PointToPixelRatio: ratio,
-		Width:             width,
-		Height:            height,
+	return &responses.RenderPageInPixels{
+		Result: responses.RenderPage{
+			Page:              index,
+			Image:             result.Image,
+			PointToPixelRatio: ratio,
+			Width:             width,
+			Height:            height,
+		},
 	}, nil
 }
 
 // RenderPagesInPixels renders a list of pages in a specific pixel size, the result is an image.
 // The given resolution is a maximum, we automatically calculate either the width or the height
 // to make sure it stays withing the maximum resolution.
-func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPages, error) {
+func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -258,7 +269,14 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 		}
 	}
 
-	return p.renderPages(pages, request.Padding)
+	result, err := p.renderPages(pages, request.Padding)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.RenderPagesInPixels{
+		Result: *result,
+	}, nil
 }
 
 type renderPage struct {
@@ -362,17 +380,17 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Image
+		renderedImage = resp.Result.Image
 		myResp = &responses.RenderToFile{
-			Width:             resp.Width,
-			Height:            resp.Height,
-			PointToPixelRatio: resp.PointToPixelRatio,
+			Width:             resp.Result.Width,
+			Height:            resp.Result.Height,
+			PointToPixelRatio: resp.Result.PointToPixelRatio,
 			Pages: []responses.RenderPagesPage{
 				{
-					Page:              resp.Page,
-					PointToPixelRatio: resp.PointToPixelRatio,
-					Width:             resp.Image.Bounds().Max.X,
-					Height:            resp.Image.Bounds().Max.Y,
+					Page:              resp.Result.Page,
+					PointToPixelRatio: resp.Result.PointToPixelRatio,
+					Width:             resp.Result.Image.Bounds().Max.X,
+					Height:            resp.Result.Image.Bounds().Max.Y,
 					X:                 0,
 					Y:                 0,
 				},
@@ -384,11 +402,11 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Image
+		renderedImage = resp.Result.Image
 		myResp = &responses.RenderToFile{
-			Width:  resp.Width,
-			Height: resp.Height,
-			Pages:  resp.Pages,
+			Width:  resp.Result.Width,
+			Height: resp.Result.Height,
+			Pages:  resp.Result.Pages,
 		}
 	} else if request.RenderPageInPixels != nil {
 		resp, err := p.RenderPageInPixels(request.RenderPageInPixels)
@@ -396,17 +414,17 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Image
+		renderedImage = resp.Result.Image
 		myResp = &responses.RenderToFile{
-			Width:             resp.Width,
-			Height:            resp.Height,
-			PointToPixelRatio: resp.PointToPixelRatio,
+			Width:             resp.Result.Width,
+			Height:            resp.Result.Height,
+			PointToPixelRatio: resp.Result.PointToPixelRatio,
 			Pages: []responses.RenderPagesPage{
 				{
-					Page:              resp.Page,
-					PointToPixelRatio: resp.PointToPixelRatio,
-					Width:             resp.Image.Bounds().Max.X,
-					Height:            resp.Image.Bounds().Max.Y,
+					Page:              resp.Result.Page,
+					PointToPixelRatio: resp.Result.PointToPixelRatio,
+					Width:             resp.Result.Image.Bounds().Max.X,
+					Height:            resp.Result.Image.Bounds().Max.Y,
 					X:                 0,
 					Y:                 0,
 				},
@@ -418,11 +436,11 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Image
+		renderedImage = resp.Result.Image
 		myResp = &responses.RenderToFile{
-			Width:  resp.Width,
-			Height: resp.Height,
-			Pages:  resp.Pages,
+			Width:  resp.Result.Width,
+			Height: resp.Result.Height,
+			Pages:  resp.Result.Pages,
 		}
 	} else {
 		return nil, errors.New("no render operation given")

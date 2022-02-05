@@ -1215,6 +1215,20 @@ func (i *pdfiumInstance) FPDFText_LoadPage(request *requests.FPDFText_LoadPage) 
 	return i.pdfium.FPDFText_LoadPage(request)
 }
 
+func (i *pdfiumInstance) FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (resp *responses.FPDF_CloseDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseDocument", panicError)
+        }
+    }()
+
+	return i.pdfium.FPDF_CloseDocument(request)
+}
+
 func (i *pdfiumInstance) FPDF_ClosePage(request *requests.FPDF_ClosePage) (resp *responses.FPDF_ClosePage, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1509,6 +1523,62 @@ func (i *pdfiumInstance) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPa
 	return i.pdfium.FPDF_ImportPagesByIndex(request)
 }
 
+func (i *pdfiumInstance) FPDF_LoadCustomDocument(request *requests.FPDF_LoadCustomDocument) (resp *responses.FPDF_LoadCustomDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadCustomDocument", panicError)
+        }
+    }()
+
+	return i.pdfium.FPDF_LoadCustomDocument(request)
+}
+
+func (i *pdfiumInstance) FPDF_LoadDocument(request *requests.FPDF_LoadDocument) (resp *responses.FPDF_LoadDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadDocument", panicError)
+        }
+    }()
+
+	return i.pdfium.FPDF_LoadDocument(request)
+}
+
+func (i *pdfiumInstance) FPDF_LoadMemDocument(request *requests.FPDF_LoadMemDocument) (resp *responses.FPDF_LoadMemDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadMemDocument", panicError)
+        }
+    }()
+
+	return i.pdfium.FPDF_LoadMemDocument(request)
+}
+
+func (i *pdfiumInstance) FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64) (resp *responses.FPDF_LoadMemDocument64, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadMemDocument64", panicError)
+        }
+    }()
+
+	return i.pdfium.FPDF_LoadMemDocument64(request)
+}
+
 func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (resp *responses.FPDF_LoadPage, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1789,7 +1859,7 @@ func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (resp *res
 	return i.pdfium.OpenDocument(request)
 }
 
-func (i *pdfiumInstance) RenderPageInDPI(request *requests.RenderPageInDPI) (resp *responses.RenderPage, err error) {
+func (i *pdfiumInstance) RenderPageInDPI(request *requests.RenderPageInDPI) (resp *responses.RenderPageInDPI, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
@@ -1803,7 +1873,7 @@ func (i *pdfiumInstance) RenderPageInDPI(request *requests.RenderPageInDPI) (res
 	return i.pdfium.RenderPageInDPI(request)
 }
 
-func (i *pdfiumInstance) RenderPageInPixels(request *requests.RenderPageInPixels) (resp *responses.RenderPage, err error) {
+func (i *pdfiumInstance) RenderPageInPixels(request *requests.RenderPageInPixels) (resp *responses.RenderPageInPixels, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
@@ -1817,7 +1887,7 @@ func (i *pdfiumInstance) RenderPageInPixels(request *requests.RenderPageInPixels
 	return i.pdfium.RenderPageInPixels(request)
 }
 
-func (i *pdfiumInstance) RenderPagesInDPI(request *requests.RenderPagesInDPI) (resp *responses.RenderPages, err error) {
+func (i *pdfiumInstance) RenderPagesInDPI(request *requests.RenderPagesInDPI) (resp *responses.RenderPagesInDPI, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
@@ -1831,7 +1901,7 @@ func (i *pdfiumInstance) RenderPagesInDPI(request *requests.RenderPagesInDPI) (r
 	return i.pdfium.RenderPagesInDPI(request)
 }
 
-func (i *pdfiumInstance) RenderPagesInPixels(request *requests.RenderPagesInPixels) (resp *responses.RenderPages, err error) {
+func (i *pdfiumInstance) RenderPagesInPixels(request *requests.RenderPagesInPixels) (resp *responses.RenderPagesInPixels, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
