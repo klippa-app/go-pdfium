@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -15,191 +14,205 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string) {
-	Describe("Render", func() {
-		Context("no references", func() {
-			When("is given", func() {
+var _ = Describe("text", func() {
+	Context("no references", func() {
+		When("is given", func() {
+			Context("GetPageText()", func() {
+				It("returns an error", func() {
+					pageText, err := PdfiumInstance.GetPageText(&requests.GetPageText{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
+						},
+					})
+					Expect(err).To(MatchError("document not given"))
+					Expect(pageText).To(BeNil())
+				})
+			})
+
+			Context("GetPageTextStructured()", func() {
+				It("returns an error", func() {
+					pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Index: 0,
+							},
+						},
+					})
+					Expect(err).To(MatchError("document not given"))
+					Expect(pageTextStructured).To(BeNil())
+				})
+			})
+		})
+	})
+
+	Context("a normal PDF file", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when an invalid page is given", func() {
 				Context("GetPageText()", func() {
 					It("returns an error", func() {
-						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+						pageText, err := PdfiumInstance.GetPageText(&requests.GetPageText{
 							Page: requests.Page{
 								ByIndex: &requests.PageByIndex{
-									Index: 0,
+									Document: doc,
+									Index:    1,
 								},
 							},
 						})
-						Expect(err).To(MatchError("document not given"))
+						Expect(err).To(MatchError(errors.ErrPage.Error()))
 						Expect(pageText).To(BeNil())
 					})
 				})
 
 				Context("GetPageTextStructured()", func() {
 					It("returns an error", func() {
-						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+						pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
 							Page: requests.Page{
 								ByIndex: &requests.PageByIndex{
-									Index: 0,
+									Document: doc,
+									Index:    1,
 								},
 							},
 						})
-						Expect(err).To(MatchError("document not given"))
+						Expect(err).To(MatchError(errors.ErrPage.Error()))
 						Expect(pageTextStructured).To(BeNil())
 					})
 				})
 			})
-		})
 
-		Context("a normal PDF file", func() {
-			var doc references.FPDF_DOCUMENT
-
-			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
-				Expect(err).To(BeNil())
-
-				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
-					Data: &pdfData,
+			Context("when the page text is requested", func() {
+				It("returns the correct text", func() {
+					pageText, err := PdfiumInstance.GetPageText(&requests.GetPageText{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(pageText).To(Equal(&responses.GetPageText{
+						Text: "File: Untitled Document 2 Page 1 of 1\r\nThis is a test PDF",
+					}))
 				})
-				Expect(err).To(BeNil())
-
-				doc = newDoc.Document
 			})
 
-			AfterEach(func() {
-				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
-					Document: doc,
-				})
-				Expect(err).To(BeNil())
-				Expect(FPDF_CloseDocument).To(Not(BeNil()))
-			})
-
-			When("is opened", func() {
-				Context("when an invalid page is given", func() {
-					Context("GetPageText()", func() {
-						It("returns an error", func() {
-							pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
-								Page: requests.Page{
-									ByIndex: &requests.PageByIndex{
-										Document: doc,
-										Index:    1,
-									},
-								},
-							})
-							Expect(err).To(MatchError(errors.ErrPage.Error()))
-							Expect(pageText).To(BeNil())
-						})
+			Context("when the structured page text is requested", func() {
+				It("returns the correct structured text", func() {
+					pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
 					})
 
-					Context("GetPageTextStructured()", func() {
+					Expect(err).To(BeNil())
+					Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", pageTextStructured)))
+				})
+
+				Context("when PixelPositions is enabled", func() {
+					Context("with no DPI and no pixels", func() {
 						It("returns an error", func() {
-							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
 								Page: requests.Page{
 									ByIndex: &requests.PageByIndex{
 										Document: doc,
-										Index:    1,
+										Index:    0,
 									},
 								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+								},
 							})
-							Expect(err).To(MatchError(errors.ErrPage.Error()))
+							Expect(err).To(MatchError("no DPI or resolution given to calculate pixel positions"))
 							Expect(pageTextStructured).To(BeNil())
 						})
 					})
+
+					Context("with DPI", func() {
+						It("returns the correct calculations", func() {
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									DPI:       300,
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", pageTextStructured)))
+						})
+					})
+
+					Context("with pixels", func() {
+						It("returns the correct calculations", func() {
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									Width:     3000,
+									Height:    3000,
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", pageTextStructured)))
+						})
+					})
 				})
 
-				Context("when the page text is requested", func() {
-					It("returns the correct text", func() {
-						pageText, err := pdfiumContainer.GetPageText(&requests.GetPageText{
+				Context("when PixelPositions is enabled", func() {
+					It("returns the correct font information", func() {
+						pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
 							Page: requests.Page{
 								ByIndex: &requests.PageByIndex{
 									Document: doc,
 									Index:    0,
 								},
 							},
+							CollectFontInformation: true,
 						})
 						Expect(err).To(BeNil())
-						Expect(pageText).To(Equal(&responses.GetPageText{
-							Text: "File: Untitled Document 2 Page 1 of 1\r\nThis is a test PDF",
-						}))
-					})
-				})
-
-				Context("when the structured page text is requested", func() {
-					It("returns the correct structured text", func() {
-						pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-							Page: requests.Page{
-								ByIndex: &requests.PageByIndex{
-									Document: doc,
-									Index:    0,
-								},
-							},
-						})
-
-						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_without_pixel_calculations.json", pageTextStructured)))
+						Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information.json", pageTextStructured)))
 					})
 
-					Context("when PixelPositions is enabled", func() {
-						Context("with no DPI and no pixels", func() {
-							It("returns an error", func() {
-								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: requests.Page{
-										ByIndex: &requests.PageByIndex{
-											Document: doc,
-											Index:    0,
-										},
-									},
-									PixelPositions: requests.GetPageTextStructuredPixelPositions{
-										Calculate: true,
-									},
-								})
-								Expect(err).To(MatchError("no DPI or resolution given to calculate pixel positions"))
-								Expect(pageTextStructured).To(BeNil())
-							})
-						})
-
-						Context("with DPI", func() {
-							It("returns the correct calculations", func() {
-								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: requests.Page{
-										ByIndex: &requests.PageByIndex{
-											Document: doc,
-											Index:    0,
-										},
-									},
-									PixelPositions: requests.GetPageTextStructuredPixelPositions{
-										Calculate: true,
-										DPI:       300,
-									},
-								})
-								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_dpi_pixel_calculations.json", pageTextStructured)))
-							})
-						})
-
-						Context("with pixels", func() {
-							It("returns the correct calculations", func() {
-								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: requests.Page{
-										ByIndex: &requests.PageByIndex{
-											Document: doc,
-											Index:    0,
-										},
-									},
-									PixelPositions: requests.GetPageTextStructuredPixelPositions{
-										Calculate: true,
-										Width:     3000,
-										Height:    3000,
-									},
-								})
-
-								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_resolution_pixel_calculations.json", pageTextStructured)))
-							})
-						})
-					})
-
-					Context("when PixelPositions is enabled", func() {
+					Context("and PixelPositions is enabled", func() {
 						It("returns the correct font information", func() {
-							pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
 								Page: requests.Page{
 									ByIndex: &requests.PageByIndex{
 										Document: doc,
@@ -207,37 +220,21 @@ func RunTextTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix string
 									},
 								},
 								CollectFontInformation: true,
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									Width:     3000,
+									Height:    3000,
+								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_font_information.json", pageTextStructured)))
-						})
-
-						Context("and PixelPositions is enabled", func() {
-							It("returns the correct font information", func() {
-								pageTextStructured, err := pdfiumContainer.GetPageTextStructured(&requests.GetPageTextStructured{
-									Page: requests.Page{
-										ByIndex: &requests.PageByIndex{
-											Document: doc,
-											Index:    0,
-										},
-									},
-									CollectFontInformation: true,
-									PixelPositions: requests.GetPageTextStructuredPixelPositions{
-										Calculate: true,
-										Width:     3000,
-										Height:    3000,
-									},
-								})
-								Expect(err).To(BeNil())
-								Expect(pageTextStructured).To(Equal(loadStructuredText(testsPath+"/testdata/text_"+prefix+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
-							})
+							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
 						})
 					})
 				})
 			})
 		})
 	})
-}
+})
 
 func loadStructuredText(path string, resp *responses.GetPageTextStructured) *responses.GetPageTextStructured {
 	writeStructuredText(path, resp)

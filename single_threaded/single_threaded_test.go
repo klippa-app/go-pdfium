@@ -1,6 +1,7 @@
 package single_threaded_test
 
 import (
+	"os"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/shared_tests"
@@ -10,13 +11,29 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Single Threaded", func() {
-	pool := single_threaded.Init()
-	instance, err := pool.GetInstance(time.Second * 30)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+var _ = BeforeSuite(func() {
+	// Set ENV to ensure resulting values.
+	err := os.Setenv("TZ", "UTC")
+	Expect(err).To(BeNil())
 
-	shared_tests.RunTests(instance, "../shared_tests", "single")
+	pool := single_threaded.Init()
+	shared_tests.PdfiumPool = pool
+
+	instance, err := pool.GetInstance(time.Second * 30)
+	Expect(err).To(BeNil())
+	shared_tests.PdfiumInstance = instance
+	shared_tests.TestDataPath = "../shared_tests"
+	shared_tests.TestType = "single"
+})
+
+var _ = AfterSuite(func() {
+	err := shared_tests.PdfiumInstance.Close()
+	Expect(err).To(BeNil())
+
+	err = shared_tests.PdfiumPool.Close()
+	Expect(err).To(BeNil())
+})
+
+var _ = Describe("Single Threaded", func() {
+	shared_tests.Import()
 })

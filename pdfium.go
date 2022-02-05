@@ -24,6 +24,8 @@ func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
 	}
 }
 
+// Pool describes a PDFium worker pool. Every instance in the pool manages
+// its own resources.
 type Pool interface {
 	// GetInstance returns an instance to the pool.
 	// For single-threaded this is thread safe, but you can only do one PDFium action at the same time.
@@ -39,7 +41,9 @@ type Pool interface {
 	Close() error
 }
 
-// Pdfium describes a Pdfium instance.
+// Pdfium describes a Pdfium worker instance. Documents and handles can't be
+// shared between different instances. WHen a worker is closed, all resources
+// and open documents are released.
 type Pdfium interface {
 	// Start instance functions.
 
