@@ -110,9 +110,9 @@ type FPDFText_GetBoundedText struct {
 type FPDFText_FindStartFlag uint64
 
 const (
-	FPDFText_FindStartFlag_MATCHCASE      FPDFText_FindStartFlag = 0x00000001
-	FPDFText_FindStartFlag_MATCHWHOLEWORD FPDFText_FindStartFlag = 0x00000002
-	FPDFText_FindStartFlag_CONSECUTIVE    FPDFText_FindStartFlag = 0x00000004
+	FPDFText_FindStartFlag_MATCHCASE      FPDFText_FindStartFlag = 0x00000001 // If not set, it will not match case by default.
+	FPDFText_FindStartFlag_MATCHWHOLEWORD FPDFText_FindStartFlag = 0x00000002 // If not set, it will not match the whole word by default.
+	FPDFText_FindStartFlag_CONSECUTIVE    FPDFText_FindStartFlag = 0x00000004 // If not set, it will skip past the current match to look for the next match.
 )
 
 type FPDFText_FindStart struct {
