@@ -191,6 +191,141 @@ type Pdfium interface {
 	// FPDF_GetPageSizeByIndex returns the size of a page by the page index.
 	FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
 
+	// FPDF_InitLibrary
+	FPDF_InitLibrary(request *requests.FPDF_InitLibrary) (*responses.FPDF_InitLibrary, error)
+
+	// FPDF_InitLibraryWithConfig
+	FPDF_InitLibraryWithConfig(request *requests.FPDF_InitLibraryWithConfig) (*responses.FPDF_InitLibraryWithConfig, error)
+
+	// FPDF_DestroyLibrary
+	FPDF_DestroyLibrary(request *requests.FPDF_DestroyLibrary) (*responses.FPDF_DestroyLibrary, error)
+
+	// FPDF_SetTypefaceAccessibleFunc
+	FPDF_SetTypefaceAccessibleFunc(request *requests.FPDF_SetTypefaceAccessibleFunc) (*responses.FPDF_SetTypefaceAccessibleFunc, error)
+
+	// FPDF_SetPrintTextWithGDI
+	FPDF_SetPrintTextWithGDI(request *requests.FPDF_SetPrintTextWithGDI) (*responses.FPDF_SetPrintTextWithGDI, error)
+
+	// FPDF_SetPrintMode
+	FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
+
+	// FPDF_DocumentHasValidCrossReferenceTable
+	FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
+
+	// FPDF_GetTrailerEnds
+	FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error)
+
+	// FPDF_GetPageWidthF
+	FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error)
+
+	// FPDF_GetPageHeightF
+	FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error)
+
+	// FPDF_GetPageBoundingBox
+	FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error)
+
+	// FPDF_GetPageSizeByIndexF
+	FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error)
+
+	// FPDF_RenderPage
+	FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
+
+	// FPDF_RenderPageBitmap
+	FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
+
+	// FPDF_RenderPageBitmapWithMatrix
+	FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error)
+
+	// FPDF_RenderPageSkp
+	FPDF_RenderPageSkp(request *requests.FPDF_RenderPageSkp) (*responses.FPDF_RenderPageSkp, error)
+
+	// FPDF_DeviceToPage
+	FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error)
+
+	// FPDF_PageToDevice
+	FPDF_PageToDevice(request *requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
+
+	// FPDFBitmap_Create
+	FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error)
+
+	// FPDFBitmap_CreateEx
+	FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error)
+
+	// FPDFBitmap_GetFormat
+	FPDFBitmap_GetFormat(request *requests.FPDFBitmap_GetFormat) (*responses.FPDFBitmap_GetFormat, error)
+
+	// FPDFBitmap_FillRect
+	FPDFBitmap_FillRect(request *requests.FPDFBitmap_FillRect) (*responses.FPDFBitmap_FillRect, error)
+
+	// FPDFBitmap_GetBuffer
+	FPDFBitmap_GetBuffer(request *requests.FPDFBitmap_GetBuffer) (*responses.FPDFBitmap_GetBuffer, error)
+
+	// FPDFBitmap_GetWidth
+	FPDFBitmap_GetWidth(request *requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error)
+
+	// FPDFBitmap_GetHeight
+	FPDFBitmap_GetHeight(request *requests.FPDFBitmap_GetHeight) (*responses.FPDFBitmap_GetHeight, error)
+
+	// FPDFBitmap_GetStride
+	FPDFBitmap_GetStride(request *requests.FPDFBitmap_GetStride) (*responses.FPDFBitmap_GetStride, error)
+
+	// FPDFBitmap_Destroy
+	FPDFBitmap_Destroy(request *requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error)
+
+	// FPDF_VIEWERREF_GetPrintScaling
+	FPDF_VIEWERREF_GetPrintScaling(request *requests.FPDF_VIEWERREF_GetPrintScaling) (*responses.FPDF_VIEWERREF_GetPrintScaling, error)
+
+	// FPDF_VIEWERREF_GetNumCopies
+	FPDF_VIEWERREF_GetNumCopies(request *requests.FPDF_VIEWERREF_GetNumCopies) (*responses.FPDF_VIEWERREF_GetNumCopies, error)
+
+	// FPDF_VIEWERREF_GetPrintPageRange
+	FPDF_VIEWERREF_GetPrintPageRange(request *requests.FPDF_VIEWERREF_GetPrintPageRange) (*responses.FPDF_VIEWERREF_GetPrintPageRange, error)
+
+	// FPDF_VIEWERREF_GetPrintPageRangeCount
+	FPDF_VIEWERREF_GetPrintPageRangeCount(request *requests.FPDF_VIEWERREF_GetPrintPageRangeCount) (*responses.FPDF_VIEWERREF_GetPrintPageRangeCount, error)
+
+	// FPDF_VIEWERREF_GetPrintPageRangeElement
+	FPDF_VIEWERREF_GetPrintPageRangeElement(request *requests.FPDF_VIEWERREF_GetPrintPageRangeElement) (*responses.FPDF_VIEWERREF_GetPrintPageRangeElement, error)
+
+	// FPDF_VIEWERREF_GetDuplex
+	FPDF_VIEWERREF_GetDuplex(request *requests.FPDF_VIEWERREF_GetDuplex) (*responses.FPDF_VIEWERREF_GetDuplex, error)
+
+	// FPDF_VIEWERREF_GetName
+	FPDF_VIEWERREF_GetName(request *requests.FPDF_VIEWERREF_GetName) (*responses.FPDF_VIEWERREF_GetName, error)
+
+	// FPDF_CountNamedDests
+	FPDF_CountNamedDests(request *requests.FPDF_CountNamedDests) (*responses.FPDF_CountNamedDests, error)
+
+	// FPDF_GetNamedDestByName
+	FPDF_GetNamedDestByName(request *requests.FPDF_GetNamedDestByName) (*responses.FPDF_GetNamedDestByName, error)
+
+	// FPDF_GetNamedDest
+	FPDF_GetNamedDest(request *requests.FPDF_GetNamedDest) (*responses.FPDF_GetNamedDest, error)
+
+	// FPDF_GetXFAPacketCount
+	FPDF_GetXFAPacketCount(request *requests.FPDF_GetXFAPacketCount) (*responses.FPDF_GetXFAPacketCount, error)
+
+	// FPDF_GetXFAPacketName
+	FPDF_GetXFAPacketName(request *requests.FPDF_GetXFAPacketName) (*responses.FPDF_GetXFAPacketName, error)
+
+	// FPDF_GetXFAPacketContent
+	FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error)
+
+	// FPDF_GetRecommendedV8Flags
+	FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error)
+
+	// FPDF_GetArrayBufferAllocatorSharedInstance
+	FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error)
+
+	// FPDF_BStr_Init
+	FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (*responses.FPDF_BStr_Init, error)
+
+	// FPDF_BStr_Set
+	FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (*responses.FPDF_BStr_Set, error)
+
+	// FPDF_BStr_Clear
+	FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (*responses.FPDF_BStr_Clear, error)
+
 	// End fpdfview.h
 
 	// Start fpdf_edit.h
