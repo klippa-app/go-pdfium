@@ -11,13 +11,12 @@ import (
 )
 
 type Pdfium interface {
-    Ping() (string, error)
+	Ping() (string, error)
 {{- range $method := .Methods }}
-    {{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
+	{{ $method.Name }}(*requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error)
 {{- end }}
-    Close() error
+	Close() error
 }
-
 {{ range $method := .Methods }}
 func (g *PdfiumRPC) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
 	resp := &responses.{{ $method.Output }}{}
@@ -28,15 +27,14 @@ func (g *PdfiumRPC) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*
 
 	return resp, nil
 }
-{{end}}
-
+{{ end -}}
 {{ range $method := .Methods }}
 func (s *PdfiumRPCServer) {{ $method.Name }}(request *requests.{{ $method.Input }}, resp *responses.{{ $method.Output }}) (err error) {
 	defer func() {
-        if panicError := recover(); panicError != nil {
-            err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
-        }
-    }()
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
+		}
+	}()
 
 	implResp, err := s.Impl.{{ $method.Name }}(request)
 	if err != nil {
@@ -48,4 +46,4 @@ func (s *PdfiumRPCServer) {{ $method.Name }}(request *requests.{{ $method.Input 
 
 	return nil
 }
-{{end}}
+{{ end -}}
