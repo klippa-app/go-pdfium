@@ -42,7 +42,7 @@ func main() {
 		method := docType.Method(i)
 
 		// These are special, don't generate them
-		if method.Name == "Close" || method.Name == "FPDF_CloseDocument" || method.Name == "NewDocumentFromBytes" || method.Name == "NewDocumentFromFilePath" || method.Name == "NewDocumentFromReader" {
+		if method.Name == "Close" {
 			continue
 		}
 
@@ -50,15 +50,6 @@ func main() {
 			Name:   method.Name,
 			Input:  method.Name,
 			Output: method.Name,
-		}
-
-		// Exceptions for the code generator.
-		if method.Name == "RenderPageInDPI" || method.Name == "RenderPageInPixels" {
-			dataMethod.Output = "RenderPage"
-		}
-
-		if method.Name == "RenderPagesInDPI" || method.Name == "RenderPagesInPixels" {
-			dataMethod.Output = "RenderPages"
 		}
 
 		data.Methods = append(data.Methods, dataMethod)

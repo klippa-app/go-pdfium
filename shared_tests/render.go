@@ -135,15 +135,20 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("is opened", func() {
@@ -363,7 +368,6 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						Context("width DPI 100", func() {
 							It("returns the right image, point to pixel ratio and resolution", func() {
 								renderedPage, err := pdfiumContainer.RenderPageInDPI(&requests.RenderPageInDPI{
-
 									Page: requests.Page{
 										ByIndex: &requests.PageByIndex{
 											Document: doc,
@@ -373,13 +377,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									DPI: 100,
 								})
 								Expect(err).To(BeNil())
-								compareRenderHash(renderedPage, &responses.RenderPage{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 									PointToPixelRatio: 1.3888888888888888,
 									Width:             827,
 									Height:            1170,
 								}, testsPath+"/testdata/render_"+prefix+"_testpdf_dpi_100")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(1170))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(827))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(1170))
 							})
 						})
 
@@ -396,13 +401,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									DPI: 300,
 								})
 								Expect(err).To(BeNil())
-								compareRenderHash(renderedPage, &responses.RenderPage{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 									PointToPixelRatio: 4.166666666666667,
 									Width:             2481,
 									Height:            3508,
 								}, testsPath+"/testdata/render_"+prefix+"_testpdf_dpi_300")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3508))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3508))
 							})
 						})
 					})
@@ -438,13 +444,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHash(renderedPage, &responses.RenderPage{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 									PointToPixelRatio: 3.3597884547259587,
 									Width:             2000,
 									Height:            2829,
 								}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x0")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2829))
 							})
 						})
 
@@ -462,13 +469,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHash(renderedPage, &responses.RenderPage{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 									PointToPixelRatio: 2.375608084404265,
 									Width:             1415,
 									Height:            2000,
 								}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_0x2000")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
 							})
 						})
 
@@ -488,13 +496,15 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHash(renderedPage, &responses.RenderPage{
+									Expect(renderedPage).To(Not(BeNil()))
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 										PointToPixelRatio: 2.375608084404265,
 										Width:             1415,
 										Height:            2000,
 									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x2000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
 								})
 							})
 							Context("and the width being larger than the height", func() {
@@ -512,13 +522,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHash(renderedPage, &responses.RenderPage{
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 										PointToPixelRatio: 2.375608084404265,
 										Width:             1415,
 										Height:            2000,
 									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_4000x2000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2000))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
 								})
 							})
 
@@ -537,13 +548,14 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHash(renderedPage, &responses.RenderPage{
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 										PointToPixelRatio: 3.3597884547259587,
 										Width:             2000,
 										Height:            2829,
 									}, testsPath+"/testdata/render_"+prefix+"_testpdf_pixels_2000x4000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2829))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2829))
 								})
 							})
 						})
@@ -618,7 +630,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									},
 								})
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  827,
 									Height: 2340,
 									Pages: []responses.RenderPagesPage{
@@ -638,8 +651,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_100")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(827))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(2340))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(827))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2340))
 							})
 						})
 
@@ -670,7 +683,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									},
 								})
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  2481,
 									Height: 7016,
 									Pages: []responses.RenderPagesPage{
@@ -690,8 +704,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_300")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7016))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(7016))
 							})
 						})
 
@@ -722,7 +736,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									},
 								})
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  2481,
 									Height: 5847,
 									Pages: []responses.RenderPagesPage{
@@ -742,8 +757,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_200_300")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5847))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5847))
 							})
 						})
 
@@ -775,7 +790,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									Padding: 50,
 								})
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  2481,
 									Height: 7066,
 									Pages: []responses.RenderPagesPage{
@@ -795,8 +811,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_dpi_300_padding_50")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2481))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(7066))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(7066))
 							})
 						})
 					})
@@ -868,7 +884,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  2000,
 									Height: 5658,
 									Pages: []responses.RenderPagesPage{
@@ -888,8 +905,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5658))
 							})
 						})
 
@@ -921,7 +938,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  1415,
 									Height: 4000,
 									Pages: []responses.RenderPagesPage{
@@ -941,8 +958,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
 							})
 						})
 
@@ -977,7 +994,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 										Width:  1415,
 										Height: 4000,
 										Pages: []responses.RenderPagesPage{
@@ -997,8 +1015,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 											},
 										},
 									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
 								})
 							})
 							Context("and the width being larger than the height", func() {
@@ -1031,7 +1049,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 										Width:  1415,
 										Height: 4000,
 										Pages: []responses.RenderPagesPage{
@@ -1051,8 +1070,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 											},
 										},
 									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_4000x2000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4000))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
 								})
 							})
 
@@ -1086,7 +1105,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 									})
 
 									Expect(err).To(BeNil())
-									compareRenderHashForPages(renderedPage, &responses.RenderPages{
+									Expect(renderedPage).To(Not(BeNil()))
+									compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 										Width:  2000,
 										Height: 5658,
 										Pages: []responses.RenderPagesPage{
@@ -1106,8 +1126,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 											},
 										},
 									}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x4000")
-									Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
-									Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(5658))
+									Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
+									Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5658))
 								})
 							})
 						})
@@ -1140,7 +1160,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  2000,
 									Height: 4951,
 									Pages: []responses.RenderPagesPage{
@@ -1160,8 +1181,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x0_1500x0")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(2000))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4951))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4951))
 							})
 						})
 
@@ -1193,7 +1214,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  1415,
 									Height: 3500,
 									Pages: []responses.RenderPagesPage{
@@ -1213,8 +1235,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_0x2000_0x1500")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3500))
 							})
 						})
 
@@ -1248,7 +1270,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  1415,
 									Height: 3500,
 									Pages: []responses.RenderPagesPage{
@@ -1268,8 +1291,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_1500x1500")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(3500))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3500))
 							})
 						})
 
@@ -1304,7 +1327,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								})
 
 								Expect(err).To(BeNil())
-								compareRenderHashForPages(renderedPage, &responses.RenderPages{
+								Expect(renderedPage).To(Not(BeNil()))
+								compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 									Width:  1415,
 									Height: 4050,
 									Pages: []responses.RenderPagesPage{
@@ -1324,8 +1348,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 										},
 									},
 								}, testsPath+"/testdata/render_"+prefix+"_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")
-								Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-								Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(4050))
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4050))
 							})
 						})
 					})
@@ -1914,15 +1938,20 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("it is rendered", func() {
@@ -1939,7 +1968,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 					})
 
 					Expect(err).To(BeNil())
-					compareRenderHash(renderedPage, &responses.RenderPage{
+					compareRenderHash(&renderedPage.Result, &responses.RenderPage{
 						PointToPixelRatio: 2.7777777777777777,
 						Width:             1653,
 						Height:            2339,
@@ -1956,15 +1985,20 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("is opened", func() {
@@ -2015,26 +2049,36 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
+				newDoc, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData,
+				})
 				Expect(err).To(BeNil())
 
-				doc = *newDoc
+				doc = newDoc.Document
 
 				pdfData2, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 
-				newDoc2, err := pdfiumContainer.NewDocumentFromBytes(&pdfData2)
+				newDoc2, err := pdfiumContainer.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+					Data: &pdfData2,
+				})
 				Expect(err).To(BeNil())
 
-				doc2 = *newDoc2
+				doc2 = newDoc2.Document
 			})
 
 			AfterEach(func() {
-				err := pdfiumContainer.FPDF_CloseDocument(doc)
+				FPDF_CloseDocument, err := pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 
-				err = pdfiumContainer.FPDF_CloseDocument(doc2)
+				FPDF_CloseDocument, err = pdfiumContainer.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+					Document: doc2,
+				})
 				Expect(err).To(BeNil())
+				Expect(FPDF_CloseDocument).To(Not(BeNil()))
 			})
 
 			When("are opened", func() {
@@ -2078,7 +2122,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 						})
 
 						Expect(err).To(BeNil())
-						compareRenderHashForPages(renderedPage, &responses.RenderPages{
+						compareRenderHashForPages(&renderedPage.Result, &responses.RenderPages{
 							Width:  1415,
 							Height: 6100,
 							Pages: []responses.RenderPagesPage{
@@ -2106,8 +2150,8 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 								},
 							},
 						}, testsPath+"/testdata/render_"+prefix+"_testpdf_multiple_pdf_combined")
-						Expect(renderedPage.Image.Bounds().Size().X).To(Equal(1415))
-						Expect(renderedPage.Image.Bounds().Size().Y).To(Equal(6100))
+						Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
+						Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(6100))
 					})
 				})
 			})

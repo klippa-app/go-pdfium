@@ -2,6 +2,24 @@ package responses
 
 import "github.com/klippa-app/go-pdfium/references"
 
+type FPDF_LoadDocument struct {
+	Document references.FPDF_DOCUMENT
+}
+
+type FPDF_LoadMemDocument struct {
+	Document references.FPDF_DOCUMENT
+}
+
+type FPDF_LoadMemDocument64 struct {
+	Document references.FPDF_DOCUMENT
+}
+
+type FPDF_LoadCustomDocument struct {
+	Document references.FPDF_DOCUMENT
+}
+
+type FPDF_CloseDocument struct{}
+
 type FPDF_GetLastErrorError int
 
 const (

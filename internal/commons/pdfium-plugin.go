@@ -1,7 +1,6 @@
 package commons
 
 import (
-	"github.com/klippa-app/go-pdfium/references"
 	"net/rpc"
 
 	"github.com/hashicorp/go-plugin"
@@ -28,15 +27,6 @@ func (g *PdfiumRPC) Close() error {
 	return nil
 }
 
-func (g *PdfiumRPC) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
-	err := g.client.Call("Plugin.FPDF_CloseDocument", document, new(interface{}))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 type PdfiumRPCServer struct {
 	Impl Pdfium
 }
@@ -56,16 +46,6 @@ func (s *PdfiumRPCServer) Close(args interface{}, resp *interface{}) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_CloseDocument(document references.FPDF_DOCUMENT, resp *interface{}) error {
-	var err error
-	err = s.Impl.FPDF_CloseDocument(document)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
