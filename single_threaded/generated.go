@@ -4,7 +4,7 @@
 package single_threaded
 
 import (
-    "errors"
+	"errors"
 	"fmt"
 
 	"github.com/klippa-app/go-pdfium/requests"
