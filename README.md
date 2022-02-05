@@ -333,8 +333,8 @@ func renderPage(filePath string, page int, output string) error {
 		File: &pdfBytes,
 	})
 	if err != nil {
-        return err
-    }
+		return err
+	}
 
 	// Always close the document, this will release its resources.
 	defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
