@@ -1,5 +1,9 @@
 package main
 
+// This tool is to generate the go-pdfium implementations.
+// The implementations follow a format for input/output which makes it easy to
+// generate the implementations, saving a lot of copy-pasting time.
+
 import (
 	"io/ioutil"
 	"log"

@@ -105,14 +105,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -335,14 +330,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -400,14 +390,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/bookmarks.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -425,70 +410,60 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 					Expect(err).To(BeNil())
 					Expect(topLevelBookmark).To(Not(BeNil()))
 
-					if topLevelBookmark != nil {
-						Expect(topLevelBookmark.Bookmark).To(Not(BeNil()))
-						// Check title of bookmark.
-						topLevelBookmarkTitle, err := pdfiumContainer.FPDFBookmark_GetTitle(&requests.FPDFBookmark_GetTitle{
-							Bookmark: *topLevelBookmark.Bookmark,
-						})
-						Expect(err).To(BeNil())
-						Expect(topLevelBookmarkTitle).To(Equal(&responses.FPDFBookmark_GetTitle{
-							Title: "A Good Beginning",
-						}))
+					Expect(topLevelBookmark.Bookmark).To(Not(BeNil()))
+					// Check title of bookmark.
+					topLevelBookmarkTitle, err := pdfiumContainer.FPDFBookmark_GetTitle(&requests.FPDFBookmark_GetTitle{
+						Bookmark: *topLevelBookmark.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(topLevelBookmarkTitle).To(Equal(&responses.FPDFBookmark_GetTitle{
+						Title: "A Good Beginning",
+					}))
 
-						// Check that we have no children
-						topLevelBookmarkSibling, err := pdfiumContainer.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
-							Document: doc,
-							Bookmark: topLevelBookmark.Bookmark,
-						})
-						Expect(err).To(BeNil())
-						Expect(topLevelBookmarkSibling).To(Not(BeNil()))
-						if topLevelBookmarkSibling != nil {
-							Expect(topLevelBookmarkSibling.Bookmark).To(BeNil())
-						}
+					// Check that we have no children
+					topLevelBookmarkSibling, err := pdfiumContainer.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
+						Document: doc,
+						Bookmark: topLevelBookmark.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(topLevelBookmarkSibling).To(Not(BeNil()))
+					Expect(topLevelBookmarkSibling.Bookmark).To(BeNil())
 
-						// Check that we have a sibling
-						sibling, err := pdfiumContainer.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{
-							Document: doc,
-							Bookmark: *topLevelBookmark.Bookmark,
-						})
-						Expect(err).To(BeNil())
-						Expect(sibling).To(Not(BeNil()))
-						if sibling != nil {
-							Expect(sibling.Bookmark).To(Not(BeNil()))
+					// Check that we have a sibling
+					sibling, err := pdfiumContainer.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{
+						Document: doc,
+						Bookmark: *topLevelBookmark.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(sibling).To(Not(BeNil()))
+					Expect(sibling.Bookmark).To(Not(BeNil()))
 
-							// Check title of bookmark.
-							siblingTitle, err := pdfiumContainer.FPDFBookmark_GetTitle(&requests.FPDFBookmark_GetTitle{
-								Bookmark: *sibling.Bookmark,
-							})
-							Expect(err).To(BeNil())
-							Expect(siblingTitle).To(Equal(&responses.FPDFBookmark_GetTitle{
-								Title: "A Good Ending",
-							}))
+					// Check title of bookmark.
+					siblingTitle, err := pdfiumContainer.FPDFBookmark_GetTitle(&requests.FPDFBookmark_GetTitle{
+						Bookmark: *sibling.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(siblingTitle).To(Equal(&responses.FPDFBookmark_GetTitle{
+						Title: "A Good Ending",
+					}))
 
-							// Check that we have no children
-							siblingChildren, err := pdfiumContainer.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
-								Document: doc,
-								Bookmark: sibling.Bookmark,
-							})
-							Expect(err).To(BeNil())
-							Expect(siblingChildren).To(Not(BeNil()))
-							if siblingChildren != nil {
-								Expect(siblingChildren.Bookmark).To(BeNil())
-							}
+					// Check that we have no children
+					siblingChildren, err := pdfiumContainer.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
+						Document: doc,
+						Bookmark: sibling.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(siblingChildren).To(Not(BeNil()))
+					Expect(siblingChildren.Bookmark).To(BeNil())
 
-							// Check that we have no sibling
-							siblingSibling, err := pdfiumContainer.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{
-								Document: doc,
-								Bookmark: *sibling.Bookmark,
-							})
-							Expect(err).To(BeNil())
-							Expect(siblingSibling).To(Not(BeNil()))
-							if sibling != nil {
-								Expect(siblingSibling.Bookmark).To(BeNil())
-							}
-						}
-					}
+					// Check that we have no sibling
+					siblingSibling, err := pdfiumContainer.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{
+						Document: doc,
+						Bookmark: *sibling.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(siblingSibling).To(Not(BeNil()))
+					Expect(siblingSibling.Bookmark).To(BeNil())
 				})
 			})
 
@@ -500,9 +475,7 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 					})
 					Expect(err).To(BeNil())
 					Expect(bookmark).To(Not(BeNil()))
-					if bookmark != nil {
-						Expect(bookmark.Bookmark).To(Not(BeNil()))
-					}
+					Expect(bookmark.Bookmark).To(Not(BeNil()))
 				})
 
 				It("it returns the no bookmark when there is no match", func() {
@@ -581,14 +554,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/about_blank.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -616,14 +584,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/page_labels.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -742,14 +705,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/split_streams.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -808,14 +766,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/non_hex_file_id.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -856,14 +809,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/hello_world.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -903,14 +851,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/launch_action.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -962,14 +905,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/launch_action.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
@@ -1132,14 +1070,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/uri_action.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
@@ -1247,14 +1180,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/goto_action.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
@@ -1388,14 +1316,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/gotoe_action.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
@@ -1532,14 +1455,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/bug_821454.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
@@ -1694,14 +1612,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/get_page_aaction.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -1876,14 +1789,9 @@ func RunfpdfDocTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix str
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/annots.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})

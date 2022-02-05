@@ -72,14 +72,9 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -108,14 +103,9 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/two_signatures.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -218,14 +208,9 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/signature_no_sub_filter.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -326,14 +311,9 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/signature_reason.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -440,14 +420,9 @@ func RunfpdfSignatureTests(pdfiumContainer pdfium.Pdfium, testsPath string, pref
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/docmdp.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})

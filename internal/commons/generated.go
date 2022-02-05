@@ -4,6 +4,8 @@
 package commons
 
 import (
+	"fmt"
+
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -1470,8 +1472,13 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 
 
 
-func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDest, resp *responses.FPDFAction_GetDest) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDest, resp *responses.FPDFAction_GetDest) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAction_GetDest", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAction_GetDest(request)
 	if err != nil {
 		return err
@@ -1483,8 +1490,13 @@ func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDes
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath, resp *responses.FPDFAction_GetFilePath) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAction_GetFilePath(request *requests.FPDFAction_GetFilePath, resp *responses.FPDFAction_GetFilePath) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAction_GetFilePath", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAction_GetFilePath(request)
 	if err != nil {
 		return err
@@ -1496,8 +1508,13 @@ func (s *PdfiumRPCServer) FPDFAction_GetFilePath(request *requests.FPDFAction_Ge
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAction_GetType(request *requests.FPDFAction_GetType, resp *responses.FPDFAction_GetType) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAction_GetType(request *requests.FPDFAction_GetType, resp *responses.FPDFAction_GetType) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAction_GetType", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAction_GetType(request)
 	if err != nil {
 		return err
@@ -1509,8 +1526,13 @@ func (s *PdfiumRPCServer) FPDFAction_GetType(request *requests.FPDFAction_GetTyp
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath, resp *responses.FPDFAction_GetURIPath) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPath, resp *responses.FPDFAction_GetURIPath) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAction_GetURIPath", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAction_GetURIPath(request)
 	if err != nil {
 		return err
@@ -1522,8 +1544,13 @@ func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_Get
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile, resp *responses.FPDFAttachment_GetFile) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile, resp *responses.FPDFAttachment_GetFile) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetFile", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_GetFile(request)
 	if err != nil {
 		return err
@@ -1535,8 +1562,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_GetFile(request *requests.FPDFAttachmen
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetName, resp *responses.FPDFAttachment_GetName) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetName, resp *responses.FPDFAttachment_GetName) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetName", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_GetName(request)
 	if err != nil {
 		return err
@@ -1548,8 +1580,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_GetName(request *requests.FPDFAttachmen
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue, resp *responses.FPDFAttachment_GetStringValue) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue, resp *responses.FPDFAttachment_GetStringValue) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetStringValue", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_GetStringValue(request)
 	if err != nil {
 		return err
@@ -1561,8 +1598,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_GetStringValue(request *requests.FPDFAt
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType, resp *responses.FPDFAttachment_GetValueType) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType, resp *responses.FPDFAttachment_GetValueType) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetValueType", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_GetValueType(request)
 	if err != nil {
 		return err
@@ -1574,8 +1616,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_GetValueType(request *requests.FPDFAtta
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey, resp *responses.FPDFAttachment_HasKey) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey, resp *responses.FPDFAttachment_HasKey) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_HasKey", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_HasKey(request)
 	if err != nil {
 		return err
@@ -1587,8 +1634,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_HasKey(request *requests.FPDFAttachment
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile, resp *responses.FPDFAttachment_SetFile) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile, resp *responses.FPDFAttachment_SetFile) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_SetFile", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_SetFile(request)
 	if err != nil {
 		return err
@@ -1600,8 +1652,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_SetFile(request *requests.FPDFAttachmen
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue, resp *responses.FPDFAttachment_SetStringValue) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue, resp *responses.FPDFAttachment_SetStringValue) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_SetStringValue", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFAttachment_SetStringValue(request)
 	if err != nil {
 		return err
@@ -1613,8 +1670,13 @@ func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAt
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find, resp *responses.FPDFBookmark_Find) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find, resp *responses.FPDFBookmark_Find) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_Find", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_Find(request)
 	if err != nil {
 		return err
@@ -1626,8 +1688,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_Find(request *requests.FPDFBookmark_Find,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction, resp *responses.FPDFBookmark_GetAction) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction, resp *responses.FPDFBookmark_GetAction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetAction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_GetAction(request)
 	if err != nil {
 		return err
@@ -1639,8 +1706,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest, resp *responses.FPDFBookmark_GetDest) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest, resp *responses.FPDFBookmark_GetDest) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetDest", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_GetDest(request)
 	if err != nil {
 		return err
@@ -1652,8 +1724,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetDest(request *requests.FPDFBookmark_Ge
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild, resp *responses.FPDFBookmark_GetFirstChild) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild, resp *responses.FPDFBookmark_GetFirstChild) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetFirstChild", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_GetFirstChild(request)
 	if err != nil {
 		return err
@@ -1665,8 +1742,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetFirstChild(request *requests.FPDFBookm
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling, resp *responses.FPDFBookmark_GetNextSibling) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling, resp *responses.FPDFBookmark_GetNextSibling) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetNextSibling", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_GetNextSibling(request)
 	if err != nil {
 		return err
@@ -1678,8 +1760,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBook
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetTitle", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFBookmark_GetTitle(request)
 	if err != nil {
 		return err
@@ -1691,8 +1778,13 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_G
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged, resp *responses.FPDFCatalog_IsTagged) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged, resp *responses.FPDFCatalog_IsTagged) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFCatalog_IsTagged", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFCatalog_IsTagged(request)
 	if err != nil {
 		return err
@@ -1704,8 +1796,13 @@ func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsT
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex, resp *responses.FPDFDest_GetDestPageIndex) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex, resp *responses.FPDFDest_GetDestPageIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDest_GetDestPageIndex", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDest_GetDestPageIndex(request)
 	if err != nil {
 		return err
@@ -1717,8 +1814,13 @@ func (s *PdfiumRPCServer) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_G
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage, resp *responses.FPDFDest_GetLocationInPage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDest_GetLocationInPage(request *requests.FPDFDest_GetLocationInPage, resp *responses.FPDFDest_GetLocationInPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDest_GetLocationInPage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDest_GetLocationInPage(request)
 	if err != nil {
 		return err
@@ -1730,8 +1832,13 @@ func (s *PdfiumRPCServer) FPDFDest_GetLocationInPage(request *requests.FPDFDest_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDest_GetView(request *requests.FPDFDest_GetView, resp *responses.FPDFDest_GetView) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDest_GetView(request *requests.FPDFDest_GetView, resp *responses.FPDFDest_GetView) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDest_GetView", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDest_GetView(request)
 	if err != nil {
 		return err
@@ -1743,8 +1850,13 @@ func (s *PdfiumRPCServer) FPDFDest_GetView(request *requests.FPDFDest_GetView, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachment, resp *responses.FPDFDoc_AddAttachment) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAttachment, resp *responses.FPDFDoc_AddAttachment) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_AddAttachment", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_AddAttachment(request)
 	if err != nil {
 		return err
@@ -1756,8 +1868,13 @@ func (s *PdfiumRPCServer) FPDFDoc_AddAttachment(request *requests.FPDFDoc_AddAtt
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction, resp *responses.FPDFDoc_CloseJavaScriptAction) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction, resp *responses.FPDFDoc_CloseJavaScriptAction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_CloseJavaScriptAction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_CloseJavaScriptAction(request)
 	if err != nil {
 		return err
@@ -1769,8 +1886,13 @@ func (s *PdfiumRPCServer) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDo
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment, resp *responses.FPDFDoc_DeleteAttachment) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_DeleteAttachment, resp *responses.FPDFDoc_DeleteAttachment) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_DeleteAttachment", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_DeleteAttachment(request)
 	if err != nil {
 		return err
@@ -1782,8 +1904,13 @@ func (s *PdfiumRPCServer) FPDFDoc_DeleteAttachment(request *requests.FPDFDoc_Del
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAttachment, resp *responses.FPDFDoc_GetAttachment) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAttachment, resp *responses.FPDFDoc_GetAttachment) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_GetAttachment", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_GetAttachment(request)
 	if err != nil {
 		return err
@@ -1795,8 +1922,13 @@ func (s *PdfiumRPCServer) FPDFDoc_GetAttachment(request *requests.FPDFDoc_GetAtt
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAttachmentCount, resp *responses.FPDFDoc_GetAttachmentCount) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_GetAttachmentCount, resp *responses.FPDFDoc_GetAttachmentCount) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_GetAttachmentCount", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_GetAttachmentCount(request)
 	if err != nil {
 		return err
@@ -1808,8 +1940,13 @@ func (s *PdfiumRPCServer) FPDFDoc_GetAttachmentCount(request *requests.FPDFDoc_G
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction, resp *responses.FPDFDoc_GetJavaScriptAction) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction, resp *responses.FPDFDoc_GetJavaScriptAction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_GetJavaScriptAction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_GetJavaScriptAction(request)
 	if err != nil {
 		return err
@@ -1821,8 +1958,13 @@ func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount, resp *responses.FPDFDoc_GetJavaScriptActionCount) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount, resp *responses.FPDFDoc_GetJavaScriptActionCount) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_GetJavaScriptActionCount", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_GetJavaScriptActionCount(request)
 	if err != nil {
 		return err
@@ -1834,8 +1976,13 @@ func (s *PdfiumRPCServer) FPDFDoc_GetJavaScriptActionCount(request *requests.FPD
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode, resp *responses.FPDFDoc_GetPageMode) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFDoc_GetPageMode", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFDoc_GetPageMode(request)
 	if err != nil {
 		return err
@@ -1847,8 +1994,13 @@ func (s *PdfiumRPCServer) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageM
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName, resp *responses.FPDFJavaScriptAction_GetName) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName, resp *responses.FPDFJavaScriptAction_GetName) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFJavaScriptAction_GetName", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFJavaScriptAction_GetName(request)
 	if err != nil {
 		return err
@@ -1860,8 +2012,13 @@ func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetName(request *requests.FPDFJav
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript, resp *responses.FPDFJavaScriptAction_GetScript) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript, resp *responses.FPDFJavaScriptAction_GetScript) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFJavaScriptAction_GetScript", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFJavaScriptAction_GetScript(request)
 	if err != nil {
 		return err
@@ -1873,8 +2030,13 @@ func (s *PdfiumRPCServer) FPDFJavaScriptAction_GetScript(request *requests.FPDFJ
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_CloseWebLinks(request *requests.FPDFLink_CloseWebLinks, resp *responses.FPDFLink_CloseWebLinks) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_CloseWebLinks(request *requests.FPDFLink_CloseWebLinks, resp *responses.FPDFLink_CloseWebLinks) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_CloseWebLinks", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_CloseWebLinks(request)
 	if err != nil {
 		return err
@@ -1886,8 +2048,13 @@ func (s *PdfiumRPCServer) FPDFLink_CloseWebLinks(request *requests.FPDFLink_Clos
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints, resp *responses.FPDFLink_CountQuadPoints) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_CountQuadPoints(request *requests.FPDFLink_CountQuadPoints, resp *responses.FPDFLink_CountQuadPoints) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_CountQuadPoints", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_CountQuadPoints(request)
 	if err != nil {
 		return err
@@ -1899,8 +2066,13 @@ func (s *PdfiumRPCServer) FPDFLink_CountQuadPoints(request *requests.FPDFLink_Co
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_CountRects(request *requests.FPDFLink_CountRects, resp *responses.FPDFLink_CountRects) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_CountRects(request *requests.FPDFLink_CountRects, resp *responses.FPDFLink_CountRects) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_CountRects", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_CountRects(request)
 	if err != nil {
 		return err
@@ -1912,8 +2084,13 @@ func (s *PdfiumRPCServer) FPDFLink_CountRects(request *requests.FPDFLink_CountRe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_CountWebLinks(request *requests.FPDFLink_CountWebLinks, resp *responses.FPDFLink_CountWebLinks) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_CountWebLinks(request *requests.FPDFLink_CountWebLinks, resp *responses.FPDFLink_CountWebLinks) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_CountWebLinks", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_CountWebLinks(request)
 	if err != nil {
 		return err
@@ -1925,8 +2102,13 @@ func (s *PdfiumRPCServer) FPDFLink_CountWebLinks(request *requests.FPDFLink_Coun
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate, resp *responses.FPDFLink_Enumerate) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerate, resp *responses.FPDFLink_Enumerate) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_Enumerate", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_Enumerate(request)
 	if err != nil {
 		return err
@@ -1938,8 +2120,13 @@ func (s *PdfiumRPCServer) FPDFLink_Enumerate(request *requests.FPDFLink_Enumerat
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetAction(request *requests.FPDFLink_GetAction, resp *responses.FPDFLink_GetAction) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetAction(request *requests.FPDFLink_GetAction, resp *responses.FPDFLink_GetAction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetAction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetAction(request)
 	if err != nil {
 		return err
@@ -1951,8 +2138,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetAction(request *requests.FPDFLink_GetActio
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot, resp *responses.FPDFLink_GetAnnot) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot, resp *responses.FPDFLink_GetAnnot) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetAnnot", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetAnnot(request)
 	if err != nil {
 		return err
@@ -1964,8 +2156,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect, resp *responses.FPDFLink_GetAnnotRect) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAnnotRect, resp *responses.FPDFLink_GetAnnotRect) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetAnnotRect", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetAnnotRect(request)
 	if err != nil {
 		return err
@@ -1977,8 +2174,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetAnnotRect(request *requests.FPDFLink_GetAn
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetDest(request *requests.FPDFLink_GetDest, resp *responses.FPDFLink_GetDest) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetDest(request *requests.FPDFLink_GetDest, resp *responses.FPDFLink_GetDest) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetDest", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetDest(request)
 	if err != nil {
 		return err
@@ -1990,8 +2192,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetDest(request *requests.FPDFLink_GetDest, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint, resp *responses.FPDFLink_GetLinkAtPoint) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_GetLinkAtPoint, resp *responses.FPDFLink_GetLinkAtPoint) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetLinkAtPoint", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetLinkAtPoint(request)
 	if err != nil {
 		return err
@@ -2003,8 +2210,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetLinkAtPoint(request *requests.FPDFLink_Get
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint, resp *responses.FPDFLink_GetLinkZOrderAtPoint) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLink_GetLinkZOrderAtPoint, resp *responses.FPDFLink_GetLinkZOrderAtPoint) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetLinkZOrderAtPoint", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetLinkZOrderAtPoint(request)
 	if err != nil {
 		return err
@@ -2016,8 +2228,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetLinkZOrderAtPoint(request *requests.FPDFLi
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints, resp *responses.FPDFLink_GetQuadPoints) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints, resp *responses.FPDFLink_GetQuadPoints) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetQuadPoints", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetQuadPoints(request)
 	if err != nil {
 		return err
@@ -2029,8 +2246,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQ
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetRect(request *requests.FPDFLink_GetRect, resp *responses.FPDFLink_GetRect) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetRect(request *requests.FPDFLink_GetRect, resp *responses.FPDFLink_GetRect) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetRect", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetRect(request)
 	if err != nil {
 		return err
@@ -2042,8 +2264,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetRect(request *requests.FPDFLink_GetRect, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetTextRange(request *requests.FPDFLink_GetTextRange, resp *responses.FPDFLink_GetTextRange) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetTextRange(request *requests.FPDFLink_GetTextRange, resp *responses.FPDFLink_GetTextRange) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetTextRange", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetTextRange(request)
 	if err != nil {
 		return err
@@ -2055,8 +2282,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetTextRange(request *requests.FPDFLink_GetTe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_GetURL(request *requests.FPDFLink_GetURL, resp *responses.FPDFLink_GetURL) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_GetURL(request *requests.FPDFLink_GetURL, resp *responses.FPDFLink_GetURL) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_GetURL", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_GetURL(request)
 	if err != nil {
 		return err
@@ -2068,8 +2300,13 @@ func (s *PdfiumRPCServer) FPDFLink_GetURL(request *requests.FPDFLink_GetURL, res
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadWebLinks, resp *responses.FPDFLink_LoadWebLinks) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadWebLinks, resp *responses.FPDFLink_LoadWebLinks) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFLink_LoadWebLinks", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFLink_LoadWebLinks(request)
 	if err != nil {
 		return err
@@ -2081,8 +2318,13 @@ func (s *PdfiumRPCServer) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadW
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_Flatten(request *requests.FPDFPage_Flatten, resp *responses.FPDFPage_Flatten) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_Flatten(request *requests.FPDFPage_Flatten, resp *responses.FPDFPage_Flatten) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_Flatten", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_Flatten(request)
 	if err != nil {
 		return err
@@ -2094,8 +2336,13 @@ func (s *PdfiumRPCServer) FPDFPage_Flatten(request *requests.FPDFPage_Flatten, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData, resp *responses.FPDFPage_GetDecodedThumbnailData) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData, resp *responses.FPDFPage_GetDecodedThumbnailData) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetDecodedThumbnailData", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_GetDecodedThumbnailData(request)
 	if err != nil {
 		return err
@@ -2107,8 +2354,13 @@ func (s *PdfiumRPCServer) FPDFPage_GetDecodedThumbnailData(request *requests.FPD
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_GetRawThumbnailData(request *requests.FPDFPage_GetRawThumbnailData, resp *responses.FPDFPage_GetRawThumbnailData) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_GetRawThumbnailData(request *requests.FPDFPage_GetRawThumbnailData, resp *responses.FPDFPage_GetRawThumbnailData) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetRawThumbnailData", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_GetRawThumbnailData(request)
 	if err != nil {
 		return err
@@ -2120,8 +2372,13 @@ func (s *PdfiumRPCServer) FPDFPage_GetRawThumbnailData(request *requests.FPDFPag
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation, resp *responses.FPDFPage_GetRotation) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation, resp *responses.FPDFPage_GetRotation) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetRotation", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_GetRotation(request)
 	if err != nil {
 		return err
@@ -2133,8 +2390,13 @@ func (s *PdfiumRPCServer) FPDFPage_GetRotation(request *requests.FPDFPage_GetRot
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPage_GetThumbnailAsBitmap, resp *responses.FPDFPage_GetThumbnailAsBitmap) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPage_GetThumbnailAsBitmap, resp *responses.FPDFPage_GetThumbnailAsBitmap) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetThumbnailAsBitmap", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_GetThumbnailAsBitmap(request)
 	if err != nil {
 		return err
@@ -2146,8 +2408,13 @@ func (s *PdfiumRPCServer) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPa
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency, resp *responses.FPDFPage_HasTransparency) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency, resp *responses.FPDFPage_HasTransparency) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_HasTransparency", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_HasTransparency(request)
 	if err != nil {
 		return err
@@ -2159,8 +2426,13 @@ func (s *PdfiumRPCServer) FPDFPage_HasTransparency(request *requests.FPDFPage_Ha
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation, resp *responses.FPDFPage_SetRotation) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation, resp *responses.FPDFPage_SetRotation) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetRotation", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFPage_SetRotation(request)
 	if err != nil {
 		return err
@@ -2172,8 +2444,13 @@ func (s *PdfiumRPCServer) FPDFPage_SetRotation(request *requests.FPDFPage_SetRot
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange, resp *responses.FPDFSignatureObj_GetByteRange) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange, resp *responses.FPDFSignatureObj_GetByteRange) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetByteRange", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetByteRange(request)
 	if err != nil {
 		return err
@@ -2185,8 +2462,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetByteRange(request *requests.FPDFSi
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents, resp *responses.FPDFSignatureObj_GetContents) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents, resp *responses.FPDFSignatureObj_GetContents) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetContents", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetContents(request)
 	if err != nil {
 		return err
@@ -2198,8 +2480,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetContents(request *requests.FPDFSig
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission, resp *responses.FPDFSignatureObj_GetDocMDPPermission) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission, resp *responses.FPDFSignatureObj_GetDocMDPPermission) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetDocMDPPermission", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetDocMDPPermission(request)
 	if err != nil {
 		return err
@@ -2211,8 +2498,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetDocMDPPermission(request *requests
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason, resp *responses.FPDFSignatureObj_GetReason) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason, resp *responses.FPDFSignatureObj_GetReason) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetReason", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetReason(request)
 	if err != nil {
 		return err
@@ -2224,8 +2516,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetReason(request *requests.FPDFSigna
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter, resp *responses.FPDFSignatureObj_GetSubFilter) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter, resp *responses.FPDFSignatureObj_GetSubFilter) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetSubFilter", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetSubFilter(request)
 	if err != nil {
 		return err
@@ -2237,8 +2534,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSi
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime, resp *responses.FPDFSignatureObj_GetTime) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime, resp *responses.FPDFSignatureObj_GetTime) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFSignatureObj_GetTime", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFSignatureObj_GetTime(request)
 	if err != nil {
 		return err
@@ -2250,8 +2552,13 @@ func (s *PdfiumRPCServer) FPDFSignatureObj_GetTime(request *requests.FPDFSignatu
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_ClosePage(request *requests.FPDFText_ClosePage, resp *responses.FPDFText_ClosePage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_ClosePage(request *requests.FPDFText_ClosePage, resp *responses.FPDFText_ClosePage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_ClosePage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_ClosePage(request)
 	if err != nil {
 		return err
@@ -2263,8 +2570,13 @@ func (s *PdfiumRPCServer) FPDFText_ClosePage(request *requests.FPDFText_ClosePag
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_CountChars(request *requests.FPDFText_CountChars, resp *responses.FPDFText_CountChars) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_CountChars(request *requests.FPDFText_CountChars, resp *responses.FPDFText_CountChars) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_CountChars", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_CountChars(request)
 	if err != nil {
 		return err
@@ -2276,8 +2588,13 @@ func (s *PdfiumRPCServer) FPDFText_CountChars(request *requests.FPDFText_CountCh
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_CountRects(request *requests.FPDFText_CountRects, resp *responses.FPDFText_CountRects) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_CountRects(request *requests.FPDFText_CountRects, resp *responses.FPDFText_CountRects) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_CountRects", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_CountRects(request)
 	if err != nil {
 		return err
@@ -2289,8 +2606,13 @@ func (s *PdfiumRPCServer) FPDFText_CountRects(request *requests.FPDFText_CountRe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_FindClose(request *requests.FPDFText_FindClose, resp *responses.FPDFText_FindClose) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_FindClose(request *requests.FPDFText_FindClose, resp *responses.FPDFText_FindClose) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_FindClose", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_FindClose(request)
 	if err != nil {
 		return err
@@ -2302,8 +2624,13 @@ func (s *PdfiumRPCServer) FPDFText_FindClose(request *requests.FPDFText_FindClos
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_FindNext(request *requests.FPDFText_FindNext, resp *responses.FPDFText_FindNext) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_FindNext(request *requests.FPDFText_FindNext, resp *responses.FPDFText_FindNext) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_FindNext", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_FindNext(request)
 	if err != nil {
 		return err
@@ -2315,8 +2642,13 @@ func (s *PdfiumRPCServer) FPDFText_FindNext(request *requests.FPDFText_FindNext,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_FindPrev(request *requests.FPDFText_FindPrev, resp *responses.FPDFText_FindPrev) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_FindPrev(request *requests.FPDFText_FindPrev, resp *responses.FPDFText_FindPrev) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_FindPrev", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_FindPrev(request)
 	if err != nil {
 		return err
@@ -2328,8 +2660,13 @@ func (s *PdfiumRPCServer) FPDFText_FindPrev(request *requests.FPDFText_FindPrev,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_FindStart(request *requests.FPDFText_FindStart, resp *responses.FPDFText_FindStart) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_FindStart(request *requests.FPDFText_FindStart, resp *responses.FPDFText_FindStart) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_FindStart", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_FindStart(request)
 	if err != nil {
 		return err
@@ -2341,8 +2678,13 @@ func (s *PdfiumRPCServer) FPDFText_FindStart(request *requests.FPDFText_FindStar
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetBoundedText(request *requests.FPDFText_GetBoundedText, resp *responses.FPDFText_GetBoundedText) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetBoundedText(request *requests.FPDFText_GetBoundedText, resp *responses.FPDFText_GetBoundedText) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetBoundedText", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetBoundedText(request)
 	if err != nil {
 		return err
@@ -2354,8 +2696,13 @@ func (s *PdfiumRPCServer) FPDFText_GetBoundedText(request *requests.FPDFText_Get
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetCharAngle(request *requests.FPDFText_GetCharAngle, resp *responses.FPDFText_GetCharAngle) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetCharAngle(request *requests.FPDFText_GetCharAngle, resp *responses.FPDFText_GetCharAngle) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetCharAngle", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetCharAngle(request)
 	if err != nil {
 		return err
@@ -2367,8 +2714,13 @@ func (s *PdfiumRPCServer) FPDFText_GetCharAngle(request *requests.FPDFText_GetCh
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetCharBox(request *requests.FPDFText_GetCharBox, resp *responses.FPDFText_GetCharBox) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetCharBox(request *requests.FPDFText_GetCharBox, resp *responses.FPDFText_GetCharBox) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetCharBox", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetCharBox(request)
 	if err != nil {
 		return err
@@ -2380,8 +2732,13 @@ func (s *PdfiumRPCServer) FPDFText_GetCharBox(request *requests.FPDFText_GetChar
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_GetCharIndexAtPos, resp *responses.FPDFText_GetCharIndexAtPos) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_GetCharIndexAtPos, resp *responses.FPDFText_GetCharIndexAtPos) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetCharIndexAtPos", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetCharIndexAtPos(request)
 	if err != nil {
 		return err
@@ -2393,8 +2750,13 @@ func (s *PdfiumRPCServer) FPDFText_GetCharIndexAtPos(request *requests.FPDFText_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin, resp *responses.FPDFText_GetCharOrigin) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetCharOrigin(request *requests.FPDFText_GetCharOrigin, resp *responses.FPDFText_GetCharOrigin) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetCharOrigin", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetCharOrigin(request)
 	if err != nil {
 		return err
@@ -2406,8 +2768,13 @@ func (s *PdfiumRPCServer) FPDFText_GetCharOrigin(request *requests.FPDFText_GetC
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor, resp *responses.FPDFText_GetFillColor) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor, resp *responses.FPDFText_GetFillColor) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetFillColor", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetFillColor(request)
 	if err != nil {
 		return err
@@ -2419,8 +2786,13 @@ func (s *PdfiumRPCServer) FPDFText_GetFillColor(request *requests.FPDFText_GetFi
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetFontInfo(request *requests.FPDFText_GetFontInfo, resp *responses.FPDFText_GetFontInfo) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetFontInfo(request *requests.FPDFText_GetFontInfo, resp *responses.FPDFText_GetFontInfo) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetFontInfo", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetFontInfo(request)
 	if err != nil {
 		return err
@@ -2432,8 +2804,13 @@ func (s *PdfiumRPCServer) FPDFText_GetFontInfo(request *requests.FPDFText_GetFon
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetFontSize(request *requests.FPDFText_GetFontSize, resp *responses.FPDFText_GetFontSize) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetFontSize(request *requests.FPDFText_GetFontSize, resp *responses.FPDFText_GetFontSize) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetFontSize", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetFontSize(request)
 	if err != nil {
 		return err
@@ -2445,8 +2822,13 @@ func (s *PdfiumRPCServer) FPDFText_GetFontSize(request *requests.FPDFText_GetFon
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetFontWeight(request *requests.FPDFText_GetFontWeight, resp *responses.FPDFText_GetFontWeight) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetFontWeight(request *requests.FPDFText_GetFontWeight, resp *responses.FPDFText_GetFontWeight) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetFontWeight", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetFontWeight(request)
 	if err != nil {
 		return err
@@ -2458,8 +2840,13 @@ func (s *PdfiumRPCServer) FPDFText_GetFontWeight(request *requests.FPDFText_GetF
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetLooseCharBox(request *requests.FPDFText_GetLooseCharBox, resp *responses.FPDFText_GetLooseCharBox) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetLooseCharBox(request *requests.FPDFText_GetLooseCharBox, resp *responses.FPDFText_GetLooseCharBox) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetLooseCharBox", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetLooseCharBox(request)
 	if err != nil {
 		return err
@@ -2471,8 +2858,13 @@ func (s *PdfiumRPCServer) FPDFText_GetLooseCharBox(request *requests.FPDFText_Ge
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetMatrix(request *requests.FPDFText_GetMatrix, resp *responses.FPDFText_GetMatrix) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetMatrix(request *requests.FPDFText_GetMatrix, resp *responses.FPDFText_GetMatrix) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetMatrix", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetMatrix(request)
 	if err != nil {
 		return err
@@ -2484,8 +2876,13 @@ func (s *PdfiumRPCServer) FPDFText_GetMatrix(request *requests.FPDFText_GetMatri
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetRect(request *requests.FPDFText_GetRect, resp *responses.FPDFText_GetRect) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetRect(request *requests.FPDFText_GetRect, resp *responses.FPDFText_GetRect) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetRect", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetRect(request)
 	if err != nil {
 		return err
@@ -2497,8 +2894,13 @@ func (s *PdfiumRPCServer) FPDFText_GetRect(request *requests.FPDFText_GetRect, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetSchCount(request *requests.FPDFText_GetSchCount, resp *responses.FPDFText_GetSchCount) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetSchCount(request *requests.FPDFText_GetSchCount, resp *responses.FPDFText_GetSchCount) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetSchCount", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetSchCount(request)
 	if err != nil {
 		return err
@@ -2510,8 +2912,13 @@ func (s *PdfiumRPCServer) FPDFText_GetSchCount(request *requests.FPDFText_GetSch
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetSchResultIndex(request *requests.FPDFText_GetSchResultIndex, resp *responses.FPDFText_GetSchResultIndex) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetSchResultIndex(request *requests.FPDFText_GetSchResultIndex, resp *responses.FPDFText_GetSchResultIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetSchResultIndex", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetSchResultIndex(request)
 	if err != nil {
 		return err
@@ -2523,8 +2930,13 @@ func (s *PdfiumRPCServer) FPDFText_GetSchResultIndex(request *requests.FPDFText_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetStrokeColor(request *requests.FPDFText_GetStrokeColor, resp *responses.FPDFText_GetStrokeColor) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetStrokeColor(request *requests.FPDFText_GetStrokeColor, resp *responses.FPDFText_GetStrokeColor) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetStrokeColor", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetStrokeColor(request)
 	if err != nil {
 		return err
@@ -2536,8 +2948,13 @@ func (s *PdfiumRPCServer) FPDFText_GetStrokeColor(request *requests.FPDFText_Get
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetText(request *requests.FPDFText_GetText, resp *responses.FPDFText_GetText) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetText(request *requests.FPDFText_GetText, resp *responses.FPDFText_GetText) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetText", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetText(request)
 	if err != nil {
 		return err
@@ -2549,8 +2966,13 @@ func (s *PdfiumRPCServer) FPDFText_GetText(request *requests.FPDFText_GetText, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode, resp *responses.FPDFText_GetTextRenderMode) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode, resp *responses.FPDFText_GetTextRenderMode) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetTextRenderMode", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetTextRenderMode(request)
 	if err != nil {
 		return err
@@ -2562,8 +2984,13 @@ func (s *PdfiumRPCServer) FPDFText_GetTextRenderMode(request *requests.FPDFText_
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode, resp *responses.FPDFText_GetUnicode) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode, resp *responses.FPDFText_GetUnicode) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetUnicode", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_GetUnicode(request)
 	if err != nil {
 		return err
@@ -2575,8 +3002,13 @@ func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnic
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDFText_LoadPage(request *requests.FPDFText_LoadPage, resp *responses.FPDFText_LoadPage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDFText_LoadPage(request *requests.FPDFText_LoadPage, resp *responses.FPDFText_LoadPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_LoadPage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDFText_LoadPage(request)
 	if err != nil {
 		return err
@@ -2588,8 +3020,13 @@ func (s *PdfiumRPCServer) FPDFText_LoadPage(request *requests.FPDFText_LoadPage,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp *responses.FPDF_ClosePage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_ClosePage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_ClosePage(request)
 	if err != nil {
 		return err
@@ -2601,8 +3038,13 @@ func (s *PdfiumRPCServer) FPDF_ClosePage(request *requests.FPDF_ClosePage, resp 
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_CloseXObject(request *requests.FPDF_CloseXObject, resp *responses.FPDF_CloseXObject) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_CloseXObject(request *requests.FPDF_CloseXObject, resp *responses.FPDF_CloseXObject) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseXObject", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_CloseXObject(request)
 	if err != nil {
 		return err
@@ -2614,8 +3056,13 @@ func (s *PdfiumRPCServer) FPDF_CloseXObject(request *requests.FPDF_CloseXObject,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences, resp *responses.FPDF_CopyViewerPreferences) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewerPreferences, resp *responses.FPDF_CopyViewerPreferences) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CopyViewerPreferences", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_CopyViewerPreferences(request)
 	if err != nil {
 		return err
@@ -2627,8 +3074,13 @@ func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_Copy
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument, resp *responses.FPDF_CreateNewDocument) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument, resp *responses.FPDF_CreateNewDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CreateNewDocument", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_CreateNewDocument(request)
 	if err != nil {
 		return err
@@ -2640,8 +3092,13 @@ func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions, resp *responses.FPDF_GetDocPermissions) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions, resp *responses.FPDF_GetDocPermissions) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetDocPermissions", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetDocPermissions(request)
 	if err != nil {
 		return err
@@ -2653,8 +3110,13 @@ func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier, resp *responses.FPDF_GetFileIdentifier) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier, resp *responses.FPDF_GetFileIdentifier) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetFileIdentifier", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetFileIdentifier(request)
 	if err != nil {
 		return err
@@ -2666,8 +3128,13 @@ func (s *PdfiumRPCServer) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileI
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion, resp *responses.FPDF_GetFileVersion) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion, resp *responses.FPDF_GetFileVersion) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetFileVersion", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetFileVersion(request)
 	if err != nil {
 		return err
@@ -2679,8 +3146,13 @@ func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVers
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetLastError(request *requests.FPDF_GetLastError, resp *responses.FPDF_GetLastError) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetLastError(request *requests.FPDF_GetLastError, resp *responses.FPDF_GetLastError) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetLastError", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetLastError(request)
 	if err != nil {
 		return err
@@ -2692,8 +3164,13 @@ func (s *PdfiumRPCServer) FPDF_GetLastError(request *requests.FPDF_GetLastError,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, resp *responses.FPDF_GetMetaText) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, resp *responses.FPDF_GetMetaText) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetMetaText", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetMetaText(request)
 	if err != nil {
 		return err
@@ -2705,8 +3182,13 @@ func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction, resp *responses.FPDF_GetPageAAction) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction, resp *responses.FPDF_GetPageAAction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageAAction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageAAction(request)
 	if err != nil {
 		return err
@@ -2718,8 +3200,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAct
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount, resp *responses.FPDF_GetPageCount) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount, resp *responses.FPDF_GetPageCount) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageCount", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageCount(request)
 	if err != nil {
 		return err
@@ -2731,8 +3218,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageCount(request *requests.FPDF_GetPageCount,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight, resp *responses.FPDF_GetPageHeight) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight, resp *responses.FPDF_GetPageHeight) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageHeight", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageHeight(request)
 	if err != nil {
 		return err
@@ -2744,8 +3236,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeigh
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel, resp *responses.FPDF_GetPageLabel) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel, resp *responses.FPDF_GetPageLabel) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageLabel", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageLabel(request)
 	if err != nil {
 		return err
@@ -2757,8 +3254,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex, resp *responses.FPDF_GetPageSizeByIndex) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex, resp *responses.FPDF_GetPageSizeByIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageSizeByIndex", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageSizeByIndex(request)
 	if err != nil {
 		return err
@@ -2770,8 +3272,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPage
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth, resp *responses.FPDF_GetPageWidth) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth, resp *responses.FPDF_GetPageWidth) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageWidth", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetPageWidth(request)
 	if err != nil {
 		return err
@@ -2783,8 +3290,13 @@ func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth,
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision, resp *responses.FPDF_GetSecurityHandlerRevision) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision, resp *responses.FPDF_GetSecurityHandlerRevision) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetSecurityHandlerRevision", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetSecurityHandlerRevision(request)
 	if err != nil {
 		return err
@@ -2796,8 +3308,13 @@ func (s *PdfiumRPCServer) FPDF_GetSecurityHandlerRevision(request *requests.FPDF
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount, resp *responses.FPDF_GetSignatureCount) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount, resp *responses.FPDF_GetSignatureCount) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetSignatureCount", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetSignatureCount(request)
 	if err != nil {
 		return err
@@ -2809,8 +3326,13 @@ func (s *PdfiumRPCServer) FPDF_GetSignatureCount(request *requests.FPDF_GetSigna
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject, resp *responses.FPDF_GetSignatureObject) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject, resp *responses.FPDF_GetSignatureObject) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetSignatureObject", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_GetSignatureObject(request)
 	if err != nil {
 		return err
@@ -2822,8 +3344,13 @@ func (s *PdfiumRPCServer) FPDF_GetSignatureObject(request *requests.FPDF_GetSign
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne, resp *responses.FPDF_ImportNPagesToOne) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNPagesToOne, resp *responses.FPDF_ImportNPagesToOne) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_ImportNPagesToOne", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_ImportNPagesToOne(request)
 	if err != nil {
 		return err
@@ -2835,8 +3362,13 @@ func (s *PdfiumRPCServer) FPDF_ImportNPagesToOne(request *requests.FPDF_ImportNP
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, resp *responses.FPDF_ImportPages) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, resp *responses.FPDF_ImportPages) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_ImportPages", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_ImportPages(request)
 	if err != nil {
 		return err
@@ -2848,8 +3380,13 @@ func (s *PdfiumRPCServer) FPDF_ImportPages(request *requests.FPDF_ImportPages, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesByIndex, resp *responses.FPDF_ImportPagesByIndex) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportPagesByIndex, resp *responses.FPDF_ImportPagesByIndex) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_ImportPagesByIndex", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_ImportPagesByIndex(request)
 	if err != nil {
 		return err
@@ -2861,8 +3398,13 @@ func (s *PdfiumRPCServer) FPDF_ImportPagesByIndex(request *requests.FPDF_ImportP
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *responses.FPDF_LoadPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadPage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_LoadPage(request)
 	if err != nil {
 		return err
@@ -2874,8 +3416,13 @@ func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *r
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject, resp *responses.FPDF_NewFormObjectFromXObject) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject, resp *responses.FPDF_NewFormObjectFromXObject) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_NewFormObjectFromXObject", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_NewFormObjectFromXObject(request)
 	if err != nil {
 		return err
@@ -2887,8 +3434,13 @@ func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_N
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFromPage, resp *responses.FPDF_NewXObjectFromPage) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFromPage, resp *responses.FPDF_NewXObjectFromPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_NewXObjectFromPage", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_NewXObjectFromPage(request)
 	if err != nil {
 		return err
@@ -2900,8 +3452,13 @@ func (s *PdfiumRPCServer) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObj
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, resp *responses.FPDF_SaveAsCopy) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, resp *responses.FPDF_SaveAsCopy) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SaveAsCopy", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_SaveAsCopy(request)
 	if err != nil {
 		return err
@@ -2913,8 +3470,13 @@ func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, res
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion, resp *responses.FPDF_SaveWithVersion) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion, resp *responses.FPDF_SaveWithVersion) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SaveWithVersion", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_SaveWithVersion(request)
 	if err != nil {
 		return err
@@ -2926,8 +3488,13 @@ func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVe
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy, resp *responses.FPDF_SetSandBoxPolicy) error {
-	var err error
+func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy, resp *responses.FPDF_SetSandBoxPolicy) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetSandBoxPolicy", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FPDF_SetSandBoxPolicy(request)
 	if err != nil {
 		return err
@@ -2939,8 +3506,13 @@ func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBo
 	return nil
 }
 
-func (s *PdfiumRPCServer) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction, resp *responses.FSDK_SetLocaltimeFunction) error {
-	var err error
+func (s *PdfiumRPCServer) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction, resp *responses.FSDK_SetLocaltimeFunction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FSDK_SetLocaltimeFunction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FSDK_SetLocaltimeFunction(request)
 	if err != nil {
 		return err
@@ -2952,8 +3524,13 @@ func (s *PdfiumRPCServer) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLo
 	return nil
 }
 
-func (s *PdfiumRPCServer) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction, resp *responses.FSDK_SetTimeFunction) error {
-	var err error
+func (s *PdfiumRPCServer) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction, resp *responses.FSDK_SetTimeFunction) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FSDK_SetTimeFunction", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FSDK_SetTimeFunction(request)
 	if err != nil {
 		return err
@@ -2965,8 +3542,13 @@ func (s *PdfiumRPCServer) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFun
 	return nil
 }
 
-func (s *PdfiumRPCServer) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler, resp *responses.FSDK_SetUnSpObjProcessHandler) error {
-	var err error
+func (s *PdfiumRPCServer) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler, resp *responses.FSDK_SetUnSpObjProcessHandler) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "FSDK_SetUnSpObjProcessHandler", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.FSDK_SetUnSpObjProcessHandler(request)
 	if err != nil {
 		return err
@@ -2978,8 +3560,13 @@ func (s *PdfiumRPCServer) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_S
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetActionInfo(request *requests.GetActionInfo, resp *responses.GetActionInfo) error {
-	var err error
+func (s *PdfiumRPCServer) GetActionInfo(request *requests.GetActionInfo, resp *responses.GetActionInfo) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetActionInfo", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetActionInfo(request)
 	if err != nil {
 		return err
@@ -2991,8 +3578,13 @@ func (s *PdfiumRPCServer) GetActionInfo(request *requests.GetActionInfo, resp *r
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetAttachments(request *requests.GetAttachments, resp *responses.GetAttachments) error {
-	var err error
+func (s *PdfiumRPCServer) GetAttachments(request *requests.GetAttachments, resp *responses.GetAttachments) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetAttachments", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetAttachments(request)
 	if err != nil {
 		return err
@@ -3004,8 +3596,13 @@ func (s *PdfiumRPCServer) GetAttachments(request *requests.GetAttachments, resp 
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *responses.GetBookmarks) error {
-	var err error
+func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *responses.GetBookmarks) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetBookmarks", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetBookmarks(request)
 	if err != nil {
 		return err
@@ -3017,8 +3614,13 @@ func (s *PdfiumRPCServer) GetBookmarks(request *requests.GetBookmarks, resp *res
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *responses.GetDestInfo) error {
-	var err error
+func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *responses.GetDestInfo) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetDestInfo", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetDestInfo(request)
 	if err != nil {
 		return err
@@ -3030,8 +3632,13 @@ func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetJavaScriptActions(request *requests.GetJavaScriptActions, resp *responses.GetJavaScriptActions) error {
-	var err error
+func (s *PdfiumRPCServer) GetJavaScriptActions(request *requests.GetJavaScriptActions, resp *responses.GetJavaScriptActions) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetJavaScriptActions", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetJavaScriptActions(request)
 	if err != nil {
 		return err
@@ -3043,8 +3650,13 @@ func (s *PdfiumRPCServer) GetJavaScriptActions(request *requests.GetJavaScriptAc
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetMetaData(request *requests.GetMetaData, resp *responses.GetMetaData) error {
-	var err error
+func (s *PdfiumRPCServer) GetMetaData(request *requests.GetMetaData, resp *responses.GetMetaData) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetMetaData", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetMetaData(request)
 	if err != nil {
 		return err
@@ -3056,8 +3668,13 @@ func (s *PdfiumRPCServer) GetMetaData(request *requests.GetMetaData, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageSize(request *requests.GetPageSize, resp *responses.GetPageSize) error {
-	var err error
+func (s *PdfiumRPCServer) GetPageSize(request *requests.GetPageSize, resp *responses.GetPageSize) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetPageSize", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetPageSize(request)
 	if err != nil {
 		return err
@@ -3069,8 +3686,13 @@ func (s *PdfiumRPCServer) GetPageSize(request *requests.GetPageSize, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageSizeInPixels(request *requests.GetPageSizeInPixels, resp *responses.GetPageSizeInPixels) error {
-	var err error
+func (s *PdfiumRPCServer) GetPageSizeInPixels(request *requests.GetPageSizeInPixels, resp *responses.GetPageSizeInPixels) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetPageSizeInPixels", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetPageSizeInPixels(request)
 	if err != nil {
 		return err
@@ -3082,8 +3704,13 @@ func (s *PdfiumRPCServer) GetPageSizeInPixels(request *requests.GetPageSizeInPix
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *responses.GetPageText) error {
-	var err error
+func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *responses.GetPageText) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetPageText", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetPageText(request)
 	if err != nil {
 		return err
@@ -3095,8 +3722,13 @@ func (s *PdfiumRPCServer) GetPageText(request *requests.GetPageText, resp *respo
 	return nil
 }
 
-func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) error {
-	var err error
+func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStructured, resp *responses.GetPageTextStructured) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "GetPageTextStructured", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.GetPageTextStructured(request)
 	if err != nil {
 		return err
@@ -3108,8 +3740,13 @@ func (s *PdfiumRPCServer) GetPageTextStructured(request *requests.GetPageTextStr
 	return nil
 }
 
-func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *responses.OpenDocument) error {
-	var err error
+func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *responses.OpenDocument) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "OpenDocument", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.OpenDocument(request)
 	if err != nil {
 		return err
@@ -3121,8 +3758,13 @@ func (s *PdfiumRPCServer) OpenDocument(request *requests.OpenDocument, resp *res
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, resp *responses.RenderPage) error {
-	var err error
+func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, resp *responses.RenderPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "RenderPageInDPI", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.RenderPageInDPI(request)
 	if err != nil {
 		return err
@@ -3134,8 +3776,13 @@ func (s *PdfiumRPCServer) RenderPageInDPI(request *requests.RenderPageInDPI, res
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixels, resp *responses.RenderPage) error {
-	var err error
+func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixels, resp *responses.RenderPage) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "RenderPageInPixels", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.RenderPageInPixels(request)
 	if err != nil {
 		return err
@@ -3147,8 +3794,13 @@ func (s *PdfiumRPCServer) RenderPageInPixels(request *requests.RenderPageInPixel
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, resp *responses.RenderPages) error {
-	var err error
+func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, resp *responses.RenderPages) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "RenderPagesInDPI", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.RenderPagesInDPI(request)
 	if err != nil {
 		return err
@@ -3160,8 +3812,13 @@ func (s *PdfiumRPCServer) RenderPagesInDPI(request *requests.RenderPagesInDPI, r
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPixels, resp *responses.RenderPages) error {
-	var err error
+func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPixels, resp *responses.RenderPages) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "RenderPagesInPixels", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.RenderPagesInPixels(request)
 	if err != nil {
 		return err
@@ -3173,8 +3830,13 @@ func (s *PdfiumRPCServer) RenderPagesInPixels(request *requests.RenderPagesInPix
 	return nil
 }
 
-func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) error {
-	var err error
+func (s *PdfiumRPCServer) RenderToFile(request *requests.RenderToFile, resp *responses.RenderToFile) (err error) {
+	defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "RenderToFile", panicError)
+        }
+    }()
+
 	implResp, err := s.Impl.RenderToFile(request)
 	if err != nil {
 		return err

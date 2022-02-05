@@ -17,7 +17,7 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 		It("allows for the last error to be fetched", func() {
 			FPDF_GetLastError, err := pdfiumContainer.FPDF_GetLastError(&requests.FPDF_GetLastError{})
 			Expect(err).To(BeNil())
-			Expect(FPDF_GetLastError).To(Equal(&responses.FPDF_GetLastError{}))
+			Expect(FPDF_GetLastError).To(Not(BeNil()))
 		})
 
 		It("allows for the sandbox policy to be enabled", func() {
@@ -78,19 +78,12 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				file, err := os.Open(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
+
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -223,20 +216,13 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfFile, err := os.Open(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
+
 				file = pdfFile
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -277,20 +263,13 @@ func RunfpdfViewTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix st
 			BeforeEach(func() {
 				pdfFile, err := os.Open(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
+
 				file = pdfFile
 				fileStat, err := file.Stat()
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromReader(file, int(fileStat.Size()))
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})

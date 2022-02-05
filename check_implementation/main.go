@@ -1,5 +1,8 @@
 package main
 
+// A tool to ensure that all PDFium methods are implemented.
+// This tool also measures implementation progress.
+
 import (
 	"bufio"
 	"fmt"
@@ -12,7 +15,6 @@ import (
 	"github.com/klippa-app/go-pdfium"
 )
 
-// A tool to ensure that all PDFium methods are implemented.
 func main() {
 	implementedMethods := map[string]bool{}
 	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()

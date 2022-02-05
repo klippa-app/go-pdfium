@@ -134,14 +134,9 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -1918,14 +1913,9 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/alpha_channel.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -1965,14 +1955,9 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 			})
@@ -2029,27 +2014,17 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 			BeforeEach(func() {
 				pdfData, err := ioutil.ReadFile(testsPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc, err := pdfiumContainer.NewDocumentFromBytes(&pdfData)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc = *newDoc
 
 				pdfData2, err := ioutil.ReadFile(testsPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
-				if err != nil {
-					return
-				}
 
 				newDoc2, err := pdfiumContainer.NewDocumentFromBytes(&pdfData2)
-				if err != nil {
-					return
-				}
+				Expect(err).To(BeNil())
 
 				doc2 = *newDoc2
 			})
@@ -2142,10 +2117,7 @@ func RunRenderTests(pdfiumContainer pdfium.Pdfium, testsPath string, prefix stri
 
 func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *responses.RenderPage, testName string) {
 	err := writePrerenderedImage(testName, renderedPage.Image)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -2158,19 +2130,14 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 	Expect(copiedPage).To(Equal(expectedPage))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedPage.Image.Pix); err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	err = enc.Encode(renderedPage.Image.Pix)
+	Expect(err).To(BeNil())
 
 	hasher.Write(buf.Bytes())
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
@@ -2179,10 +2146,7 @@ func compareRenderHash(renderedPage *responses.RenderPage, expectedPage *respons
 
 func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPage *responses.RenderPages, testName string) {
 	err := writePrerenderedImage(testName, renderedPages.Image)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -2195,17 +2159,12 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 	Expect(copiedPage).To(Equal(expectedPage))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedPages.Image.Pix); err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	err = enc.Encode(renderedPages.Image.Pix)
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 	hasher.Write(buf.Bytes())
@@ -2215,10 +2174,7 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, expectedPag
 
 func compareFileHash(request *requests.RenderToFile, renderedFile *responses.RenderToFile, expectedFile *responses.RenderToFile, testName string) {
 	err := writePrerenderedFile(testName, request, renderedFile)
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	// Copy object so we can skip Image.
 	// For the image we compare the file hash.
@@ -2231,10 +2187,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	Expect(copiedFile).To(Equal(expectedFile))
 
 	existingFileHash, err := ioutil.ReadFile(testName + ".hash")
-	if err != nil {
-		Expect(err).To(BeNil())
-		return
-	}
+	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
 
@@ -2248,11 +2201,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 			defer os.Remove(renderedFile.ImagePath)
 		}
 		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
-
+		Expect(err).To(BeNil())
 		hasher.Write(fileContent)
 	}
 
@@ -2262,50 +2211,32 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	if strings.Contains(testName, "_single_") {
 		// Compare the single variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
 
 		// Compare the single variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	} else if strings.Contains(testName, "_multi_") {
 		// Compare the multi variant to the single variant.
 		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_single_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
 		// Compare the multi variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	} else if strings.Contains(testName, "_internal_") {
 		// Compare the internal variant to the single variant.
 		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_single_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
 		// Compare the internal variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
-		if err != nil {
-			Expect(err).To(BeNil())
-			return
-		}
+		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
 	}
 }

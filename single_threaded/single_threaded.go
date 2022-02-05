@@ -2,6 +2,7 @@ package single_threaded
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation"
@@ -73,10 +74,16 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 }
 
 // Close will close the pool and all instances in it.
-func (p *pdfiumPool) Close() error {
+func (p *pdfiumPool) Close() (err error) {
 	if p.closed {
 		return errors.New("pool is already closed")
 	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "Close", panicError)
+		}
+	}()
 
 	// Close all instances
 	for i := range p.instanceRefs {
@@ -105,51 +112,63 @@ type pdfiumInstance struct {
 }
 
 // NewDocumentFromBytes creates a new PDFium references from a byte array.
-func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
+func (i *pdfiumInstance) NewDocumentFromBytes(file *[]byte, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
 		return nil, errors.New("instance is closed")
 	}
 	i.lock.Unlock()
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromBytes", panicError)
+		}
+	}()
 
 	openDocRequest := &requests.OpenDocument{File: file}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	doc, err := i.pdfium.OpenDocument(openDocRequest)
+	newDoc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	return &doc.Document, nil
+	return &newDoc.Document, nil
 }
 
 // NewDocumentFromFilePath creates a new PDFium references from a file path.
-func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
+func (i *pdfiumInstance) NewDocumentFromFilePath(filePath string, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
 		return nil, errors.New("instance is closed")
 	}
 	i.lock.Unlock()
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromFilePath", panicError)
+		}
+	}()
 
 	openDocRequest := &requests.OpenDocument{FilePath: &filePath}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	doc, err := i.pdfium.OpenDocument(openDocRequest)
+	newDoc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	return &doc.Document, nil
+	return &newDoc.Document, nil
 }
 
 // NewDocumentFromReader creates a new PDFium references from a reader.
-func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (*references.FPDF_DOCUMENT, error) {
+func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, opts ...pdfium.NewDocumentOption) (doc *references.FPDF_DOCUMENT, err error) {
 	i.lock.Lock()
 	if i.closed {
 		i.lock.Unlock()
@@ -157,22 +176,28 @@ func (i *pdfiumInstance) NewDocumentFromReader(reader io.ReadSeeker, size int, o
 	}
 	i.lock.Unlock()
 
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromReader", panicError)
+		}
+	}()
+
 	openDocRequest := &requests.OpenDocument{FileReader: reader, FileReaderSize: size}
 	for _, opt := range opts {
 		opt.AlterOpenDocumentRequest(openDocRequest)
 	}
 
-	doc, err := i.pdfium.OpenDocument(openDocRequest)
+	newDoc, err := i.pdfium.OpenDocument(openDocRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	return &doc.Document, nil
+	return &newDoc.Document, nil
 }
 
 // Close will close the instance and will clean up the underlying PDFium resources
 // by calling i.pdfium.Close().
-func (i *pdfiumInstance) Close() error {
+func (i *pdfiumInstance) Close() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -180,8 +205,14 @@ func (i *pdfiumInstance) Close() error {
 		return errors.New("instance is already closed")
 	}
 
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "NewDocumentFromReader", panicError)
+		}
+	}()
+
 	// Close underlying instance. That will close all docs.
-	err := i.pdfium.Close()
+	err = i.pdfium.Close()
 	if err != nil {
 		return err
 	}
@@ -199,10 +230,16 @@ func (i *pdfiumInstance) Close() error {
 }
 
 // FPDF_CloseDocument closes a single Document and it's resources.
-func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) error {
+func (i *pdfiumInstance) FPDF_CloseDocument(document references.FPDF_DOCUMENT) (err error) {
 	if i.closed {
 		return errors.New("instance is closed")
 	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CloseDocument", panicError)
+		}
+	}()
 
 	return i.pdfium.FPDF_CloseDocument(document)
 }

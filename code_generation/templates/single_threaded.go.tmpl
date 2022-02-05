@@ -5,15 +5,23 @@ package single_threaded
 
 import (
     "errors"
+	"fmt"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
 {{ range $method := .Methods }}
-func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
+func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (resp *responses.{{ $method.Output }}, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
+
+    defer func() {
+        if panicError := recover(); panicError != nil {
+            err = fmt.Errorf("panic occurred in %s: %v", "{{ $method.Name }}", panicError)
+        }
+    }()
+
 	return i.pdfium.{{ $method.Name }}(request)
 }
 {{end}}

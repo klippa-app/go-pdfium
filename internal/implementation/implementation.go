@@ -203,6 +203,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	var cPassword *C.char
 	if request.Password != nil {
 		cPassword = C.CString(*request.Password)
+		defer C.free(unsafe.Pointer(cPassword))
 	}
 
 	nativeDoc := &DocumentHandle{
