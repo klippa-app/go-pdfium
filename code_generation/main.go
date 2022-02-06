@@ -21,6 +21,13 @@ type GenerateDataMethod struct {
 	Output string
 }
 
+func (m *GenerateDataMethod) IsMultiThreaded() bool {
+	if m.Name == "FPDFBitmap_CreateEx" || m.Name == "FSDK_SetUnSpObjProcessHandler" || m.Name == "FSDK_SetTimeFunction" || m.Name == "FSDK_SetLocaltimeFunction" {
+		return true
+	}
+	return false
+}
+
 type GenerateData struct {
 	Methods []GenerateDataMethod
 }
