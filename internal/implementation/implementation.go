@@ -568,3 +568,27 @@ func (p *PdfiumImplementation) getPageLinkHandle(pageLink references.FPDF_PAGELI
 
 	return nil, errors.New("could not find pageLink handle, perhaps the pageLink was already closed or you tried to share pageLinks between instances")
 }
+
+func (p *PdfiumImplementation) getBitmapHandle(bitmap references.FPDF_BITMAP) (*BitmapHandle, error) {
+	if bitmap == "" {
+		return nil, errors.New("bitmap not given")
+	}
+
+	if val, ok := p.bitmapRefs[bitmap]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find bitmap handle, perhaps the bitmap was already closed or you tried to share bitmaps between instances")
+}
+
+func (p *PdfiumImplementation) getPageRangeHandle(pageRange references.FPDF_PAGERANGE) (*PageRangeHandle, error) {
+	if pageRange == "" {
+		return nil, errors.New("pageRange not given")
+	}
+
+	if val, ok := p.pageRangeRefs[pageRange]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageRange handle, perhaps the pageRange was already closed or you tried to share pageRanges between instances")
+}
