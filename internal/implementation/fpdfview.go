@@ -500,12 +500,12 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap(request *requests.FPDF_Rend
 	p.Lock()
 	defer p.Unlock()
 
-	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	pageHandle, err := p.loadPage(request.Page)
+	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
 	if err != nil {
 		return nil, err
 	}
@@ -520,12 +520,12 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithMatrix(request *requests
 	p.Lock()
 	defer p.Unlock()
 
-	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	pageHandle, err := p.loadPage(request.Page)
+	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
 	if err != nil {
 		return nil, err
 	}
@@ -548,7 +548,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithMatrix(request *requests
 
 	C.FPDF_RenderPageBitmapWithMatrix(bitmapHandle.handle, pageHandle.handle, &matrix, &clipping, C.int(request.Flags))
 
-	return nil, nil
+	return &responses.FPDF_RenderPageBitmapWithMatrix{}, nil
 }
 
 // FPDF_DeviceToPage converts the screen coordinates of a point to page coordinates.
@@ -794,7 +794,7 @@ func (p *PdfiumImplementation) FPDFBitmap_Destroy(request *requests.FPDFBitmap_D
 
 	delete(p.bitmapRefs, bitmapHandle.nativeRef)
 
-	return nil, nil
+	return &responses.FPDFBitmap_Destroy{}, nil
 }
 
 // FPDF_VIEWERREF_GetPrintScaling returns whether the PDF document prefers to be scaled or not.
@@ -874,6 +874,10 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetPrintPageRangeElement(request *
 	}
 
 	value := C.FPDF_VIEWERREF_GetPrintPageRangeElement(pageRangeHandle.handle, C.size_t(request.Index))
+	if int(value) == -1 {
+		return nil, errors.New("could not load page range element")
+	}
+
 	return &responses.FPDF_VIEWERREF_GetPrintPageRangeElement{
 		Value: int(value),
 	}, nil
@@ -911,19 +915,14 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIE
 	// First get the metadata length.
 	nameSize := C.FPDF_VIEWERREF_GetName(documentHandle.handle, cstr, nil, 0)
 	if nameSize == 0 {
-		return nil, errors.New("Could not get name")
+		return nil, errors.New("could not get name")
 	}
 
 	charData := make([]byte, uint64(nameSize))
 	C.FPDF_VIEWERREF_GetName(documentHandle.handle, cstr, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
 
-	transformedText, err := p.transformUTF16LEToUTF8(charData)
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.FPDF_VIEWERREF_GetName{
-		Name: transformedText,
+		Value: string(charData[:len(charData)-1]), // Remove nil terminator
 	}, nil
 }
 
@@ -1044,13 +1043,9 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketName(request *requests.FPDF_GetX
 		return nil, errors.New("could not get name of the XFA packet")
 	}
 
-	transformedText, err := p.transformUTF16LEToUTF8(charData)
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.FPDF_GetXFAPacketName{
-		Name: transformedText,
+		Index: request.Index,
+		Name:  string(charData[:len(charData)-1]),
 	}, nil
 }
 
@@ -1085,6 +1080,7 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_G
 	}
 
 	return &responses.FPDF_GetXFAPacketContent{
+		Index:   request.Index,
 		Content: contentData,
 	}, nil
 }
