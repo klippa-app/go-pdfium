@@ -153,7 +153,16 @@ var _ = Describe("document", func() {
 					Expect(err).To(MatchError(errors.ErrPassword.Error()))
 					Expect(doc).To(BeNil())
 				})
+
+				It("returns the password error", func() {
+					doc, err := PdfiumInstance.FPDF_LoadMemDocument64(&requests.FPDF_LoadMemDocument64{
+						Data: &pdfData,
+					})
+					Expect(err).To(MatchError(errors.ErrPassword.Error()))
+					Expect(doc).To(BeNil())
+				})
 			})
+
 			When("is opened with the wrong password", func() {
 				It("returns the password error", func() {
 					wrongPassword := "test"
