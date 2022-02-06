@@ -7,23 +7,6 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-type NewDocumentOption interface {
-	AlterOpenDocumentRequest(*requests.OpenDocument)
-}
-
-type openDocumentWithPassword struct{ password string }
-
-func (p openDocumentWithPassword) AlterOpenDocumentRequest(r *requests.OpenDocument) {
-	r.Password = &p.password
-}
-
-// OpenDocumentWithPasswordOption can be used as NewDocumentOption when your PDF contains a password.
-func OpenDocumentWithPasswordOption(password string) NewDocumentOption {
-	return openDocumentWithPassword{
-		password: password,
-	}
-}
-
 // Pool describes a PDFium worker pool. Every instance in the pool manages
 // its own resources.
 type Pool interface {
