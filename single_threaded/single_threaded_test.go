@@ -16,7 +16,7 @@ var _ = BeforeSuite(func() {
 	err := os.Setenv("TZ", "UTC")
 	Expect(err).To(BeNil())
 
-	pool := single_threaded.Init()
+	pool := single_threaded.Init(single_threaded.Config{})
 	shared_tests.PdfiumPool = pool
 
 	instance, err := pool.GetInstance(time.Second * 30)
