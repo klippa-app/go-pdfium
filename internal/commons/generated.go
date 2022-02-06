@@ -23,6 +23,15 @@ type Pdfium interface {
 	FPDFAttachment_HasKey(*requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error)
 	FPDFAttachment_SetFile(*requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error)
 	FPDFAttachment_SetStringValue(*requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error)
+	FPDFBitmap_Create(*requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error)
+	FPDFBitmap_CreateEx(*requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error)
+	FPDFBitmap_Destroy(*requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error)
+	FPDFBitmap_FillRect(*requests.FPDFBitmap_FillRect) (*responses.FPDFBitmap_FillRect, error)
+	FPDFBitmap_GetBuffer(*requests.FPDFBitmap_GetBuffer) (*responses.FPDFBitmap_GetBuffer, error)
+	FPDFBitmap_GetFormat(*requests.FPDFBitmap_GetFormat) (*responses.FPDFBitmap_GetFormat, error)
+	FPDFBitmap_GetHeight(*requests.FPDFBitmap_GetHeight) (*responses.FPDFBitmap_GetHeight, error)
+	FPDFBitmap_GetStride(*requests.FPDFBitmap_GetStride) (*responses.FPDFBitmap_GetStride, error)
+	FPDFBitmap_GetWidth(*requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error)
 	FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
 	FPDFBookmark_GetAction(*requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
 	FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
@@ -104,21 +113,34 @@ type Pdfium interface {
 	FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
 	FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
 	FPDF_CopyViewerPreferences(*requests.FPDF_CopyViewerPreferences) (*responses.FPDF_CopyViewerPreferences, error)
+	FPDF_CountNamedDests(*requests.FPDF_CountNamedDests) (*responses.FPDF_CountNamedDests, error)
 	FPDF_CreateNewDocument(*requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
+	FPDF_DeviceToPage(*requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error)
+	FPDF_DocumentHasValidCrossReferenceTable(*requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
 	FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
 	FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
 	FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
 	FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 	FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
+	FPDF_GetNamedDest(*requests.FPDF_GetNamedDest) (*responses.FPDF_GetNamedDest, error)
+	FPDF_GetNamedDestByName(*requests.FPDF_GetNamedDestByName) (*responses.FPDF_GetNamedDestByName, error)
 	FPDF_GetPageAAction(*requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error)
+	FPDF_GetPageBoundingBox(*requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error)
 	FPDF_GetPageCount(*requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
 	FPDF_GetPageHeight(*requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
+	FPDF_GetPageHeightF(*requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error)
 	FPDF_GetPageLabel(*requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error)
 	FPDF_GetPageSizeByIndex(*requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
+	FPDF_GetPageSizeByIndexF(*requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error)
 	FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
+	FPDF_GetPageWidthF(*requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error)
 	FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
 	FPDF_GetSignatureCount(*requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error)
 	FPDF_GetSignatureObject(*requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error)
+	FPDF_GetTrailerEnds(*requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error)
+	FPDF_GetXFAPacketContent(*requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error)
+	FPDF_GetXFAPacketCount(*requests.FPDF_GetXFAPacketCount) (*responses.FPDF_GetXFAPacketCount, error)
+	FPDF_GetXFAPacketName(*requests.FPDF_GetXFAPacketName) (*responses.FPDF_GetXFAPacketName, error)
 	FPDF_ImportNPagesToOne(*requests.FPDF_ImportNPagesToOne) (*responses.FPDF_ImportNPagesToOne, error)
 	FPDF_ImportPages(*requests.FPDF_ImportPages) (*responses.FPDF_ImportPages, error)
 	FPDF_ImportPagesByIndex(*requests.FPDF_ImportPagesByIndex) (*responses.FPDF_ImportPagesByIndex, error)
@@ -129,9 +151,19 @@ type Pdfium interface {
 	FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
 	FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
 	FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
+	FPDF_PageToDevice(*requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
+	FPDF_RenderPageBitmap(*requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
+	FPDF_RenderPageBitmapWithMatrix(*requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error)
 	FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
 	FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
 	FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
+	FPDF_VIEWERREF_GetDuplex(*requests.FPDF_VIEWERREF_GetDuplex) (*responses.FPDF_VIEWERREF_GetDuplex, error)
+	FPDF_VIEWERREF_GetName(*requests.FPDF_VIEWERREF_GetName) (*responses.FPDF_VIEWERREF_GetName, error)
+	FPDF_VIEWERREF_GetNumCopies(*requests.FPDF_VIEWERREF_GetNumCopies) (*responses.FPDF_VIEWERREF_GetNumCopies, error)
+	FPDF_VIEWERREF_GetPrintPageRange(*requests.FPDF_VIEWERREF_GetPrintPageRange) (*responses.FPDF_VIEWERREF_GetPrintPageRange, error)
+	FPDF_VIEWERREF_GetPrintPageRangeCount(*requests.FPDF_VIEWERREF_GetPrintPageRangeCount) (*responses.FPDF_VIEWERREF_GetPrintPageRangeCount, error)
+	FPDF_VIEWERREF_GetPrintPageRangeElement(*requests.FPDF_VIEWERREF_GetPrintPageRangeElement) (*responses.FPDF_VIEWERREF_GetPrintPageRangeElement, error)
+	FPDF_VIEWERREF_GetPrintScaling(*requests.FPDF_VIEWERREF_GetPrintScaling) (*responses.FPDF_VIEWERREF_GetPrintScaling, error)
 	FSDK_SetLocaltimeFunction(*requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error)
 	FSDK_SetTimeFunction(*requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error)
 	FSDK_SetUnSpObjProcessHandler(*requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error)
@@ -257,6 +289,96 @@ func (g *PdfiumRPC) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetF
 func (g *PdfiumRPC) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error) {
 	resp := &responses.FPDFAttachment_SetStringValue{}
 	err := g.client.Call("Plugin.FPDFAttachment_SetStringValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error) {
+	resp := &responses.FPDFBitmap_Create{}
+	err := g.client.Call("Plugin.FPDFBitmap_Create", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error) {
+	resp := &responses.FPDFBitmap_CreateEx{}
+	err := g.client.Call("Plugin.FPDFBitmap_CreateEx", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_Destroy(request *requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error) {
+	resp := &responses.FPDFBitmap_Destroy{}
+	err := g.client.Call("Plugin.FPDFBitmap_Destroy", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_FillRect(request *requests.FPDFBitmap_FillRect) (*responses.FPDFBitmap_FillRect, error) {
+	resp := &responses.FPDFBitmap_FillRect{}
+	err := g.client.Call("Plugin.FPDFBitmap_FillRect", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap_GetBuffer) (*responses.FPDFBitmap_GetBuffer, error) {
+	resp := &responses.FPDFBitmap_GetBuffer{}
+	err := g.client.Call("Plugin.FPDFBitmap_GetBuffer", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_GetFormat(request *requests.FPDFBitmap_GetFormat) (*responses.FPDFBitmap_GetFormat, error) {
+	resp := &responses.FPDFBitmap_GetFormat{}
+	err := g.client.Call("Plugin.FPDFBitmap_GetFormat", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_GetHeight(request *requests.FPDFBitmap_GetHeight) (*responses.FPDFBitmap_GetHeight, error) {
+	resp := &responses.FPDFBitmap_GetHeight{}
+	err := g.client.Call("Plugin.FPDFBitmap_GetHeight", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_GetStride(request *requests.FPDFBitmap_GetStride) (*responses.FPDFBitmap_GetStride, error) {
+	resp := &responses.FPDFBitmap_GetStride{}
+	err := g.client.Call("Plugin.FPDFBitmap_GetStride", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBitmap_GetWidth(request *requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error) {
+	resp := &responses.FPDFBitmap_GetWidth{}
+	err := g.client.Call("Plugin.FPDFBitmap_GetWidth", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1074,9 +1196,39 @@ func (g *PdfiumRPC) FPDF_CopyViewerPreferences(request *requests.FPDF_CopyViewer
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_CountNamedDests(request *requests.FPDF_CountNamedDests) (*responses.FPDF_CountNamedDests, error) {
+	resp := &responses.FPDF_CountNamedDests{}
+	err := g.client.Call("Plugin.FPDF_CountNamedDests", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
 	resp := &responses.FPDF_CreateNewDocument{}
 	err := g.client.Call("Plugin.FPDF_CreateNewDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error) {
+	resp := &responses.FPDF_DeviceToPage{}
+	err := g.client.Call("Plugin.FPDF_DeviceToPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error) {
+	resp := &responses.FPDF_DocumentHasValidCrossReferenceTable{}
+	err := g.client.Call("Plugin.FPDF_DocumentHasValidCrossReferenceTable", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1134,9 +1286,39 @@ func (g *PdfiumRPC) FPDF_GetMetaText(request *requests.FPDF_GetMetaText) (*respo
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_GetNamedDest(request *requests.FPDF_GetNamedDest) (*responses.FPDF_GetNamedDest, error) {
+	resp := &responses.FPDF_GetNamedDest{}
+	err := g.client.Call("Plugin.FPDF_GetNamedDest", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetNamedDestByName(request *requests.FPDF_GetNamedDestByName) (*responses.FPDF_GetNamedDestByName, error) {
+	resp := &responses.FPDF_GetNamedDestByName{}
+	err := g.client.Call("Plugin.FPDF_GetNamedDestByName", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
 	resp := &responses.FPDF_GetPageAAction{}
 	err := g.client.Call("Plugin.FPDF_GetPageAAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error) {
+	resp := &responses.FPDF_GetPageBoundingBox{}
+	err := g.client.Call("Plugin.FPDF_GetPageBoundingBox", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1164,6 +1346,16 @@ func (g *PdfiumRPC) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*r
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error) {
+	resp := &responses.FPDF_GetPageHeightF{}
+	err := g.client.Call("Plugin.FPDF_GetPageHeightF", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel) (*responses.FPDF_GetPageLabel, error) {
 	resp := &responses.FPDF_GetPageLabel{}
 	err := g.client.Call("Plugin.FPDF_GetPageLabel", request, resp)
@@ -1184,9 +1376,29 @@ func (g *PdfiumRPC) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeBy
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error) {
+	resp := &responses.FPDF_GetPageSizeByIndexF{}
+	err := g.client.Call("Plugin.FPDF_GetPageSizeByIndexF", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error) {
 	resp := &responses.FPDF_GetPageWidth{}
 	err := g.client.Call("Plugin.FPDF_GetPageWidth", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error) {
+	resp := &responses.FPDF_GetPageWidthF{}
+	err := g.client.Call("Plugin.FPDF_GetPageWidthF", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1217,6 +1429,46 @@ func (g *PdfiumRPC) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCo
 func (g *PdfiumRPC) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error) {
 	resp := &responses.FPDF_GetSignatureObject{}
 	err := g.client.Call("Plugin.FPDF_GetSignatureObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error) {
+	resp := &responses.FPDF_GetTrailerEnds{}
+	err := g.client.Call("Plugin.FPDF_GetTrailerEnds", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error) {
+	resp := &responses.FPDF_GetXFAPacketContent{}
+	err := g.client.Call("Plugin.FPDF_GetXFAPacketContent", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetXFAPacketCount(request *requests.FPDF_GetXFAPacketCount) (*responses.FPDF_GetXFAPacketCount, error) {
+	resp := &responses.FPDF_GetXFAPacketCount{}
+	err := g.client.Call("Plugin.FPDF_GetXFAPacketCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetXFAPacketName(request *requests.FPDF_GetXFAPacketName) (*responses.FPDF_GetXFAPacketName, error) {
+	resp := &responses.FPDF_GetXFAPacketName{}
+	err := g.client.Call("Plugin.FPDF_GetXFAPacketName", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1324,6 +1576,36 @@ func (g *PdfiumRPC) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFro
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error) {
+	resp := &responses.FPDF_PageToDevice{}
+	err := g.client.Call("Plugin.FPDF_PageToDevice", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error) {
+	resp := &responses.FPDF_RenderPageBitmap{}
+	err := g.client.Call("Plugin.FPDF_RenderPageBitmap", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error) {
+	resp := &responses.FPDF_RenderPageBitmapWithMatrix{}
+	err := g.client.Call("Plugin.FPDF_RenderPageBitmapWithMatrix", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error) {
 	resp := &responses.FPDF_SaveAsCopy{}
 	err := g.client.Call("Plugin.FPDF_SaveAsCopy", request, resp)
@@ -1347,6 +1629,76 @@ func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion)
 func (g *PdfiumRPC) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {
 	resp := &responses.FPDF_SetSandBoxPolicy{}
 	err := g.client.Call("Plugin.FPDF_SetSandBoxPolicy", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetDuplex(request *requests.FPDF_VIEWERREF_GetDuplex) (*responses.FPDF_VIEWERREF_GetDuplex, error) {
+	resp := &responses.FPDF_VIEWERREF_GetDuplex{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetDuplex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIEWERREF_GetName) (*responses.FPDF_VIEWERREF_GetName, error) {
+	resp := &responses.FPDF_VIEWERREF_GetName{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetName", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetNumCopies(request *requests.FPDF_VIEWERREF_GetNumCopies) (*responses.FPDF_VIEWERREF_GetNumCopies, error) {
+	resp := &responses.FPDF_VIEWERREF_GetNumCopies{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetNumCopies", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetPrintPageRange(request *requests.FPDF_VIEWERREF_GetPrintPageRange) (*responses.FPDF_VIEWERREF_GetPrintPageRange, error) {
+	resp := &responses.FPDF_VIEWERREF_GetPrintPageRange{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetPrintPageRange", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetPrintPageRangeCount(request *requests.FPDF_VIEWERREF_GetPrintPageRangeCount) (*responses.FPDF_VIEWERREF_GetPrintPageRangeCount, error) {
+	resp := &responses.FPDF_VIEWERREF_GetPrintPageRangeCount{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetPrintPageRangeCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetPrintPageRangeElement(request *requests.FPDF_VIEWERREF_GetPrintPageRangeElement) (*responses.FPDF_VIEWERREF_GetPrintPageRangeElement, error) {
+	resp := &responses.FPDF_VIEWERREF_GetPrintPageRangeElement{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetPrintPageRangeElement", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_VIEWERREF_GetPrintScaling(request *requests.FPDF_VIEWERREF_GetPrintScaling) (*responses.FPDF_VIEWERREF_GetPrintScaling, error) {
+	resp := &responses.FPDF_VIEWERREF_GetPrintScaling{}
+	err := g.client.Call("Plugin.FPDF_VIEWERREF_GetPrintScaling", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1732,6 +2084,168 @@ func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAt
 	}()
 
 	implResp, err := s.Impl.FPDFAttachment_SetStringValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_Create(request *requests.FPDFBitmap_Create, resp *responses.FPDFBitmap_Create) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_Create", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_Create(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx, resp *responses.FPDFBitmap_CreateEx) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_CreateEx", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_CreateEx(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_Destroy(request *requests.FPDFBitmap_Destroy, resp *responses.FPDFBitmap_Destroy) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_Destroy", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_Destroy(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_FillRect(request *requests.FPDFBitmap_FillRect, resp *responses.FPDFBitmap_FillRect) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_FillRect", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_FillRect(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap_GetBuffer, resp *responses.FPDFBitmap_GetBuffer) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_GetBuffer", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_GetBuffer(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_GetFormat(request *requests.FPDFBitmap_GetFormat, resp *responses.FPDFBitmap_GetFormat) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_GetFormat", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_GetFormat(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_GetHeight(request *requests.FPDFBitmap_GetHeight, resp *responses.FPDFBitmap_GetHeight) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_GetHeight", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_GetHeight(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_GetStride(request *requests.FPDFBitmap_GetStride, resp *responses.FPDFBitmap_GetStride) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_GetStride", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_GetStride(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBitmap_GetWidth(request *requests.FPDFBitmap_GetWidth, resp *responses.FPDFBitmap_GetWidth) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBitmap_GetWidth", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBitmap_GetWidth(request)
 	if err != nil {
 		return err
 	}
@@ -3200,6 +3714,24 @@ func (s *PdfiumRPCServer) FPDF_CopyViewerPreferences(request *requests.FPDF_Copy
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_CountNamedDests(request *requests.FPDF_CountNamedDests, resp *responses.FPDF_CountNamedDests) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CountNamedDests", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_CountNamedDests(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument, resp *responses.FPDF_CreateNewDocument) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -3208,6 +3740,42 @@ func (s *PdfiumRPCServer) FPDF_CreateNewDocument(request *requests.FPDF_CreateNe
 	}()
 
 	implResp, err := s.Impl.FPDF_CreateNewDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage, resp *responses.FPDF_DeviceToPage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_DeviceToPage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_DeviceToPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable, resp *responses.FPDF_DocumentHasValidCrossReferenceTable) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_DocumentHasValidCrossReferenceTable", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_DocumentHasValidCrossReferenceTable(request)
 	if err != nil {
 		return err
 	}
@@ -3308,6 +3876,42 @@ func (s *PdfiumRPCServer) FPDF_GetMetaText(request *requests.FPDF_GetMetaText, r
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_GetNamedDest(request *requests.FPDF_GetNamedDest, resp *responses.FPDF_GetNamedDest) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetNamedDest", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetNamedDest(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetNamedDestByName(request *requests.FPDF_GetNamedDestByName, resp *responses.FPDF_GetNamedDestByName) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetNamedDestByName", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetNamedDestByName(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction, resp *responses.FPDF_GetPageAAction) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -3316,6 +3920,24 @@ func (s *PdfiumRPCServer) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAct
 	}()
 
 	implResp, err := s.Impl.FPDF_GetPageAAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox, resp *responses.FPDF_GetPageBoundingBox) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageBoundingBox", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetPageBoundingBox(request)
 	if err != nil {
 		return err
 	}
@@ -3362,6 +3984,24 @@ func (s *PdfiumRPCServer) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeigh
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF, resp *responses.FPDF_GetPageHeightF) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageHeightF", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetPageHeightF(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetPageLabel(request *requests.FPDF_GetPageLabel, resp *responses.FPDF_GetPageLabel) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -3398,6 +4038,24 @@ func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPage
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF, resp *responses.FPDF_GetPageSizeByIndexF) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageSizeByIndexF", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetPageSizeByIndexF(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth, resp *responses.FPDF_GetPageWidth) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -3406,6 +4064,24 @@ func (s *PdfiumRPCServer) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth,
 	}()
 
 	implResp, err := s.Impl.FPDF_GetPageWidth(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF, resp *responses.FPDF_GetPageWidthF) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetPageWidthF", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetPageWidthF(request)
 	if err != nil {
 		return err
 	}
@@ -3460,6 +4136,78 @@ func (s *PdfiumRPCServer) FPDF_GetSignatureObject(request *requests.FPDF_GetSign
 	}()
 
 	implResp, err := s.Impl.FPDF_GetSignatureObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds, resp *responses.FPDF_GetTrailerEnds) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetTrailerEnds", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetTrailerEnds(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent, resp *responses.FPDF_GetXFAPacketContent) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetXFAPacketContent", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetXFAPacketContent(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetXFAPacketCount(request *requests.FPDF_GetXFAPacketCount, resp *responses.FPDF_GetXFAPacketCount) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetXFAPacketCount", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetXFAPacketCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetXFAPacketName(request *requests.FPDF_GetXFAPacketName, resp *responses.FPDF_GetXFAPacketName) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetXFAPacketName", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetXFAPacketName(request)
 	if err != nil {
 		return err
 	}
@@ -3650,6 +4398,60 @@ func (s *PdfiumRPCServer) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObj
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_PageToDevice(request *requests.FPDF_PageToDevice, resp *responses.FPDF_PageToDevice) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_PageToDevice", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_PageToDevice(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap, resp *responses.FPDF_RenderPageBitmap) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmap", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPageBitmap(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix, resp *responses.FPDF_RenderPageBitmapWithMatrix) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmapWithMatrix", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPageBitmapWithMatrix(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy, resp *responses.FPDF_SaveAsCopy) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -3694,6 +4496,132 @@ func (s *PdfiumRPCServer) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBo
 	}()
 
 	implResp, err := s.Impl.FPDF_SetSandBoxPolicy(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetDuplex(request *requests.FPDF_VIEWERREF_GetDuplex, resp *responses.FPDF_VIEWERREF_GetDuplex) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetDuplex", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetDuplex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIEWERREF_GetName, resp *responses.FPDF_VIEWERREF_GetName) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetName", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetName(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetNumCopies(request *requests.FPDF_VIEWERREF_GetNumCopies, resp *responses.FPDF_VIEWERREF_GetNumCopies) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetNumCopies", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetNumCopies(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetPrintPageRange(request *requests.FPDF_VIEWERREF_GetPrintPageRange, resp *responses.FPDF_VIEWERREF_GetPrintPageRange) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetPrintPageRange", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetPrintPageRange(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetPrintPageRangeCount(request *requests.FPDF_VIEWERREF_GetPrintPageRangeCount, resp *responses.FPDF_VIEWERREF_GetPrintPageRangeCount) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetPrintPageRangeCount", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetPrintPageRangeCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetPrintPageRangeElement(request *requests.FPDF_VIEWERREF_GetPrintPageRangeElement, resp *responses.FPDF_VIEWERREF_GetPrintPageRangeElement) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetPrintPageRangeElement", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetPrintPageRangeElement(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_VIEWERREF_GetPrintScaling(request *requests.FPDF_VIEWERREF_GetPrintScaling, resp *responses.FPDF_VIEWERREF_GetPrintScaling) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_VIEWERREF_GetPrintScaling", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_VIEWERREF_GetPrintScaling(request)
 	if err != nil {
 		return err
 	}

@@ -183,148 +183,165 @@ type Pdfium interface {
 	FPDF_GetPageCount(request *requests.FPDF_GetPageCount) (*responses.FPDF_GetPageCount, error)
 
 	// FPDF_GetPageWidth returns the width of a page.
+	// Prefer FPDF_GetPageWidthF(). This will be deprecated in the future.
 	FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
 
 	// FPDF_GetPageHeight returns the height of a page.
+	// Prefer FPDF_GetPageHeightF(). This will be deprecated in the future.
 	FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error)
 
 	// FPDF_GetPageSizeByIndex returns the size of a page by the page index.
 	FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
 
-	// FPDF_InitLibrary
-	FPDF_InitLibrary(request *requests.FPDF_InitLibrary) (*responses.FPDF_InitLibrary, error)
-
-	// FPDF_InitLibraryWithConfig
-	FPDF_InitLibraryWithConfig(request *requests.FPDF_InitLibraryWithConfig) (*responses.FPDF_InitLibraryWithConfig, error)
-
-	// FPDF_DestroyLibrary
-	FPDF_DestroyLibrary(request *requests.FPDF_DestroyLibrary) (*responses.FPDF_DestroyLibrary, error)
-
-	// FPDF_SetTypefaceAccessibleFunc
-	FPDF_SetTypefaceAccessibleFunc(request *requests.FPDF_SetTypefaceAccessibleFunc) (*responses.FPDF_SetTypefaceAccessibleFunc, error)
-
-	// FPDF_SetPrintTextWithGDI
-	FPDF_SetPrintTextWithGDI(request *requests.FPDF_SetPrintTextWithGDI) (*responses.FPDF_SetPrintTextWithGDI, error)
-
-	// FPDF_SetPrintMode
-	FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
-
-	// FPDF_DocumentHasValidCrossReferenceTable
+	// FPDF_DocumentHasValidCrossReferenceTable returns whether the document's cross reference table is valid or not.
 	FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
 
-	// FPDF_GetTrailerEnds
+	// FPDF_GetTrailerEnds returns the byte offsets of trailer ends.
+	// Experimental API.
 	FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error)
 
-	// FPDF_GetPageWidthF
+	// FPDF_GetPageWidthF returns the page width in float32.
 	FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error)
 
-	// FPDF_GetPageHeightF
+	// FPDF_GetPageHeightF returns the page height in float32.
 	FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error)
 
-	// FPDF_GetPageBoundingBox
+	// FPDF_GetPageBoundingBox returns the bounding box of the page. This is the intersection between
+	// its media box and its crop box.
 	FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error)
 
-	// FPDF_GetPageSizeByIndexF
+	// FPDF_GetPageSizeByIndexF returns the size of the page at the given index.
+	// Prefer FPDF_GetPageSizeByIndexF(). This will be deprecated in the future.
 	FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error)
 
-	// FPDF_RenderPage
-	FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
-
-	// FPDF_RenderPageBitmap
+	// FPDF_RenderPageBitmap renders contents of a page to a device independent bitmap.
 	FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
 
-	// FPDF_RenderPageBitmapWithMatrix
+	// FPDF_RenderPageBitmapWithMatrix renders contents of a page to a device independent bitmap.
 	FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error)
 
-	// FPDF_RenderPageSkp
-	FPDF_RenderPageSkp(request *requests.FPDF_RenderPageSkp) (*responses.FPDF_RenderPageSkp, error)
-
-	// FPDF_DeviceToPage
+	// FPDF_DeviceToPage converts the screen coordinates of a point to page coordinates.
+	// The page coordinate system has its origin at the left-bottom corner
+	// of the page, with the X-axis on the bottom going to the right, and
+	// the Y-axis on the left side going up.
+	//
+	// NOTE: this coordinate system can be altered when you zoom, scroll,
+	// or rotate a page, however, a point on the page should always have
+	// the same coordinate values in the page coordinate system.
+	//
+	// The device coordinate system is device dependent. For screen device,
+	// its origin is at the left-top corner of the window. However this
+	// origin can be altered by the Windows coordinate transformation
+	// utilities.
+	//
+	// You must make sure the start_x, start_y, size_x, size_y
+	// and rotate parameters have exactly same values as you used in
+	// the FPDF_RenderPage() function call.
 	FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error)
 
-	// FPDF_PageToDevice
+	// FPDF_PageToDevice converts the page coordinates of a point to screen coordinates.
+	// See comments for FPDF_DeviceToPage().
 	FPDF_PageToDevice(request *requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
 
-	// FPDFBitmap_Create
+	// FPDFBitmap_Create Create a device independent bitmap (FXDIB).
 	FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error)
 
-	// FPDFBitmap_CreateEx
+	// FPDFBitmap_CreateEx Create a device independent bitmap (FXDIB) with an
+	// external buffer.
+	// Similar to FPDFBitmap_Create function, but allows for more formats
+	// and an external buffer is supported. The bitmap created by this
+	// function can be used in any place that a FPDF_BITMAP handle is
+	// required.
+	//
+	// If an external buffer is used, then the application should destroy
+	// the buffer by itself. FPDFBitmap_Destroy function will not destroy
+	// the buffer.
+	//
+	// Not supported on multi-threaded usage.
 	FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error)
 
-	// FPDFBitmap_GetFormat
+	// FPDFBitmap_GetFormat returns the format of the bitmap.
+	// Only formats supported by FPDFBitmap_CreateEx are supported by this function.
 	FPDFBitmap_GetFormat(request *requests.FPDFBitmap_GetFormat) (*responses.FPDFBitmap_GetFormat, error)
 
-	// FPDFBitmap_FillRect
+	// FPDFBitmap_FillRect fills a rectangle in a bitmap.
+	// This function sets the color and (optionally) alpha value in the
+	// specified region of the bitmap.
+	//
+	// NOTE: If the alpha channel is used, this function does NOT
+	// composite the background with the source color, instead the
+	// background will be replaced by the source color and the alpha.
+	//
+	// If the alpha channel is not used, the alpha parameter is ignored.
 	FPDFBitmap_FillRect(request *requests.FPDFBitmap_FillRect) (*responses.FPDFBitmap_FillRect, error)
 
-	// FPDFBitmap_GetBuffer
+	// FPDFBitmap_GetBuffer returns the data buffer of a bitmap.
+	// The stride may be more than width * number of bytes per pixel
+	//
+	// Applications can use this function to get the bitmap buffer pointer,
+	// then manipulate any color and/or alpha values for any pixels in the
+	// bitmap.
+	//
+	// The data is in BGRA format. Where the A maybe unused if alpha was
+	// not specified.
 	FPDFBitmap_GetBuffer(request *requests.FPDFBitmap_GetBuffer) (*responses.FPDFBitmap_GetBuffer, error)
 
-	// FPDFBitmap_GetWidth
+	// FPDFBitmap_GetWidth returns the width of a bitmap.
 	FPDFBitmap_GetWidth(request *requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error)
 
-	// FPDFBitmap_GetHeight
+	// FPDFBitmap_GetHeight returns the height of a bitmap.
 	FPDFBitmap_GetHeight(request *requests.FPDFBitmap_GetHeight) (*responses.FPDFBitmap_GetHeight, error)
 
-	// FPDFBitmap_GetStride
+	// FPDFBitmap_GetStride returns the number of bytes for each line in the bitmap buffer.
 	FPDFBitmap_GetStride(request *requests.FPDFBitmap_GetStride) (*responses.FPDFBitmap_GetStride, error)
 
-	// FPDFBitmap_Destroy
+	// FPDFBitmap_Destroy destroys a bitmap and release all related buffers.
+	// This function will not destroy any external buffers provided when
+	// the bitmap was created.
 	FPDFBitmap_Destroy(request *requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error)
 
-	// FPDF_VIEWERREF_GetPrintScaling
+	// FPDF_VIEWERREF_GetPrintScaling returns whether the PDF document prefers to be scaled or not.
 	FPDF_VIEWERREF_GetPrintScaling(request *requests.FPDF_VIEWERREF_GetPrintScaling) (*responses.FPDF_VIEWERREF_GetPrintScaling, error)
 
-	// FPDF_VIEWERREF_GetNumCopies
+	// FPDF_VIEWERREF_GetNumCopies returns the number of copies to be printed.
 	FPDF_VIEWERREF_GetNumCopies(request *requests.FPDF_VIEWERREF_GetNumCopies) (*responses.FPDF_VIEWERREF_GetNumCopies, error)
 
-	// FPDF_VIEWERREF_GetPrintPageRange
+	// FPDF_VIEWERREF_GetPrintPageRange returns the page numbers to initialize print dialog box when file is printed.
 	FPDF_VIEWERREF_GetPrintPageRange(request *requests.FPDF_VIEWERREF_GetPrintPageRange) (*responses.FPDF_VIEWERREF_GetPrintPageRange, error)
 
-	// FPDF_VIEWERREF_GetPrintPageRangeCount
+	// FPDF_VIEWERREF_GetPrintPageRangeCount returns the number of elements in a FPDF_PAGERANGE.
+	// Experimental API.
 	FPDF_VIEWERREF_GetPrintPageRangeCount(request *requests.FPDF_VIEWERREF_GetPrintPageRangeCount) (*responses.FPDF_VIEWERREF_GetPrintPageRangeCount, error)
 
-	// FPDF_VIEWERREF_GetPrintPageRangeElement
+	// FPDF_VIEWERREF_GetPrintPageRangeElement returns an element from a FPDF_PAGERANGE.
+	// Experimental API.
 	FPDF_VIEWERREF_GetPrintPageRangeElement(request *requests.FPDF_VIEWERREF_GetPrintPageRangeElement) (*responses.FPDF_VIEWERREF_GetPrintPageRangeElement, error)
 
-	// FPDF_VIEWERREF_GetDuplex
+	// FPDF_VIEWERREF_GetDuplex returns the paper handling option to be used when printing from the print dialog.
 	FPDF_VIEWERREF_GetDuplex(request *requests.FPDF_VIEWERREF_GetDuplex) (*responses.FPDF_VIEWERREF_GetDuplex, error)
 
-	// FPDF_VIEWERREF_GetName
+	// FPDF_VIEWERREF_GetName returns the contents for a viewer ref, with a given key. The value must be of type "name".
 	FPDF_VIEWERREF_GetName(request *requests.FPDF_VIEWERREF_GetName) (*responses.FPDF_VIEWERREF_GetName, error)
 
-	// FPDF_CountNamedDests
+	// FPDF_CountNamedDests returns the count of named destinations in the PDF document.
 	FPDF_CountNamedDests(request *requests.FPDF_CountNamedDests) (*responses.FPDF_CountNamedDests, error)
 
-	// FPDF_GetNamedDestByName
+	// FPDF_GetNamedDestByName returns the destination handle for the given name.
 	FPDF_GetNamedDestByName(request *requests.FPDF_GetNamedDestByName) (*responses.FPDF_GetNamedDestByName, error)
 
-	// FPDF_GetNamedDest
+	// FPDF_GetNamedDest returns the named destination by index.
 	FPDF_GetNamedDest(request *requests.FPDF_GetNamedDest) (*responses.FPDF_GetNamedDest, error)
 
-	// FPDF_GetXFAPacketCount
+	// FPDF_GetXFAPacketCount returns the number of valid packets in the XFA entry.
+	// Experimental API.
 	FPDF_GetXFAPacketCount(request *requests.FPDF_GetXFAPacketCount) (*responses.FPDF_GetXFAPacketCount, error)
 
-	// FPDF_GetXFAPacketName
+	// FPDF_GetXFAPacketName returns the name of a packet in the XFA array.
+	// Experimental API.
 	FPDF_GetXFAPacketName(request *requests.FPDF_GetXFAPacketName) (*responses.FPDF_GetXFAPacketName, error)
 
-	// FPDF_GetXFAPacketContent
+	// FPDF_GetXFAPacketContent returns the content of a packet in the XFA array.
 	FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error)
-
-	// FPDF_GetRecommendedV8Flags
-	FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error)
-
-	// FPDF_GetArrayBufferAllocatorSharedInstance
-	FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error)
-
-	// FPDF_BStr_Init
-	FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (*responses.FPDF_BStr_Init, error)
-
-	// FPDF_BStr_Set
-	FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (*responses.FPDF_BStr_Set, error)
-
-	// FPDF_BStr_Clear
-	FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (*responses.FPDF_BStr_Clear, error)
 
 	// End fpdfview.h
 
