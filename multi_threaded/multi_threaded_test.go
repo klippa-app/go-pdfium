@@ -1,11 +1,10 @@
 package multi_threaded_test
 
 import (
-	"github.com/klippa-app/go-pdfium/multi_threaded"
-	"log"
 	"os"
 	"time"
 
+	"github.com/klippa-app/go-pdfium/multi_threaded"
 	"github.com/klippa-app/go-pdfium/shared_tests"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -41,12 +40,8 @@ var _ = AfterSuite(func() {
 	err := shared_tests.PdfiumInstance.Close()
 	Expect(err).To(BeNil())
 
-	log.Println("Closed instance")
-
 	err = shared_tests.PdfiumPool.Close()
 	Expect(err).To(BeNil())
-
-	log.Println("Closed pool")
 })
 
 var _ = Describe("Multi Threaded", func() {
