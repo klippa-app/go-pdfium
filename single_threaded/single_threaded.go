@@ -14,12 +14,14 @@ var singleThreadedMutex = &sync.Mutex{}
 
 var poolRefs = map[string]*pdfiumPool{}
 
+type Config struct{}
+
 // Init will return a single-threaded pool.
 // Every pool will keep track of its own instances and the documents that
 // belong to those instances. When you close it, it will clean up the resources
 // of that pool. Underwater every pool/instance uses the same mutex to ensure
 // thread safety in PDFium across pools/instances/documents.
-func Init() pdfium.Pool {
+func Init(config Config) pdfium.Pool {
 	singleThreadedMutex.Lock()
 	defer singleThreadedMutex.Unlock()
 

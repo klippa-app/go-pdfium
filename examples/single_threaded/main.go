@@ -16,7 +16,7 @@ var instance pdfium.Pdfium
 
 func init() {
 	// Init the PDFium library and return the instance to open documents.
-	pool = single_threaded.Init()
+	pool = single_threaded.Init(single_threaded.Config{})
 
 	var err error
 	instance, err = pool.GetInstance(time.Second * 30)
