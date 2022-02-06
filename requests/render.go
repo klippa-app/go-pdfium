@@ -1,8 +1,11 @@
 package requests
 
+import "github.com/klippa-app/go-pdfium/enums"
+
 type RenderPageInDPI struct {
-	Page Page
-	DPI  int // The DPI to render the page in.
+	Page        Page
+	DPI         int                    // The DPI to render the page in.
+	RenderFlags enums.FPDF_RENDER_FLAG // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
 }
 
 type RenderPagesInDPI struct {
@@ -11,9 +14,10 @@ type RenderPagesInDPI struct {
 }
 
 type RenderPageInPixels struct {
-	Page   Page
-	Width  int // The maximum width of the image.
-	Height int // The maximum height of the image.
+	Page        Page
+	Width       int                    // The maximum width of the image.
+	Height      int                    // The maximum height of the image.
+	RenderFlags enums.FPDF_RENDER_FLAG // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
 }
 
 type RenderPagesInPixels struct {
