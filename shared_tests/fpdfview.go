@@ -848,12 +848,13 @@ var _ = Describe("fpdfview", func() {
 			})
 
 			When("an external bitmap has been created", func() {
-				if TestType == "multi" {
-					Skip("External bitmap is not supported on multi-threaded usage")
-				}
 				var bitmap references.FPDF_BITMAP
 				var buffer []byte
 				BeforeEach(func() {
+					if TestType == "multi" {
+						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
 					buffer = make([]byte, (1000*4)*1000) // 1000 pixels in width * 4 bytes per pixel * 1000 pixels in height
 
 					FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
@@ -869,6 +870,10 @@ var _ = Describe("fpdfview", func() {
 				})
 
 				AfterEach(func() {
+					if TestType == "multi" {
+						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
 					FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
 						Bitmap: bitmap,
 					})
