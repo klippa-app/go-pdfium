@@ -26,3 +26,8 @@ type FPDF_FS_MATRIX struct {
 	E float32
 	F float32
 }
+
+type FPDF_FS_SIZEF struct {
+	Width  float32
+	Height float32
+}

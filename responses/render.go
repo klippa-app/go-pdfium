@@ -1,6 +1,8 @@
 package responses
 
-import "image"
+import (
+	"image"
+)
 
 type RenderPage struct {
 	Page              int         // The rendered page number (0-index based).

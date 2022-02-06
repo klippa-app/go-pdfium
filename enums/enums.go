@@ -130,3 +130,41 @@ const (
 	FPDF_TEXTRENDERMODE_FILL_STROKE_CLIP FPDF_TEXT_RENDERMODE = 6
 	FPDF_TEXTRENDERMODE_CLIP             FPDF_TEXT_RENDERMODE = 7
 )
+
+type FPDF_BITMAP_FORMAT int
+
+const (
+	FPDF_BITMAP_FORMAT_UNKNOWN FPDF_BITMAP_FORMAT = 0 // Unknown or unsupported format.
+	FPDF_BITMAP_FORMAT_GRAY    FPDF_BITMAP_FORMAT = 1 // Gray scale bitmap, one byte per pixel.
+	FPDF_BITMAP_FORMAT_BGR     FPDF_BITMAP_FORMAT = 2 // 3 bytes per pixel, byte order: blue, green, red.
+	FPDF_BITMAP_FORMAT_BGRX    FPDF_BITMAP_FORMAT = 3 // 4 bytes per pixel, byte order: blue, green, red, unused.
+	FPDF_BITMAP_FORMAT_BGRA    FPDF_BITMAP_FORMAT = 4 // 4 bytes per pixel, byte order: blue, green, red, alpha.
+)
+
+type FPDF_DUPLEXTYPE int
+
+const (
+	FPDF_DUPLEXTYPE_UNDEFINED              FPDF_DUPLEXTYPE = 0
+	FPDF_DUPLEXTYPE_SIMPLEX                FPDF_DUPLEXTYPE = 1
+	FPDF_DUPLEXTYPE_DUPLEX_FLIP_SHORT_EDGE FPDF_DUPLEXTYPE = 2
+	FPDF_DUPLEXTYPE_DUPLEX_FLIP_LONG_EDGE  FPDF_DUPLEXTYPE = 3
+)
+
+type FPDF_RENDER_FLAG int
+
+const (
+	FPDF_RENDER_FLAG_ANNOT                    FPDF_RENDER_FLAG = 0x01   // Set if annotations are to be rendered.
+	FPDF_RENDER_FLAG_LCD_TEXT                 FPDF_RENDER_FLAG = 0x02   // Set if using text rendering optimized for LCD display. This flag will only take effect if anti-aliasing is enabled for text.
+	FPDF_RENDER_FLAG_NO_NATIVETEXT            FPDF_RENDER_FLAG = 0x04   // Don't use the native text output available on some platforms.
+	FPDF_RENDER_FLAG_GRAYSCALE                FPDF_RENDER_FLAG = 0x08   // Grayscale output.
+	FPDF_RENDER_FLAG_DEBUG_INFO               FPDF_RENDER_FLAG = 0x80   // Obsolete, has no effect, retained for compatibility.
+	FPDF_RENDER_FLAG_NO_CATCH                 FPDF_RENDER_FLAG = 0x100  // Obsolete, has no effect, retained for compatibility.
+	FPDF_RENDER_FLAG_RENDER_LIMITEDIMAGECACHE FPDF_RENDER_FLAG = 0x200  // Limit image cache size.
+	FPDF_RENDER_FLAG_RENDER_FORCEHALFTONE     FPDF_RENDER_FLAG = 0x400  // Always use halftone for image stretching.
+	FPDF_RENDER_FLAG_PRINTING                 FPDF_RENDER_FLAG = 0x800  // Render for printing.
+	FPDF_RENDER_FLAG_RENDER_NO_SMOOTHTEXT     FPDF_RENDER_FLAG = 0x1000 // Set to disable anti-aliasing on text. This flag will also disable LCD optimization for text rendering.
+	FPDF_RENDER_FLAG_RENDER_NO_SMOOTHIMAGE    FPDF_RENDER_FLAG = 0x2000 // Set to disable anti-aliasing on images.
+	FPDF_RENDER_FLAG_RENDER_NO_SMOOTHPATH     FPDF_RENDER_FLAG = 0x4000 // Set to disable anti-aliasing on paths.
+	FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER       FPDF_RENDER_FLAG = 0x10   // Set whether to render in a reverse Byte order, this flag is only used when rendering to a bitmap.
+	FPDF_RENDER_FLAG_CONVERT_FILL_TO_STROKE   FPDF_RENDER_FLAG = 0x20   // Set whether fill paths need to be stroked. This flag is only used when FPDF_COLORSCHEME is passed in, since with a single fill color for paths the boundaries of adjacent fill paths are less visible.
+)
