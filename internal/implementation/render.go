@@ -17,6 +17,7 @@ import (
 	"os"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -108,6 +109,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 			Width:             widthInPixels,
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
+			Flags:             request.RenderFlags,
 		},
 	}, 0)
 	if err != nil {
@@ -150,6 +152,7 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			Width:             widthInPixels,
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
+			Flags:             request.Pages[i].RenderFlags,
 		}
 	}
 
@@ -222,6 +225,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 			Width:             width,
 			Height:            height,
 			PointToPixelRatio: ratio,
+			Flags:             request.RenderFlags,
 		},
 	}, 0)
 	if err != nil {
@@ -266,6 +270,7 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			Width:             width,
 			Height:            height,
 			PointToPixelRatio: ratio,
+			Flags:             request.Pages[i].RenderFlags,
 		}
 	}
 
@@ -281,6 +286,7 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 
 type renderPage struct {
 	Page              requests.Page
+	Flags             enums.FPDF_RENDER_FLAG
 	Width             int
 	Height            int
 	PointToPixelRatio float64
@@ -322,7 +328,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset)
+		index, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
 		if err != nil {
 			return nil, err
 		}
@@ -343,7 +349,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int) (int, error) {
+func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, err
@@ -365,7 +371,7 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.FPDF_ANNOT|C.FPDF_REVERSE_BYTE_ORDER)
+	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
 
 	return pageHandle.index, nil
 }
