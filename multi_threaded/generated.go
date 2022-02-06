@@ -108,11 +108,7 @@ func (i *pdfiumInstance) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) 
 }
 
 func (i *pdfiumInstance) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FPDFBitmap_CreateEx(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FPDFBitmap_Destroy(request *requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error) {
@@ -1073,15 +1069,12 @@ func (i *pdfiumInstance) FPDF_LoadCustomDocument(request *requests.FPDF_LoadCust
 	}
 
 	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
-	// To make it support the full interface, we just completely read the file into memory.
-	fileData, err := ioutil.ReadAll(request.Reader)
-	if err != nil {
-		return nil, err
-	}
-
+	// To make it support the full interface, we just rewrite it to OpenDocument,
+	// and OpenDocument just fully reads the io.ReadSeeker into an byte array.
 	doc, err := i.OpenDocument(&requests.OpenDocument{
-		File:     &fileData,
-		Password: request.Password,
+		FileReader:     request.Reader,
+		FileReaderSize: request.Size,
+		Password:       request.Password,
 	})
 	if err != nil {
 		return nil, err
@@ -1167,6 +1160,10 @@ func (i *pdfiumInstance) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*re
 		return nil, errors.New("instance is closed")
 	}
 
+	if request.FileWriter != nil {
+		return nil, errors.New("using a file-writer is not supported on multi-threaded usage")
+	}
+
 	return i.worker.plugin.FPDF_SaveAsCopy(request)
 }
 
@@ -1243,27 +1240,15 @@ func (i *pdfiumInstance) FPDF_VIEWERREF_GetPrintScaling(request *requests.FPDF_V
 }
 
 func (i *pdfiumInstance) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FSDK_SetLocaltimeFunction(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FSDK_SetTimeFunction(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FSDK_SetUnSpObjProcessHandler(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) GetActionInfo(request *requests.GetActionInfo) (*responses.GetActionInfo, error) {
@@ -1351,6 +1336,18 @@ func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (*response
 		return nil, errors.New("instance is closed")
 	}
 
+	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
+	// To make it support the full interface, we just fully reads the io.ReadSeeker into
+	// an byte array.
+	if request.FileReader != nil {
+		fileData, err := ioutil.ReadAll(request.FileReader)
+		if err != nil {
+			return nil, err
+		}
+		request.FileReader = nil
+		request.FileReaderSize = 0
+		request.File = &fileData
+	}
 	return i.worker.plugin.OpenDocument(request)
 }
 
