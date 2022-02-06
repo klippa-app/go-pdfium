@@ -12,29 +12,52 @@ import (
 )
 {{ range $method := .Methods }}
 func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
+	{{ if eq $method.IsMultiThreaded true -}}
+	return nil, errors.New("unsupported method on multi-threaded usage")
+	{{- else -}}
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 
 	{{ if eq $method.Name "FPDF_LoadCustomDocument" -}}
 	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
-	// To make it support the full interface, we just completely read the file into memory.
-	fileData, err := ioutil.ReadAll(request.Reader)
-	if err != nil {
-		return nil, err
-	}
-
+	// To make it support the full interface, we just rewrite it to OpenDocument,
+	// and OpenDocument just fully reads the io.ReadSeeker into an byte array.
 	doc, err := i.OpenDocument(&requests.OpenDocument{
-		File:     &fileData,
-		Password: request.Password,
+		FileReader:     request.Reader,
+		FileReaderSize: request.Size,
+		Password:       request.Password,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.FPDF_LoadCustomDocument{Document: doc.Document}, nil
-    {{- else -}}
+	{{- else if eq $method.Name "OpenDocument" -}}
+	// Since multi-threaded usage implements gRPC, it can't serialize the reader onto that.
+	// To make it support the full interface, we just fully reads the io.ReadSeeker into
+	// an byte array.
+	if request.FileReader != nil {
+		fileData, err := ioutil.ReadAll(request.FileReader)
+		if err != nil {
+			return nil, err
+		}
+		request.FileReader = nil
+		request.FileReaderSize = 0
+		request.File = &fileData
+	}
 	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- else if eq $method.Name "FPDF_SaveWithVersion" -}}
+	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- else if eq $method.Name "FPDF_SaveAsCopy" -}}
+	if request.FileWriter != nil {
+		return nil, errors.New("using a file-writer is not supported on multi-threaded usage")
+	}
+
+	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- else -}}
+	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- end }}
 	{{- end }}
 }
 {{end}}
