@@ -185,7 +185,7 @@ type FPDF_VIEWERREF_GetDuplex struct {
 }
 
 type FPDF_VIEWERREF_GetName struct {
-	Name string
+	Value string
 }
 
 type FPDF_CountNamedDests struct {
@@ -206,9 +206,11 @@ type FPDF_GetXFAPacketCount struct {
 }
 
 type FPDF_GetXFAPacketName struct {
-	Name string
+	Index int
+	Name  string
 }
 
 type FPDF_GetXFAPacketContent struct {
+	Index   int
 	Content []byte
 }

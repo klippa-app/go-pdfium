@@ -118,7 +118,7 @@ var _ = Describe("fpdf_thumbnail", func() {
 			Expect(FPDF_CloseDocument).To(Not(BeNil()))
 		})
 
-		It("returns no decoded thumbnail data", func() {
+		It("returns decoded thumbnail data", func() {
 			FPDFPage_GetDecodedThumbnailData, err := PdfiumInstance.FPDFPage_GetDecodedThumbnailData(&requests.FPDFPage_GetDecodedThumbnailData{
 				Page: requests.Page{
 					ByIndex: &requests.PageByIndex{
@@ -132,7 +132,7 @@ var _ = Describe("fpdf_thumbnail", func() {
 			Expect(FPDFPage_GetDecodedThumbnailData.Thumbnail).To(HaveLen(1138))
 		})
 
-		It("returns no raw thumbnail data", func() {
+		It("returns raw thumbnail data", func() {
 			FPDFPage_GetRawThumbnailData, err := PdfiumInstance.FPDFPage_GetRawThumbnailData(&requests.FPDFPage_GetRawThumbnailData{
 				Page: requests.Page{
 					ByIndex: &requests.PageByIndex{
@@ -146,7 +146,8 @@ var _ = Describe("fpdf_thumbnail", func() {
 			Expect(FPDFPage_GetRawThumbnailData.RawThumbnail).To(HaveLen(1851))
 		})
 
-		It("returns no decoded thumbnail data", func() {
+		It("returns thumbnail as bitmap", func() {
+			By("when the thumbnail is fetched")
 			FPDFPage_GetThumbnailAsBitmap, err := PdfiumInstance.FPDFPage_GetThumbnailAsBitmap(&requests.FPDFPage_GetThumbnailAsBitmap{
 				Page: requests.Page{
 					ByIndex: &requests.PageByIndex{
@@ -157,7 +158,16 @@ var _ = Describe("fpdf_thumbnail", func() {
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDFPage_GetThumbnailAsBitmap).To(Not(BeNil()))
-			// @todo: render thumbnail when FPDFBitmap_* is implemented and compare hash.
+			Expect(FPDFPage_GetThumbnailAsBitmap.Bitmap).To(Not(BeNil()))
+
+			By("the first byte in the bitmap buffer is white")
+			FPDFBitmap_GetBuffer, err := PdfiumInstance.FPDFBitmap_GetBuffer(&requests.FPDFBitmap_GetBuffer{
+				Bitmap: *FPDFPage_GetThumbnailAsBitmap.Bitmap,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_GetBuffer).To(Not(BeNil()))
+			Expect(FPDFBitmap_GetBuffer.Buffer).To(Not(BeNil()))
+			Expect(FPDFBitmap_GetBuffer.Buffer[0]).To(Equal(uint8(255)))
 		})
 	})
 })
