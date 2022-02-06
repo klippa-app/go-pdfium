@@ -48,7 +48,12 @@ type Pdfium interface {
 	// Start instance functions.
 
 	// OpenDocument returns a PDFium references for the given file data.
-	// This is a gateway to FPDF_LoadMemDocument, FPDF_LoadMemDocument64, FPDF_LoadDocument and FPDF_LoadCustomDocument.
+	// This is a gateway to FPDF_LoadMemDocument, FPDF_LoadMemDocument64,
+	// FPDF_LoadDocument and FPDF_LoadCustomDocument. Please note that
+	// FPDF_LoadCustomDocument will only work efficiently on single-threaded
+	// usage, on multi-threaded this will just fully read from the reader
+	// into a byte array before it's being sent over to PDFium.
+	// This method already checks FPDF_GetLastError internally for the result.
 	OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error)
 
 	// Close closes the instance.
@@ -127,20 +132,17 @@ type Pdfium interface {
 
 	// FPDF_LoadDocument opens and load a PDF document from a file path.
 	// Loaded document can be closed by FPDF_CloseDocument().
-	// If this function fails, you can use FPDF_GetLastError() to retrieve
-	// the reason why it failed.
+	// This method already checks FPDF_GetLastError internally for the result.
 	FPDF_LoadDocument(request *requests.FPDF_LoadDocument) (*responses.FPDF_LoadDocument, error)
 
 	// FPDF_LoadMemDocument opens and load a PDF document from memory.
 	// Loaded document can be closed by FPDF_CloseDocument().
-	// If this function fails, you can use FPDF_GetLastError() to retrieve
-	// the reason why it failed.
+	// This method already checks FPDF_GetLastError internally for the result.
 	FPDF_LoadMemDocument(request *requests.FPDF_LoadMemDocument) (*responses.FPDF_LoadMemDocument, error)
 
 	// FPDF_LoadMemDocument64 opens and load a PDF document from memory.
 	// Loaded document can be closed by FPDF_CloseDocument().
-	// If this function fails, you can use FPDF_GetLastError() to retrieve
-	// the reason why it failed.
+	// This method already checks FPDF_GetLastError internally for the result.
 	FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
 
 	// FPDF_LoadCustomDocument loads a PDF document from a custom access descriptor.
@@ -150,8 +152,7 @@ type Pdfium interface {
 	// over gRPC. The single-threaded usage will actually efficiently walk over
 	// the PDF as it's being used by PDFium.
 	// Loaded document can be closed by FPDF_CloseDocument().
-	// If this function fails, you can use FPDF_GetLastError() to retrieve
-	// the reason why it failed.
+	// This method already checks FPDF_GetLastError internally for the result.
 	FPDF_LoadCustomDocument(request *requests.FPDF_LoadCustomDocument) (*responses.FPDF_LoadCustomDocument, error)
 
 	// FPDF_CloseDocument closes the references, releases the resources.
@@ -159,6 +160,9 @@ type Pdfium interface {
 
 	// FPDF_GetLastError returns the last error code of a PDFium function, which is just called.
 	// Usually, this function is called after a PDFium function returns, in order to check the error code of the previous PDFium function.
+	// Please note that when using go-pdfium from the same instance (on single-threaded any instance)
+	// from different subroutines, FPDF_GetLastError might already be reset from
+	// executing another PDFium method.
 	FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 
 	// FPDF_SetSandBoxPolicy set the policy for the sandbox environment.
