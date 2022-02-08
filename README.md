@@ -380,9 +380,13 @@ func renderPage(filePath string, page int, output string) error {
 
 Some newer API's by PDFium are marked as experimental. We do have support for these functions, but because they are prone to change
 we do not compile with support for it by default. This is to keep support for most PDFium versions by default.
-Adding support for this is quite easy. All you have to do is give the build tag `pdfium_experimental` when running `go build` or `go run`, like this:
+
+**If you call any API methods marked as experimental, the call will result in an error**
+
+Adding support for the experimental API is quite easy. All you have to do is give the build tag `pdfium_experimental` when running `go build` or `go run`, like this:
 `go run -tags pdfium_experimental {package}/{file.go}` or `go build -tags pdfium_experimental {package}/{file.go}`.
 
+We actively monitor PDFium API additions/changes/deletions and apply them in the code-base. When API methods become non-experimental, we will make them available in the default configuration.
 
 ## About Klippa
 
