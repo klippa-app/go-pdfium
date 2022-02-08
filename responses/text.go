@@ -16,7 +16,7 @@ type FontInformation struct {
 	Size         float64 // Font size in points (also known as em).
 	SizeInPixels *int    // Font size in pixels, only available when PixelPositions is used.
 	Weight       int     // The weight of the font, can be negative for spaces and newlines.
-	Name         string  // The name of the font, can be empty for spaces and newlines.
+	Name         string  // The name of the font, can be empty for spaces and newlines. The font name will only be returned when compiled with experimental support.
 	Flags        int     // Font flags, should be interpreted per PDF spec 1.7, Section 5.7.1 Font Descriptor Flags.
 }
 
