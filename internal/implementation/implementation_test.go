@@ -13,7 +13,7 @@ import (
 )
 
 var _ = BeforeSuite(func() {
-	implementation.InitLibrary()
+	implementation.InitLibrary(nil)
 
 	// Set ENV to ensure resulting values.
 	err := os.Setenv("TZ", "UTC")

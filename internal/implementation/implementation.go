@@ -2,12 +2,13 @@ package implementation
 
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/references"
 	"io"
 	"sync"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium"
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -70,8 +71,10 @@ var Pdfium = &mainPdfium{
 
 var isInitialized = false
 
+var libraryConfig C.FPDF_LIBRARY_CONFIG
+
 // InitLibrary loads the actual C++ library.
-func InitLibrary() {
+func InitLibrary(config *pdfium.LibraryConfig) {
 	Pdfium.mutex.Lock()
 	defer Pdfium.mutex.Unlock()
 
@@ -80,7 +83,26 @@ func InitLibrary() {
 		return
 	}
 
-	C.FPDF_InitLibrary()
+	if config == nil {
+		C.FPDF_InitLibrary()
+	} else {
+		libraryConfig = C.FPDF_LIBRARY_CONFIG{}
+
+		if config.UserFontPaths != nil && len(config.UserFontPaths) > 0 {
+			// Create array of length config.UserFontPaths + 1 for the NULL terminator.
+			cArray := C.malloc(C.size_t(len(config.UserFontPaths)+1) * C.size_t(unsafe.Sizeof(uintptr(0))))
+
+			cFonts := (*[1<<30 - 1]*C.char)(cArray)
+			for i := range config.UserFontPaths {
+				cFonts[i] = C.CString(config.UserFontPaths[i])
+			}
+
+			libraryConfig.m_pUserFontPaths = (**C.char)(cArray)
+		}
+
+		C.FPDF_InitLibraryWithConfig(&libraryConfig)
+	}
+
 	isInitialized = true
 }
 
