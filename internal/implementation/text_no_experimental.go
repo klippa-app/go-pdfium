@@ -14,12 +14,8 @@ import (
 
 func (p *PdfiumImplementation) getFontInformation(textPage C.FPDF_TEXTPAGE, charIndex int) *responses.FontInformation {
 	fontSize := C.FPDFText_GetFontSize(textPage, C.int(charIndex))
-	fontWeight := C.FPDFText_GetFontWeight(textPage, C.int(charIndex))
-	fontFlags := C.int(0)
 
 	return &responses.FontInformation{
-		Size:   float64(fontSize),
-		Weight: int(fontWeight),
-		Flags:  int(fontFlags),
+		Size: float64(fontSize),
 	}
 }
