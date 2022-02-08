@@ -1,3 +1,6 @@
+//go:build pdfium_experimental
+// +build pdfium_experimental
+
 package shared_tests
 
 import (
@@ -59,6 +62,12 @@ var _ = Describe("fpdf_doc", func() {
 				FPDFDest_GetDestPageIndex, err := PdfiumInstance.FPDFDest_GetDestPageIndex(&requests.FPDFDest_GetDestPageIndex{})
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFDest_GetDestPageIndex).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetFileIdentifier", func() {
+				FPDF_GetFileIdentifier, err := PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetFileIdentifier).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_GetPageLabel", func() {
@@ -201,6 +210,12 @@ var _ = Describe("fpdf_doc", func() {
 			})
 
 			Context("without giving a dest", func() {
+				It("FPDFDest_GetView returns an error", func() {
+					destView, err := PdfiumInstance.FPDFDest_GetView(&requests.FPDFDest_GetView{})
+					Expect(err).To(MatchError("dest not given"))
+					Expect(destView).To(BeNil())
+				})
+
 				It("FPDFDest_GetDestPageIndex returns an error", func() {
 					destPageIndex, err := PdfiumInstance.FPDFDest_GetDestPageIndex(&requests.FPDFDest_GetDestPageIndex{
 						Document: doc,
@@ -234,6 +249,18 @@ var _ = Describe("fpdf_doc", func() {
 					Expect(err).To(MatchError("either page reference or index should be given"))
 					Expect(FPDFLink_Enumerate).To(BeNil())
 				})
+
+				It("FPDFLink_GetAnnot returns an error", func() {
+					FPDFLink_GetAnnot, err := PdfiumInstance.FPDFLink_GetAnnot(&requests.FPDFLink_GetAnnot{})
+					Expect(err).To(MatchError("either page reference or index should be given"))
+					Expect(FPDFLink_GetAnnot).To(BeNil())
+				})
+
+				It("FPDF_GetPageAAction returns an error", func() {
+					FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{})
+					Expect(err).To(MatchError("either page reference or index should be given"))
+					Expect(FPDF_GetPageAAction).To(BeNil())
+				})
 			})
 
 			Context("without giving a link", func() {
@@ -249,6 +276,25 @@ var _ = Describe("fpdf_doc", func() {
 					FPDFLink_GetAction, err := PdfiumInstance.FPDFLink_GetAction(&requests.FPDFLink_GetAction{})
 					Expect(err).To(MatchError("link not given"))
 					Expect(FPDFLink_GetAction).To(BeNil())
+				})
+
+				It("FPDFLink_GetAnnot returns an error", func() {
+					FPDFLink_GetAnnot, err := PdfiumInstance.FPDFLink_GetAnnot(&requests.FPDFLink_GetAnnot{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(MatchError("link not given"))
+					Expect(FPDFLink_GetAnnot).To(BeNil())
+				})
+
+				It("FPDFLink_GetAnnotRect returns an error", func() {
+					FPDFLink_GetAnnotRect, err := PdfiumInstance.FPDFLink_GetAnnotRect(&requests.FPDFLink_GetAnnotRect{})
+					Expect(err).To(MatchError("link not given"))
+					Expect(FPDFLink_GetAnnotRect).To(BeNil())
 				})
 
 				It("FPDFLink_CountQuadPoints returns an error", func() {
@@ -679,6 +725,168 @@ var _ = Describe("fpdf_doc", func() {
 		})
 	})
 
+	Context("a PDF file with a non-text identifier", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/split_streams.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDF_GetFileIdentifier is called with an invalid type", func() {
+			It("should return an error", func() {
+				identifier, err := PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: -1,
+				})
+				Expect(err).To(MatchError("invalid file id type given"))
+				Expect(identifier).To(BeNil())
+
+				identifier, err = PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: 2,
+				})
+				Expect(err).To(MatchError("invalid file id type given"))
+				Expect(identifier).To(BeNil())
+			})
+		})
+
+		When("FPDF_GetFileIdentifier is called with a valid type", func() {
+			It("returns the correct identifier", func() {
+				identifier, err := PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					Identifier: []byte{243, 65, 174, 101, 74, 119, 172, 213, 6, 90, 118, 69, 229, 150, 230, 230}, // Byte identifier
+				}))
+
+				identifier, err = PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					Identifier: []byte{188, 55, 41, 138, 63, 135, 244, 121, 34, 155, 206, 153, 124, 167, 145, 247}, // Byte identifier
+				}))
+			})
+		})
+	})
+
+	Context("a PDF file with a text identifier", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/non_hex_file_id.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDF_GetFileIdentifier is called with a valid type", func() {
+			It("returns the correct identifier", func() {
+				identifier, err := PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					Identifier: []byte("permanent non-hex"), // Text identifier
+				}))
+
+				identifier, err = PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					Identifier: []byte("changing non-hex"), // Text identifier
+				}))
+			})
+		})
+	})
+
+	Context("a PDF file without identifier", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDF_GetFileIdentifier is called with a valid type", func() {
+			It("returns a nil identifier", func() {
+				identifier, err := PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_PERMANENT,
+					Identifier: nil,
+				}))
+
+				identifier, err = PdfiumInstance.FPDF_GetFileIdentifier(&requests.FPDF_GetFileIdentifier{
+					Document:   doc,
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+				})
+				Expect(err).To(BeNil())
+				Expect(identifier).To(Equal(&responses.FPDF_GetFileIdentifier{
+					FileIdType: enums.FPDF_FILEIDTYPE_CHANGING,
+					Identifier: nil,
+				}))
+			})
+		})
+	})
+
 	Context("a PDF file with a link", func() {
 		var doc references.FPDF_DOCUMENT
 		BeforeEach(func() {
@@ -783,6 +991,36 @@ var _ = Describe("fpdf_doc", func() {
 				Expect(err).To(BeNil())
 				Expect(action).To(Not(BeNil()))
 				Expect(action.Action).To(Not(BeNil()))
+			})
+		})
+
+		When("FPDFLink_GetAnnot is called", func() {
+			It("returns an annotation", func() {
+				annotation, err := PdfiumInstance.FPDFLink_GetAnnot(&requests.FPDFLink_GetAnnot{
+					Link: link,
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(annotation).To(Not(BeNil()))
+				Expect(annotation.Annotation).To(Not(BeNil()))
+			})
+		})
+
+		When("FPDFLink_GetAnnotRect is called", func() {
+			It("returns an annotation rect", func() {
+				annotationRect, err := PdfiumInstance.FPDFLink_GetAnnotRect(&requests.FPDFLink_GetAnnotRect{
+					Link: link,
+				})
+				Expect(err).To(BeNil())
+				Expect(annotationRect).To(Not(BeNil()))
+				Expect(annotationRect).To(Equal(&responses.FPDFLink_GetAnnotRect{
+					Rect: &structs.FPDF_FS_RECTF{Left: 1, Top: 199, Right: 199, Bottom: 1},
+				}))
 			})
 		})
 
@@ -1422,6 +1660,201 @@ var _ = Describe("fpdf_doc", func() {
 						Y:    &expectedY,
 						Zoom: nil,
 					}))
+				})
+			})
+
+			When("FPDFDest_GetView is called", func() {
+				It("returns the right view", func() {
+					FPDFDest_GetView, err := PdfiumInstance.FPDFDest_GetView(&requests.FPDFDest_GetView{
+						Dest: dest,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFDest_GetView).To(Equal(&responses.FPDFDest_GetView{
+						DestView: 1,
+						Params:   []float32{100, 200, 0},
+					}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with an aaction", func() {
+		var doc references.FPDF_DOCUMENT
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/get_page_aaction.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDF_GetPageAAction is called", func() {
+			It("returns null for FPDFPAGE_AACTION_CLOSE", func() {
+				FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					AAType: enums.FPDF_PAGE_AACTION_CLOSE,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageAAction).To(Equal(&responses.FPDF_GetPageAAction{}))
+			})
+
+			It("returns null for -1", func() {
+				FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					AAType: -1,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageAAction).To(Equal(&responses.FPDF_GetPageAAction{}))
+			})
+
+			It("returns null for 99", func() {
+				FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					AAType: 99,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageAAction).To(Equal(&responses.FPDF_GetPageAAction{}))
+			})
+
+			It("returns an action for FPDFPAGE_AACTION_OPEN", func() {
+				FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					AAType: enums.FPDF_PAGE_AACTION_OPEN,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageAAction).To(Not(BeNil()))
+				Expect(FPDF_GetPageAAction.Action).To(Not(BeNil()))
+			})
+
+			Context("An embedded goto action is loaded", func() {
+				var action references.FPDF_ACTION
+
+				BeforeEach(func() {
+					FPDF_GetPageAAction, err := PdfiumInstance.FPDF_GetPageAAction(&requests.FPDF_GetPageAAction{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						AAType: enums.FPDF_PAGE_AACTION_OPEN,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_GetPageAAction).To(Not(BeNil()))
+					Expect(FPDF_GetPageAAction.Action).To(Not(BeNil()))
+					action = *FPDF_GetPageAAction.Action
+				})
+
+				When("FPDFAction_GetType is called", func() {
+					It("returns an type", func() {
+						actionType, err := PdfiumInstance.FPDFAction_GetType(&requests.FPDFAction_GetType{
+							Action: action,
+						})
+						Expect(err).To(BeNil())
+						Expect(actionType).To(Not(BeNil()))
+						Expect(actionType).To(Equal(&responses.FPDFAction_GetType{
+							Type: enums.FPDF_ACTION_ACTION_EMBEDDEDGOTO,
+						}))
+					})
+				})
+
+				When("FPDFAction_GetURIPath is called", func() {
+					It("returns no uri path", func() {
+						uriPath, err := PdfiumInstance.FPDFAction_GetURIPath(&requests.FPDFAction_GetURIPath{
+							Document: doc,
+							Action:   action,
+						})
+						Expect(err).To(BeNil())
+						Expect(uriPath).To(Not(BeNil()))
+						Expect(uriPath).To(Equal(&responses.FPDFAction_GetURIPath{}))
+					})
+				})
+
+				When("FPDFAction_GetFilePath is called", func() {
+					It("returns the file path", func() {
+						actionType, err := PdfiumInstance.FPDFAction_GetFilePath(&requests.FPDFAction_GetFilePath{
+							Action: action,
+						})
+						Expect(err).To(BeNil())
+						Expect(actionType).To(Not(BeNil()))
+						expectedFilePath := "\\\\127.0.0.1\\c$\\Program Files\\test.exe"
+						Expect(actionType).To(Equal(&responses.FPDFAction_GetFilePath{
+							FilePath: &expectedFilePath,
+						}))
+					})
+				})
+
+				When("FPDFAction_GetDest is called", func() {
+					It("returns a dest", func() {
+						actionDest, err := PdfiumInstance.FPDFAction_GetDest(&requests.FPDFAction_GetDest{
+							Document: doc,
+							Action:   action,
+						})
+						Expect(err).To(BeNil())
+						Expect(actionDest).To(Not(BeNil()))
+						Expect(actionDest.Dest).To(Not(BeNil()))
+					})
+				})
+
+				Context("A dest action is loaded", func() {
+					var dest references.FPDF_DEST
+
+					BeforeEach(func() {
+						actionDest, err := PdfiumInstance.FPDFAction_GetDest(&requests.FPDFAction_GetDest{
+							Document: doc,
+							Action:   action,
+						})
+						Expect(err).To(BeNil())
+						Expect(actionDest).To(Not(BeNil()))
+						Expect(actionDest.Dest).To(Not(BeNil()))
+						dest = *actionDest.Dest
+					})
+
+					When("FPDFDest_GetDestPageIndex is called", func() {
+						It("returns the correct page index", func() {
+							destPageIndex, err := PdfiumInstance.FPDFDest_GetDestPageIndex(&requests.FPDFDest_GetDestPageIndex{
+								Document: doc,
+								Dest:     dest,
+							})
+							Expect(err).To(BeNil())
+							Expect(destPageIndex).To(Not(BeNil()))
+							Expect(destPageIndex).To(Equal(&responses.FPDFDest_GetDestPageIndex{
+								Index: 1,
+							}))
+						})
+					})
 				})
 			})
 		})

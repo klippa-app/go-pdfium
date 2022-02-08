@@ -1,3 +1,6 @@
+//go:build pdfium_experimental
+// +build pdfium_experimental
+
 package implementation
 
 /*

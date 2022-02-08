@@ -16,7 +16,7 @@
 
 * Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
 * This library will handle all complicated cgo gymnastics for you
-* The goal is to implement all PDFium public API methods (including experimental), current progress: 40%
+* The goal is to implement all PDFium public API methods (including [experimental](#experimental)), current progress: 40%
 * Current PDFium methods exposed, no cgo required
     * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
@@ -375,6 +375,14 @@ func renderPage(filePath string, page int, output string) error {
 	return nil
 }
 ```
+
+## Experimental
+
+Some newer API's by PDFium are marked as experimental. We do have support for these functions, but because they are prone to change
+we do not compile with support for it by default. This is to keep support for most PDFium versions by default.
+Adding support for this is quite easy. All you have to do is give the build tag `pdfium_experimental` when running `go build` or `go run`, like this:
+`go run -tags pdfium_experimental {package}/{file.go}` or `go build -tags pdfium_experimental {package}/{file.go}`.
+
 
 ## About Klippa
 
