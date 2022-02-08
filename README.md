@@ -16,7 +16,7 @@
 
 * Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
 * This library will handle all complicated cgo gymnastics for you
-* The goal is to implement all PDFium public API methods (including experimental), current progress: 40%
+* The goal is to implement all PDFium public API methods (including [experimental](#experimental)), current progress: 40%
 * Current PDFium methods exposed, no cgo required
     * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
