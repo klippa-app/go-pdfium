@@ -3,14 +3,15 @@ package implementation
 import (
 	"os"
 
+	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/commons"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 )
 
-func StartPlugin() {
-	InitLibrary()
+func StartPlugin(config *pdfium.LibraryConfig) {
+	InitLibrary(config)
 
 	logger := hclog.New(&hclog.LoggerOptions{
 		Level:      hclog.Trace,
