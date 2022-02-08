@@ -24,36 +24,6 @@ var _ = Describe("fpdf_ppo", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDF_CopyViewerPreferences).To(BeNil())
 			})
-
-			It("returns an error when calling FPDF_ImportPagesByIndex", func() {
-				FPDF_ImportPagesByIndex, err := PdfiumInstance.FPDF_ImportPagesByIndex(&requests.FPDF_ImportPagesByIndex{})
-				Expect(err).To(MatchError("document not given"))
-				Expect(FPDF_ImportPagesByIndex).To(BeNil())
-			})
-
-			It("returns an error when calling FPDF_ImportNPagesToOne", func() {
-				FPDF_ImportNPagesToOne, err := PdfiumInstance.FPDF_ImportNPagesToOne(&requests.FPDF_ImportNPagesToOne{})
-				Expect(err).To(MatchError("document not given"))
-				Expect(FPDF_ImportNPagesToOne).To(BeNil())
-			})
-
-			It("returns an error when calling FPDF_NewXObjectFromPage", func() {
-				FPDF_NewXObjectFromPage, err := PdfiumInstance.FPDF_NewXObjectFromPage(&requests.FPDF_NewXObjectFromPage{})
-				Expect(err).To(MatchError("document not given"))
-				Expect(FPDF_NewXObjectFromPage).To(BeNil())
-			})
-
-			It("returns an error when calling FPDF_CloseXObject", func() {
-				FPDF_CloseXObject, err := PdfiumInstance.FPDF_CloseXObject(&requests.FPDF_CloseXObject{})
-				Expect(err).To(MatchError("xObject not given"))
-				Expect(FPDF_CloseXObject).To(BeNil())
-			})
-
-			It("returns an error when calling FPDF_NewFormObjectFromXObject", func() {
-				FPDF_NewFormObjectFromXObject, err := PdfiumInstance.FPDF_NewFormObjectFromXObject(&requests.FPDF_NewFormObjectFromXObject{})
-				Expect(err).To(MatchError("xObject not given"))
-				Expect(FPDF_NewFormObjectFromXObject).To(BeNil())
-			})
 		})
 	})
 
@@ -96,47 +66,6 @@ var _ = Describe("fpdf_ppo", func() {
 					})
 					Expect(err).To(MatchError("document not given"))
 					Expect(FPDF_CopyViewerPreferences).To(BeNil())
-				})
-
-				It("returns an error when calling FPDF_ImportPagesByIndex", func() {
-					FPDF_ImportPagesByIndex, err := PdfiumInstance.FPDF_ImportPagesByIndex(&requests.FPDF_ImportPagesByIndex{
-						Source: doc,
-					})
-					Expect(err).To(MatchError("document not given"))
-					Expect(FPDF_ImportPagesByIndex).To(BeNil())
-				})
-
-				It("returns an error when calling FPDF_NewXObjectFromPage", func() {
-					FPDF_NewXObjectFromPage, err := PdfiumInstance.FPDF_NewXObjectFromPage(&requests.FPDF_NewXObjectFromPage{
-						Source: doc,
-					})
-					Expect(err).To(MatchError("document not given"))
-					Expect(FPDF_NewXObjectFromPage).To(BeNil())
-				})
-			})
-
-			When("no page information is given to FPDF_ImportNPagesToOne", func() {
-				It("returns an error when calling FPDF_ImportNPagesToOne", func() {
-					FPDF_ImportNPagesToOne, err := PdfiumInstance.FPDF_ImportNPagesToOne(&requests.FPDF_ImportNPagesToOne{
-						Source: doc,
-					})
-					Expect(err).To(MatchError("import of pages failed"))
-					Expect(FPDF_ImportNPagesToOne).To(BeNil())
-				})
-			})
-
-			When("page information is given to FPDF_ImportNPagesToOne", func() {
-				It("returns a new document when calling FPDF_ImportNPagesToOne", func() {
-					FPDF_ImportNPagesToOne, err := PdfiumInstance.FPDF_ImportNPagesToOne(&requests.FPDF_ImportNPagesToOne{
-						Source:          doc,
-						OutputWidth:     2000,
-						OutputHeight:    2000,
-						NumPagesOnXAxis: 2,
-						NumPagesOnYAxis: 2,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDF_ImportNPagesToOne).To(Not(BeNil()))
-					Expect(FPDF_ImportNPagesToOne.Document).To(Not(BeNil()))
 				})
 			})
 
@@ -211,81 +140,6 @@ var _ = Describe("fpdf_ppo", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_CopyViewerPreferences).To(Not(BeNil()))
-					})
-
-					It("returns no error when calling FPDF_ImportPagesByIndex", func() {
-						FPDF_ImportPagesByIndex, err := PdfiumInstance.FPDF_ImportPagesByIndex(&requests.FPDF_ImportPagesByIndex{
-							Source:      doc2,
-							Destination: doc,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_ImportPagesByIndex).To(Not(BeNil()))
-					})
-
-					It("returns no error when calling FPDF_ImportPagesByIndex with indices", func() {
-						FPDF_ImportPagesByIndex, err := PdfiumInstance.FPDF_ImportPagesByIndex(&requests.FPDF_ImportPagesByIndex{
-							Source:      doc2,
-							Destination: doc,
-							PageIndices: []int{0},
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_ImportPagesByIndex).To(Not(BeNil()))
-					})
-
-					It("returns no error when calling FPDF_ImportPagesByIndex with invalid indices", func() {
-						FPDF_ImportPagesByIndex, err := PdfiumInstance.FPDF_ImportPagesByIndex(&requests.FPDF_ImportPagesByIndex{
-							Source:      doc2,
-							Destination: doc,
-							PageIndices: []int{32},
-						})
-						Expect(err).To(MatchError("import of pages failed"))
-						Expect(FPDF_ImportPagesByIndex).To(BeNil())
-					})
-
-					It("returns an xobject when calling FPDF_NewXObjectFromPage", func() {
-						FPDF_NewXObjectFromPage, err := PdfiumInstance.FPDF_NewXObjectFromPage(&requests.FPDF_NewXObjectFromPage{
-							Source:          doc2,
-							Destination:     doc,
-							SourcePageIndex: 0,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_NewXObjectFromPage).To(Not(BeNil()))
-						Expect(FPDF_NewXObjectFromPage.XObject).To(Not(BeNil()))
-					})
-
-					It("closes an xobject when calling FPDF_NewXObjectFromPage", func() {
-						FPDF_NewXObjectFromPage, err := PdfiumInstance.FPDF_NewXObjectFromPage(&requests.FPDF_NewXObjectFromPage{
-							Source:          doc2,
-							Destination:     doc,
-							SourcePageIndex: 0,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_NewXObjectFromPage).To(Not(BeNil()))
-						Expect(FPDF_NewXObjectFromPage.XObject).To(Not(BeNil()))
-
-						FPDF_CloseXObject, err := PdfiumInstance.FPDF_CloseXObject(&requests.FPDF_CloseXObject{
-							XObject: FPDF_NewXObjectFromPage.XObject,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_CloseXObject).To(Not(BeNil()))
-					})
-
-					It("returns an page object when calling FPDF_NewXObjectFromPage", func() {
-						FPDF_NewXObjectFromPage, err := PdfiumInstance.FPDF_NewXObjectFromPage(&requests.FPDF_NewXObjectFromPage{
-							Source:          doc2,
-							Destination:     doc,
-							SourcePageIndex: 0,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_NewXObjectFromPage).To(Not(BeNil()))
-						Expect(FPDF_NewXObjectFromPage.XObject).To(Not(BeNil()))
-
-						FPDF_NewFormObjectFromXObject, err := PdfiumInstance.FPDF_NewFormObjectFromXObject(&requests.FPDF_NewFormObjectFromXObject{
-							XObject: FPDF_NewXObjectFromPage.XObject,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_NewFormObjectFromXObject).To(Not(BeNil()))
-						Expect(FPDF_NewFormObjectFromXObject.PageObject).To(Not(BeNil()))
 					})
 				})
 			})

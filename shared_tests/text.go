@@ -252,7 +252,7 @@ func loadStructuredText(path string, resp *responses.GetPageTextStructured) *res
 }
 
 func writeStructuredText(path string, resp *responses.GetPageTextStructured) error {
-	return nil // Comment this in case of updating PDFium versions and output has changed.
+	//return nil // Comment this in case of updating PDFium versions and output has changed.
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)

@@ -1,7 +1,10 @@
+//go:build pdfium_experimental
+// +build pdfium_experimental
+
 package shared_tests
 
-import "C"
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -71,6 +74,24 @@ var _ = Describe("fpdfview", func() {
 				Expect(FPDF_GetPageSizeByIndex).To(BeNil())
 			})
 
+			It("returns an error when calling FPDF_DocumentHasValidCrossReferenceTable", func() {
+				FPDF_DocumentHasValidCrossReferenceTable, err := PdfiumInstance.FPDF_DocumentHasValidCrossReferenceTable(&requests.FPDF_DocumentHasValidCrossReferenceTable{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_DocumentHasValidCrossReferenceTable).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetTrailerEnds", func() {
+				FPDF_GetTrailerEnds, err := PdfiumInstance.FPDF_GetTrailerEnds(&requests.FPDF_GetTrailerEnds{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetTrailerEnds).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetPageSizeByIndexF", func() {
+				FPDF_GetPageSizeByIndexF, err := PdfiumInstance.FPDF_GetPageSizeByIndexF(&requests.FPDF_GetPageSizeByIndexF{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetPageSizeByIndexF).To(BeNil())
+			})
+
 			It("returns an error when calling FPDF_VIEWERREF_GetPrintScaling", func() {
 				FPDF_VIEWERREF_GetPrintScaling, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintScaling(&requests.FPDF_VIEWERREF_GetPrintScaling{})
 				Expect(err).To(MatchError("document not given"))
@@ -118,11 +139,47 @@ var _ = Describe("fpdfview", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDF_GetNamedDest).To(BeNil())
 			})
+
+			It("returns an error when calling FPDF_GetXFAPacketCount", func() {
+				FPDF_GetXFAPacketCount, err := PdfiumInstance.FPDF_GetXFAPacketCount(&requests.FPDF_GetXFAPacketCount{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetXFAPacketCount).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetXFAPacketName", func() {
+				FPDF_GetXFAPacketName, err := PdfiumInstance.FPDF_GetXFAPacketName(&requests.FPDF_GetXFAPacketName{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetXFAPacketName).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetXFAPacketContent", func() {
+				FPDF_GetXFAPacketContent, err := PdfiumInstance.FPDF_GetXFAPacketContent(&requests.FPDF_GetXFAPacketContent{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_GetXFAPacketContent).To(BeNil())
+			})
 		})
 	})
 
 	Context("no page", func() {
 		When("is opened", func() {
+			It("returns an error when calling FPDF_GetPageWidthF", func() {
+				FPDF_GetPageWidthF, err := PdfiumInstance.FPDF_GetPageWidthF(&requests.FPDF_GetPageWidthF{})
+				Expect(err).To(MatchError("either page reference or index should be given"))
+				Expect(FPDF_GetPageWidthF).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetPageHeightF", func() {
+				FPDF_GetPageHeightF, err := PdfiumInstance.FPDF_GetPageHeightF(&requests.FPDF_GetPageHeightF{})
+				Expect(err).To(MatchError("either page reference or index should be given"))
+				Expect(FPDF_GetPageHeightF).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_GetPageBoundingBox", func() {
+				FPDF_GetPageBoundingBox, err := PdfiumInstance.FPDF_GetPageBoundingBox(&requests.FPDF_GetPageBoundingBox{})
+				Expect(err).To(MatchError("either page reference or index should be given"))
+				Expect(FPDF_GetPageBoundingBox).To(BeNil())
+			})
+
 			It("returns an error when calling FPDF_RenderPageBitmap", func() {
 				FPDF_RenderPageBitmap, err := PdfiumInstance.FPDF_RenderPageBitmap(&requests.FPDF_RenderPageBitmap{})
 				Expect(err).To(MatchError("either page reference or index should be given"))
@@ -191,6 +248,102 @@ var _ = Describe("fpdfview", func() {
 				FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{})
 				Expect(err).To(MatchError("bitmap not given"))
 				Expect(FPDFBitmap_Destroy).To(BeNil())
+			})
+		})
+	})
+
+	Context("no page range", func() {
+		When("is opened", func() {
+			It("returns an error when calling FPDF_VIEWERREF_GetPrintPageRangeCount", func() {
+				FPDF_VIEWERREF_GetPrintPageRangeCount, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeCount(&requests.FPDF_VIEWERREF_GetPrintPageRangeCount{})
+				Expect(err).To(MatchError("pageRange not given"))
+				Expect(FPDF_VIEWERREF_GetPrintPageRangeCount).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_VIEWERREF_GetPrintPageRangeElement", func() {
+				FPDF_VIEWERREF_GetPrintPageRangeElement, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeElement(&requests.FPDF_VIEWERREF_GetPrintPageRangeElement{})
+				Expect(err).To(MatchError("pageRange not given"))
+				Expect(FPDF_VIEWERREF_GetPrintPageRangeElement).To(BeNil())
+			})
+		})
+	})
+
+	Context("a PDF file with an invalid cross reference table", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			file, err := os.Open(TestDataPath + "/testdata/bug_664284.pdf")
+			Expect(err).To(BeNil())
+
+			fileStat, err := file.Stat()
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+				Reader: file,
+				Size:   fileStat.Size(),
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			It("returns that it has an invalid cross reference table", func() {
+				FPDF_DocumentHasValidCrossReferenceTable, err := PdfiumInstance.FPDF_DocumentHasValidCrossReferenceTable(&requests.FPDF_DocumentHasValidCrossReferenceTable{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_DocumentHasValidCrossReferenceTable).To(Equal(&responses.FPDF_DocumentHasValidCrossReferenceTable{
+					DocumentHasValidCrossReferenceTable: false,
+				}))
+			})
+		})
+	})
+
+	Context("a PDF file with multiple trailer ends", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			file, err := os.Open(TestDataPath + "/testdata/annotation_stamp_with_ap.pdf")
+			Expect(err).To(BeNil())
+
+			fileStat, err := file.Stat()
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+				Reader: file,
+				Size:   fileStat.Size(),
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			It("returns the correct trailer ends", func() {
+				FPDF_GetTrailerEnds, err := PdfiumInstance.FPDF_GetTrailerEnds(&requests.FPDF_GetTrailerEnds{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetTrailerEnds).To(Equal(&responses.FPDF_GetTrailerEnds{
+					TrailerEnds: []int{441, 7945, 101719},
+				}))
 			})
 		})
 	})
@@ -336,6 +489,90 @@ var _ = Describe("fpdfview", func() {
 				Expect(pageCount).To(BeNil())
 			})
 
+			It("returns that it has a valid cross reference table", func() {
+				FPDF_DocumentHasValidCrossReferenceTable, err := PdfiumInstance.FPDF_DocumentHasValidCrossReferenceTable(&requests.FPDF_DocumentHasValidCrossReferenceTable{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_DocumentHasValidCrossReferenceTable).To(Equal(&responses.FPDF_DocumentHasValidCrossReferenceTable{
+					DocumentHasValidCrossReferenceTable: true,
+				}))
+			})
+
+			It("returns the correct trailer ends", func() {
+				FPDF_GetTrailerEnds, err := PdfiumInstance.FPDF_GetTrailerEnds(&requests.FPDF_GetTrailerEnds{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetTrailerEnds).To(Equal(&responses.FPDF_GetTrailerEnds{
+					TrailerEnds: []int{11616},
+				}))
+			})
+
+			It("returns the correct page width in float32", func() {
+				FPDF_GetPageWidthF, err := PdfiumInstance.FPDF_GetPageWidthF(&requests.FPDF_GetPageWidthF{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageWidthF).To(Equal(&responses.FPDF_GetPageWidthF{
+					PageWidth: 595.2755737304688,
+				}))
+			})
+
+			It("returns the correct page height in float32", func() {
+				FPDF_GetPageHeightF, err := PdfiumInstance.FPDF_GetPageHeightF(&requests.FPDF_GetPageHeightF{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageHeightF).To(Equal(&responses.FPDF_GetPageHeightF{
+					PageHeight: 841.8897094726562,
+				}))
+			})
+
+			It("returns the correct page bounding box", func() {
+				FPDF_GetPageBoundingBox, err := PdfiumInstance.FPDF_GetPageBoundingBox(&requests.FPDF_GetPageBoundingBox{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageBoundingBox).To(Equal(&responses.FPDF_GetPageBoundingBox{
+					Rect: structs.FPDF_FS_RECTF{
+						Left:   0,
+						Top:    841.8897094726562,
+						Right:  595.2755737304688,
+						Bottom: 0,
+					},
+				}))
+			})
+
+			It("returns the correct page size by index in float32", func() {
+				FPDF_GetPageSizeByIndexF, err := PdfiumInstance.FPDF_GetPageSizeByIndexF(&requests.FPDF_GetPageSizeByIndexF{
+					Document: doc,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetPageSizeByIndexF).To(Equal(&responses.FPDF_GetPageSizeByIndexF{
+					Size: structs.FPDF_FS_SIZEF{
+						Width:  595.2755737304688,
+						Height: 841.8897094726562,
+					},
+				}))
+			})
+
 			It("returns the correct device to page calculations", func() {
 				FPDF_DeviceToPage, err := PdfiumInstance.FPDF_DeviceToPage(&requests.FPDF_DeviceToPage{
 					Page: requests.Page{
@@ -400,6 +637,26 @@ var _ = Describe("fpdfview", func() {
 				Expect(FPDF_VIEWERREF_GetNumCopies).To(Equal(&responses.FPDF_VIEWERREF_GetNumCopies{
 					NumCopies: 1,
 				}))
+			})
+
+			When("a print page range has been loaded", func() {
+				var pageRange references.FPDF_PAGERANGE
+				BeforeEach(func() {
+					FPDF_VIEWERREF_GetPrintPageRange, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRange(&requests.FPDF_VIEWERREF_GetPrintPageRange{
+						Document: doc,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_VIEWERREF_GetPrintPageRange).To(Not(BeNil()))
+					pageRange = FPDF_VIEWERREF_GetPrintPageRange.PageRange
+				})
+
+				It("returns the correct print page range count", func() {
+					FPDF_VIEWERREF_GetPrintPageRangeCount, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeCount(&requests.FPDF_VIEWERREF_GetPrintPageRangeCount{
+						PageRange: pageRange,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_VIEWERREF_GetPrintPageRangeCount).To(Equal(&responses.FPDF_VIEWERREF_GetPrintPageRangeCount{}))
+				})
 			})
 
 			It("returns the correct print duplex", func() {
@@ -771,6 +1028,109 @@ var _ = Describe("fpdfview", func() {
 		})
 	})
 
+	Context("a normal PDF file", func() {
+		It("can be loaded with FPDF_LoadMemDocument", func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument64(&requests.FPDF_LoadMemDocument64{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: newDoc.Document,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+	})
+
+	Context("a PDF file with XFA data", func() {
+		var doc references.FPDF_DOCUMENT
+		var file *os.File
+
+		BeforeEach(func() {
+			pdfFile, err := os.Open(TestDataPath + "/testdata/simple_xfa.pdf")
+			Expect(err).To(BeNil())
+
+			file = pdfFile
+			fileStat, err := file.Stat()
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadCustomDocument(&requests.FPDF_LoadCustomDocument{
+				Reader: file,
+				Size:   fileStat.Size(),
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+			file.Close()
+		})
+
+		When("is opened", func() {
+			It("returns the correct XFA packet count", func() {
+				FPDF_GetXFAPacketCount, err := PdfiumInstance.FPDF_GetXFAPacketCount(&requests.FPDF_GetXFAPacketCount{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetXFAPacketCount).To(Equal(&responses.FPDF_GetXFAPacketCount{
+					Count: 5,
+				}))
+			})
+
+			It("returns the correct XFA packet name", func() {
+				FPDF_GetXFAPacketName, err := PdfiumInstance.FPDF_GetXFAPacketName(&requests.FPDF_GetXFAPacketName{
+					Document: doc,
+					Index:    1,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetXFAPacketName).To(Equal(&responses.FPDF_GetXFAPacketName{
+					Index: 1,
+					Name:  "config",
+				}))
+			})
+
+			It("returns an error when requesting an incorrect XFA packet name", func() {
+				FPDF_GetXFAPacketName, err := PdfiumInstance.FPDF_GetXFAPacketName(&requests.FPDF_GetXFAPacketName{
+					Document: doc,
+					Index:    25,
+				})
+				Expect(err).To(MatchError("could not get name of the XFA packet"))
+				Expect(FPDF_GetXFAPacketName).To(BeNil())
+			})
+
+			It("returns the correct XFA packet content", func() {
+				FPDF_GetXFAPacketContent, err := PdfiumInstance.FPDF_GetXFAPacketContent(&requests.FPDF_GetXFAPacketContent{
+					Document: doc,
+					Index:    1,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_GetXFAPacketContent).To(Equal(&responses.FPDF_GetXFAPacketContent{
+					Index:   1,
+					Content: []byte{60, 99, 111, 110, 102, 105, 103, 32, 120, 109, 108, 110, 115, 61, 34, 104, 116, 116, 112, 58, 47, 47, 119, 119, 119, 46, 120, 102, 97, 46, 111, 114, 103, 47, 115, 99, 104, 101, 109, 97, 47, 120, 99, 105, 47, 51, 46, 48, 47, 34, 62, 10, 60, 97, 103, 101, 110, 116, 32, 110, 97, 109, 101, 61, 34, 100, 101, 115, 105, 103, 110, 101, 114, 34, 62, 10, 32, 32, 60, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110, 62, 112, 100, 102, 60, 47, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110, 62, 10, 32, 32, 60, 112, 100, 102, 62, 10, 32, 32, 32, 32, 60, 102, 111, 110, 116, 73, 110, 102, 111, 47, 62, 10, 32, 32, 60, 47, 112, 100, 102, 62, 10, 60, 47, 97, 103, 101, 110, 116, 62, 10, 60, 112, 114, 101, 115, 101, 110, 116, 62, 10, 32, 32, 60, 112, 100, 102, 62, 10, 32, 32, 32, 32, 60, 118, 101, 114, 115, 105, 111, 110, 62, 49, 46, 55, 60, 47, 118, 101, 114, 115, 105, 111, 110, 62, 10, 32, 32, 32, 32, 60, 97, 100, 111, 98, 101, 69, 120, 116, 101, 110, 115, 105, 111, 110, 76, 101, 118, 101, 108, 62, 56, 60, 47, 97, 100, 111, 98, 101, 69, 120, 116, 101, 110, 115, 105, 111, 110, 76, 101, 118, 101, 108, 62, 10, 32, 32, 32, 32, 60, 114, 101, 110, 100, 101, 114, 80, 111, 108, 105, 99, 121, 62, 99, 108, 105, 101, 110, 116, 60, 47, 114, 101, 110, 100, 101, 114, 80, 111, 108, 105, 99, 121, 62, 10, 32, 32, 32, 32, 60, 115, 99, 114, 105, 112, 116, 77, 111, 100, 101, 108, 62, 88, 70, 65, 60, 47, 115, 99, 114, 105, 112, 116, 77, 111, 100, 101, 108, 62, 10, 32, 32, 32, 32, 60, 105, 110, 116, 101, 114, 97, 99, 116, 105, 118, 101, 62, 49, 60, 47, 105, 110, 116, 101, 114, 97, 99, 116, 105, 118, 101, 62, 10, 32, 32, 60, 47, 112, 100, 102, 62, 10, 32, 32, 60, 120, 100, 112, 62, 10, 32, 32, 32, 32, 60, 112, 97, 99, 107, 101, 116, 115, 62, 42, 60, 47, 112, 97, 99, 107, 101, 116, 115, 62, 10, 32, 32, 60, 47, 120, 100, 112, 62, 10, 32, 32, 60, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110, 62, 112, 100, 102, 60, 47, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110, 62, 10, 32, 32, 60, 115, 99, 114, 105, 112, 116, 62, 10, 32, 32, 32, 32, 60, 114, 117, 110, 83, 99, 114, 105, 112, 116, 115, 62, 115, 101, 114, 118, 101, 114, 60, 47, 114, 117, 110, 83, 99, 114, 105, 112, 116, 115, 62, 10, 32, 32, 60, 47, 115, 99, 114, 105, 112, 116, 62, 10, 60, 47, 112, 114, 101, 115, 101, 110, 116, 62, 10, 60, 97, 99, 114, 111, 98, 97, 116, 62, 10, 32, 32, 60, 97, 99, 114, 111, 98, 97, 116, 55, 62, 10, 32, 32, 32, 32, 60, 100, 121, 110, 97, 109, 105, 99, 82, 101, 110, 100, 101, 114, 62, 114, 101, 113, 117, 105, 114, 101, 100, 60, 47, 100, 121, 110, 97, 109, 105, 99, 82, 101, 110, 100, 101, 114, 62, 10, 32, 32, 60, 47, 97, 99, 114, 111, 98, 97, 116, 55, 62, 10, 32, 32, 60, 118, 97, 108, 105, 100, 97, 116, 101, 62, 112, 114, 101, 83, 117, 98, 109, 105, 116, 60, 47, 118, 97, 108, 105, 100, 97, 116, 101, 62, 10, 60, 47, 97, 99, 114, 111, 98, 97, 116, 62, 10, 60, 47, 99, 111, 110, 102, 105, 103, 62, 10},
+				}))
+			})
+
+			It("returns an error when requesting an incorrect XFA packet content", func() {
+				FPDF_GetXFAPacketContent, err := PdfiumInstance.FPDF_GetXFAPacketContent(&requests.FPDF_GetXFAPacketContent{
+					Document: doc,
+					Index:    25,
+				})
+				Expect(err).To(MatchError("could not get content of the XFA packet"))
+				Expect(FPDF_GetXFAPacketContent).To(BeNil())
+			})
+		})
+	})
+
 	Context("a normal PDF file with multiple pages", func() {
 		var doc references.FPDF_DOCUMENT
 		var file *os.File
@@ -830,6 +1190,48 @@ var _ = Describe("fpdfview", func() {
 				Expect(FPDF_VIEWERREF_GetName).To(Equal(&responses.FPDF_VIEWERREF_GetName{
 					Value: "R2L",
 				}))
+			})
+
+			When("a print page range has been loaded", func() {
+				var pageRange references.FPDF_PAGERANGE
+				BeforeEach(func() {
+					FPDF_VIEWERREF_GetPrintPageRange, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRange(&requests.FPDF_VIEWERREF_GetPrintPageRange{
+						Document: doc,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_VIEWERREF_GetPrintPageRange).To(Not(BeNil()))
+					pageRange = FPDF_VIEWERREF_GetPrintPageRange.PageRange
+				})
+
+				It("returns the correct print page range count", func() {
+					FPDF_VIEWERREF_GetPrintPageRangeCount, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeCount(&requests.FPDF_VIEWERREF_GetPrintPageRangeCount{
+						PageRange: pageRange,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_VIEWERREF_GetPrintPageRangeCount).To(Equal(&responses.FPDF_VIEWERREF_GetPrintPageRangeCount{
+						Count: 4,
+					}))
+				})
+
+				It("returns an error when requesting an invalid print page range element", func() {
+					FPDF_VIEWERREF_GetPrintPageRangeElement, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeElement(&requests.FPDF_VIEWERREF_GetPrintPageRangeElement{
+						PageRange: pageRange,
+						Index:     25,
+					})
+					Expect(err).To(MatchError("could not load page range element"))
+					Expect(FPDF_VIEWERREF_GetPrintPageRangeElement).To(BeNil())
+				})
+
+				It("returns the correct print page range element", func() {
+					FPDF_VIEWERREF_GetPrintPageRangeElement, err := PdfiumInstance.FPDF_VIEWERREF_GetPrintPageRangeElement(&requests.FPDF_VIEWERREF_GetPrintPageRangeElement{
+						PageRange: pageRange,
+						Index:     1,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_VIEWERREF_GetPrintPageRangeElement).To(Equal(&responses.FPDF_VIEWERREF_GetPrintPageRangeElement{
+						Value: 2,
+					}))
+				})
 			})
 		})
 	})
