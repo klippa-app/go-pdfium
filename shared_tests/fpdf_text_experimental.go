@@ -1,11 +1,17 @@
+//go:build pdfium_experimental
+// +build pdfium_experimental
+
 package shared_tests
 
 import (
 	"io/ioutil"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -44,10 +50,58 @@ var _ = Describe("fpdf_text", func() {
 			Expect(FPDFText_GetFontSize).To(BeNil())
 		})
 
+		It("returns an error when calling FPDFText_GetFontInfo", func() {
+			FPDFText_GetFontInfo, err := PdfiumInstance.FPDFText_GetFontInfo(&requests.FPDFText_GetFontInfo{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetFontInfo).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetFontWeight", func() {
+			FPDFText_GetFontWeight, err := PdfiumInstance.FPDFText_GetFontWeight(&requests.FPDFText_GetFontWeight{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetFontWeight).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetTextRenderMode", func() {
+			FPDFText_GetTextRenderMode, err := PdfiumInstance.FPDFText_GetTextRenderMode(&requests.FPDFText_GetTextRenderMode{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetTextRenderMode).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetFillColor", func() {
+			FPDFText_GetFillColor, err := PdfiumInstance.FPDFText_GetFillColor(&requests.FPDFText_GetFillColor{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetFillColor).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetStrokeColor", func() {
+			FPDFText_GetStrokeColor, err := PdfiumInstance.FPDFText_GetStrokeColor(&requests.FPDFText_GetStrokeColor{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetStrokeColor).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetCharAngle", func() {
+			FPDFText_GetCharAngle, err := PdfiumInstance.FPDFText_GetCharAngle(&requests.FPDFText_GetCharAngle{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetCharAngle).To(BeNil())
+		})
+
 		It("returns an error when calling FPDFText_GetCharBox", func() {
 			FPDFText_GetCharBox, err := PdfiumInstance.FPDFText_GetCharBox(&requests.FPDFText_GetCharBox{})
 			Expect(err).To(MatchError("textPage not given"))
 			Expect(FPDFText_GetCharBox).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetLooseCharBox", func() {
+			FPDFText_GetLooseCharBox, err := PdfiumInstance.FPDFText_GetLooseCharBox(&requests.FPDFText_GetLooseCharBox{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetLooseCharBox).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetMatrix", func() {
+			FPDFText_GetMatrix, err := PdfiumInstance.FPDFText_GetMatrix(&requests.FPDFText_GetMatrix{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetMatrix).To(BeNil())
 		})
 
 		It("returns an error when calling FPDFText_GetCharOrigin", func() {
@@ -156,6 +210,12 @@ var _ = Describe("fpdf_text", func() {
 			Expect(FPDFLink_GetRect).To(BeNil())
 		})
 
+		It("returns an error when calling FPDFLink_GetTextRange", func() {
+			FPDFLink_GetTextRange, err := PdfiumInstance.FPDFLink_GetTextRange(&requests.FPDFLink_GetTextRange{})
+			Expect(err).To(MatchError("pageLink not given"))
+			Expect(FPDFLink_GetTextRange).To(BeNil())
+		})
+
 		It("returns an error when calling FPDFLink_CloseWebLinks", func() {
 			FPDFLink_CloseWebLinks, err := PdfiumInstance.FPDFLink_CloseWebLinks(&requests.FPDFLink_CloseWebLinks{})
 			Expect(err).To(MatchError("pageLink not given"))
@@ -246,6 +306,130 @@ var _ = Describe("fpdf_text", func() {
 				}))
 			})
 
+			It("returns the correct font info for char 0", func() {
+				FPDFText_GetFontInfo, err := PdfiumInstance.FPDFText_GetFontInfo(&requests.FPDFText_GetFontInfo{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetFontInfo).To(Equal(&responses.FPDFText_GetFontInfo{
+					Index:    0,
+					FontName: "CGKWYO+DejaVuSans",
+					Flags:    524320,
+				}))
+			})
+
+			It("returns an error when getting the font info for an invalid char", func() {
+				FPDFText_GetFontInfo, err := PdfiumInstance.FPDFText_GetFontInfo(&requests.FPDFText_GetFontInfo{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get font name"))
+				Expect(FPDFText_GetFontInfo).To(BeNil())
+			})
+
+			It("returns the correct font weight for char 0", func() {
+				FPDFText_GetFontWeight, err := PdfiumInstance.FPDFText_GetFontWeight(&requests.FPDFText_GetFontWeight{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetFontWeight).To(Equal(&responses.FPDFText_GetFontWeight{
+					Index:      0,
+					FontWeight: 400,
+				}))
+			})
+
+			It("returns an error when getting the font weight for an invalid char", func() {
+				FPDFText_GetFontWeight, err := PdfiumInstance.FPDFText_GetFontWeight(&requests.FPDFText_GetFontWeight{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get font weight"))
+				Expect(FPDFText_GetFontWeight).To(BeNil())
+			})
+
+			It("returns the correct text render mode for char 0", func() {
+				FPDFText_GetTextRenderMode, err := PdfiumInstance.FPDFText_GetTextRenderMode(&requests.FPDFText_GetTextRenderMode{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetTextRenderMode).To(Equal(&responses.FPDFText_GetTextRenderMode{
+					Index:          0,
+					TextRenderMode: enums.FPDF_TEXTRENDERMODE_FILL,
+				}))
+			})
+
+			It("returns the correct text fill color for char 0", func() {
+				FPDFText_GetFillColor, err := PdfiumInstance.FPDFText_GetFillColor(&requests.FPDFText_GetFillColor{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetFillColor).To(Equal(&responses.FPDFText_GetFillColor{
+					Index: 0,
+					R:     0,
+					G:     0,
+					B:     0,
+					A:     255,
+				}))
+			})
+
+			It("returns an error when getting the text fill color for an invalid char", func() {
+				FPDFText_GetFillColor, err := PdfiumInstance.FPDFText_GetFillColor(&requests.FPDFText_GetFillColor{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get fill color"))
+				Expect(FPDFText_GetFillColor).To(BeNil())
+			})
+
+			It("returns the correct text stroke color for char 0", func() {
+				FPDFText_GetStrokeColor, err := PdfiumInstance.FPDFText_GetStrokeColor(&requests.FPDFText_GetStrokeColor{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetStrokeColor).To(Equal(&responses.FPDFText_GetStrokeColor{
+					Index: 0,
+					R:     0,
+					G:     0,
+					B:     0,
+					A:     255,
+				}))
+			})
+
+			It("returns an error when getting the text stroke color for an invalid char", func() {
+				FPDFText_GetStrokeColor, err := PdfiumInstance.FPDFText_GetStrokeColor(&requests.FPDFText_GetStrokeColor{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get stroke color"))
+				Expect(FPDFText_GetStrokeColor).To(BeNil())
+			})
+
+			It("returns the correct char angle for char 0", func() {
+				FPDFText_GetCharAngle, err := PdfiumInstance.FPDFText_GetCharAngle(&requests.FPDFText_GetCharAngle{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetCharAngle).To(Equal(&responses.FPDFText_GetCharAngle{
+					Index:     0,
+					CharAngle: 0,
+				}))
+			})
+
+			It("returns an error when getting the char angle for an invalid char", func() {
+				FPDFText_GetCharAngle, err := PdfiumInstance.FPDFText_GetCharAngle(&requests.FPDFText_GetCharAngle{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get char angle"))
+				Expect(FPDFText_GetCharAngle).To(BeNil())
+			})
+
 			It("returns the correct char box for char 0", func() {
 				FPDFText_GetCharBox, err := PdfiumInstance.FPDFText_GetCharBox(&requests.FPDFText_GetCharBox{
 					TextPage: textPage,
@@ -268,6 +452,60 @@ var _ = Describe("fpdf_text", func() {
 				})
 				Expect(err).To(MatchError("could not get char box"))
 				Expect(FPDFText_GetCharBox).To(BeNil())
+			})
+
+			It("returns the correct loose char box for char 0", func() {
+				FPDFText_GetLooseCharBox, err := PdfiumInstance.FPDFText_GetLooseCharBox(&requests.FPDFText_GetLooseCharBox{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetLooseCharBox).To(Equal(&responses.FPDFText_GetLooseCharBox{
+					Index: 0,
+					Rect: structs.FPDF_FS_RECTF{
+						Left:   70.8671875,
+						Top:    797.9365234375,
+						Right:  77.19218444824219,
+						Bottom: 786.9365234375,
+					},
+				}))
+			})
+
+			It("returns an error when getting the loose char box for an invalid char", func() {
+				FPDFText_GetLooseCharBox, err := PdfiumInstance.FPDFText_GetLooseCharBox(&requests.FPDFText_GetLooseCharBox{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get loose char box"))
+				Expect(FPDFText_GetLooseCharBox).To(BeNil())
+			})
+
+			It("returns the correct char matrix for char 0", func() {
+				FPDFText_GetMatrix, err := PdfiumInstance.FPDFText_GetMatrix(&requests.FPDFText_GetMatrix{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetMatrix).To(Equal(&responses.FPDFText_GetMatrix{
+					Index: 0,
+					Matrix: structs.FPDF_FS_MATRIX{
+						A: 11,
+						B: 0,
+						C: 0,
+						D: 11,
+						E: 70.8671875,
+						F: 789.1592407226562,
+					},
+				}))
+			})
+
+			It("returns an error when getting the char matrix for an invalid char", func() {
+				FPDFText_GetMatrix, err := PdfiumInstance.FPDFText_GetMatrix(&requests.FPDFText_GetMatrix{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get char matrix"))
+				Expect(FPDFText_GetMatrix).To(BeNil())
 			})
 
 			It("returns the correct char origin for char 0", func() {
@@ -636,6 +874,29 @@ var _ = Describe("fpdf_text", func() {
 						Top:    108.84400177001953,
 						Right:  187.9879913330078,
 						Bottom: 97.52799987792969,
+					}))
+				})
+
+				It("returns the correct text range for link 0 and gets the correct text for it", func() {
+					FPDFLink_GetTextRange, err := PdfiumInstance.FPDFLink_GetTextRange(&requests.FPDFLink_GetTextRange{
+						PageLink: pageLink,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFLink_GetTextRange).To(Equal(&responses.FPDFLink_GetTextRange{
+						Index:          0,
+						StartCharIndex: 35,
+						CharCount:      24,
+					}))
+
+					FPDFText_GetText, err := PdfiumInstance.FPDFText_GetText(&requests.FPDFText_GetText{
+						TextPage:   textPage,
+						StartIndex: FPDFLink_GetTextRange.StartCharIndex,
+						Count:      FPDFLink_GetTextRange.CharCount,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_GetText).To(Equal(&responses.FPDFText_GetText{
+						Text: "http://example.com?q=foo",
 					}))
 				})
 			})

@@ -29,10 +29,11 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test ./...
+          go test ./... -tags pdfium_experimental
       - name: Test implementation for coverage
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic
+          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:

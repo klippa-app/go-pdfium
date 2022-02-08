@@ -1,3 +1,6 @@
+//go:build pdfium_experimental
+// +build pdfium_experimental
+
 package shared_tests
 
 import (
@@ -148,6 +151,14 @@ var _ = Describe("document", func() {
 			When("is opened with no password", func() {
 				It("returns the password error", func() {
 					doc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+						Data: &pdfData,
+					})
+					Expect(err).To(MatchError(errors.ErrPassword.Error()))
+					Expect(doc).To(BeNil())
+				})
+
+				It("returns the password error", func() {
+					doc, err := PdfiumInstance.FPDF_LoadMemDocument64(&requests.FPDF_LoadMemDocument64{
 						Data: &pdfData,
 					})
 					Expect(err).To(MatchError(errors.ErrPassword.Error()))
