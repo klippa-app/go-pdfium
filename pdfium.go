@@ -7,6 +7,10 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+type LibraryConfig struct {
+	UserFontPaths []string // Array of paths to scan in place of the defaults when using built-in FXGE font loading code. The Array may be nil or empty itself to use the default paths. May be ignored entirely depending upon the platform.
+}
+
 // Pool describes a PDFium worker pool. Every instance in the pool manages
 // its own resources.
 type Pool interface {
