@@ -130,6 +130,7 @@ type Pdfium interface {
 	// FPDF_LoadMemDocument64 opens and load a PDF document from memory.
 	// Loaded document can be closed by FPDF_CloseDocument().
 	// This method already checks FPDF_GetLastError internally for the result.
+	// Experimental API.
 	FPDF_LoadMemDocument64(request *requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
 
 	// FPDF_LoadCustomDocument loads a PDF document from a custom access descriptor.
@@ -185,6 +186,7 @@ type Pdfium interface {
 	FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error)
 
 	// FPDF_DocumentHasValidCrossReferenceTable returns whether the document's cross reference table is valid or not.
+	// Experimental API.
 	FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
 
 	// FPDF_GetTrailerEnds returns the byte offsets of trailer ends.
@@ -192,17 +194,21 @@ type Pdfium interface {
 	FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error)
 
 	// FPDF_GetPageWidthF returns the page width in float32.
+	// Experimental API.
 	FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error)
 
 	// FPDF_GetPageHeightF returns the page height in float32.
+	// Experimental API.
 	FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error)
 
 	// FPDF_GetPageBoundingBox returns the bounding box of the page. This is the intersection between
 	// its media box and its crop box.
+	// Experimental API.
 	FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error)
 
 	// FPDF_GetPageSizeByIndexF returns the size of the page at the given index.
 	// Prefer FPDF_GetPageSizeByIndexF(). This will be deprecated in the future.
+	// Experimental API.
 	FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error)
 
 	// FPDF_RenderPageBitmap renders contents of a page to a device independent bitmap.
@@ -530,6 +536,7 @@ type Pdfium interface {
 
 	// FPDFCatalog_IsTagged determines if the given document represents a tagged PDF.
 	// For the definition of tagged PDF, See (see 10.7 "Tagged PDF" in PDF Reference 1.7).
+	// Experimental API.
 	FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
 
 	// End fpdf_catalog.h
