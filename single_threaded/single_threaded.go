@@ -14,7 +14,9 @@ var singleThreadedMutex = &sync.Mutex{}
 
 var poolRefs = map[string]*pdfiumPool{}
 
-type Config struct{}
+type Config struct {
+	LibraryConfig *pdfium.LibraryConfig
+}
 
 // Init will return a single-threaded pool.
 // Every pool will keep track of its own instances and the documents that
@@ -26,7 +28,7 @@ func Init(config Config) pdfium.Pool {
 	defer singleThreadedMutex.Unlock()
 
 	// Init the PDFium library.
-	implementation.InitLibrary()
+	implementation.InitLibrary(config.LibraryConfig)
 
 	poolRef := uuid.New()
 
