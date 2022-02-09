@@ -16,6 +16,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         go: [1.16, 1.17]
+        fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -26,11 +27,9 @@ jobs:
           go-version: ${{ matrix.go }}
       - name: Set up PDFium library
         run: |
-          echo $GOOS_$GOARCH
-          echo $GOPATH
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4849/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
           sudo rm pdfium-linux-x64.tgz
-          sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+          sudo cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
       - name: Test all packages
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
