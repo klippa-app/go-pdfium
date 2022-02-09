@@ -1758,6 +1758,7 @@ var _ = Describe("Render", func() {
 								Expect(err).To(BeNil())
 								err = tmpPath.Close()
 								Expect(err).To(BeNil())
+								defer os.Remove(tmpPath.Name())
 								request := &requests.RenderToFile{
 									OutputTarget: requests.RenderToFileOutputTargetFile,
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
@@ -1792,8 +1793,6 @@ var _ = Describe("Render", func() {
 									Height:            2000,
 									PointToPixelRatio: 2.375608084404265,
 								}, TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_filepath")
-
-								os.Remove(request.TargetFilePath)
 							})
 						})
 
