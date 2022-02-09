@@ -1,0 +1,11 @@
+prefix=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium
+libdir=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium/lib
+includedir=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium/include
+
+Name: PDFium
+Description: PDFium
+Version: 4874
+Requires:
+
+Libs: -L${libdir} -lpdfium
+Cflags: -I${includedir}
