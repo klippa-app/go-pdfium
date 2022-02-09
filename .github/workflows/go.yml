@@ -41,8 +41,8 @@ jobs:
       - name: Test all packages
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test -exec "env LD_LIBRARY_PATH=/opt/pdfium/lib" ./...
-          go test -exec "env LD_LIBRARY_PATH=/opt/pdfium/lib" ./... -tags pdfium_experimental
+          go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
+          go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '48744874'
         run: |

@@ -21,8 +21,8 @@ var _ = BeforeSuite(func() {
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
 		MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
 		Command: multi_threaded.Command{
-			BinPath: "go",                                                                                                                                         // Only do this while developing, on production put the actual binary path in here. You should not want the Go runtime on production.
-			Args:    []string{"run", "-exec", "env LD_LIBRARY_PATH=/opt/pdfium/lib", "-tags", "pdfium_experimental", "../examples/multi_threaded/worker/main.go"}, // This is a reference to the worker package, this can be left empty when using a direct binary path.
+			BinPath: "go",                                                                                                                                           // Only do this while developing, on production put the actual binary path in here. You should not want the Go runtime on production.
+			Args:    []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib", "-tags", "pdfium_experimental", "../examples/multi_threaded/worker/main.go"}, // This is a reference to the worker package, this can be left empty when using a direct binary path.
 		},
 	})
 
