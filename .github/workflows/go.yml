@@ -41,8 +41,11 @@ jobs:
       - name: Set up PDFium library (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-win-x64.tgz -o pdfium-win-x64.tgz && mkdir /opt/pdfium && tar -C /opt/pdfium -xvf pdfium-win-x64.tgz
-          rm pdfium-env-x64.tgz
+          echo "$GOPATH"
+          curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-win-x64.tgz -o pdfium-win-x64.tgz
+          mkdir /opt/go
+          tar -C /opt/pdfium -xvf pdfium-win-x64.tgz
+          rm pdfium-win-x64.tgz
           cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
       - name: Test all packages (Linux & MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
