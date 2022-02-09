@@ -275,7 +275,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		if len(fileData) > 2147483647 {
 			doc = C.FPDF_LoadMemDocument64(
 				unsafe.Pointer(&(fileData[0])),
-				C.ulong(len(fileData)),
+				C.size_t(len(fileData)),
 				cPassword)
 		} else {
 			doc = C.FPDF_LoadMemDocument(
