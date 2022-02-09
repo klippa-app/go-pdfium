@@ -34,6 +34,10 @@ type Config struct {
 type Command struct {
 	BinPath string
 	Args    []string
+
+	// StartTimeout is the timeout to wait for the plugin to say it
+	// has started successfully.
+	StartTimeout time.Duration
 }
 
 type pdfiumPool struct {
@@ -79,6 +83,7 @@ func Init(config Config) pdfium.Pool {
 				Plugins:         pluginMap,
 				Cmd:             exec.Command(config.Command.BinPath, config.Command.Args...),
 				Logger:          logger,
+				StartTimeout:    config.Command.StartTimeout,
 			})
 
 			rpcClient, err := client.Client()
