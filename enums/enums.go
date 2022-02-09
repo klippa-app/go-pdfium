@@ -168,3 +168,17 @@ const (
 	FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER       FPDF_RENDER_FLAG = 0x10   // Set whether to render in a reverse Byte order, this flag is only used when rendering to a bitmap.
 	FPDF_RENDER_FLAG_CONVERT_FILL_TO_STROKE   FPDF_RENDER_FLAG = 0x20   // Set whether fill paths need to be stroked. This flag is only used when FPDF_COLORSCHEME is passed in, since with a single fill color for paths the boundaries of adjacent fill paths are less visible.
 )
+
+type FPDF_PRINTMODE int
+
+const (
+	FPDF_PRINTMODE_EMF                            FPDF_PRINTMODE = 0 // To output EMF (default)
+	FPDF_PRINTMODE_TEXTONLY                       FPDF_PRINTMODE = 1 // to output text only (for charstream devices)
+	FPDF_PRINTMODE_POSTSCRIPT2                    FPDF_PRINTMODE = 2 // to output level 2 PostScript into EMF as a series of GDI comments.
+	FPDF_PRINTMODE_POSTSCRIPT3                    FPDF_PRINTMODE = 3 // to output level 3 PostScript into EMF as a series of GDI comments.
+	FPDF_PRINTMODE_POSTSCRIPT2_PASSTHROUGH        FPDF_PRINTMODE = 4 // to output level 2 PostScript via ExtEscape() in PASSTHROUGH mode.
+	FPDF_PRINTMODE_POSTSCRIPT3_PASSTHROUGH        FPDF_PRINTMODE = 5 // to output level 3 PostScript via ExtEscape() in PASSTHROUGH mode.
+	FPDF_PRINTMODE_EMF_IMAGE_MASKS                FPDF_PRINTMODE = 6 // to output EMF, with more efficient processing of documents containing image masks.
+	FPDF_PRINTMODE_POSTSCRIPT3_TYPE42             FPDF_PRINTMODE = 7 // to output level 3 PostScript with embedded Type 42 fonts, when applicable, into EMF as a series of GDI comments.
+	FPDF_PRINTMODE_POSTSCRIPT3_TYPE42_PASSTHROUGH FPDF_PRINTMODE = 8 // to output level 3 PostScript with embedded Type 42 fonts, when applicable, via ExtEscape() in PASSTHROUGH mode.
+)

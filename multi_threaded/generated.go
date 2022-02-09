@@ -1139,6 +1139,14 @@ func (i *pdfiumInstance) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) 
 	return i.worker.plugin.FPDF_PageToDevice(request)
 }
 
+func (i *pdfiumInstance) FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_RenderPage(request)
+}
+
 func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1173,6 +1181,14 @@ func (i *pdfiumInstance) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVer
 	}
 
 	return i.worker.plugin.FPDF_SaveWithVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_SetPrintMode(request)
 }
 
 func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error) {

@@ -1971,6 +1971,20 @@ func (i *pdfiumInstance) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) 
 	return i.pdfium.FPDF_PageToDevice(request)
 }
 
+func (i *pdfiumInstance) FPDF_RenderPage(request *requests.FPDF_RenderPage) (resp *responses.FPDF_RenderPage, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPage(request)
+}
+
 func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (resp *responses.FPDF_RenderPageBitmap, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2025,6 +2039,20 @@ func (i *pdfiumInstance) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVer
 	}()
 
 	return i.pdfium.FPDF_SaveWithVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (resp *responses.FPDF_SetPrintMode, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetPrintMode", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_SetPrintMode(request)
 }
 
 func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBoxPolicy) (resp *responses.FPDF_SetSandBoxPolicy, err error) {

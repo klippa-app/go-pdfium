@@ -21,11 +21,11 @@ func StartPlugin(config *pdfium.LibraryConfig) {
 
 	Pdfium.logger = logger
 
-	pdfium := Pdfium.GetInstance()
+	instance := Pdfium.GetInstance()
 
 	// pluginMap is the map of plugins we can dispense.
 	var pluginMap = map[string]plugin.Plugin{
-		"pdfium": &commons.PdfiumPlugin{Impl: pdfium},
+		"pdfium": &commons.PdfiumPlugin{Impl: instance},
 	}
 
 	plugin.Serve(&plugin.ServeConfig{
