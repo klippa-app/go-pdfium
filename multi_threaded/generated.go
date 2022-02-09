@@ -1140,11 +1140,7 @@ func (i *pdfiumInstance) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) 
 }
 
 func (i *pdfiumInstance) FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FPDF_RenderPage(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error) {

@@ -346,6 +346,7 @@ type Pdfium interface {
 	FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
 
 	// FPDF_RenderPage renders contents of a page to a device (screen, bitmap, or printer).
+	// This feature does not work on multi-threaded usage as you will need to give a device handle.
 	// Windows only!
 	FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
 

@@ -35,6 +35,7 @@
     * Attachments
     * XFA packet handling
     * ViewerRef (print settings)
+    * Windows features (`FPDF_SetPrintMode`, `FPDF_RenderPage`)
 * Methods to be implemented:
     * Form filling
     * Transformations (page boxes, clip paths)
