@@ -253,3 +253,18 @@ type FPDF_GetXFAPacketContent struct {
 	Document references.FPDF_DOCUMENT
 	Index    int
 }
+
+type FPDF_SetPrintMode struct {
+	PrintMode enums.FPDF_PRINTMODE
+}
+
+type FPDF_RenderPage struct {
+	DC     interface{} // Handle to the device context. This should be of type C.HDC, which is a device (screen, bitmap, or printer).
+	Page   Page
+	StartX int                      // Left pixel position of the display area in bitmap coordinates.
+	StartY int                      // Top pixel position of the display area in bitmap coordinates.
+	SizeX  int                      // Horizontal size (in pixels) for displaying the page.
+	SizeY  int                      // Vertical size (in pixels) for displaying the page.
+	Rotate enums.FPDF_PAGE_ROTATION // Page orientation.
+	Flags  enums.FPDF_RENDER_FLAG   // 0 for normal display, or combination of enums.FPDF_RENDER_FLAG. With the enums.FPDF_RENDER_FLAG_ANNOT flag, it renders all annotations that do not require user-interaction, which are all annotations except widget and popup annotations.
+}

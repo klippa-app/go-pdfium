@@ -214,3 +214,9 @@ type FPDF_GetXFAPacketContent struct {
 	Index   int
 	Content []byte
 }
+
+type FPDF_SetPrintMode struct {
+}
+
+type FPDF_RenderPage struct {
+}
