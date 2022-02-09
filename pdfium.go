@@ -340,6 +340,16 @@ type Pdfium interface {
 	// FPDF_GetXFAPacketContent returns the content of a packet in the XFA array.
 	FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error)
 
+	// FPDF_SetPrintMode sets printing mode when printing on Windows.
+	// Experimental API.
+	// Windows only!
+	FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
+
+	// FPDF_RenderPage renders contents of a page to a device (screen, bitmap, or printer).
+	// This feature does not work on multi-threaded usage as you will need to give a device handle.
+	// Windows only!
+	FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
+
 	// End fpdfview.h
 
 	// Start fpdf_edit.h
