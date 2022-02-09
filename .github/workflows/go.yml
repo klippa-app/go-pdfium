@@ -57,10 +57,11 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
+          ls D:\opt\pdfium\include
           go test ./internal/implementation
           go test ./internal/implementation -tags pdfium_experimental
       - name: Test implementation for coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '48744874'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental
