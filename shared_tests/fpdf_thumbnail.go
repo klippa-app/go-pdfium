@@ -146,7 +146,7 @@ var _ = Describe("fpdf_thumbnail", func() {
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDFPage_GetRawThumbnailData).To(Not(BeNil()))
-			Expect(FPDFPage_GetRawThumbnailData.RawThumbnail).To(HaveLen(1851))
+			Expect(len(FPDFPage_GetRawThumbnailData.RawThumbnail)).To(BeNumerically("~", 1851, 100)) // Allow some room, not all platforms return the same value.
 		})
 
 		It("returns thumbnail as bitmap", func() {

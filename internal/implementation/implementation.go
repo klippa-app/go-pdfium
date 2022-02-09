@@ -23,8 +23,9 @@ import (
 
 extern int go_read_seeker_cb(void *param, unsigned long position, unsigned char *pBuf, unsigned long size);
 
-static inline void FPDF_FILEACCESS_SET_GET_BLOCK(FPDF_FILEACCESS *fs) {
+static inline void FPDF_FILEACCESS_SET_GET_BLOCK(FPDF_FILEACCESS *fs, char *id) {
 	fs->m_GetBlock = &go_read_seeker_cb;
+	fs->m_Param = id;
 }
 */
 import "C"
@@ -37,7 +38,14 @@ import "C"
 // readSeeker into the byte array.
 //export go_read_seeker_cb
 func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, size C.ulong) C.int {
-	r := *(*io.ReadSeeker)((*[1]*io.ReadSeeker)(param)[0])
+	fileIdentifier := C.GoString((*C.char)(param))
+
+	// Check if we still have the reader.
+	if _, ok := Pdfium.fileReaders[fileIdentifier]; !ok {
+		return C.int(0)
+	}
+
+	r := Pdfium.fileReaders[fileIdentifier].reader
 
 	_, err := r.Seek(int64(position), 0)
 	if err != nil {
@@ -67,6 +75,7 @@ var Pdfium = &mainPdfium{
 	mutex:        &sync.Mutex{},
 	instanceRefs: map[int]*PdfiumImplementation{},
 	documentRefs: map[references.FPDF_DOCUMENT]*DocumentHandle{},
+	fileReaders:  map[string]*fileReaderRef{},
 }
 
 var isInitialized = false
@@ -126,6 +135,12 @@ func DestroyLibrary() {
 	isInitialized = false
 }
 
+type fileReaderRef struct {
+	reader     io.ReadSeeker
+	stringRef  unsafe.Pointer
+	fileAccess *C.FPDF_FILEACCESS
+}
+
 // Here is the real implementation of Pdfium
 type mainPdfium struct {
 	// logger is for communication with the plugin.
@@ -140,6 +155,10 @@ type mainPdfium struct {
 	// documentRefs keeps track of the opened documents for this process.
 	// we need this for document lookups and in case of closing the instance
 	documentRefs map[references.FPDF_DOCUMENT]*DocumentHandle
+
+	// fileReaders keeps track of the file readers when using FPDF_LoadCustomDocument.
+	// We need this to look it up from Go.
+	fileReaders map[string]*fileReaderRef
 }
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
@@ -256,7 +275,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		if len(fileData) > 2147483647 {
 			doc = C.FPDF_LoadMemDocument64(
 				unsafe.Pointer(&(fileData[0])),
-				C.ulong(len(fileData)),
+				C.size_t(len(fileData)),
 				cPassword)
 		} else {
 			doc = C.FPDF_LoadMemDocument(
@@ -275,25 +294,25 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
-		// Allocate memory on C heap. we send the io.ReadSeeker address in this pointer.
-		readSeekerAlloc := C.malloc(C.size_t(unsafe.Sizeof(uintptr(0))))
-
-		// Create array to write the address in the array.
-		a := (*[1]*io.ReadSeeker)(readSeekerAlloc)
-
-		// Save the address in index 0 of the array.
-		a[0] = &(*(*io.ReadSeeker)(unsafe.Pointer(&request.FileReader)))
-
-		// Keep track of the allocated memory to free it later on.
-		nativeDoc.readSeekerRef = readSeekerAlloc
-
 		// Create a PDFium file access struct.
 		readerStruct := C.FPDF_FILEACCESS{}
 		readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
-		readerStruct.m_Param = readSeekerAlloc
+
+		readerRef := uuid.New()
+		readerRefString := readerRef.String()
+		cReaderRef := C.CString(readerRefString)
 
 		// Set the Go callback through cgo.
-		C.FPDF_FILEACCESS_SET_GET_BLOCK(&readerStruct)
+		C.FPDF_FILEACCESS_SET_GET_BLOCK(&readerStruct, cReaderRef)
+
+		fileReaderRef := &fileReaderRef{
+			stringRef:  unsafe.Pointer(cReaderRef),
+			reader:     request.FileReader,
+			fileAccess: &readerStruct,
+		}
+
+		Pdfium.fileReaders[readerRef.String()] = fileReaderRef
+		nativeDoc.fileHandleRef = &readerRefString
 
 		doc = C.FPDF_LoadCustomDocument(
 			&readerStruct,
@@ -324,12 +343,19 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		default:
 			pdfiumError = pdfium_errors.ErrUnexpected
 		}
+
+		// Cleanup when file loading didn't work.
+		if nativeDoc.fileHandleRef != nil {
+			C.free(Pdfium.fileReaders[*nativeDoc.fileHandleRef].stringRef)
+			delete(Pdfium.fileReaders, *nativeDoc.fileHandleRef)
+		}
+
 		return nil, pdfiumError
 	}
 
+	documentRef := uuid.New()
 	nativeDoc.handle = doc
 	nativeDoc.data = request.File
-	documentRef := uuid.New()
 	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
 	Pdfium.documentRefs[nativeDoc.nativeRef] = nativeDoc
 	p.documentRefs[nativeDoc.nativeRef] = nativeDoc

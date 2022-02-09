@@ -1,6 +1,6 @@
-prefix=/opt/pdfium
-libdir=/opt/pdfium/lib
-includedir=/opt/pdfium/include
+prefix=D:/opt/pdfium
+libdir=D:/opt/pdfium/bin
+includedir=D:/opt/pdfium/include
 
 Name: PDFium
 Description: PDFium

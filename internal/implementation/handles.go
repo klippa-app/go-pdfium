@@ -9,15 +9,14 @@ import "C"
 import (
 	"errors"
 	"github.com/klippa-app/go-pdfium/references"
-	"unsafe"
 )
 
 type DocumentHandle struct {
 	handle        C.FPDF_DOCUMENT
-	readSeekerRef unsafe.Pointer
 	currentPage   *PageHandle
 	data          *[]byte                  // Keep a reference to the data otherwise weird stuff happens
 	nativeRef     references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	fileHandleRef *string
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the document
@@ -149,14 +148,16 @@ func (d *DocumentHandle) Close() error {
 	C.FPDF_CloseDocument(d.handle)
 	d.handle = nil
 
-	if d.readSeekerRef != nil {
-		C.free(d.readSeekerRef)
-		d.readSeekerRef = nil
-	}
-
 	// Remove reference to data.
 	if d.data != nil {
 		d.data = nil
+	}
+
+	// Cleanup file handle.
+	if d.fileHandleRef != nil {
+		Pdfium.fileReaders[*d.fileHandleRef].fileAccess = nil
+		C.free(Pdfium.fileReaders[*d.fileHandleRef].stringRef)
+		delete(Pdfium.fileReaders, *d.fileHandleRef)
 	}
 
 	delete(Pdfium.documentRefs, d.nativeRef)
