@@ -1747,7 +1747,7 @@ var _ = Describe("Render", func() {
 									TargetFilePath: "/file/path/that/is/invalid",
 								}
 								renderedFile, err := PdfiumInstance.RenderToFile(request)
-								Expect(err).To(MatchError("open /file/path/that/is/invalid: no such file or directory"))
+								Expect(err).To(Not(BeNil()))
 								Expect(renderedFile).To(BeNil())
 							})
 						})
