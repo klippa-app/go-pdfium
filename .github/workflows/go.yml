@@ -67,11 +67,13 @@ jobs:
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental
       - name: Archive code coverage results
+        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
           path: ./coverage.out
       - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         uses: codecov/codecov-action@v2
         with:
           files: coverage.out
