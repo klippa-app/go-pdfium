@@ -152,10 +152,12 @@ type Pdfium interface {
 	FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
 	FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
 	FPDF_PageToDevice(*requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
+	FPDF_RenderPage(*requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
 	FPDF_RenderPageBitmap(*requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
 	FPDF_RenderPageBitmapWithMatrix(*requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error)
 	FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
 	FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
+	FPDF_SetPrintMode(*requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
 	FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
 	FPDF_VIEWERREF_GetDuplex(*requests.FPDF_VIEWERREF_GetDuplex) (*responses.FPDF_VIEWERREF_GetDuplex, error)
 	FPDF_VIEWERREF_GetName(*requests.FPDF_VIEWERREF_GetName) (*responses.FPDF_VIEWERREF_GetName, error)
@@ -1586,6 +1588,16 @@ func (g *PdfiumRPC) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) (*res
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error) {
+	resp := &responses.FPDF_RenderPage{}
+	err := g.client.Call("Plugin.FPDF_RenderPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error) {
 	resp := &responses.FPDF_RenderPageBitmap{}
 	err := g.client.Call("Plugin.FPDF_RenderPageBitmap", request, resp)
@@ -1619,6 +1631,16 @@ func (g *PdfiumRPC) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*respons
 func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error) {
 	resp := &responses.FPDF_SaveWithVersion{}
 	err := g.client.Call("Plugin.FPDF_SaveWithVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error) {
+	resp := &responses.FPDF_SetPrintMode{}
+	err := g.client.Call("Plugin.FPDF_SetPrintMode", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -4416,6 +4438,24 @@ func (s *PdfiumRPCServer) FPDF_PageToDevice(request *requests.FPDF_PageToDevice,
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_RenderPage(request *requests.FPDF_RenderPage, resp *responses.FPDF_RenderPage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap, resp *responses.FPDF_RenderPageBitmap) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -4478,6 +4518,24 @@ func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVe
 	}()
 
 	implResp, err := s.Impl.FPDF_SaveWithVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode, resp *responses.FPDF_SetPrintMode) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetPrintMode", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_SetPrintMode(request)
 	if err != nil {
 		return err
 	}

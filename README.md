@@ -35,6 +35,7 @@
     * Attachments
     * XFA packet handling
     * ViewerRef (print settings)
+    * Windows features (`FPDF_SetPrintMode`, `FPDF_RenderPage`)
 * Methods to be implemented:
     * Form filling
     * Transformations (page boxes, clip paths)
@@ -43,7 +44,6 @@
     * Progressive rendering
     * Struct trees
 * Methods that won't be implemented for now:
-    * Win32-only methods
     * fpdf_sysfontinfo.h (probably too complicated)
 * Useful helpers to make your life easier:
     * Get all document metadata
@@ -123,7 +123,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 4849
+Version: 4874
 Requires:
 
 Libs: -L${libdir} -lpdfium
