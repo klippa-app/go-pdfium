@@ -1747,13 +1747,18 @@ var _ = Describe("Render", func() {
 									TargetFilePath: "/file/path/that/is/invalid",
 								}
 								renderedFile, err := PdfiumInstance.RenderToFile(request)
-								Expect(err).To(MatchError("open /file/path/that/is/invalid: no such file or directory"))
+								Expect(err).To(Not(BeNil()))
 								Expect(renderedFile).To(BeNil())
 							})
 						})
 
 						Context("with a filepath given", func() {
 							It("returns the right image, point to pixel ratio and resolution in the given filepath", func() {
+								tmpPath, err := os.CreateTemp("", "render_file_testpdf_filepath_*")
+								Expect(err).To(BeNil())
+								err = tmpPath.Close()
+								Expect(err).To(BeNil())
+								defer os.Remove(tmpPath.Name())
 								request := &requests.RenderToFile{
 									OutputTarget: requests.RenderToFileOutputTargetFile,
 									OutputFormat: requests.RenderToFileOutputFormatJPG,
@@ -1768,7 +1773,7 @@ var _ = Describe("Render", func() {
 										Width:  2000,
 										Height: 2000,
 									},
-									TargetFilePath: "/tmp/render_file_testpdf_filepath",
+									TargetFilePath: tmpPath.Name(),
 								}
 								renderedFile, err := PdfiumInstance.RenderToFile(request)
 
@@ -1788,8 +1793,6 @@ var _ = Describe("Render", func() {
 									Height:            2000,
 									PointToPixelRatio: 2.375608084404265,
 								}, TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_filepath")
-
-								os.Remove(request.TargetFilePath)
 							})
 						})
 

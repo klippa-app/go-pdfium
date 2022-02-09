@@ -630,13 +630,15 @@ var _ = Describe("fpdf_text", func() {
 						RectIndex: 0,
 					})
 					Expect(err).To(BeNil())
-					Expect(FPDFLink_GetRect).To(Equal(&responses.FPDFLink_GetRect{
-						Index:  0,
-						Left:   50.779998779296875,
-						Top:    108.84400177001953,
-						Right:  187.9879913330078,
-						Bottom: 97.52799987792969,
-					}))
+					Expect(FPDFLink_GetRect).To(Not(BeNil()))
+					Expect(FPDFLink_GetRect.Index).To(Equal(0))
+					Expect(FPDFLink_GetRect.RectIndex).To(Equal(0))
+
+					// Rect can be a little different depending on the platform.
+					Expect(FPDFLink_GetRect.Left).To(BeNumerically("~", 50, 1))
+					Expect(FPDFLink_GetRect.Top).To(BeNumerically("~", 108, 1))
+					Expect(FPDFLink_GetRect.Right).To(BeNumerically("~", 187, 1))
+					Expect(FPDFLink_GetRect.Bottom).To(BeNumerically("~", 97, 1))
 				})
 			})
 		})

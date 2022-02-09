@@ -96,7 +96,7 @@ var _ = Describe("fpdf_save", func() {
 						FilePath: &fakeFilePath,
 					})
 
-					Expect(err).To(MatchError("open /path/that/will/never/work: no such file or directory"))
+					Expect(err).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy).To(BeNil())
 				})
 			})
