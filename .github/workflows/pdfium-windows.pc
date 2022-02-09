@@ -1,6 +1,6 @@
-prefix=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium
-libdir=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium/lib
-includedir=${GOPATH}/lib/${GOOS}_${GOARCH}/pdfium/include
+prefix=D:\opt\pdfium
+libdir=D:\opt\pdfium\lib
+includedir=D:\opt\pdfium\include
 
 Name: PDFium
 Description: PDFium
