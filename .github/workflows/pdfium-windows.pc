@@ -1,5 +1,5 @@
 prefix=D:/opt/pdfium
-libdir=D:/opt/pdfium/lib
+libdir=D:/opt/pdfium/bin
 includedir=D:/opt/pdfium/include
 
 Name: PDFium
