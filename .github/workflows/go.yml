@@ -26,23 +26,35 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
-      - name: Set up PDFium library
+      - name: Set up PDFium library (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
           sudo rm pdfium-linux-x64.tgz
           sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
-      - name: Set up PDFium library
+      - name: Set up PDFium library (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
           sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-mac-x64.tgz -o pdfium-mac-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-mac-x64.tgz
           sudo rm pdfium-mac-x64.tgz
           sudo cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
-      - name: Test all packages
+      - name: Set up PDFium library (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-win-x64.tgz -o pdfium-win-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-win-x64.tgz
+          sudo rm pdfium-env-x64.tgz
+          sudo cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
+      - name: Test all packages (Linux & MacOS)
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
           go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
+      - name: Test all packages (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          go test ./...
+          go test ./... -tags pdfium_experimental
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '48744874'
         run: |
