@@ -16,7 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        go: [1.16, 1.17]
+        go: [ 1.16, 1.17 ]
+        pdfium: [ 4849, 4874 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -26,9 +27,16 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: Set up PDFium library
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F4849/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-linux-x64.tgz -o pdfium-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-linux-x64.tgz
           sudo rm pdfium-linux-x64.tgz
+          sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+      - name: Set up PDFium library
+        if: matrix.os == 'macos-latest'
+        run: |
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-mac-x64.tgz -o pdfium-mac-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-mac-x64.tgz
+          sudo rm pdfium-mac-x64.tgz
           sudo cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
       - name: Test all packages
         run: |
