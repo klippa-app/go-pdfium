@@ -22,7 +22,7 @@ func (p *PdfiumImplementation) FPDF_SetPrintMode(request *requests.FPDF_SetPrint
 
 	success := C.FPDF_SetPrintMode(C.int(request.PrintMode))
 	if int(success) == 0 {
-		return errors.New("could not set print mode")
+		return nil, errors.New("could not set print mode")
 	}
 
 	return &responses.FPDF_SetPrintMode{}, nil
