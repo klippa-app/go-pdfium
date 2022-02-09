@@ -58,8 +58,9 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
-          go test -x ./internal/implementation
-          go test -x ./internal/implementation -tags pdfium_experimental
+          $env:Path += ";D:\opt\pdfium\bin"
+          go test ./internal/implementation
+          go test ./internal/implementation -tags pdfium_experimental
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         run: |
