@@ -44,7 +44,6 @@
     * Progressive rendering
     * Struct trees
 * Methods that won't be implemented for now:
-    * Win32-only methods
     * fpdf_sysfontinfo.h (probably too complicated)
 * Useful helpers to make your life easier:
     * Get all document metadata
