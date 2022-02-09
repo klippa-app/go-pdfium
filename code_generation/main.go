@@ -22,7 +22,7 @@ type GenerateDataMethod struct {
 }
 
 func (m *GenerateDataMethod) IsMultiThreaded() bool {
-	if m.Name == "FPDFBitmap_CreateEx" || m.Name == "FSDK_SetUnSpObjProcessHandler" || m.Name == "FSDK_SetTimeFunction" || m.Name == "FSDK_SetLocaltimeFunction" {
+	if m.Name == "FPDFBitmap_CreateEx" || m.Name == "FSDK_SetUnSpObjProcessHandler" || m.Name == "FSDK_SetTimeFunction" || m.Name == "FSDK_SetLocaltimeFunction" || m.Name == "FPDF_RenderPage" {
 		return true
 	}
 	return false
