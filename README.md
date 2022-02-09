@@ -61,7 +61,7 @@
 ## PDFium
 
 This project uses the PDFium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
-documents.
+documents. Therefor this project could also be called a binding.
 
 ## Single/Multi-threading
 
