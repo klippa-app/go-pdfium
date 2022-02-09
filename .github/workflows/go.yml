@@ -43,6 +43,7 @@ jobs:
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pdfium'
           curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-win-x64.tgz -o pdfium-win-x64.tgz
+          mkdir -p D:\opt\pdfium
           tar -C D:\opt\pdfium -xvf pdfium-win-x64.tgz
           rm pdfium-win-x64.tgz
           cp ./.github/workflows/pdfium-windows.pc D:\opt\pdfium\pdfium.pc
