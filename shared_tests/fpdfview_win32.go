@@ -5,6 +5,7 @@ package shared_tests
 
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"
+// #include <windows.h>
 import "C"
 import (
 	"github.com/klippa-app/go-pdfium/enums"

@@ -29,7 +29,7 @@ func (p *PdfiumImplementation) FPDF_RenderPage(request *requests.FPDF_RenderPage
 		return nil, errors.New("DC is not of type C.HDC")
 	}
 
-	C.FPDF_RenderPage(request.DC.(C.HDC), pageHandle.handle, C.int(request.StartX), C.int(request.StartY), C.int(request.SizeX), C.int(request.SizeY), C.int(request.Rotate), C.int(request.Flags))
+	C.FPDF_RenderPage(hdc, pageHandle.handle, C.int(request.StartX), C.int(request.StartY), C.int(request.SizeX), C.int(request.SizeY), C.int(request.Rotate), C.int(request.Flags))
 
 	return &responses.FPDF_RenderPage{}, nil
 }
