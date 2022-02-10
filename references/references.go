@@ -59,3 +59,6 @@ type FPDF_ATTACHMENT string
 
 // FPDF_JAVASCRIPT_ACTION is an internal reference to a C.FPDF_JAVASCRIPT_ACTION handle.
 type FPDF_JAVASCRIPT_ACTION string
+
+// FPDF_PATHSEGMENT is an internal reference to a C.FPDF_PATHSEGMENT handle.
+type FPDF_PATHSEGMENT string
