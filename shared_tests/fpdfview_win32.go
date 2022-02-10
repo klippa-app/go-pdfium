@@ -87,7 +87,7 @@ var _ = Describe("fpdfview_win32", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDF_GetPageHeightF).To(Not(BeNil()))
 
-				dc := C.CreateEnhMetaFileA(C.nullptr, C.nullptr, C.nullptr, C.nullptr)
+				dc := C.CreateEnhMetaFileA(nil, nil, nil, nil)
 				width := int(FPDF_GetPageWidthF.PageWidth)
 				height := int(FPDF_GetPageHeightF.PageHeight)
 				rgn := C.CreateRectRgn(0, 0, C.int(width), C.int(height))
