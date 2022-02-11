@@ -285,3 +285,8 @@ type SearchHandle struct {
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_SCHHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
+
+type PathSegmentHandle struct {
+	handle    C.FPDF_PATHSEGMENT
+	nativeRef references.FPDF_PATHSEGMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}

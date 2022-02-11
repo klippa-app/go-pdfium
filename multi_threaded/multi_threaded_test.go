@@ -23,7 +23,7 @@ var _ = BeforeSuite(func() {
 		Command: multi_threaded.Command{
 			BinPath:      "go",                                                                                                                                           // Only do this while developing, on production put the actual binary path in here. You should not want the Go runtime on production.
 			Args:         []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib", "-tags", "pdfium_experimental", "../examples/multi_threaded/worker/main.go"}, // This is a reference to the worker package, this can be left empty when using a direct binary path.
-			StartTimeout: time.Minute * 5,                                                                                                                                // Some test environments are real slow.
+			StartTimeout: time.Minute * 15,                                                                                                                               // Some test environments are real slow.
 		},
 	})
 
