@@ -12,7 +12,7 @@ import (
 )
 {{ range $method := .Methods }}
 func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*responses.{{ $method.Output }}, error) {
-	{{ if eq $method.IsMultiThreaded true -}}
+	{{ if eq $method.BlockForMultiThreaded true -}}
 	return nil, errors.New("unsupported method on multi-threaded usage")
 	{{- else -}}
 	if i.closed {

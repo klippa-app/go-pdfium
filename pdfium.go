@@ -907,4 +907,25 @@ type Pdfium interface {
 	FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error)
 
 	// End fpdf_transformpage.h
+
+	// Start fpdf_progressive.h
+
+	// FPDF_RenderPageBitmapWithColorScheme_Start starts to render page contents to a device independent bitmap progressively with a specified color scheme for the content.
+	// Not supported on multi-threaded usage.
+	// Experimental API.
+	FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error)
+
+	// FPDF_RenderPageBitmap_Start starts to render page contents to a device independent bitmap progressively.
+	// Not supported on multi-threaded usage.
+	FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error)
+
+	// FPDF_RenderPage_Continue continues rendering a PDF page.
+	// Not supported on multi-threaded usage.
+	FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error)
+
+	// FPDF_RenderPage_Close Release the resource allocate during page rendering. Need to be called after finishing rendering or cancel the rendering.
+	// Not supported on multi-threaded usage.
+	FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error)
+
+	// End fpdf_progressive.h
 }

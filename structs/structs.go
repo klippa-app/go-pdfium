@@ -31,3 +31,10 @@ type FPDF_FS_SIZEF struct {
 	Width  float32
 	Height float32
 }
+
+type FPDF_COLORSCHEME struct {
+	PathFillColor   uint64
+	PathStrokeColor uint64
+	TextFillColor   uint64
+	TextStrokeColor uint64
+}

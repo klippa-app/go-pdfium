@@ -18,6 +18,14 @@ import (
 )
 
 var _ = Describe("fpdfview", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	It("allows for the last error to be fetched", func() {
 		FPDF_GetLastError, err := PdfiumInstance.FPDF_GetLastError(&requests.FPDF_GetLastError{})
 		Expect(err).To(BeNil())

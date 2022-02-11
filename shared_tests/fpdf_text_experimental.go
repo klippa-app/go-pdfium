@@ -17,6 +17,14 @@ import (
 )
 
 var _ = Describe("fpdf_text", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no page is given", func() {
 		It("returns an error when calling FPDFText_LoadPage", func() {
 			FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{})
