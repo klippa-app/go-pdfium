@@ -14,6 +14,14 @@ import (
 )
 
 var _ = Describe("document", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Describe("FPDF_LoadMemDocument", func() {
 		Context("a normal PDF file with 1 page", func() {
 			var doc references.FPDF_DOCUMENT

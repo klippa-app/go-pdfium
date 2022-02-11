@@ -13,6 +13,14 @@ import (
 )
 
 var _ = Describe("fpdf_transformpage", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDF_CreateClipPath", func() {
