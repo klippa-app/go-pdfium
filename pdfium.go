@@ -842,4 +842,69 @@ type Pdfium interface {
 	FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
 
 	// End fpdf_searchex.h
+
+	// Start fpdf_transformpage.h
+
+	// FPDFPage_SetMediaBox sets the "MediaBox" entry to the page dictionary.
+	FPDFPage_SetMediaBox(request *requests.FPDFPage_SetMediaBox) (*responses.FPDFPage_SetMediaBox, error)
+
+	// FPDFPage_SetCropBox sets the "CropBox" entry to the page dictionary.
+	FPDFPage_SetCropBox(request *requests.FPDFPage_SetCropBox) (*responses.FPDFPage_SetCropBox, error)
+
+	// FPDFPage_SetBleedBox sets the "BleedBox" entry to the page dictionary.
+	FPDFPage_SetBleedBox(request *requests.FPDFPage_SetBleedBox) (*responses.FPDFPage_SetBleedBox, error)
+
+	// FPDFPage_SetTrimBox sets the "TrimBox" entry to the page dictionary.
+	FPDFPage_SetTrimBox(request *requests.FPDFPage_SetTrimBox) (*responses.FPDFPage_SetTrimBox, error)
+
+	// FPDFPage_SetArtBox sets the "ArtBox" entry to the page dictionary.
+	FPDFPage_SetArtBox(request *requests.FPDFPage_SetArtBox) (*responses.FPDFPage_SetArtBox, error)
+
+	// FPDFPage_GetMediaBox gets the "MediaBox" entry from the page dictionary
+	FPDFPage_GetMediaBox(request *requests.FPDFPage_GetMediaBox) (*responses.FPDFPage_GetMediaBox, error)
+
+	// FPDFPage_GetCropBox gets the "CropBox" entry from the page dictionary.
+	FPDFPage_GetCropBox(request *requests.FPDFPage_GetCropBox) (*responses.FPDFPage_GetCropBox, error)
+
+	// FPDFPage_GetBleedBox gets the "BleedBox" entry from the page dictionary.
+	FPDFPage_GetBleedBox(request *requests.FPDFPage_GetBleedBox) (*responses.FPDFPage_GetBleedBox, error)
+
+	// FPDFPage_GetTrimBox gets the "TrimBox" entry from the page dictionary.
+	FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimBox) (*responses.FPDFPage_GetTrimBox, error)
+
+	// FPDFPage_GetArtBox gets the "ArtBox" entry from the page dictionary.
+	FPDFPage_GetArtBox(request *requests.FPDFPage_GetArtBox) (*responses.FPDFPage_GetArtBox, error)
+
+	// FPDFPage_TransFormWithClip applies the transforms to the page.
+	FPDFPage_TransFormWithClip(request *requests.FPDFPage_TransFormWithClip) (*responses.FPDFPage_TransFormWithClip, error)
+
+	// FPDFPageObj_TransformClipPath transform (scale, rotate, shear, move) the clip path of page object.
+	FPDFPageObj_TransformClipPath(request *requests.FPDFPageObj_TransformClipPath) (*responses.FPDFPageObj_TransformClipPath, error)
+
+	// FPDFPageObj_GetClipPath Get the clip path of the page object.
+	// Experimental API.
+	FPDFPageObj_GetClipPath(request *requests.FPDFPageObj_GetClipPath) (*responses.FPDFPageObj_GetClipPath, error)
+
+	// FPDFClipPath_CountPaths returns the number of paths inside the given clip path.
+	// Experimental API.
+	FPDFClipPath_CountPaths(request *requests.FPDFClipPath_CountPaths) (*responses.FPDFClipPath_CountPaths, error)
+
+	// FPDFClipPath_CountPathSegments returns the number of segments inside one path of the given clip path.
+	// Experimental API.
+	FPDFClipPath_CountPathSegments(request *requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error)
+
+	// FPDFClipPath_GetPathSegment returns the segment in one specific path of the given clip path at index.
+	// Experimental API.
+	FPDFClipPath_GetPathSegment(request *requests.FPDFClipPath_GetPathSegment) (*responses.FPDFClipPath_GetPathSegment, error)
+
+	// FPDF_CreateClipPath creates a new clip path, with a rectangle inserted.
+	FPDF_CreateClipPath(request *requests.FPDF_CreateClipPath) (*responses.FPDF_CreateClipPath, error)
+
+	// FPDF_DestroyClipPath destroys the clip path.
+	FPDF_DestroyClipPath(request *requests.FPDF_DestroyClipPath) (*responses.FPDF_DestroyClipPath, error)
+
+	// FPDFPage_InsertClipPath Clip the page content, the page content that outside the clipping region become invisible.
+	FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error)
+
+	// End fpdf_transformpage.h
 }
