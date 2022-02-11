@@ -2265,6 +2265,20 @@ func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPage
 	return i.pdfium.FPDF_RenderPageBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (resp *responses.FPDF_RenderPageBitmapWithColorScheme_Start, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmapWithColorScheme_Start", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPageBitmapWithColorScheme_Start(request)
+}
+
 func (i *pdfiumInstance) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (resp *responses.FPDF_RenderPageBitmapWithMatrix, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2277,6 +2291,48 @@ func (i *pdfiumInstance) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_
 	}()
 
 	return i.pdfium.FPDF_RenderPageBitmapWithMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (resp *responses.FPDF_RenderPageBitmap_Start, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmap_Start", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPageBitmap_Start(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (resp *responses.FPDF_RenderPage_Close, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Close", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPage_Close(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (resp *responses.FPDF_RenderPage_Continue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Continue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPage_Continue(request)
 }
 
 func (i *pdfiumInstance) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (resp *responses.FPDF_SaveAsCopy, err error) {

@@ -21,8 +21,16 @@ type GenerateDataMethod struct {
 	Output string
 }
 
-func (m *GenerateDataMethod) IsMultiThreaded() bool {
-	if m.Name == "FPDFBitmap_CreateEx" || m.Name == "FSDK_SetUnSpObjProcessHandler" || m.Name == "FSDK_SetTimeFunction" || m.Name == "FSDK_SetLocaltimeFunction" || m.Name == "FPDF_RenderPage" {
+func (m *GenerateDataMethod) BlockForMultiThreaded() bool {
+	if m.Name == "FPDFBitmap_CreateEx" ||
+		m.Name == "FSDK_SetUnSpObjProcessHandler" ||
+		m.Name == "FSDK_SetTimeFunction" ||
+		m.Name == "FSDK_SetLocaltimeFunction" ||
+		m.Name == "FPDF_RenderPage" ||
+		m.Name == "FPDF_RenderPageBitmapWithColorScheme_Start" ||
+		m.Name == "FPDF_RenderPageBitmap_Start" ||
+		m.Name == "FPDF_RenderPage_Continue" ||
+		m.Name == "FPDF_RenderPage_Close" {
 		return true
 	}
 	return false

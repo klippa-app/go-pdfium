@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("fpdf_javascript", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document is given", func() {
 		It("returns an error when FPDFDoc_GetJavaScriptActionCount is called", func() {
 			FPDFDoc_GetJavaScriptActionCount, err := PdfiumInstance.FPDFDoc_GetJavaScriptActionCount(&requests.FPDFDoc_GetJavaScriptActionCount{})

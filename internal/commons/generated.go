@@ -173,7 +173,11 @@ type Pdfium interface {
 	FPDF_PageToDevice(*requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
 	FPDF_RenderPage(*requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
 	FPDF_RenderPageBitmap(*requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
+	FPDF_RenderPageBitmapWithColorScheme_Start(*requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error)
 	FPDF_RenderPageBitmapWithMatrix(*requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error)
+	FPDF_RenderPageBitmap_Start(*requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error)
+	FPDF_RenderPage_Close(*requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error)
+	FPDF_RenderPage_Continue(*requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error)
 	FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
 	FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
 	FPDF_SetPrintMode(*requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
@@ -1817,9 +1821,49 @@ func (g *PdfiumRPC) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitma
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error) {
+	resp := &responses.FPDF_RenderPageBitmapWithColorScheme_Start{}
+	err := g.client.Call("Plugin.FPDF_RenderPageBitmapWithColorScheme_Start", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error) {
 	resp := &responses.FPDF_RenderPageBitmapWithMatrix{}
 	err := g.client.Call("Plugin.FPDF_RenderPageBitmapWithMatrix", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error) {
+	resp := &responses.FPDF_RenderPageBitmap_Start{}
+	err := g.client.Call("Plugin.FPDF_RenderPageBitmap_Start", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error) {
+	resp := &responses.FPDF_RenderPage_Close{}
+	err := g.client.Call("Plugin.FPDF_RenderPage_Close", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error) {
+	resp := &responses.FPDF_RenderPage_Continue{}
+	err := g.client.Call("Plugin.FPDF_RenderPage_Continue", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -5025,6 +5069,24 @@ func (s *PdfiumRPCServer) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPag
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start, resp *responses.FPDF_RenderPageBitmapWithColorScheme_Start) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmapWithColorScheme_Start", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPageBitmapWithColorScheme_Start(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix, resp *responses.FPDF_RenderPageBitmapWithMatrix) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -5033,6 +5095,60 @@ func (s *PdfiumRPCServer) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF
 	}()
 
 	implResp, err := s.Impl.FPDF_RenderPageBitmapWithMatrix(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start, resp *responses.FPDF_RenderPageBitmap_Start) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmap_Start", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPageBitmap_Start(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close, resp *responses.FPDF_RenderPage_Close) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Close", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPage_Close(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue, resp *responses.FPDF_RenderPage_Continue) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Continue", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RenderPage_Continue(request)
 	if err != nil {
 		return err
 	}

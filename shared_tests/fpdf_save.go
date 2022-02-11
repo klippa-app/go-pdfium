@@ -14,6 +14,14 @@ import (
 )
 
 var _ = Describe("fpdf_save", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDF_SaveAsCopy", func() {

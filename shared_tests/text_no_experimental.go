@@ -13,6 +13,14 @@ import (
 )
 
 var _ = Describe("text", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("a normal PDF file", func() {
 		var doc references.FPDF_DOCUMENT
 

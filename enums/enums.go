@@ -182,3 +182,12 @@ const (
 	FPDF_PRINTMODE_POSTSCRIPT3_TYPE42             FPDF_PRINTMODE = 7 // to output level 3 PostScript with embedded Type 42 fonts, when applicable, into EMF as a series of GDI comments.
 	FPDF_PRINTMODE_POSTSCRIPT3_TYPE42_PASSTHROUGH FPDF_PRINTMODE = 8 // to output level 3 PostScript with embedded Type 42 fonts, when applicable, via ExtEscape() in PASSTHROUGH mode.
 )
+
+type FPDF_RENDER_STATUS int
+
+const (
+	FPDF_RENDER_STATUS_READY         FPDF_RENDER_STATUS = 0
+	FPDF_RENDER_STATUS_TOBECONTINUED FPDF_RENDER_STATUS = 1
+	FPDF_RENDER_STATUS_DONE          FPDF_RENDER_STATUS = 2
+	FPDF_RENDER_STATUS_FAILED        FPDF_RENDER_STATUS = 3
+)
