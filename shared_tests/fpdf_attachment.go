@@ -16,6 +16,14 @@ import (
 )
 
 var _ = Describe("fpdf_attachment", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document is given", func() {
 		It("returns an error when FPDFDoc_GetAttachmentCount is called", func() {
 			FPDFDoc_GetAttachmentCount, err := PdfiumInstance.FPDFDoc_GetAttachmentCount(&requests.FPDFDoc_GetAttachmentCount{})
