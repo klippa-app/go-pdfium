@@ -185,6 +185,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		pathSegmentRefs:      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle{},
+		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -222,6 +223,7 @@ type PdfiumImplementation struct {
 	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
 	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
 	pathSegmentRefs      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle
+	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -462,6 +464,10 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.pathSegmentRefs, i)
 	}
 
+	for i := range p.dataAvailRefs {
+		delete(p.dataAvailRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -669,4 +675,16 @@ func (p *PdfiumImplementation) getClipPathHandle(clipPath references.FPDF_CLIPPA
 	}
 
 	return nil, errors.New("could not find clipPath handle, perhaps the clipPath was already closed or you tried to share clipPaths between instances")
+}
+
+func (p *PdfiumImplementation) getDataAvailHandle(dataAvail references.FPDF_AVAIL) (*DataAvailHandle, error) {
+	if dataAvail == "" {
+		return nil, errors.New("dataAvail not given")
+	}
+
+	if val, ok := p.dataAvailRefs[dataAvail]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find dataAvail handle, perhaps the dataAvail was already closed or you tried to share dataAvails between instances")
 }

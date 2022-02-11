@@ -23,6 +23,14 @@ type Pdfium interface {
 	FPDFAttachment_HasKey(*requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error)
 	FPDFAttachment_SetFile(*requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error)
 	FPDFAttachment_SetStringValue(*requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error)
+	FPDFAvail_Create(*requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error)
+	FPDFAvail_Destroy(*requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error)
+	FPDFAvail_GetDocument(*requests.FPDFAvail_GetDocument) (*responses.FPDFAvail_GetDocument, error)
+	FPDFAvail_GetFirstPageNum(*requests.FPDFAvail_GetFirstPageNum) (*responses.FPDFAvail_GetFirstPageNum, error)
+	FPDFAvail_IsDocAvail(*requests.FPDFAvail_IsDocAvail) (*responses.FPDFAvail_IsDocAvail, error)
+	FPDFAvail_IsFormAvail(*requests.FPDFAvail_IsFormAvail) (*responses.FPDFAvail_IsFormAvail, error)
+	FPDFAvail_IsLinearized(*requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error)
+	FPDFAvail_IsPageAvail(*requests.FPDFAvail_IsPageAvail) (*responses.FPDFAvail_IsPageAvail, error)
 	FPDFBitmap_Create(*requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error)
 	FPDFBitmap_CreateEx(*requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error)
 	FPDFBitmap_Destroy(*requests.FPDFBitmap_Destroy) (*responses.FPDFBitmap_Destroy, error)
@@ -314,6 +322,86 @@ func (g *PdfiumRPC) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetF
 func (g *PdfiumRPC) FPDFAttachment_SetStringValue(request *requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error) {
 	resp := &responses.FPDFAttachment_SetStringValue{}
 	err := g.client.Call("Plugin.FPDFAttachment_SetStringValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_Create(request *requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error) {
+	resp := &responses.FPDFAvail_Create{}
+	err := g.client.Call("Plugin.FPDFAvail_Create", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error) {
+	resp := &responses.FPDFAvail_Destroy{}
+	err := g.client.Call("Plugin.FPDFAvail_Destroy", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (*responses.FPDFAvail_GetDocument, error) {
+	resp := &responses.FPDFAvail_GetDocument{}
+	err := g.client.Call("Plugin.FPDFAvail_GetDocument", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (*responses.FPDFAvail_GetFirstPageNum, error) {
+	resp := &responses.FPDFAvail_GetFirstPageNum{}
+	err := g.client.Call("Plugin.FPDFAvail_GetFirstPageNum", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (*responses.FPDFAvail_IsDocAvail, error) {
+	resp := &responses.FPDFAvail_IsDocAvail{}
+	err := g.client.Call("Plugin.FPDFAvail_IsDocAvail", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (*responses.FPDFAvail_IsFormAvail, error) {
+	resp := &responses.FPDFAvail_IsFormAvail{}
+	err := g.client.Call("Plugin.FPDFAvail_IsFormAvail", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error) {
+	resp := &responses.FPDFAvail_IsLinearized{}
+	err := g.client.Call("Plugin.FPDFAvail_IsLinearized", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (*responses.FPDFAvail_IsPageAvail, error) {
+	resp := &responses.FPDFAvail_IsPageAvail{}
+	err := g.client.Call("Plugin.FPDFAvail_IsPageAvail", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2359,6 +2447,150 @@ func (s *PdfiumRPCServer) FPDFAttachment_SetStringValue(request *requests.FPDFAt
 	}()
 
 	implResp, err := s.Impl.FPDFAttachment_SetStringValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_Create(request *requests.FPDFAvail_Create, resp *responses.FPDFAvail_Create) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Create", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_Create(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy, resp *responses.FPDFAvail_Destroy) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Destroy", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_Destroy(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument, resp *responses.FPDFAvail_GetDocument) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetDocument", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_GetDocument(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum, resp *responses.FPDFAvail_GetFirstPageNum) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetFirstPageNum", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_GetFirstPageNum(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail, resp *responses.FPDFAvail_IsDocAvail) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsDocAvail", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_IsDocAvail(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail, resp *responses.FPDFAvail_IsFormAvail) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsFormAvail", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_IsFormAvail(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized, resp *responses.FPDFAvail_IsLinearized) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsLinearized", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_IsLinearized(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail, resp *responses.FPDFAvail_IsPageAvail) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsPageAvail", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAvail_IsPageAvail(request)
 	if err != nil {
 		return err
 	}
