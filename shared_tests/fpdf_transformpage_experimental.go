@@ -11,6 +11,14 @@ import (
 )
 
 var _ = Describe("fpdf_transformpage_experimental", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no page object", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFPageObj_GetClipPath", func() {

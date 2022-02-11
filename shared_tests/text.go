@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("text", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no references", func() {
 		When("is given", func() {
 			Context("GetPageText()", func() {

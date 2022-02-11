@@ -19,12 +19,14 @@ var _ = Describe("fpdf_progressive_experimental", func() {
 		if TestType == "multi" {
 			Skip("Multi-threaded usage does not support setting callbacks")
 		}
+		Locker.Lock()
 	})
 
 	AfterEach(func() {
 		if TestType == "multi" {
 			Skip("Multi-threaded usage does not support setting callbacks")
 		}
+		Locker.Unlock()
 	})
 
 	Context("no page", func() {

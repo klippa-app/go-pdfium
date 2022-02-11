@@ -18,6 +18,14 @@ import (
 )
 
 var _ = Describe("fpdf_doc", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document", func() {
 		When("is opened", func() {
 			It("returns an error when getting the page metadata", func() {

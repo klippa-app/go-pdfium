@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("fpdf_thumbnail", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no page is given", func() {
 		It("returns an error when getting the decoded thumbnail data", func() {
 			FPDFPage_GetDecodedThumbnailData, err := PdfiumInstance.FPDFPage_GetDecodedThumbnailData(&requests.FPDFPage_GetDecodedThumbnailData{})

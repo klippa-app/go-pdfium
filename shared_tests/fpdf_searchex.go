@@ -12,6 +12,14 @@ import (
 )
 
 var _ = Describe("fpdf_searchex", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no text page is given", func() {
 		It("returns an error when FPDFText_GetCharIndexFromTextIndex is called", func() {
 			FPDFText_GetCharIndexFromTextIndex, err := PdfiumInstance.FPDFText_GetCharIndexFromTextIndex(&requests.FPDFText_GetCharIndexFromTextIndex{})
