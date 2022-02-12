@@ -24,6 +24,7 @@ func (p *PdfiumImplementation) registerDataAvail(dataAvail C.FPDF_AVAIL, fileHan
 		nativeRef:       references.FPDF_AVAIL(ref.String()),
 		fileHandleRef:   fileHandleRef,
 		fileAvailHandle: fileAvailHandle,
+		hints:           hints,
 	}
 
 	p.dataAvailRefs[handle.nativeRef] = handle

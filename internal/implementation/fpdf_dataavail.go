@@ -26,7 +26,6 @@ static inline void FPDF_FILEAVAIL_FILEACCESS_SET_GET_BLOCK(FPDF_FILEACCESS *fs, 
 import "C"
 import (
 	"errors"
-	"log"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -42,17 +41,37 @@ import (
 // it on FX_FILEAVAIL structs.
 //export go_dataavail_is_data_avail_cb
 func go_dataavail_is_data_avail_cb(me *C.FX_FILEAVAIL, offset C.size_t, size C.size_t) C.FPDF_BOOL {
-	log.Println("Checking if data is available")
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	if _, ok := dataAvailAbilityCallbacks[pointer]; !ok {
+		return C.FPDF_BOOL(0)
+	}
+
+	if dataAvailAbilityCallbacks[pointer](uint64(offset), uint64(size)) {
+		return C.FPDF_BOOL(1)
+	}
+
 	return C.FPDF_BOOL(0)
 }
 
 // go_dataavail_add_segment_cb is the Go implementation of FX_DOWNLOADHINTS::AddSegment.
 // It is exported through cgo so that we can use the reference to it and set
-// it on FX_FILEAVAIL structs.
+// it on FX_DOWNLOADHINTS structs.
 //export go_dataavail_add_segment_cb
 func go_dataavail_add_segment_cb(me *C.FX_DOWNLOADHINTS, offset C.size_t, size C.size_t) {
-	log.Println("please add segment")
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	if _, ok := addSegmentCallbacks[pointer]; !ok {
+		return
+	}
+
+	addSegmentCallbacks[pointer](uint64(offset), uint64(size))
 }
+
+var dataAvailAbilityCallbacks = map[unsafe.Pointer]func(offset, size uint64) bool{}
+var addSegmentCallbacks = map[unsafe.Pointer]func(offset, size uint64){}
 
 // FPDFAvail_Create creates a document availability provider.
 // FPDFAvail_Destroy() must be called when done with the availability provider.
@@ -76,6 +95,7 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 	if request.AddSegmentCallback != nil {
 		hints = &C.FX_DOWNLOADHINTS{}
 		C.FPDF_FX_DOWNLOADHINTS_CB(hints)
+		addSegmentCallbacks[unsafe.Pointer(hints)] = request.AddSegmentCallback
 	}
 
 	// Create a PDFium file access struct.
@@ -102,6 +122,8 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 	// Set the Go callback through cgo.
 	C.FPDF_FX_FILEAVAIL_CB(&availStruct)
 
+	dataAvailAbilityCallbacks[unsafe.Pointer(&availStruct)] = request.IsDataAvailableCallback
+
 	dataAvail := C.FPDFAvail_Create(&availStruct, &readerStruct)
 	dataAvailHandle := p.registerDataAvail(dataAvail, readerRefString, availStruct, hints)
 
@@ -125,6 +147,11 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 	delete(p.dataAvailRefs, dataAvailHandler.nativeRef)
 	C.free(Pdfium.fileReaders[dataAvailHandler.fileHandleRef].stringRef)
 	delete(Pdfium.fileReaders, dataAvailHandler.fileHandleRef)
+
+	delete(dataAvailAbilityCallbacks, unsafe.Pointer(&dataAvailHandler.handle))
+	if dataAvailHandler.hints != nil {
+		delete(addSegmentCallbacks, unsafe.Pointer(dataAvailHandler.hints))
+	}
 
 	return &responses.FPDFAvail_Destroy{}, nil
 }
