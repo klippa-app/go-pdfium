@@ -91,7 +91,7 @@ var _ = Describe("fpdfview_win32", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDF_GetPageHeightF).To(Not(BeNil()))
 
-				tmpFile, err := ioutil.TempFile()
+				tmpFile, err := ioutil.TempFile("", "")
 				Expect(err).To(BeNil())
 				err = tmpFile.Close()
 				Expect(err).To(BeNil())
@@ -99,7 +99,7 @@ var _ = Describe("fpdfview_win32", func() {
 				defer os.Remove(tmpFile.Name())
 
 				fileName := tmpFile.Name()
-				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(fileName), uintptr(0), uintptr(0))
+				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(syscall.StringToUTF16Ptr(fileName)), uintptr(0), uintptr(0))
 				Expect(dc).To(Not(BeNil()))
 
 				width := int(FPDF_GetPageWidthF.PageWidth)
