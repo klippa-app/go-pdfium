@@ -19,7 +19,6 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-	"log"
 	"unsafe"
 )
 
@@ -29,8 +28,6 @@ import (
 //export go_progressive_render_pause_cb
 func go_progressive_render_pause_cb(me *C.IFSDK_PAUSE) C.FPDF_BOOL {
 	pageRef := C.GoString((*C.char)(me.user))
-
-	log.Println("looking for pause")
 
 	// Check if we still have the reference.
 	if _, ok := pauseHandles[references.FPDF_PAGE(pageRef)]; !ok {
