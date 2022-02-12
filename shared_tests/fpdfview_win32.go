@@ -87,7 +87,7 @@ var _ = Describe("fpdfview_win32", func() {
 							Index:    0,
 						},
 					},
-					DC:     dcPointer.(C.HDC),
+					DC:     dcPointer,
 					StartX: 0,
 					StartY: 0,
 					SizeX:  2000,
