@@ -52,20 +52,20 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
-          go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
-          go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"
+          go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+          go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go test ./...
-          go test ./... -tags pdfium_experimental
+          go test ./... -v
+          go test ./... -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental
+          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
       - name: Archive code coverage results
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4874'
         uses: actions/upload-artifact@v2

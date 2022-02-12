@@ -928,4 +928,57 @@ type Pdfium interface {
 	FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error)
 
 	// End fpdf_progressive.h
+
+	// Start fpdf_dataavail.h
+
+	// FPDFAvail_Create creates a document availability provider.
+	// FPDFAvail_Destroy() must be called when done with the availability provider.
+	FPDFAvail_Create(request *requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error)
+
+	// FPDFAvail_Destroy destroys the given document availability provider.
+	FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error)
+
+	// FPDFAvail_IsDocAvail checks if the document is ready for loading, if not, gets download hints.
+	// Applications should call this function whenever new data arrives, and process
+	// all the generated download hints, if any, until the function returns
+	// enums.PDF_FILEAVAIL_DATA_ERROR or enums.PDF_FILEAVAIL_DATA_AVAIL.
+	// if hints is nil, the function just check current document availability.
+	//
+	// Once all data is available, call FPDFAvail_GetDocument() to get a document
+	// handle.
+	FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (*responses.FPDFAvail_IsDocAvail, error)
+
+	// FPDFAvail_GetDocument returns the document from the availability provider.
+	// When FPDFAvail_IsDocAvail() returns TRUE, call FPDFAvail_GetDocument() to
+	// retrieve the document handle.
+	FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (*responses.FPDFAvail_GetDocument, error)
+
+	// FPDFAvail_GetFirstPageNum returns the page number for the first available page in a linearized PDF.
+	// For most linearized PDFs, the first available page will be the first page,
+	// however, some PDFs might make another page the first available page.
+	// For non-linearized PDFs, this function will always return zero.
+	FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (*responses.FPDFAvail_GetFirstPageNum, error)
+
+	// FPDFAvail_IsPageAvail checks if the given page index is ready for loading, if not, it will
+	// call the hints to fetch more data.
+	FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (*responses.FPDFAvail_IsPageAvail, error)
+
+	// FPDFAvail_IsFormAvail
+	// This function can be called only after FPDFAvail_GetDocument() is called.
+	// Applications should call this function whenever new data arrives and process
+	// all the generated download hints, if any, until this function returns
+	// enums.PDF_FILEAVAIL_DATA_ERROR or enums.PDF_FILEAVAIL_DATA_AVAIL. Applications can then perform page
+	// loading.
+	// if hints is nil, the function just check current availability of
+	// specified page.
+	FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (*responses.FPDFAvail_IsFormAvail, error)
+
+	// FPDFAvail_IsLinearized Check whether a document is a linearized PDF.
+	// FPDFAvail_IsLinearized() will return enums.PDF_FILEAVAIL_LINEARIZED or enums.PDF_FILEAVAIL_NOT_LINEARIZED
+	// when we have 1k  of data. If the files size less than 1k, it returns
+	// enums.PDF_FILEAVAIL_LINEARIZATION_UNKNOWN as there is insufficient information to determine
+	// if the PDF is linearlized.
+	FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error)
+
+	// End fpdf_dataavail.h
 }

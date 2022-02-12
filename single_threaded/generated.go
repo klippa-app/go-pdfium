@@ -165,6 +165,118 @@ func (i *pdfiumInstance) FPDFAttachment_SetStringValue(request *requests.FPDFAtt
 	return i.pdfium.FPDFAttachment_SetStringValue(request)
 }
 
+func (i *pdfiumInstance) FPDFAvail_Create(request *requests.FPDFAvail_Create) (resp *responses.FPDFAvail_Create, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Create", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_Create(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (resp *responses.FPDFAvail_Destroy, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Destroy", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_Destroy(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (resp *responses.FPDFAvail_GetDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetDocument", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_GetDocument(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (resp *responses.FPDFAvail_GetFirstPageNum, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetFirstPageNum", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_GetFirstPageNum(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (resp *responses.FPDFAvail_IsDocAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsDocAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsDocAvail(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (resp *responses.FPDFAvail_IsFormAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsFormAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsFormAvail(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (resp *responses.FPDFAvail_IsLinearized, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsLinearized", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsLinearized(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (resp *responses.FPDFAvail_IsPageAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsPageAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsPageAvail(request)
+}
+
 func (i *pdfiumInstance) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (resp *responses.FPDFBitmap_Create, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
