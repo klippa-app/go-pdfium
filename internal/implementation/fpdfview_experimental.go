@@ -9,7 +9,6 @@ package implementation
 import "C"
 import (
 	"errors"
-	"log"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -280,8 +279,6 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_G
 	if int(success) == 0 || uint64(outBufLen) == 0 {
 		return nil, errors.New("could not get content of the XFA packet")
 	}
-
-	log.Printf("FPDF_GetXFAPacketContent stream length: %d", int(outBufLen))
 
 	contentData := make([]byte, uint64(outBufLen))
 	success = C.FPDF_GetXFAPacketContent(documentHandle.handle, C.int(request.Index), unsafe.Pointer(&contentData[0]), C.ulong(len(contentData)), &outBufLen)
