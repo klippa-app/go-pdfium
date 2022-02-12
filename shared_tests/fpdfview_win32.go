@@ -70,7 +70,7 @@ var _ = Describe("fpdfview_win32", func() {
 
 		When("is opened", func() {
 			It("returns the correct page render", func() {
-				FPDF_GetPageWidthF, err := PdfiumInstance.FPDF_GetPageWidthF(&requests.FPDF_GetPageWidthF{
+				FPDF_GetPageWidth, err := PdfiumInstance.FPDF_GetPageWidth(&requests.FPDF_GetPageWidth{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
 							Document: doc,
@@ -79,9 +79,9 @@ var _ = Describe("fpdfview_win32", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageWidthF).To(Not(BeNil()))
+				Expect(FPDF_GetPageWidth).To(Not(BeNil()))
 
-				FPDF_GetPageHeightF, err := PdfiumInstance.FPDF_GetPageHeightF(&requests.FPDF_GetPageHeightF{
+				FPDF_GetPageHeight, err := PdfiumInstance.FPDF_GetPageHeight(&requests.FPDF_GetPageHeight{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
 							Document: doc,
@@ -90,7 +90,7 @@ var _ = Describe("fpdfview_win32", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageHeightF).To(Not(BeNil()))
+				Expect(FPDF_GetPageHeight).To(Not(BeNil()))
 
 				tmpFile, err := ioutil.TempFile("", "")
 				Expect(err).To(BeNil())
@@ -103,8 +103,8 @@ var _ = Describe("fpdfview_win32", func() {
 				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(fileName))), uintptr(0), uintptr(0))
 				Expect(dc).To(Not(BeNil()))
 
-				width := int(FPDF_GetPageWidthF.PageWidth)
-				height := int(FPDF_GetPageHeightF.PageHeight)
+				width := int(FPDF_GetPageWidth.PageWidth)
+				height := int(FPDF_GetPageHeight.PageHeight)
 				startX := int(0)
 				startY := int(0)
 
@@ -158,8 +158,6 @@ var _ = Describe("fpdfview_win32", func() {
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDF_RenderPage).To(Equal(&responses.FPDF_RenderPage{}))
-
-				// @todo:   DeleteEnhMetaFile(CloseEnhMetaFile(dc));
 			})
 		})
 	})
