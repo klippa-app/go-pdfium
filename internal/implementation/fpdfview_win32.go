@@ -8,6 +8,7 @@ package implementation
 import "C"
 import (
 	"errors"
+	"log"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -24,6 +25,9 @@ func (p *PdfiumImplementation) FPDF_RenderPage(request *requests.FPDF_RenderPage
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println(request.DC)
+	log.Println(&request.DC)
 
 	hdc, ok := request.DC.(C.HDC)
 	if !ok {

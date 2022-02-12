@@ -22,6 +22,20 @@ import (
 )
 
 var _ = Describe("fpdfview_win32", func() {
+	BeforeEach(func() {
+		if TestType == "multi" {
+			Skip("Multi-threaded usage does not support setting callbacks")
+		}
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		if TestType == "multi" {
+			Skip("Multi-threaded usage does not support setting callbacks")
+		}
+		Locker.Unlock()
+	})
+
 	Context("no document", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDF_RenderPage", func() {
@@ -36,10 +50,6 @@ var _ = Describe("fpdfview_win32", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			if TestType == "multi" {
-				Skip("Multi-threaded usage does not support FPDF_RenderPage")
-			}
-
 			file, err := os.Open(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
@@ -56,10 +66,6 @@ var _ = Describe("fpdfview_win32", func() {
 		})
 
 		AfterEach(func() {
-			if TestType == "multi" {
-				Skip("Multi-threaded usage does not support FPDF_RenderPage")
-			}
-
 			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 				Document: doc,
 			})
@@ -81,7 +87,7 @@ var _ = Describe("fpdfview_win32", func() {
 							Index:    0,
 						},
 					},
-					DC:     dcPointer,
+					DC:     dcPointer.(C.HDC),
 					StartX: 0,
 					StartY: 0,
 					SizeX:  2000,
