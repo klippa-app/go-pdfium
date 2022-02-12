@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"strings"
 	"text/template"
 
 	"github.com/klippa-app/go-pdfium"
@@ -30,7 +31,8 @@ func (m *GenerateDataMethod) BlockForMultiThreaded() bool {
 		m.Name == "FPDF_RenderPageBitmapWithColorScheme_Start" ||
 		m.Name == "FPDF_RenderPageBitmap_Start" ||
 		m.Name == "FPDF_RenderPage_Continue" ||
-		m.Name == "FPDF_RenderPage_Close" {
+		m.Name == "FPDF_RenderPage_Close" ||
+		strings.HasPrefix(m.Name, "FPDFAvail_") {
 		return true
 	}
 	return false

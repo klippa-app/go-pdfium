@@ -99,6 +99,38 @@ func (i *pdfiumInstance) FPDFAttachment_SetStringValue(request *requests.FPDFAtt
 	return i.worker.plugin.FPDFAttachment_SetStringValue(request)
 }
 
+func (i *pdfiumInstance) FPDFAvail_Create(request *requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (*responses.FPDFAvail_GetDocument, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (*responses.FPDFAvail_GetFirstPageNum, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (*responses.FPDFAvail_IsDocAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (*responses.FPDFAvail_IsFormAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (*responses.FPDFAvail_IsPageAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
 func (i *pdfiumInstance) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
