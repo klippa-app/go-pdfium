@@ -93,7 +93,7 @@ var _ = Describe("fpdfview_win32", func() {
 					SizeX:  2000,
 					SizeY:  2000,
 					Rotate: enums.FPDF_PAGE_ROTATION_NONE,
-					Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
+					Flags:  enums.FPDF_RENDER_FLAG_ANNOT | enums.FPDF_RENDER_FLAG_PRINTING,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDF_RenderPage).To(Equal(&responses.FPDF_RenderPage{}))
