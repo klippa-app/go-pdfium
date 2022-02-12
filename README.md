@@ -38,10 +38,10 @@
     * Windows features (`FPDF_SetPrintMode`, `FPDF_RenderPage`)
     * Transformations (page boxes, clip paths)
     * Progressive rendering
+    * Document loading through data availability (loading data as needed)
 * Methods to be implemented:
     * Form filling
     * Annotations
-    * Document loading through data availability
     * Struct trees
 * Methods that won't be implemented for now:
     * fpdf_sysfontinfo.h (probably too complicated)
