@@ -99,7 +99,7 @@ var _ = Describe("fpdfview_win32", func() {
 				defer os.Remove(tmpFile.Name())
 
 				fileName := tmpFile.Name()
-				dc, _, _ := procCreateEnhMetaFileA.Call(nil, uintptr(tmpFile.Name()), nil, nil)
+				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(fileName), uintptr(0), uintptr(0))
 				Expect(dc).To(Not(BeNil()))
 
 				width := int(FPDF_GetPageWidthF.PageWidth)
