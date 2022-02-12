@@ -23,10 +23,16 @@ func (f *FakeReadSeeker) Seek(offset int64, whence int) (int64, error) {
 
 var _ = Describe("fpdf_dataavail", func() {
 	BeforeEach(func() {
+		if TestType == "multi" {
+			Skip("Multi-threaded usage does not support setting callbacks")
+		}
 		Locker.Lock()
 	})
 
 	AfterEach(func() {
+		if TestType == "multi" {
+			Skip("Multi-threaded usage does not support setting callbacks")
+		}
 		Locker.Unlock()
 	})
 
