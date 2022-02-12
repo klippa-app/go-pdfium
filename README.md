@@ -40,6 +40,7 @@
     * Progressive rendering
     * Document loading through data availability (loading data as needed)
 * Methods to be implemented:
+    * Page/Page object editing
     * Form filling
     * Annotations
     * Struct trees
