@@ -10,6 +10,7 @@ import "C"
 import (
 	"os"
 	"syscall"
+	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -71,6 +72,8 @@ var _ = Describe("fpdfview_win32", func() {
 				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(0), uintptr(0), uintptr(0))
 				Expect(dc).To(Not(BeNil()))
 
+				dcPointer := (C.HDC)(unsafe.Pointer(dc))
+
 				FPDF_RenderPage, err := PdfiumInstance.FPDF_RenderPage(&requests.FPDF_RenderPage{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
@@ -78,11 +81,11 @@ var _ = Describe("fpdfview_win32", func() {
 							Index:    0,
 						},
 					},
-					DC:     dc.(C.HDC),
+					DC:     dcPointer,
 					StartX: 0,
 					StartY: 0,
-					SizeX:  width,
-					SizeY:  height,
+					SizeX:  2000,
+					SizeY:  2000,
 					Rotate: enums.FPDF_PAGE_ROTATION_NONE,
 					Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
 				})
