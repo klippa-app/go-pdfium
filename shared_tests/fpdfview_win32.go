@@ -8,12 +8,14 @@ package shared_tests
 // #include <windows.h>
 import "C"
 import (
-	"github.com/klippa-app/go-pdfium/enums"
 	"os"
+	"syscall"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -88,17 +90,46 @@ var _ = Describe("fpdfview_win32", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDF_GetPageHeightF).To(Not(BeNil()))
 
-				dc := C.CreateEnhMetaFileA(nil, nil, nil, nil)
+				dc := procCreateEnhMetaFileA.Call(nil, nil, nil, nil)
+				Expect(dc).To(Not(BeNil()))
+
 				width := int(FPDF_GetPageWidthF.PageWidth)
 				height := int(FPDF_GetPageHeightF.PageHeight)
-				rgn := C.CreateRectRgn(0, 0, C.int(width), C.int(height))
-				C.SelectClipRgn(dc, rgn)
-				C.DeleteObject(rgn)
+				startX := int(0)
+				startY := int(0)
 
-				C.SelectObject(dc, C.GetStockObject(C.NULL_PEN))
-				C.SelectObject(dc, C.GetStockObject(C.WHITE_BRUSH))
+				rgn := procCreateRectRgn.Call(uintptr(startX), uintptr(startY), uintptr(width), uintptr(height))
+				Expect(rgn).To(Not(BeNil()))
+
+				selectClip, _, _ := procSelectClipRgn.Call(uintptr(dc), uintptr(rgn))
+				Expect(deleteRGN).To(Not(Equal(0)))
+
+				deleteRGN, _, _ := procDeleteObject.Call(uintptr(rgn))
+				Expect(deleteRGN).To(Not(Equal(0)))
+
+				WHITE_BRUSH := 0
+				NULL_PEN := 8
+
+				nullPen, _, _ := procGetStockObject.Call(uintptr(NULL_PEN))
+				Expect(nullPen).To(Not(BeNil()))
+
+				whiteBrush, _, _ := procGetStockObject.Call(uintptr(WHITE_BRUSH))
+				Expect(whiteBrush).To(Not(BeNil()))
+
+				nullPenSelect, _, _ := procSelectObject.Call(uintptr(dc), uintptr(nullPen))
+				Expect(nullPenSelect).To(Not(Equal(0)))
+
+				whiteBrushSelect, _, _ := procSelectObject.Call(uintptr(dc), uintptr(whiteBrush))
+				Expect(whiteBrushSelect).To(Not(Equal(0)))
+
+				rectAngleX1 := int(0)
+				rectAngleY1 := int(0)
+				rectAngleX2 := int(width + 1)
+				rectAngleY2 := int(height + 1)
+
 				// If a PS_NULL pen is used, the dimensions of the rectangle are 1 pixel less.
-				C.Rectangle(dc, 0, 0, C.int(width+1), C.int(height+1))
+				rectangleResult, _, _ := procRectangle.Call(uintptr(dc), uintptr(rectAngleX1), uintptr(rectAngleY1), uintptr(rectAngleX2), uintptr(rectAngleY2))
+				Expect(rectangleResult).To(Not(Equal(0)))
 
 				FPDF_RenderPage, err := PdfiumInstance.FPDF_RenderPage(&requests.FPDF_RenderPage{
 					Page: requests.Page{
@@ -121,3 +152,14 @@ var _ = Describe("fpdfview_win32", func() {
 		})
 	})
 })
+
+var (
+	modgdi32               = syscall.NewLazyDLL("gdi32.dll")
+	procDeleteObject       = modgdi32.NewProc("DeleteObject")
+	procSelectObject       = modgdi32.NewProc("SelectObject")
+	procGetStockObject     = modgdi32.NewProc("GetStockObject")
+	procRectangle          = modgdi32.NewProc("Rectangle")
+	procCreateRectRgn      = modgdi32.NewProc("CreateRectRgn")
+	procSelectClipRgn      = modgdi32.NewProc("SelectClipRgn")
+	procCreateEnhMetaFileA = modgdi32.NewProc("CreateEnhMetaFileA")
+)
