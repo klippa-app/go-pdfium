@@ -16,7 +16,7 @@
 
 * Option between single-threaded and multi-threaded (through subprocesses), while keeping the same interface
 * This library will handle all complicated cgo gymnastics for you
-* The goal is to implement all PDFium public API methods (including [experimental](#experimental)), current progress: 40%
+* The goal is to implement all PDFium public API methods (including [experimental](#experimental)), current progress: 46%
 * Current PDFium methods exposed, no cgo required
     * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
@@ -36,12 +36,13 @@
     * XFA packet handling
     * ViewerRef (print settings)
     * Windows features (`FPDF_SetPrintMode`, `FPDF_RenderPage`)
-* Methods to be implemented:
-    * Form filling
     * Transformations (page boxes, clip paths)
-    * Annotations
-    * Document loading through data availability
     * Progressive rendering
+    * Document loading through data availability (loading data as needed)
+* Methods to be implemented:
+    * Page/Page object editing
+    * Form filling
+    * Annotations
     * Struct trees
 * Methods that won't be implemented for now:
     * fpdf_sysfontinfo.h (probably too complicated)

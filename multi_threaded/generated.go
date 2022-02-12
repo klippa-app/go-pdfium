@@ -99,6 +99,38 @@ func (i *pdfiumInstance) FPDFAttachment_SetStringValue(request *requests.FPDFAtt
 	return i.worker.plugin.FPDFAttachment_SetStringValue(request)
 }
 
+func (i *pdfiumInstance) FPDFAvail_Create(request *requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (*responses.FPDFAvail_GetDocument, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (*responses.FPDFAvail_GetFirstPageNum, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (*responses.FPDFAvail_IsDocAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (*responses.FPDFAvail_IsFormAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (*responses.FPDFAvail_IsPageAvail, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
 func (i *pdfiumInstance) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (*responses.FPDFBitmap_Create, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -221,6 +253,30 @@ func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTa
 	}
 
 	return i.worker.plugin.FPDFCatalog_IsTagged(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_CountPathSegments(request *requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFClipPath_CountPathSegments(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_CountPaths(request *requests.FPDFClipPath_CountPaths) (*responses.FPDFClipPath_CountPaths, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFClipPath_CountPaths(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_GetPathSegment(request *requests.FPDFClipPath_GetPathSegment) (*responses.FPDFClipPath_GetPathSegment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFClipPath_GetPathSegment(request)
 }
 
 func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error) {
@@ -455,6 +511,22 @@ func (i *pdfiumInstance) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadWe
 	return i.worker.plugin.FPDFLink_LoadWebLinks(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetClipPath(request *requests.FPDFPageObj_GetClipPath) (*responses.FPDFPageObj_GetClipPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_GetClipPath(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_TransformClipPath(request *requests.FPDFPageObj_TransformClipPath) (*responses.FPDFPageObj_TransformClipPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_TransformClipPath(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -463,12 +535,44 @@ func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*
 	return i.worker.plugin.FPDFPage_Flatten(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_GetArtBox(request *requests.FPDFPage_GetArtBox) (*responses.FPDFPage_GetArtBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_GetArtBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetBleedBox(request *requests.FPDFPage_GetBleedBox) (*responses.FPDFPage_GetBleedBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_GetBleedBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetCropBox(request *requests.FPDFPage_GetCropBox) (*responses.FPDFPage_GetCropBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_GetCropBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData) (*responses.FPDFPage_GetDecodedThumbnailData, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 
 	return i.worker.plugin.FPDFPage_GetDecodedThumbnailData(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetMediaBox(request *requests.FPDFPage_GetMediaBox) (*responses.FPDFPage_GetMediaBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_GetMediaBox(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_GetRawThumbnailData(request *requests.FPDFPage_GetRawThumbnailData) (*responses.FPDFPage_GetRawThumbnailData, error) {
@@ -495,6 +599,14 @@ func (i *pdfiumInstance) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPag
 	return i.worker.plugin.FPDFPage_GetThumbnailAsBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimBox) (*responses.FPDFPage_GetTrimBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_GetTrimBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -503,12 +615,68 @@ func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_Has
 	return i.worker.plugin.FPDFPage_HasTransparency(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_InsertClipPath(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetArtBox(request *requests.FPDFPage_SetArtBox) (*responses.FPDFPage_SetArtBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_SetArtBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetBleedBox(request *requests.FPDFPage_SetBleedBox) (*responses.FPDFPage_SetBleedBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_SetBleedBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetCropBox(request *requests.FPDFPage_SetCropBox) (*responses.FPDFPage_SetCropBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_SetCropBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetMediaBox(request *requests.FPDFPage_SetMediaBox) (*responses.FPDFPage_SetMediaBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_SetMediaBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 
 	return i.worker.plugin.FPDFPage_SetRotation(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetTrimBox(request *requests.FPDFPage_SetTrimBox) (*responses.FPDFPage_SetTrimBox, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_SetTrimBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_TransFormWithClip(request *requests.FPDFPage_TransFormWithClip) (*responses.FPDFPage_TransFormWithClip, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_TransFormWithClip(request)
 }
 
 func (i *pdfiumInstance) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error) {
@@ -823,12 +991,28 @@ func (i *pdfiumInstance) FPDF_CountNamedDests(request *requests.FPDF_CountNamedD
 	return i.worker.plugin.FPDF_CountNamedDests(request)
 }
 
+func (i *pdfiumInstance) FPDF_CreateClipPath(request *requests.FPDF_CreateClipPath) (*responses.FPDF_CreateClipPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_CreateClipPath(request)
+}
+
 func (i *pdfiumInstance) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 
 	return i.worker.plugin.FPDF_CreateNewDocument(request)
+}
+
+func (i *pdfiumInstance) FPDF_DestroyClipPath(request *requests.FPDF_DestroyClipPath) (*responses.FPDF_DestroyClipPath, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_DestroyClipPath(request)
 }
 
 func (i *pdfiumInstance) FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error) {
@@ -1151,12 +1335,28 @@ func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPage
 	return i.worker.plugin.FPDF_RenderPageBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
 func (i *pdfiumInstance) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
 	}
 
 	return i.worker.plugin.FPDF_RenderPageBitmapWithMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error) {

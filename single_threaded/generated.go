@@ -165,6 +165,118 @@ func (i *pdfiumInstance) FPDFAttachment_SetStringValue(request *requests.FPDFAtt
 	return i.pdfium.FPDFAttachment_SetStringValue(request)
 }
 
+func (i *pdfiumInstance) FPDFAvail_Create(request *requests.FPDFAvail_Create) (resp *responses.FPDFAvail_Create, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Create", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_Create(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (resp *responses.FPDFAvail_Destroy, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_Destroy", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_Destroy(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetDocument(request *requests.FPDFAvail_GetDocument) (resp *responses.FPDFAvail_GetDocument, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetDocument", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_GetDocument(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_GetFirstPageNum(request *requests.FPDFAvail_GetFirstPageNum) (resp *responses.FPDFAvail_GetFirstPageNum, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_GetFirstPageNum", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_GetFirstPageNum(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_IsDocAvail) (resp *responses.FPDFAvail_IsDocAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsDocAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsDocAvail(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsFormAvail(request *requests.FPDFAvail_IsFormAvail) (resp *responses.FPDFAvail_IsFormAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsFormAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsFormAvail(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (resp *responses.FPDFAvail_IsLinearized, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsLinearized", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsLinearized(request)
+}
+
+func (i *pdfiumInstance) FPDFAvail_IsPageAvail(request *requests.FPDFAvail_IsPageAvail) (resp *responses.FPDFAvail_IsPageAvail, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAvail_IsPageAvail", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAvail_IsPageAvail(request)
+}
+
 func (i *pdfiumInstance) FPDFBitmap_Create(request *requests.FPDFBitmap_Create) (resp *responses.FPDFBitmap_Create, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -387,6 +499,48 @@ func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTa
 	}()
 
 	return i.pdfium.FPDFCatalog_IsTagged(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_CountPathSegments(request *requests.FPDFClipPath_CountPathSegments) (resp *responses.FPDFClipPath_CountPathSegments, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFClipPath_CountPathSegments", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFClipPath_CountPathSegments(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_CountPaths(request *requests.FPDFClipPath_CountPaths) (resp *responses.FPDFClipPath_CountPaths, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFClipPath_CountPaths", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFClipPath_CountPaths(request)
+}
+
+func (i *pdfiumInstance) FPDFClipPath_GetPathSegment(request *requests.FPDFClipPath_GetPathSegment) (resp *responses.FPDFClipPath_GetPathSegment, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFClipPath_GetPathSegment", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFClipPath_GetPathSegment(request)
 }
 
 func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (resp *responses.FPDFDest_GetDestPageIndex, err error) {
@@ -795,6 +949,34 @@ func (i *pdfiumInstance) FPDFLink_LoadWebLinks(request *requests.FPDFLink_LoadWe
 	return i.pdfium.FPDFLink_LoadWebLinks(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetClipPath(request *requests.FPDFPageObj_GetClipPath) (resp *responses.FPDFPageObj_GetClipPath, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetClipPath", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_GetClipPath(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_TransformClipPath(request *requests.FPDFPageObj_TransformClipPath) (resp *responses.FPDFPageObj_TransformClipPath, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_TransformClipPath", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_TransformClipPath(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (resp *responses.FPDFPage_Flatten, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -809,6 +991,48 @@ func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (r
 	return i.pdfium.FPDFPage_Flatten(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_GetArtBox(request *requests.FPDFPage_GetArtBox) (resp *responses.FPDFPage_GetArtBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetArtBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_GetArtBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetBleedBox(request *requests.FPDFPage_GetBleedBox) (resp *responses.FPDFPage_GetBleedBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetBleedBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_GetBleedBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetCropBox(request *requests.FPDFPage_GetCropBox) (resp *responses.FPDFPage_GetCropBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetCropBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_GetCropBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData) (resp *responses.FPDFPage_GetDecodedThumbnailData, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -821,6 +1045,20 @@ func (i *pdfiumInstance) FPDFPage_GetDecodedThumbnailData(request *requests.FPDF
 	}()
 
 	return i.pdfium.FPDFPage_GetDecodedThumbnailData(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_GetMediaBox(request *requests.FPDFPage_GetMediaBox) (resp *responses.FPDFPage_GetMediaBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetMediaBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_GetMediaBox(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_GetRawThumbnailData(request *requests.FPDFPage_GetRawThumbnailData) (resp *responses.FPDFPage_GetRawThumbnailData, err error) {
@@ -865,6 +1103,20 @@ func (i *pdfiumInstance) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPag
 	return i.pdfium.FPDFPage_GetThumbnailAsBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimBox) (resp *responses.FPDFPage_GetTrimBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_GetTrimBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_GetTrimBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (resp *responses.FPDFPage_HasTransparency, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -879,6 +1131,76 @@ func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_Has
 	return i.pdfium.FPDFPage_HasTransparency(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertClipPath) (resp *responses.FPDFPage_InsertClipPath, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_InsertClipPath", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_InsertClipPath(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetArtBox(request *requests.FPDFPage_SetArtBox) (resp *responses.FPDFPage_SetArtBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetArtBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_SetArtBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetBleedBox(request *requests.FPDFPage_SetBleedBox) (resp *responses.FPDFPage_SetBleedBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetBleedBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_SetBleedBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetCropBox(request *requests.FPDFPage_SetCropBox) (resp *responses.FPDFPage_SetCropBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetCropBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_SetCropBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetMediaBox(request *requests.FPDFPage_SetMediaBox) (resp *responses.FPDFPage_SetMediaBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetMediaBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_SetMediaBox(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (resp *responses.FPDFPage_SetRotation, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -891,6 +1213,34 @@ func (i *pdfiumInstance) FPDFPage_SetRotation(request *requests.FPDFPage_SetRota
 	}()
 
 	return i.pdfium.FPDFPage_SetRotation(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_SetTrimBox(request *requests.FPDFPage_SetTrimBox) (resp *responses.FPDFPage_SetTrimBox, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_SetTrimBox", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_SetTrimBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_TransFormWithClip(request *requests.FPDFPage_TransFormWithClip) (resp *responses.FPDFPage_TransFormWithClip, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_TransFormWithClip", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_TransFormWithClip(request)
 }
 
 func (i *pdfiumInstance) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (resp *responses.FPDFSignatureObj_GetByteRange, err error) {
@@ -1439,6 +1789,20 @@ func (i *pdfiumInstance) FPDF_CountNamedDests(request *requests.FPDF_CountNamedD
 	return i.pdfium.FPDF_CountNamedDests(request)
 }
 
+func (i *pdfiumInstance) FPDF_CreateClipPath(request *requests.FPDF_CreateClipPath) (resp *responses.FPDF_CreateClipPath, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_CreateClipPath", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_CreateClipPath(request)
+}
+
 func (i *pdfiumInstance) FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (resp *responses.FPDF_CreateNewDocument, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1451,6 +1815,20 @@ func (i *pdfiumInstance) FPDF_CreateNewDocument(request *requests.FPDF_CreateNew
 	}()
 
 	return i.pdfium.FPDF_CreateNewDocument(request)
+}
+
+func (i *pdfiumInstance) FPDF_DestroyClipPath(request *requests.FPDF_DestroyClipPath) (resp *responses.FPDF_DestroyClipPath, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_DestroyClipPath", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_DestroyClipPath(request)
 }
 
 func (i *pdfiumInstance) FPDF_DeviceToPage(request *requests.FPDF_DeviceToPage) (resp *responses.FPDF_DeviceToPage, err error) {
@@ -1999,6 +2377,20 @@ func (i *pdfiumInstance) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPage
 	return i.pdfium.FPDF_RenderPageBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (resp *responses.FPDF_RenderPageBitmapWithColorScheme_Start, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmapWithColorScheme_Start", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPageBitmapWithColorScheme_Start(request)
+}
+
 func (i *pdfiumInstance) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (resp *responses.FPDF_RenderPageBitmapWithMatrix, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2011,6 +2403,48 @@ func (i *pdfiumInstance) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_
 	}()
 
 	return i.pdfium.FPDF_RenderPageBitmapWithMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (resp *responses.FPDF_RenderPageBitmap_Start, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPageBitmap_Start", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPageBitmap_Start(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (resp *responses.FPDF_RenderPage_Close, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Close", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPage_Close(request)
+}
+
+func (i *pdfiumInstance) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (resp *responses.FPDF_RenderPage_Continue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RenderPage_Continue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RenderPage_Continue(request)
 }
 
 func (i *pdfiumInstance) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (resp *responses.FPDF_SaveAsCopy, err error) {

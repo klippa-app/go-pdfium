@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("fpdf_signature", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document is given", func() {
 		It("returns an error when getting the document signature count", func() {
 			FPDF_GetSignatureCount, err := PdfiumInstance.FPDF_GetSignatureCount(&requests.FPDF_GetSignatureCount{})

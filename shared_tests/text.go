@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("text", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no references", func() {
 		When("is given", func() {
 			Context("GetPageText()", func() {
@@ -194,43 +202,6 @@ var _ = Describe("text", func() {
 						})
 					})
 				})
-
-				Context("when PixelPositions is enabled", func() {
-					It("returns the correct font information", func() {
-						pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
-							Page: requests.Page{
-								ByIndex: &requests.PageByIndex{
-									Document: doc,
-									Index:    0,
-								},
-							},
-							CollectFontInformation: true,
-						})
-						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information.json", pageTextStructured)))
-					})
-
-					Context("and PixelPositions is enabled", func() {
-						It("returns the correct font information", func() {
-							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
-								Page: requests.Page{
-									ByIndex: &requests.PageByIndex{
-										Document: doc,
-										Index:    0,
-									},
-								},
-								CollectFontInformation: true,
-								PixelPositions: requests.GetPageTextStructuredPixelPositions{
-									Calculate: true,
-									Width:     3000,
-									Height:    3000,
-								},
-							})
-							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
-						})
-					})
-				})
 			})
 		})
 	})
@@ -252,7 +223,7 @@ func loadStructuredText(path string, resp *responses.GetPageTextStructured) *res
 }
 
 func writeStructuredText(path string, resp *responses.GetPageTextStructured) error {
-	//return nil // Comment this in case of updating PDFium versions and output has changed.
+	return nil // Comment this in case of updating PDFium versions and output has changed.
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)

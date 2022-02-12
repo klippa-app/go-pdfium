@@ -184,6 +184,8 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
+		pathSegmentRefs:      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle{},
+		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -220,6 +222,8 @@ type PdfiumImplementation struct {
 	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
 	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
 	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
+	pathSegmentRefs      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle
+	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -456,6 +460,14 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.searchRefs, i)
 	}
 
+	for i := range p.pathSegmentRefs {
+		delete(p.pathSegmentRefs, i)
+	}
+
+	for i := range p.dataAvailRefs {
+		delete(p.dataAvailRefs, i)
+	}
+
 	delete(Pdfium.instanceRefs, p.instanceRef)
 
 	return nil
@@ -639,4 +651,40 @@ func (p *PdfiumImplementation) getPageRangeHandle(pageRange references.FPDF_PAGE
 	}
 
 	return nil, errors.New("could not find pageRange handle, perhaps the pageRange was already closed or you tried to share pageRanges between instances")
+}
+
+func (p *PdfiumImplementation) getPageObjectHandle(pageObject references.FPDF_PAGEOBJECT) (*PageObjectHandle, error) {
+	if pageObject == "" {
+		return nil, errors.New("pageObject not given")
+	}
+
+	if val, ok := p.pageObjectRefs[pageObject]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageObject handle, perhaps the pageObject was already closed or you tried to share pageObjects between instances")
+}
+
+func (p *PdfiumImplementation) getClipPathHandle(clipPath references.FPDF_CLIPPATH) (*ClipPathHandle, error) {
+	if clipPath == "" {
+		return nil, errors.New("clipPath not given")
+	}
+
+	if val, ok := p.clipPathRefs[clipPath]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find clipPath handle, perhaps the clipPath was already closed or you tried to share clipPaths between instances")
+}
+
+func (p *PdfiumImplementation) getDataAvailHandle(dataAvail references.FPDF_AVAIL) (*DataAvailHandle, error) {
+	if dataAvail == "" {
+		return nil, errors.New("dataAvail not given")
+	}
+
+	if val, ok := p.dataAvailRefs[dataAvail]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find dataAvail handle, perhaps the dataAvail was already closed or you tried to share dataAvails between instances")
 }

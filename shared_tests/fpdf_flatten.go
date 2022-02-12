@@ -8,6 +8,14 @@ import (
 )
 
 var _ = Describe("fpdf_flatten", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no document", func() {
 		When("is opened", func() {
 			It("returns an error when flattening a pdf page", func() {

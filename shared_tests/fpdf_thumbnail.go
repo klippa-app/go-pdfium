@@ -15,6 +15,14 @@ import (
 )
 
 var _ = Describe("fpdf_thumbnail", func() {
+	BeforeEach(func() {
+		Locker.Lock()
+	})
+
+	AfterEach(func() {
+		Locker.Unlock()
+	})
+
 	Context("no page is given", func() {
 		It("returns an error when getting the decoded thumbnail data", func() {
 			FPDFPage_GetDecodedThumbnailData, err := PdfiumInstance.FPDFPage_GetDecodedThumbnailData(&requests.FPDFPage_GetDecodedThumbnailData{})
@@ -146,7 +154,7 @@ var _ = Describe("fpdf_thumbnail", func() {
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDFPage_GetRawThumbnailData).To(Not(BeNil()))
-			Expect(len(FPDFPage_GetRawThumbnailData.RawThumbnail)).To(BeNumerically("~", 1851, 100)) // Allow some room, not all platforms return the same value.
+			Expect(FPDFPage_GetRawThumbnailData.RawThumbnail).To(HaveLen(1851))
 		})
 
 		It("returns thumbnail as bitmap", func() {
