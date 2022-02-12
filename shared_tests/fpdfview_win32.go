@@ -8,10 +8,8 @@ package shared_tests
 // #include <windows.h>
 import "C"
 import (
-	"io/ioutil"
 	"os"
 	"syscall"
-	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -70,76 +68,8 @@ var _ = Describe("fpdfview_win32", func() {
 
 		When("is opened", func() {
 			It("returns the correct page render", func() {
-				FPDF_GetPageWidth, err := PdfiumInstance.FPDF_GetPageWidth(&requests.FPDF_GetPageWidth{
-					Page: requests.Page{
-						ByIndex: &requests.PageByIndex{
-							Document: doc,
-							Index:    0,
-						},
-					},
-				})
-				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageWidth).To(Not(BeNil()))
-
-				FPDF_GetPageHeight, err := PdfiumInstance.FPDF_GetPageHeight(&requests.FPDF_GetPageHeight{
-					Page: requests.Page{
-						ByIndex: &requests.PageByIndex{
-							Document: doc,
-							Index:    0,
-						},
-					},
-				})
-				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageHeight).To(Not(BeNil()))
-
-				tmpFile, err := ioutil.TempFile("", "")
-				Expect(err).To(BeNil())
-				err = tmpFile.Close()
-				Expect(err).To(BeNil())
-
-				defer os.Remove(tmpFile.Name())
-
-				fileName := tmpFile.Name()
-				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(fileName))), uintptr(0), uintptr(0))
+				dc, _, _ := procCreateEnhMetaFileA.Call(uintptr(0), uintptr(0), uintptr(0), uintptr(0))
 				Expect(dc).To(Not(BeNil()))
-
-				width := int(FPDF_GetPageWidth.PageWidth)
-				height := int(FPDF_GetPageHeight.PageHeight)
-				startX := int(0)
-				startY := int(0)
-
-				rgn, _, _ := procCreateRectRgn.Call(uintptr(startX), uintptr(startY), uintptr(width), uintptr(height))
-				Expect(rgn).To(Not(BeNil()))
-
-				selectClip, _, _ := procSelectClipRgn.Call(uintptr(dc), uintptr(rgn))
-				Expect(selectClip).To(Not(Equal(0)))
-
-				deleteRGN, _, _ := procDeleteObject.Call(uintptr(rgn))
-				Expect(deleteRGN).To(Not(Equal(0)))
-
-				WHITE_BRUSH := 0
-				NULL_PEN := 8
-
-				nullPen, _, _ := procGetStockObject.Call(uintptr(NULL_PEN))
-				Expect(nullPen).To(Not(BeNil()))
-
-				whiteBrush, _, _ := procGetStockObject.Call(uintptr(WHITE_BRUSH))
-				Expect(whiteBrush).To(Not(BeNil()))
-
-				nullPenSelect, _, _ := procSelectObject.Call(uintptr(dc), uintptr(nullPen))
-				Expect(nullPenSelect).To(Not(Equal(0)))
-
-				whiteBrushSelect, _, _ := procSelectObject.Call(uintptr(dc), uintptr(whiteBrush))
-				Expect(whiteBrushSelect).To(Not(Equal(0)))
-
-				rectAngleX1 := int(0)
-				rectAngleY1 := int(0)
-				rectAngleX2 := int(width + 1)
-				rectAngleY2 := int(height + 1)
-
-				// If a PS_NULL pen is used, the dimensions of the rectangle are 1 pixel less.
-				rectangleResult, _, _ := procRectangle.Call(uintptr(dc), uintptr(rectAngleX1), uintptr(rectAngleY1), uintptr(rectAngleX2), uintptr(rectAngleY2))
-				Expect(rectangleResult).To(Not(Equal(0)))
 
 				FPDF_RenderPage, err := PdfiumInstance.FPDF_RenderPage(&requests.FPDF_RenderPage{
 					Page: requests.Page{
@@ -148,7 +78,7 @@ var _ = Describe("fpdfview_win32", func() {
 							Index:    0,
 						},
 					},
-					DC:     dc,
+					DC:     dc.(C.HDC),
 					StartX: 0,
 					StartY: 0,
 					SizeX:  width,
@@ -158,6 +88,12 @@ var _ = Describe("fpdfview_win32", func() {
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDF_RenderPage).To(Equal(&responses.FPDF_RenderPage{}))
+
+				emf, _, _ := procCloseEnhMetaFile.Call(uintptr(dc))
+				Expect(emf).To(Not(BeNil()))
+
+				res, _, _ := procDeleteEnhMetaFile.Call(uintptr(emf))
+				Expect(res).To(Not(Equal(0)))
 			})
 		})
 	})
@@ -165,11 +101,7 @@ var _ = Describe("fpdfview_win32", func() {
 
 var (
 	modgdi32               = syscall.NewLazyDLL("gdi32.dll")
-	procDeleteObject       = modgdi32.NewProc("DeleteObject")
-	procSelectObject       = modgdi32.NewProc("SelectObject")
-	procGetStockObject     = modgdi32.NewProc("GetStockObject")
-	procRectangle          = modgdi32.NewProc("Rectangle")
-	procCreateRectRgn      = modgdi32.NewProc("CreateRectRgn")
-	procSelectClipRgn      = modgdi32.NewProc("SelectClipRgn")
 	procCreateEnhMetaFileA = modgdi32.NewProc("CreateEnhMetaFileA")
+	procCloseEnhMetaFile   = modgdi32.NewProc("CloseEnhMetaFile")
+	procDeleteEnhMetaFile  = modgdi32.NewProc("DeleteEnhMetaFile")
 )
