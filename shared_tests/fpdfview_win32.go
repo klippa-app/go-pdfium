@@ -8,6 +8,7 @@ package shared_tests
 // #include <windows.h>
 import "C"
 import (
+	"io/ioutil"
 	"os"
 	"syscall"
 
@@ -90,7 +91,15 @@ var _ = Describe("fpdfview_win32", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDF_GetPageHeightF).To(Not(BeNil()))
 
-				dc := procCreateEnhMetaFileA.Call(nil, nil, nil, nil)
+				tmpFile, err := ioutil.TempFile()
+				Expect(err).To(BeNil())
+				err = tmpFile.Close()
+				Expect(err).To(BeNil())
+
+				defer os.Remove(tmpFile.Name())
+
+				fileName := tmpFile.Name()
+				dc, _, _ := procCreateEnhMetaFileA.Call(nil, uintptr(tmpFile.Name()), nil, nil)
 				Expect(dc).To(Not(BeNil()))
 
 				width := int(FPDF_GetPageWidthF.PageWidth)
@@ -98,11 +107,11 @@ var _ = Describe("fpdfview_win32", func() {
 				startX := int(0)
 				startY := int(0)
 
-				rgn := procCreateRectRgn.Call(uintptr(startX), uintptr(startY), uintptr(width), uintptr(height))
+				rgn, _, _ := procCreateRectRgn.Call(uintptr(startX), uintptr(startY), uintptr(width), uintptr(height))
 				Expect(rgn).To(Not(BeNil()))
 
 				selectClip, _, _ := procSelectClipRgn.Call(uintptr(dc), uintptr(rgn))
-				Expect(deleteRGN).To(Not(Equal(0)))
+				Expect(selectClip).To(Not(Equal(0)))
 
 				deleteRGN, _, _ := procDeleteObject.Call(uintptr(rgn))
 				Expect(deleteRGN).To(Not(Equal(0)))
@@ -148,6 +157,8 @@ var _ = Describe("fpdfview_win32", func() {
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDF_RenderPage).To(Equal(&responses.FPDF_RenderPage{}))
+
+				// @todo:   DeleteEnhMetaFile(CloseEnhMetaFile(dc));
 			})
 		})
 	})
