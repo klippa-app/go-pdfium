@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"syscall"
+	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
