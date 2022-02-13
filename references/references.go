@@ -65,3 +65,9 @@ type FPDF_PATHSEGMENT string
 
 // FPDF_AVAIL is an internal reference to a C.FPDF_AVAIL handle.
 type FPDF_AVAIL string
+
+// FPDF_STRUCTTREE is an internal reference to a C.FPDF_STRUCTTREE handle.
+type FPDF_STRUCTTREE string
+
+// FPDF_STRUCTELEMENT is an internal reference to a C.FPDF_STRUCTELEMENT handle.
+type FPDF_STRUCTELEMENT string

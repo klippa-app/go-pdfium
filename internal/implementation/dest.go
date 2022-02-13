@@ -4,10 +4,11 @@ package implementation
 // #include "fpdf_doc.h"
 import "C"
 import (
-	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+
+	"github.com/google/uuid"
 )
 
 func (p *PdfiumImplementation) registerDest(dest C.FPDF_DEST, documentHandle *DocumentHandle) *DestHandle {
