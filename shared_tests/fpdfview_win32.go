@@ -106,7 +106,7 @@ var _ = Describe("fpdfview_win32", func() {
 
 				uintFileSize := uint(fileSize)
 				buffer := make([]byte, int(uintFileSize))
-				writtenFileSize, _, _ := procGetEnhMetaFileBits.Call(uintptr(dc), uintptr(uintFileSize), uintptr(&buffer[0]))
+				writtenFileSize, _, _ := procGetEnhMetaFileBits.Call(uintptr(dc), uintptr(uintFileSize), uintptr(unsafe.Pointer(&buffer[0])))
 				Expect(int(writtenFileSize)).To(Not(Equal(int(0))))
 				Expect(buffer).To(Equal([]byte{}))
 
