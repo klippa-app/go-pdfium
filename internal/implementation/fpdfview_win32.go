@@ -7,7 +7,6 @@ package implementation
 // #include "fpdfview.h"
 import "C"
 import (
-	"fmt"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -22,11 +21,6 @@ func (p *PdfiumImplementation) FPDF_RenderPage(request *requests.FPDF_RenderPage
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
-	}
-
-	hdc, ok := request.DC.(C.HDC)
-	if !ok {
-		return nil, fmt.Errorf("DC is not of type C.HDC, but type is: %T", request.DC)
 	}
 
 	C.FPDF_RenderPage(hdc, pageHandle.handle, C.int(request.StartX), C.int(request.StartY), C.int(request.SizeX), C.int(request.SizeY), C.int(request.Rotate), C.int(request.Flags))
