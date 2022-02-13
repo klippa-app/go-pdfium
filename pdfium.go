@@ -981,4 +981,52 @@ type Pdfium interface {
 	FPDFAvail_IsLinearized(request *requests.FPDFAvail_IsLinearized) (*responses.FPDFAvail_IsLinearized, error)
 
 	// End fpdf_dataavail.h
+
+	// Start fpdf_structtree.h
+
+	// FPDF_StructTree_GetForPage returns the structure tree for a page.
+	FPDF_StructTree_GetForPage(request *requests.FPDF_StructTree_GetForPage) (*responses.FPDF_StructTree_GetForPage, error)
+
+	// FPDF_StructTree_Close releases a resource allocated by FPDF_StructTree_GetForPage().
+	FPDF_StructTree_Close(request *requests.FPDF_StructTree_Close) (*responses.FPDF_StructTree_Close, error)
+
+	// FPDF_StructTree_CountChildren counts the number of children for the structure tree.
+	FPDF_StructTree_CountChildren(request *requests.FPDF_StructTree_CountChildren) (*responses.FPDF_StructTree_CountChildren, error)
+
+	// FPDF_StructTree_GetChildAtIndex returns a child in the structure tree.
+	FPDF_StructTree_GetChildAtIndex(request *requests.FPDF_StructTree_GetChildAtIndex) (*responses.FPDF_StructTree_GetChildAtIndex, error)
+
+	// FPDF_StructElement_GetAltText returns the alt text for a given element.
+	FPDF_StructElement_GetAltText(request *requests.FPDF_StructElement_GetAltText) (*responses.FPDF_StructElement_GetAltText, error)
+
+	// FPDF_StructElement_GetID returns the ID for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error)
+
+	// FPDF_StructElement_GetLang returns the case-insensitive IETF BCP 47 language code for an element.
+	// Experimental API.
+	FPDF_StructElement_GetLang(request *requests.FPDF_StructElement_GetLang) (*responses.FPDF_StructElement_GetLang, error)
+
+	// FPDF_StructElement_GetStringAttribute returns a struct element attribute of type "name" or "string"
+	// Experimental API.
+	FPDF_StructElement_GetStringAttribute(request *requests.FPDF_StructElement_GetStringAttribute) (*responses.FPDF_StructElement_GetStringAttribute, error)
+
+	// FPDF_StructElement_GetMarkedContentID returns the marked content ID for a given element.
+	FPDF_StructElement_GetMarkedContentID(request *requests.FPDF_StructElement_GetMarkedContentID) (*responses.FPDF_StructElement_GetMarkedContentID, error)
+
+	// FPDF_StructElement_GetType returns the type (/S) for a given element.
+	FPDF_StructElement_GetType(request *requests.FPDF_StructElement_GetType) (*responses.FPDF_StructElement_GetType, error)
+
+	// FPDF_StructElement_GetTitle returns the title (/T) for a given element.
+	FPDF_StructElement_GetTitle(request *requests.FPDF_StructElement_GetTitle) (*responses.FPDF_StructElement_GetTitle, error)
+
+	// FPDF_StructElement_CountChildren counts the number of children for the structure element.
+	FPDF_StructElement_CountChildren(request *requests.FPDF_StructElement_CountChildren) (*responses.FPDF_StructElement_CountChildren, error)
+
+	// FPDF_StructElement_GetChildAtIndex returns a child in the structure element.
+	// If the child exists but is not an element, then this function will
+	// return an error. This will also return an error for out of bounds indices.
+	FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error)
+
+	// End fpdf_structtree.h
 }
