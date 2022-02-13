@@ -65,6 +65,11 @@ func main() {
 						methodParts := strings.SplitN(method, "(", 2)
 						method = methodParts[0]
 
+						// Skip methods that should never be implemented.
+						if method == "FPDF_InitLibrary" || method == "FPDF_InitLibraryWithConfig" || method == "FPDF_DestroyLibrary" {
+							continue
+						}
+
 						methodCount++
 						if _, ok := implementedMethods[method]; !ok {
 							fmt.Println(method)
