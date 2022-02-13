@@ -186,6 +186,8 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		pathSegmentRefs:      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle{},
 		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
+		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
+		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -224,6 +226,8 @@ type PdfiumImplementation struct {
 	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
 	pathSegmentRefs      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle
 	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
+	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
+	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -269,6 +273,8 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
+		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
+		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -466,6 +472,14 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.dataAvailRefs {
 		delete(p.dataAvailRefs, i)
+	}
+
+	for i := range p.structTreeRefs {
+		delete(p.structTreeRefs, i)
+	}
+
+	for i := range p.structElementRefs {
+		delete(p.structElementRefs, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
@@ -687,4 +701,28 @@ func (p *PdfiumImplementation) getDataAvailHandle(dataAvail references.FPDF_AVAI
 	}
 
 	return nil, errors.New("could not find dataAvail handle, perhaps the dataAvail was already closed or you tried to share dataAvails between instances")
+}
+
+func (p *PdfiumImplementation) getStructTreeHandle(structTree references.FPDF_STRUCTTREE) (*StructTreeHandle, error) {
+	if structTree == "" {
+		return nil, errors.New("structTree not given")
+	}
+
+	if val, ok := p.structTreeRefs[structTree]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find structTree handle, perhaps the structTree was already closed or you tried to share structTrees between instances")
+}
+
+func (p *PdfiumImplementation) getStructElementHandle(structElement references.FPDF_STRUCTELEMENT) (*StructElementHandle, error) {
+	if structElement == "" {
+		return nil, errors.New("structElement not given")
+	}
+
+	if val, ok := p.structElementRefs[structElement]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find structElement handle, perhaps the structElement was already closed or you tried to share structElements between instances")
 }
