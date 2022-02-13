@@ -101,6 +101,15 @@ var _ = Describe("fpdfview_win32", func() {
 				emf, _, _ := procCloseEnhMetaFile.Call(uintptr(dc))
 				Expect(emf).To(Not(BeNil()))
 
+				fileSize, _, _ := procGetEnhMetaFileBits.Call(uintptr(dc), uintptr(0), uintptr(0))
+				Expect(int(fileSize)).To(Not(Equal(int(0))))
+
+				uintFileSize := uint(fileSize)
+				buffer := make([]byte, int(uintFileSize))
+				writtenFileSize, _, _ := procGetEnhMetaFileBits.Call(uintptr(dc), uintptr(uintFileSize), uintptr(&buffer[0]))
+				Expect(int(writtenFileSize)).To(Not(Equal(int(0))))
+				Expect(buffer).To(Equal([]byte{}))
+
 				res, _, _ := procDeleteEnhMetaFile.Call(uintptr(emf))
 				Expect(res).To(Not(Equal(0)))
 			})
@@ -113,4 +122,5 @@ var (
 	procCreateEnhMetaFileA = modgdi32.NewProc("CreateEnhMetaFileA")
 	procCloseEnhMetaFile   = modgdi32.NewProc("CloseEnhMetaFile")
 	procDeleteEnhMetaFile  = modgdi32.NewProc("DeleteEnhMetaFile")
+	procGetEnhMetaFileBits = modgdi32.NewProc("GetEnhMetaFileBits")
 )
