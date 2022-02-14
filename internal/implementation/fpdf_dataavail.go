@@ -29,7 +29,6 @@ import (
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
@@ -199,13 +198,7 @@ func (p *PdfiumImplementation) FPDFAvail_GetDocument(request *requests.FPDFAvail
 	}
 
 	doc := C.FPDFAvail_GetDocument(dataAvailHandler.handle, cPassword)
-
-	documentHandle := &DocumentHandle{}
-	documentHandle.handle = doc
-	documentRef := uuid.New()
-	documentHandle.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
-	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle
-	p.documentRefs[documentHandle.nativeRef] = documentHandle
+	documentHandle := p.registerDocument(doc)
 
 	return &responses.FPDFAvail_GetDocument{
 		Document: documentHandle.nativeRef,

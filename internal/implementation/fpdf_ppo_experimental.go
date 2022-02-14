@@ -68,12 +68,7 @@ func (p *PdfiumImplementation) FPDF_ImportNPagesToOne(request *requests.FPDF_Imp
 		return nil, errors.New("import of pages failed")
 	}
 
-	documentHandle := &DocumentHandle{}
-	documentHandle.handle = doc
-	documentRef := uuid.New()
-	documentHandle.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
-	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle
-	p.documentRefs[documentHandle.nativeRef] = documentHandle
+	documentHandle := p.registerDocument(doc)
 
 	return &responses.FPDF_ImportNPagesToOne{
 		Document: documentHandle.nativeRef,

@@ -177,7 +177,7 @@ func (d *DocumentHandle) Close() error {
 
 type PageHandle struct {
 	handle      C.FPDF_PAGE
-	index       int
+	index       int // -1 when unknown.
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }

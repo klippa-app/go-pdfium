@@ -7,8 +7,10 @@ package implementation
 // #include "fpdf_edit.h"
 import "C"
 import (
+	"errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
 )
 
 // FPDFPage_RemoveObject removes an object from a page.
@@ -18,6 +20,21 @@ import (
 func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_RemoveObject) (*responses.FPDFPage_RemoveObject, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPage_RemoveObject(pageHandle.handle, pageObjectHandle.handle)
+	if int(success) == 0 {
+		return nil, errors.New("could not remove object")
+	}
 
 	return &responses.FPDFPage_RemoveObject{}, nil
 }
@@ -32,7 +49,28 @@ func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageO
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetMatrix{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrix := C.FS_MATRIX{}
+
+	success := C.FPDFPageObj_GetMatrix(pageObjectHandle.handle, &matrix)
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object matrix")
+	}
+
+	return &responses.FPDFPageObj_GetMatrix{
+		Matrix: structs.FPDF_FS_MATRIX{
+			A: float32(matrix.a),
+			B: float32(matrix.b),
+			C: float32(matrix.c),
+			D: float32(matrix.d),
+			E: float32(matrix.e),
+			F: float32(matrix.f),
+		},
+	}, nil
 }
 
 // FPDFPageObj_SetMatrix sets the transform matrix on a page object.
@@ -45,6 +83,24 @@ func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageO
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrix := C.FS_MATRIX{}
+	matrix.a = C.float(request.Transform.A)
+	matrix.b = C.float(request.Transform.B)
+	matrix.c = C.float(request.Transform.C)
+	matrix.d = C.float(request.Transform.D)
+	matrix.e = C.float(request.Transform.E)
+	matrix.f = C.float(request.Transform.F)
+
+	success := C.FPDFPageObj_SetMatrix(pageObjectHandle.handle, &matrix)
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object matrix")
+	}
+
 	return &responses.FPDFPageObj_SetMatrix{}, nil
 }
 
@@ -54,7 +110,16 @@ func (p *PdfiumImplementation) FPDFPageObj_CountMarks(request *requests.FPDFPage
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_CountMarks{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFPageObj_CountMarks(pageObjectHandle.handle)
+
+	return &responses.FPDFPageObj_CountMarks{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFPageObj_GetMark returns the content mark of a page object at the given index.
