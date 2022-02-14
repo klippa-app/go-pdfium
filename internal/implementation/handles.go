@@ -40,6 +40,7 @@ type DocumentHandle struct {
 	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
 	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
 	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
+	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 }
 
 func (d *DocumentHandle) getPageHandle(pageRef references.FPDF_PAGE) (*PageHandle, error) {
@@ -153,6 +154,10 @@ func (d *DocumentHandle) Close() error {
 
 	for i := range d.structElementRefs {
 		delete(d.structElementRefs, i)
+	}
+
+	for i := range d.pageObjectMarkRefs {
+		delete(d.pageObjectMarkRefs, i)
 	}
 
 	C.FPDF_CloseDocument(d.handle)
@@ -311,4 +316,10 @@ type StructElementHandle struct {
 	handle      C.FPDF_STRUCTELEMENT
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_STRUCTELEMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type PageObjectMarkHandle struct {
+	handle      C.FPDF_PAGEOBJECTMARK
+	documentRef references.FPDF_DOCUMENT
+	nativeRef   references.FPDF_PAGEOBJECTMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }

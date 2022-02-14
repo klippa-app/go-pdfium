@@ -93,7 +93,7 @@ type FPDFPageObjMark_GetParamKey struct {
 }
 
 type FPDFPageObjMark_GetParamValueType struct {
-	Type enums.FPDF_OBJECT_TYPE
+	ValueType enums.FPDF_OBJECT_TYPE
 }
 
 type FPDFPageObjMark_GetParamIntValue struct {

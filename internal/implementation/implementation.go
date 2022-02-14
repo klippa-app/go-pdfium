@@ -188,6 +188,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
+		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -228,6 +229,7 @@ type PdfiumImplementation struct {
 	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
 	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
 	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
+	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -275,6 +277,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
+		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -480,6 +483,10 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.structElementRefs {
 		delete(p.structElementRefs, i)
+	}
+
+	for i := range p.pageObjectMarkRefs {
+		delete(p.pageObjectMarkRefs, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
@@ -725,4 +732,16 @@ func (p *PdfiumImplementation) getStructElementHandle(structElement references.F
 	}
 
 	return nil, errors.New("could not find structElement handle, perhaps the structElement was already closed or you tried to share structElements between instances")
+}
+
+func (p *PdfiumImplementation) getPageObjectMarkHandle(pageObjectMark references.FPDF_PAGEOBJECTMARK) (*PageObjectMarkHandle, error) {
+	if pageObjectMark == "" {
+		return nil, errors.New("pageObjectMark not given")
+	}
+
+	if val, ok := p.pageObjectMarkRefs[pageObjectMark]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageObjectMark handle, perhaps the pageObjectMark was already closed or you tried to share pageObjectMarks between instances")
 }
