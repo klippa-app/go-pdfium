@@ -357,15 +357,6 @@ type Pdfium interface {
 	// FPDF_CreateNewDocument returns a new document.
 	FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
 
-	// FPDFPage_SetRotation sets the page rotation for a given page.
-	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
-
-	// FPDFPage_GetRotation returns the rotation of the given page.
-	FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
-
-	// FPDFPage_HasTransparency returns whether a page has transparency.
-	FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
-
 	// FPDFPage_New creates a new PDF page.
 	// The page should be closed with FPDF_ClosePage() when finished as
 	// with any other page in the document.
@@ -373,6 +364,12 @@ type Pdfium interface {
 
 	// FPDFPage_Delete deletes the page at the given index.
 	FPDFPage_Delete(request *requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error)
+
+	// FPDFPage_SetRotation sets the page rotation for a given page.
+	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
+
+	// FPDFPage_GetRotation returns the rotation of the given page.
+	FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
 
 	// FPDFPage_InsertObject inserts the given object into a page.
 	FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
@@ -388,6 +385,9 @@ type Pdfium interface {
 
 	// FPDFPage_GetObject returns the object at the given index.
 	FPDFPage_GetObject(request *requests.FPDFPage_GetObject) (*responses.FPDFPage_GetObject, error)
+
+	// FPDFPage_HasTransparency returns whether a page has transparency.
+	FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
 
 	// FPDFPage_GenerateContent generates the contents of the page.
 	FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error)

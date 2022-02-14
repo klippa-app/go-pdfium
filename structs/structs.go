@@ -18,6 +18,10 @@ type FPDF_FS_QUADPOINTSF struct {
 	Y4 float32
 }
 
+// FPDF_FS_MATRIX is a matrix that is composed as:
+//   | A C E |
+//   | B D F |
+// and can be used to scale, rotate, shear and translate.
 type FPDF_FS_MATRIX struct {
 	A float32
 	B float32
@@ -37,4 +41,21 @@ type FPDF_COLORSCHEME struct {
 	PathStrokeColor uint64
 	TextFillColor   uint64
 	TextStrokeColor uint64
+}
+
+type FPDF_COLOR struct {
+	R uint
+	G uint
+	B uint
+	A uint
+}
+
+type FPDF_IMAGEOBJ_METADATA struct {
+	Width           uint
+	Height          uint
+	HorizontalDPI   float32
+	VerticalDPI     float32
+	BitsPerPixel    uint
+	ColorSpace      int
+	MarkedContentID int
 }

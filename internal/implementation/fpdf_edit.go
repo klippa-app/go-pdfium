@@ -4,9 +4,8 @@ package implementation
 // #include "fpdf_edit.h"
 import "C"
 import (
-	"github.com/google/uuid"
+	"errors"
 	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -16,17 +15,47 @@ func (p *PdfiumImplementation) FPDF_CreateNewDocument(request *requests.FPDF_Cre
 	p.Lock()
 	defer p.Unlock()
 
-	documentHandle := &DocumentHandle{}
 	doc := C.FPDF_CreateNewDocument()
-	documentHandle.handle = doc
-	documentRef := uuid.New()
-	documentHandle.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
-	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle
-	p.documentRefs[documentHandle.nativeRef] = documentHandle
+	documentHandle := p.registerDocument(doc)
 
 	return &responses.FPDF_CreateNewDocument{
 		Document: documentHandle.nativeRef,
 	}, nil
+}
+
+// FPDFPage_New creates a new PDF page.
+// The page should be closed with FPDF_ClosePage() when finished as
+// with any other page in the document.
+func (p *PdfiumImplementation) FPDFPage_New(request *requests.FPDFPage_New) (*responses.FPDFPage_New, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	page := C.FPDFPage_New(documentHandle.handle, C.int(request.PageIndex), C.double(request.Width), C.double(request.Height))
+	pageHandle := p.registerPage(page, -1, documentHandle)
+
+	return &responses.FPDFPage_New{
+		Page: pageHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPage_Delete deletes the page at the given index.
+func (p *PdfiumImplementation) FPDFPage_Delete(request *requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPage_Delete(documentHandle.handle, C.int(request.PageIndex))
+
+	return &responses.FPDFPage_Delete{}, nil
 }
 
 // FPDFPage_GetRotation returns the page rotation.
@@ -62,6 +91,70 @@ func (p *PdfiumImplementation) FPDFPage_SetRotation(request *requests.FPDFPage_S
 	return &responses.FPDFPage_SetRotation{}, nil
 }
 
+// FPDFPage_InsertObject inserts the given object into a page.
+func (p *PdfiumImplementation) FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPage_InsertObject(pageHandle.handle, pageObjectHandle.handle)
+
+	return &responses.FPDFPage_InsertObject{}, nil
+}
+
+// FPDFPage_CountObjects returns the number of page objects inside the given page.
+func (p *PdfiumImplementation) FPDFPage_CountObjects(request *requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFPage_CountObjects(pageHandle.handle)
+
+	return &responses.FPDFPage_CountObjects{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFPage_GetObject returns the object at the given index.
+func (p *PdfiumImplementation) FPDFPage_GetObject(request *requests.FPDFPage_GetObject) (*responses.FPDFPage_GetObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObject := C.FPDFPage_GetObject(pageHandle.handle, C.int(request.Index))
+	if pageObject == nil {
+		return nil, errors.New("could not get object")
+	}
+
+	pageObjectHandle := p.registerPageObject(pageObject, documentHandle)
+
+	return &responses.FPDFPage_GetObject{
+		PageObject: pageObjectHandle.nativeRef,
+	}, nil
+}
+
 // FPDFPage_HasTransparency returns whether the page has transparency.
 func (p *PdfiumImplementation) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error) {
 	p.Lock()
@@ -80,52 +173,20 @@ func (p *PdfiumImplementation) FPDFPage_HasTransparency(request *requests.FPDFPa
 	}, nil
 }
 
-// FPDFPage_New creates a new PDF page.
-// The page should be closed with FPDF_ClosePage() when finished as
-// with any other page in the document.
-func (p *PdfiumImplementation) FPDFPage_New(request *requests.FPDFPage_New) (*responses.FPDFPage_New, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_New{}, nil
-}
-
-// FPDFPage_Delete deletes the page at the given index.
-func (p *PdfiumImplementation) FPDFPage_Delete(request *requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_Delete{}, nil
-}
-
-// FPDFPage_InsertObject inserts the given object into a page.
-func (p *PdfiumImplementation) FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_InsertObject{}, nil
-}
-
-// FPDFPage_CountObjects returns the number of page objects inside the given page.
-func (p *PdfiumImplementation) FPDFPage_CountObjects(request *requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_CountObjects{}, nil
-}
-
-// FPDFPage_GetObject returns the object at the given index.
-func (p *PdfiumImplementation) FPDFPage_GetObject(request *requests.FPDFPage_GetObject) (*responses.FPDFPage_GetObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_GetObject{}, nil
-}
-
 // FPDFPage_GenerateContent generates the contents of the page.
 func (p *PdfiumImplementation) FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPage_GenerateContent(pageHandle.handle)
+	if int(success) == 0 {
+		return nil, errors.New("could not generate content")
+	}
 
 	return &responses.FPDFPage_GenerateContent{}, nil
 }
@@ -139,6 +200,13 @@ func (p *PdfiumImplementation) FPDFPageObj_Destroy(request *requests.FPDFPageObj
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPageObj_Destroy(pageObjectHandle.handle)
+
 	return &responses.FPDFPageObj_Destroy{}, nil
 }
 
@@ -147,7 +215,16 @@ func (p *PdfiumImplementation) FPDFPageObj_HasTransparency(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_HasTransparency{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	hasTransparency := C.FPDFPageObj_HasTransparency(pageObjectHandle.handle)
+
+	return &responses.FPDFPageObj_HasTransparency{
+		HasTransparency: int(hasTransparency) == 1,
+	}, nil
 }
 
 // FPDFPageObj_GetType returns the type of the given page object.
@@ -155,7 +232,16 @@ func (p *PdfiumImplementation) FPDFPageObj_GetType(request *requests.FPDFPageObj
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetType{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectType := C.FPDFPageObj_GetType(pageObjectHandle.handle)
+
+	return &responses.FPDFPageObj_GetType{
+		Type: enums.FPDF_PAGEOBJ(pageObjectType),
+	}, nil
 }
 
 // FPDFPageObj_Transform transforms the page object by the given matrix.
@@ -166,6 +252,13 @@ func (p *PdfiumImplementation) FPDFPageObj_GetType(request *requests.FPDFPageObj
 func (p *PdfiumImplementation) FPDFPageObj_Transform(request *requests.FPDFPageObj_Transform) (*responses.FPDFPageObj_Transform, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPageObj_Transform(pageObjectHandle.handle, C.double(request.Transform.A), C.double(request.Transform.B), C.double(request.Transform.C), C.double(request.Transform.D), C.double(request.Transform.E), C.double(request.Transform.F))
 
 	return &responses.FPDFPageObj_Transform{}, nil
 }
@@ -179,6 +272,13 @@ func (p *PdfiumImplementation) FPDFPage_TransformAnnots(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPage_TransformAnnots(pageHandle.handle, C.double(request.Transform.A), C.double(request.Transform.B), C.double(request.Transform.C), C.double(request.Transform.D), C.double(request.Transform.E), C.double(request.Transform.F))
+
 	return &responses.FPDFPage_TransformAnnots{}, nil
 }
 
@@ -187,7 +287,17 @@ func (p *PdfiumImplementation) FPDFPageObj_NewImageObj(request *requests.FPDFPag
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_NewImageObj{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	imageObject := C.FPDFPageObj_NewImageObj(documentHandle.handle)
+	imageObjectHandle := p.registerPageObject(imageObject, documentHandle)
+
+	return &responses.FPDFPageObj_NewImageObj{
+		PageObject: imageObjectHandle.nativeRef,
+	}, nil
 }
 
 // FPDFImageObj_LoadJpegFile loads an image from a JPEG image file and then set it into the given image object.

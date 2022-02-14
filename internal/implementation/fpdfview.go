@@ -8,10 +8,8 @@ import (
 	"errors"
 	"unsafe"
 
-	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium/enums"
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
-	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -139,16 +137,7 @@ func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*
 		return nil, pdfium_errors.ErrPage
 	}
 
-	pageRef := uuid.New()
-	pageHandle := &PageHandle{
-		handle:      pageObject,
-		index:       request.Index,
-		nativeRef:   references.FPDF_PAGE(pageRef.String()),
-		documentRef: documentHandle.nativeRef,
-	}
-
-	documentHandle.pageRefs[pageHandle.nativeRef] = pageHandle
-	p.pageRefs[pageHandle.nativeRef] = pageHandle
+	pageHandle := p.registerPage(pageObject, request.Index, documentHandle)
 
 	return &responses.FPDF_LoadPage{
 		Page: pageHandle.nativeRef,
