@@ -32,6 +32,7 @@ func (p *PdfiumImplementation) registerDocument(document C.FPDF_DOCUMENT) *Docum
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
+		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 	}
 
 	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle

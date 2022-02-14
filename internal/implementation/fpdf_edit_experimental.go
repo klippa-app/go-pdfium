@@ -5,9 +5,13 @@ package implementation
 
 // #cgo pkg-config: pdfium
 // #include "fpdf_edit.h"
+// #include <stdlib.h>
 import "C"
 import (
 	"errors"
+	"unsafe"
+
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
@@ -128,7 +132,26 @@ func (p *PdfiumImplementation) FPDFPageObj_GetMark(request *requests.FPDFPageObj
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetMark{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageObjectHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	mark := C.FPDFPageObj_GetMark(pageObjectHandle.handle, C.ulong(request.Index))
+	if mark == nil {
+		return nil, errors.New("could not get mark")
+	}
+
+	markHandle := p.registerPageObjectMark(mark, documentHandle)
+
+	return &responses.FPDFPageObj_GetMark{
+		Mark: markHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPageObj_AddMark adds a new content mark to the given page object.
@@ -137,7 +160,29 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_AddMark{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	documentHandle, err := p.getDocumentHandle(pageObjectHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
+	name := C.CString(request.Name)
+	defer C.free(unsafe.Pointer(name))
+
+	mark := C.FPDFPageObj_AddMark(pageObjectHandle.handle, name)
+	if mark == nil {
+		return nil, errors.New("could not add mark")
+	}
+
+	markHandle := p.registerPageObjectMark(mark, documentHandle)
+
+	return &responses.FPDFPageObj_AddMark{
+		Mark: markHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPageObj_RemoveMark removes the given content mark from the given page object.
@@ -145,6 +190,21 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 func (p *PdfiumImplementation) FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_RemoveMark(pageObjectHandle.handle, pageObjectMarkHandle.handle)
+	if int(success) == 0 {
+		return nil, errors.New("could not remove mark")
+	}
 
 	return &responses.FPDFPageObj_RemoveMark{}, nil
 }
@@ -155,7 +215,33 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetName(request *requests.FPDFPag
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetName{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	nameLength := C.ulong(0)
+
+	success := C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, nil, 0, &nameLength)
+	if int(success) == 0 {
+		return nil, errors.New("Could not get name")
+	}
+
+	if uint64(nameLength) == 0 {
+		return nil, errors.New("Could not get name")
+	}
+
+	charData := make([]byte, uint64(nameLength))
+	C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &nameLength)
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetName{
+		Name: transformedText,
+	}, nil
 }
 
 // FPDFPageObjMark_CountParams returns the number of key/value pair parameters in the given mark.
@@ -164,7 +250,16 @@ func (p *PdfiumImplementation) FPDFPageObjMark_CountParams(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_CountParams{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFPageObjMark_CountParams(pageObjectMarkHandle.handle)
+
+	return &responses.FPDFPageObjMark_CountParams{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFPageObjMark_GetParamKey returns the key of a property in a content mark.
@@ -173,7 +268,33 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamKey(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetParamKey{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyLength := C.ulong(0)
+
+	success := C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), nil, 0, &keyLength)
+	if int(success) == 0 {
+		return nil, errors.New("Could not get key")
+	}
+
+	if uint64(keyLength) == 0 {
+		return nil, errors.New("Could not get key")
+	}
+
+	charData := make([]byte, uint64(keyLength))
+	C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &keyLength)
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamKey{
+		Key: transformedText,
+	}, nil
 }
 
 // FPDFPageObjMark_GetParamValueType returns the type of the value of a property in a content mark by key.
@@ -182,7 +303,19 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamValueType(request *reques
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetParamValueType{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	valueType := C.FPDFPageObjMark_GetParamValueType(pageObjectMarkHandle.handle, key)
+
+	return &responses.FPDFPageObjMark_GetParamValueType{
+		ValueType: enums.FPDF_OBJECT_TYPE(valueType),
+	}, nil
 }
 
 // FPDFPageObjMark_GetParamIntValue returns the value of a number property in a content mark by key as int.
@@ -193,7 +326,24 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamIntValue(request *request
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetParamIntValue{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	intValue := C.int(0)
+
+	success := C.FPDFPageObjMark_GetParamIntValue(pageObjectMarkHandle.handle, key, &intValue)
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	return &responses.FPDFPageObjMark_GetParamIntValue{
+		Value: int(intValue),
+	}, nil
 }
 
 // FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
@@ -202,7 +352,36 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requ
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetParamStringValue{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	valueLength := C.ulong(0)
+
+	success := C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, nil, 0, &valueLength)
+	if int(success) == 0 {
+		return nil, errors.New("Could not get value")
+	}
+
+	if uint64(valueLength) == 0 {
+		return nil, errors.New("Could not get value")
+	}
+
+	charData := make([]byte, uint64(valueLength))
+	C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &valueLength)
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamStringValue{
+		Value: transformedText,
+	}, nil
 }
 
 // FPDFPageObjMark_GetParamBlobValue returns the value of a blob property in a content mark by key.
@@ -211,7 +390,31 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObjMark_GetParamBlobValue{}, nil
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	valueLength := C.ulong(0)
+
+	success := C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, nil, 0, &valueLength)
+	if int(success) == 0 {
+		return nil, errors.New("Could not get value")
+	}
+
+	if uint64(valueLength) == 0 {
+		return nil, errors.New("Could not get value")
+	}
+
+	valueData := make([]byte, uint64(valueLength))
+	C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&valueData[0]), C.ulong(len(valueData)), &valueLength)
+
+	return &responses.FPDFPageObjMark_GetParamBlobValue{
+		Value: valueData,
+	}, nil
 }
 
 // FPDFPageObjMark_SetIntParam sets the value of an int property in a content mark by key. If a parameter
@@ -221,6 +424,29 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	success := C.FPDFPageObjMark_SetIntParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, C.int(request.Value))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
 
 	return &responses.FPDFPageObjMark_SetIntParam{}, nil
 }
@@ -233,6 +459,32 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetStringParam(request *requests.
 	p.Lock()
 	defer p.Unlock()
 
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	value := C.CString(request.Value)
+	defer C.free(unsafe.Pointer(value))
+
+	success := C.FPDFPageObjMark_SetStringParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, value)
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
 	return &responses.FPDFPageObjMark_SetStringParam{}, nil
 }
 
@@ -244,6 +496,33 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetBlobParam(request *requests.FP
 	p.Lock()
 	defer p.Unlock()
 
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Value == nil || len(request.Value) == 0 {
+		return nil, errors.New("blob value cant be empty")
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	success := C.FPDFPageObjMark_SetBlobParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, unsafe.Pointer(&request.Value[0]), C.ulong(len(request.Value)))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
 	return &responses.FPDFPageObjMark_SetBlobParam{}, nil
 }
 
@@ -252,6 +531,24 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetBlobParam(request *requests.FP
 func (p *PdfiumImplementation) FPDFPageObjMark_RemoveParam(request *requests.FPDFPageObjMark_RemoveParam) (*responses.FPDFPageObjMark_RemoveParam, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	success := C.FPDFPageObjMark_RemoveParam(pageObjectHandle.handle, pageObjectMarkHandle.handle, key)
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
 
 	return &responses.FPDFPageObjMark_RemoveParam{}, nil
 }
