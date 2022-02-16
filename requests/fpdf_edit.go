@@ -193,10 +193,11 @@ type FPDFImageObj_LoadJpegFileInline struct {
 
 type FPDFImageObj_SetMatrix struct {
 	ImageObject references.FPDF_PAGEOBJECT
+	Transform   structs.FPDF_FS_MATRIX
 }
 
 type FPDFImageObj_SetBitmap struct {
-	Page        Page
+	Page        *Page
 	Count       int
 	ImageObject references.FPDF_PAGEOBJECT
 	Bitmap      references.FPDF_BITMAP
@@ -293,7 +294,7 @@ type FPDFPageObj_SetLineCap struct {
 
 type FPDFPageObj_SetFillColor struct {
 	PageObject references.FPDF_PAGEOBJECT
-	Color      structs.FPDF_COLOR
+	FillColor  structs.FPDF_COLOR
 }
 
 type FPDFPageObj_GetFillColor struct {
@@ -306,7 +307,7 @@ type FPDFPageObj_GetDashPhase struct {
 
 type FPDFPageObj_SetDashPhase struct {
 	PageObject references.FPDF_PAGEOBJECT
-	Phase      float32
+	DashPhase  float32
 }
 
 type FPDFPageObj_GetDashCount struct {
@@ -320,7 +321,7 @@ type FPDFPageObj_GetDashArray struct {
 type FPDFPageObj_SetDashArray struct {
 	PageObject references.FPDF_PAGEOBJECT
 	DashArray  []float32
-	Phase      float32
+	DashPhase  float32
 }
 
 type FPDFPath_CountSegments struct {

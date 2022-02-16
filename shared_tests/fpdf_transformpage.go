@@ -21,16 +21,6 @@ var _ = Describe("fpdf_transformpage", func() {
 		Locker.Unlock()
 	})
 
-	Context("no document", func() {
-		When("is opened", func() {
-			It("returns an error when calling FPDF_CreateClipPath", func() {
-				FPDF_CreateClipPath, err := PdfiumInstance.FPDF_CreateClipPath(&requests.FPDF_CreateClipPath{})
-				Expect(err).To(MatchError("document not given"))
-				Expect(FPDF_CreateClipPath).To(BeNil())
-			})
-		})
-	})
-
 	Context("no page", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFPage_SetMediaBox", func() {
@@ -350,11 +340,10 @@ var _ = Describe("fpdf_transformpage", func() {
 
 			It("allows for a clippath to be created, inserted and destroyed", func() {
 				FPDF_CreateClipPath, err := PdfiumInstance.FPDF_CreateClipPath(&requests.FPDF_CreateClipPath{
-					Document: doc,
-					Left:     100,
-					Bottom:   100,
-					Right:    100,
-					Top:      100,
+					Left:   100,
+					Bottom: 100,
+					Right:  100,
+					Top:    100,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDF_CreateClipPath).To(Not(BeNil()))

@@ -267,8 +267,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
 		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
 		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
@@ -277,7 +275,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
-		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
 
@@ -744,4 +741,16 @@ func (p *PdfiumImplementation) getPageObjectMarkHandle(pageObjectMark references
 	}
 
 	return nil, errors.New("could not find pageObjectMark handle, perhaps the pageObjectMark was already closed or you tried to share pageObjectMarks between instances")
+}
+
+func (p *PdfiumImplementation) getPathSegmentHandle(pathSegment references.FPDF_PATHSEGMENT) (*PathSegmentHandle, error) {
+	if pathSegment == "" {
+		return nil, errors.New("pathSegment not given")
+	}
+
+	if val, ok := p.pathSegmentRefs[pathSegment]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pathSegment handle, perhaps the pathSegment was already closed or you tried to share pathSegments between instances")
 }
