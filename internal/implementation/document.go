@@ -22,8 +22,6 @@ func (p *PdfiumImplementation) registerDocument(document C.FPDF_DOCUMENT) *Docum
 		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
 		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
 		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
@@ -32,7 +30,6 @@ func (p *PdfiumImplementation) registerDocument(document C.FPDF_DOCUMENT) *Docum
 		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
-		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 	}
 
 	Pdfium.documentRefs[documentHandle.nativeRef] = documentHandle

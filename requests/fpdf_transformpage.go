@@ -101,11 +101,10 @@ type FPDFClipPath_GetPathSegment struct {
 }
 
 type FPDF_CreateClipPath struct {
-	Document references.FPDF_DOCUMENT
-	Left     float32
-	Bottom   float32
-	Right    float32
-	Top      float32
+	Left   float32
+	Bottom float32
+	Right  float32
+	Top    float32
 }
 
 type FPDF_DestroyClipPath struct {

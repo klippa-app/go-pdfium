@@ -26,12 +26,7 @@ func (p *PdfiumImplementation) FPDFPageObj_GetClipPath(request *requests.FPDFPag
 
 	clipPath := C.FPDFPageObj_GetClipPath(pageObjectHandle.handle)
 
-	documentHandle, err := p.getDocumentHandle(pageObjectHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	clipPathHandle := p.registerClipPath(clipPath, documentHandle)
+	clipPathHandle := p.registerClipPath(clipPath)
 	return &responses.FPDFPageObj_GetClipPath{
 		ClipPath: clipPathHandle.nativeRef,
 	}, nil

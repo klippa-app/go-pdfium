@@ -1,5 +1,7 @@
 package structs
 
+import "github.com/klippa-app/go-pdfium/enums"
+
 type FPDF_FS_RECTF struct {
 	Left   float32
 	Top    float32
@@ -56,6 +58,6 @@ type FPDF_IMAGEOBJ_METADATA struct {
 	HorizontalDPI   float32
 	VerticalDPI     float32
 	BitsPerPixel    uint
-	ColorSpace      int
+	Colorspace      enums.FPDF_COLORSPACE
 	MarkedContentID int
 }

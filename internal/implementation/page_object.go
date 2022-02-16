@@ -8,16 +8,14 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerPageObject(pageObject C.FPDF_PAGEOBJECT, documentHandle *DocumentHandle) *PageObjectHandle {
+func (p *PdfiumImplementation) registerPageObject(pageObject C.FPDF_PAGEOBJECT) *PageObjectHandle {
 	ref := uuid.New()
 	handle := &PageObjectHandle{
-		handle:      pageObject,
-		nativeRef:   references.FPDF_PAGEOBJECT(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    pageObject,
+		nativeRef: references.FPDF_PAGEOBJECT(ref.String()),
 	}
 
 	p.pageObjectRefs[handle.nativeRef] = handle
-	documentHandle.pageObjectRefs[handle.nativeRef] = handle
 
 	return handle
 }

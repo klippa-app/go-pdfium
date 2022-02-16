@@ -287,17 +287,12 @@ func (p *PdfiumImplementation) FPDF_CreateClipPath(request *requests.FPDF_Create
 	p.Lock()
 	defer p.Unlock()
 
-	documentHandle, err := p.getDocumentHandle(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
 	clipPath := C.FPDF_CreateClipPath(C.float(request.Left), C.float(request.Bottom), C.float(request.Right), C.float(request.Top))
 	if clipPath == nil {
 		return nil, errors.New("could not create clip path")
 	}
 
-	clipPathHandle := p.registerClipPath(clipPath, documentHandle)
+	clipPathHandle := p.registerClipPath(clipPath)
 	return &responses.FPDF_CreateClipPath{
 		ClipPath: clipPathHandle.nativeRef,
 	}, nil

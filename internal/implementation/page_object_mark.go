@@ -9,16 +9,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func (p *PdfiumImplementation) registerPageObjectMark(pageObjectMark C.FPDF_PAGEOBJECTMARK, documentHandle *DocumentHandle) *PageObjectMarkHandle {
+func (p *PdfiumImplementation) registerPageObjectMark(pageObjectMark C.FPDF_PAGEOBJECTMARK) *PageObjectMarkHandle {
 	ref := uuid.New()
 	handle := &PageObjectMarkHandle{
-		handle:      pageObjectMark,
-		nativeRef:   references.FPDF_PAGEOBJECTMARK(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    pageObjectMark,
+		nativeRef: references.FPDF_PAGEOBJECTMARK(ref.String()),
 	}
 
 	p.pageObjectMarkRefs[handle.nativeRef] = handle
-	documentHandle.pageObjectMarkRefs[handle.nativeRef] = handle
 
 	return handle
 }

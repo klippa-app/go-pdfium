@@ -137,17 +137,12 @@ func (p *PdfiumImplementation) FPDFPageObj_GetMark(request *requests.FPDFPageObj
 		return nil, err
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageObjectHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
 	mark := C.FPDFPageObj_GetMark(pageObjectHandle.handle, C.ulong(request.Index))
 	if mark == nil {
 		return nil, errors.New("could not get mark")
 	}
 
-	markHandle := p.registerPageObjectMark(mark, documentHandle)
+	markHandle := p.registerPageObjectMark(mark)
 
 	return &responses.FPDFPageObj_GetMark{
 		Mark: markHandle.nativeRef,
@@ -165,11 +160,6 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 		return nil, err
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageObjectHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
 	name := C.CString(request.Name)
 	defer C.free(unsafe.Pointer(name))
 
@@ -178,7 +168,7 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 		return nil, errors.New("could not add mark")
 	}
 
-	markHandle := p.registerPageObjectMark(mark, documentHandle)
+	markHandle := p.registerPageObjectMark(mark)
 
 	return &responses.FPDFPageObj_AddMark{
 		Mark: markHandle.nativeRef,
@@ -564,7 +554,31 @@ func (p *PdfiumImplementation) FPDFImageObj_GetRenderedBitmap(request *requests.
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetRenderedBitmap{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmap := C.FPDFImageObj_GetRenderedBitmap(documentHandle.handle, pageHandle.handle, imageObjectHandle.handle)
+	if bitmap == nil {
+		return nil, errors.New("could not get bitmap")
+	}
+
+	bitmapHandle := p.registerBitmap(bitmap)
+
+	return &responses.FPDFImageObj_GetRenderedBitmap{
+		Bitmap: bitmapHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
@@ -573,7 +587,20 @@ func (p *PdfiumImplementation) FPDFPageObj_GetDashPhase(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetDashPhase{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	dashPhase := C.float(0)
+	success := C.FPDFPageObj_GetDashPhase(pageObjectHandle.handle, &dashPhase)
+	if int(success) == 0 {
+		return nil, errors.New("could not get dash phase")
+	}
+
+	return &responses.FPDFPageObj_GetDashPhase{
+		DashPhase: float32(dashPhase),
+	}, nil
 }
 
 // FPDFPageObj_SetDashPhase sets the line dash phase of the page object.
@@ -581,6 +608,16 @@ func (p *PdfiumImplementation) FPDFPageObj_GetDashPhase(request *requests.FPDFPa
 func (p *PdfiumImplementation) FPDFPageObj_SetDashPhase(request *requests.FPDFPageObj_SetDashPhase) (*responses.FPDFPageObj_SetDashPhase, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetDashPhase(pageObjectHandle.handle, C.float(request.DashPhase))
+	if int(success) == 0 {
+		return nil, errors.New("could not set dash phase")
+	}
 
 	return &responses.FPDFPageObj_SetDashPhase{}, nil
 }
@@ -591,7 +628,16 @@ func (p *PdfiumImplementation) FPDFPageObj_GetDashCount(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetDashCount{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	dashCount := C.FPDFPageObj_GetDashCount(pageObjectHandle.handle)
+
+	return &responses.FPDFPageObj_GetDashCount{
+		DashCount: int(dashCount),
+	}, nil
 }
 
 // FPDFPageObj_GetDashArray returns the line dash array of the page object.
@@ -600,7 +646,29 @@ func (p *PdfiumImplementation) FPDFPageObj_GetDashArray(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetDashArray{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the Dash Count.
+	dashCount := C.FPDFPageObj_GetDashCount(pageObjectHandle.handle)
+
+	convertedData := make([]float32, 0)
+	if int(dashCount) > 0 {
+		// Create an array that's big enough.
+		valueData := make([]C.float, int(dashCount))
+		C.FPDFPageObj_GetDashArray(pageObjectHandle.handle, &valueData[0], C.size_t(len(valueData)))
+
+		convertedData = make([]float32, int(dashCount))
+		for i := range valueData {
+			convertedData[i] = float32(valueData[i])
+		}
+	}
+
+	return &responses.FPDFPageObj_GetDashArray{
+		DashArray: convertedData,
+	}, nil
 }
 
 // FPDFPageObj_SetDashArray sets the line dash array of the page object.
@@ -608,6 +676,19 @@ func (p *PdfiumImplementation) FPDFPageObj_GetDashArray(request *requests.FPDFPa
 func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPageObj_SetDashArray) (*responses.FPDFPageObj_SetDashArray, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an array that's big enough.
+	valueData := make([]C.float, len(request.DashArray))
+	for i := range request.DashArray {
+		valueData[i] = C.float(request.DashArray[i])
+	}
+
+	C.FPDFPageObj_SetDashArray(pageObjectHandle.handle, &valueData[0], C.size_t(len(valueData)), C.float(request.DashPhase))
 
 	return &responses.FPDFPageObj_SetDashArray{}, nil
 }

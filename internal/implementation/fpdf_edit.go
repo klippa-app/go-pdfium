@@ -2,12 +2,15 @@ package implementation
 
 // #cgo pkg-config: pdfium
 // #include "fpdf_edit.h"
+// #include <stdlib.h>
 import "C"
 import (
 	"errors"
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
+	"unsafe"
 )
 
 // FPDF_CreateNewDocument returns a new document.
@@ -138,17 +141,12 @@ func (p *PdfiumImplementation) FPDFPage_GetObject(request *requests.FPDFPage_Get
 		return nil, err
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
 	pageObject := C.FPDFPage_GetObject(pageHandle.handle, C.int(request.Index))
 	if pageObject == nil {
 		return nil, errors.New("could not get object")
 	}
 
-	pageObjectHandle := p.registerPageObject(pageObject, documentHandle)
+	pageObjectHandle := p.registerPageObject(pageObject)
 
 	return &responses.FPDFPage_GetObject{
 		PageObject: pageObjectHandle.nativeRef,
@@ -293,7 +291,7 @@ func (p *PdfiumImplementation) FPDFPageObj_NewImageObj(request *requests.FPDFPag
 	}
 
 	imageObject := C.FPDFPageObj_NewImageObj(documentHandle.handle)
-	imageObjectHandle := p.registerPageObject(imageObject, documentHandle)
+	imageObjectHandle := p.registerPageObject(imageObject)
 
 	return &responses.FPDFPageObj_NewImageObj{
 		PageObject: imageObjectHandle.nativeRef,
@@ -310,6 +308,8 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFile(request *requests.FPDFI
 	p.Lock()
 	defer p.Unlock()
 
+	// @todo: implement me.
+
 	return &responses.FPDFImageObj_LoadJpegFile{}, nil
 }
 
@@ -325,6 +325,8 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFileInline(request *requests
 	p.Lock()
 	defer p.Unlock()
 
+	// @todo: implement me.
+
 	return &responses.FPDFImageObj_LoadJpegFileInline{}, nil
 }
 
@@ -338,6 +340,16 @@ func (p *PdfiumImplementation) FPDFImageObj_SetMatrix(request *requests.FPDFImag
 	p.Lock()
 	defer p.Unlock()
 
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFImageObj_SetMatrix(imageObjectHandle.handle, C.double(request.Transform.A), C.double(request.Transform.B), C.double(request.Transform.C), C.double(request.Transform.D), C.double(request.Transform.E), C.double(request.Transform.F))
+	if int(success) == 0 {
+		return nil, errors.New("could not set image object matrix")
+	}
+
 	return &responses.FPDFImageObj_SetMatrix{}, nil
 }
 
@@ -345,6 +357,31 @@ func (p *PdfiumImplementation) FPDFImageObj_SetMatrix(request *requests.FPDFImag
 func (p *PdfiumImplementation) FPDFImageObj_SetBitmap(request *requests.FPDFImageObj_SetBitmap) (*responses.FPDFImageObj_SetBitmap, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	var pageHandle *C.FPDF_PAGE
+	if request.Page != nil {
+		loadedPage, err := p.loadPage(*request.Page)
+		if err != nil {
+			return nil, err
+		}
+
+		pageHandle = &loadedPage.handle
+	}
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFImageObj_SetBitmap(pageHandle, C.int(request.Count), imageObjectHandle.handle, bitmapHandle.handle)
+	if int(success) == 0 {
+		return nil, errors.New("could not set image object bitmap")
+	}
 
 	return &responses.FPDFImageObj_SetBitmap{}, nil
 }
@@ -358,7 +395,21 @@ func (p *PdfiumImplementation) FPDFImageObj_GetBitmap(request *requests.FPDFImag
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetBitmap{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmap := C.FPDFImageObj_GetBitmap(imageObjectHandle.handle)
+	if bitmap == nil {
+		return nil, errors.New("could not get bitmap")
+	}
+
+	bitmapHandle := p.registerBitmap(bitmap)
+
+	return &responses.FPDFImageObj_GetBitmap{
+		Bitmap: bitmapHandle.nativeRef,
+	}, nil
 }
 
 // FPDFImageObj_GetImageDataDecoded returns the decoded image data of the image object. The decoded data is the
@@ -368,7 +419,22 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageDataDecoded(request *request
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetImageDataDecoded{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	imageDataLength := C.FPDFImageObj_GetImageDataDecoded(imageObjectHandle.handle, nil, 0)
+	if int(imageDataLength) == 0 {
+		return nil, errors.New("Could not get raw image data")
+	}
+
+	valueData := make([]byte, uint64(imageDataLength))
+	C.FPDFImageObj_GetImageDataDecoded(imageObjectHandle.handle, unsafe.Pointer(&valueData[0]), C.ulong(len(valueData)))
+
+	return &responses.FPDFImageObj_GetImageDataDecoded{
+		Data: valueData,
+	}, nil
 }
 
 // FPDFImageObj_GetImageDataRaw returns the raw image data of the image object. The raw data is the image data as
@@ -377,7 +443,22 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageDataRaw(request *requests.FP
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetImageDataRaw{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	imageDataLength := C.FPDFImageObj_GetImageDataRaw(imageObjectHandle.handle, nil, 0)
+	if int(imageDataLength) == 0 {
+		return nil, errors.New("Could not get raw image data")
+	}
+
+	valueData := make([]byte, uint64(imageDataLength))
+	C.FPDFImageObj_GetImageDataRaw(imageObjectHandle.handle, unsafe.Pointer(&valueData[0]), C.ulong(len(valueData)))
+
+	return &responses.FPDFImageObj_GetImageDataRaw{
+		Data: valueData,
+	}, nil
 }
 
 // FPDFImageObj_GetImageFilterCount returns the number of filters (i.e. decoders) of the image in image object.
@@ -385,7 +466,16 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageFilterCount(request *request
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetImageFilterCount{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFImageObj_GetImageFilterCount(imageObjectHandle.handle)
+
+	return &responses.FPDFImageObj_GetImageFilterCount{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFImageObj_GetImageFilter returns the filter at index of the image object's list of filters. Note that the
@@ -395,7 +485,28 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageFilter(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetImageFilter{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	imageFilterLength := C.FPDFImageObj_GetImageFilter(imageObjectHandle.handle, C.int(request.Index), nil, 0)
+	if int(imageFilterLength) == 0 {
+		return nil, errors.New("Could not get image filter")
+	}
+
+	charData := make([]byte, uint64(imageFilterLength))
+	C.FPDFImageObj_GetImageFilter(imageObjectHandle.handle, C.int(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
+
+	// @todo: is this UTF16LE?
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFImageObj_GetImageFilter{
+		ImageFilter: transformedText,
+	}, nil
 }
 
 // FPDFImageObj_GetImageMetadata returns the image metadata of the image object, including dimension, DPI, bits per
@@ -406,7 +517,34 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageMetadata(request *requests.F
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFImageObj_GetImageMetadata{}, nil
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata := C.FPDF_IMAGEOBJ_METADATA{}
+
+	success := C.FPDFImageObj_GetImageMetadata(imageObjectHandle.handle, pageHandle.handle, &metadata)
+	if int(success) == 0 {
+		return nil, errors.New("could not load image metadata")
+	}
+
+	return &responses.FPDFImageObj_GetImageMetadata{
+		ImageMetadata: structs.FPDF_IMAGEOBJ_METADATA{
+			Width:           uint(metadata.width),
+			Height:          uint(metadata.height),
+			HorizontalDPI:   float32(metadata.horizontal_dpi),
+			VerticalDPI:     float32(metadata.vertical_dpi),
+			BitsPerPixel:    uint(metadata.bits_per_pixel),
+			Colorspace:      enums.FPDF_COLORSPACE(metadata.colorspace),
+			MarkedContentID: int(metadata.marked_content_id),
+		},
+	}, nil
 }
 
 // FPDFPageObj_CreateNewPath creates a new path object at an initial position.
@@ -414,7 +552,12 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewPath(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_CreateNewPath{}, nil
+	pageObject := C.FPDFPageObj_CreateNewPath(C.float(request.X), C.float(request.Y))
+	pageObjectHandle := p.registerPageObject(pageObject)
+
+	return &responses.FPDFPageObj_CreateNewPath{
+		PageObject: pageObjectHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPageObj_CreateNewRect creates a closed path consisting of a rectangle.
@@ -422,7 +565,12 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewRect(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_CreateNewRect{}, nil
+	pageObject := C.FPDFPageObj_CreateNewRect(C.float(request.X), C.float(request.Y), C.float(request.W), C.float(request.H))
+	pageObjectHandle := p.registerPageObject(pageObject)
+
+	return &responses.FPDFPageObj_CreateNewRect{
+		PageObject: pageObjectHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPageObj_GetBounds returns the bounding box of the given page object.
@@ -430,13 +578,42 @@ func (p *PdfiumImplementation) FPDFPageObj_GetBounds(request *requests.FPDFPageO
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetBounds{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	left := C.float(0)
+	bottom := C.float(0)
+	right := C.float(0)
+	top := C.float(0)
+	success := C.FPDFPageObj_GetBounds(pageObjectHandle.handle, &left, &bottom, &right, &top)
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object bounds")
+	}
+
+	return &responses.FPDFPageObj_GetBounds{
+		Left:   float32(left),
+		Bottom: float32(bottom),
+		Right:  float32(right),
+		Top:    float32(top),
+	}, nil
 }
 
 // FPDFPageObj_SetBlendMode sets the blend mode of the page object.
 func (p *PdfiumImplementation) FPDFPageObj_SetBlendMode(request *requests.FPDFPageObj_SetBlendMode) (*responses.FPDFPageObj_SetBlendMode, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	blendMode := C.CString(string(request.BlendMode))
+	defer C.free(unsafe.Pointer(blendMode))
+
+	C.FPDFPageObj_SetBlendMode(pageObjectHandle.handle, blendMode)
 
 	return &responses.FPDFPageObj_SetBlendMode{}, nil
 }
@@ -446,6 +623,16 @@ func (p *PdfiumImplementation) FPDFPageObj_SetStrokeColor(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetStrokeColor(pageObjectHandle.handle, C.uint(request.StrokeColor.R), C.uint(request.StrokeColor.G), C.uint(request.StrokeColor.B), C.uint(request.StrokeColor.A))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object stroke color")
+	}
+
 	return &responses.FPDFPageObj_SetStrokeColor{}, nil
 }
 
@@ -454,13 +641,45 @@ func (p *PdfiumImplementation) FPDFPageObj_GetStrokeColor(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetStrokeColor{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	r := C.uint(0)
+	g := C.uint(0)
+	b := C.uint(0)
+	a := C.uint(0)
+
+	success := C.FPDFPageObj_GetStrokeColor(pageObjectHandle.handle, &r, &g, &b, &a)
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object stroke color")
+	}
+
+	return &responses.FPDFPageObj_GetStrokeColor{
+		StrokeColor: structs.FPDF_COLOR{
+			R: uint(r),
+			G: uint(g),
+			B: uint(b),
+			A: uint(a),
+		},
+	}, nil
 }
 
 // FPDFPageObj_SetStrokeWidth sets the stroke width of a page object
 func (p *PdfiumImplementation) FPDFPageObj_SetStrokeWidth(request *requests.FPDFPageObj_SetStrokeWidth) (*responses.FPDFPageObj_SetStrokeWidth, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetStrokeWidth(pageObjectHandle.handle, C.float(request.StrokeWidth))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object stroke width")
+	}
 
 	return &responses.FPDFPageObj_SetStrokeWidth{}, nil
 }
@@ -470,7 +689,20 @@ func (p *PdfiumImplementation) FPDFPageObj_GetStrokeWidth(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetStrokeWidth{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	strokeWidth := C.float(0)
+	success := C.FPDFPageObj_GetStrokeWidth(pageObjectHandle.handle, &strokeWidth)
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object stroke width")
+	}
+
+	return &responses.FPDFPageObj_GetStrokeWidth{
+		StrokeWidth: float32(strokeWidth),
+	}, nil
 }
 
 // FPDFPageObj_GetLineJoin returns the line join of the page object.
@@ -478,13 +710,35 @@ func (p *PdfiumImplementation) FPDFPageObj_GetLineJoin(request *requests.FPDFPag
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetLineJoin{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	lineJoin := C.FPDFPageObj_GetLineJoin(pageObjectHandle.handle)
+	if int(lineJoin) == -1 {
+		return nil, errors.New("could not get page object line join")
+	}
+
+	return &responses.FPDFPageObj_GetLineJoin{
+		LineJoin: enums.FPDF_LINEJOIN(lineJoin),
+	}, nil
 }
 
 // FPDFPageObj_SetLineJoin sets the line join of the page object.
 func (p *PdfiumImplementation) FPDFPageObj_SetLineJoin(request *requests.FPDFPageObj_SetLineJoin) (*responses.FPDFPageObj_SetLineJoin, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetLineJoin(pageObjectHandle.handle, C.int(request.LineJoin))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object line join")
+	}
 
 	return &responses.FPDFPageObj_SetLineJoin{}, nil
 }
@@ -494,13 +748,35 @@ func (p *PdfiumImplementation) FPDFPageObj_GetLineCap(request *requests.FPDFPage
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetLineCap{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	lineCap := C.FPDFPageObj_GetLineCap(pageObjectHandle.handle)
+	if int(lineCap) == -1 {
+		return nil, errors.New("could not get page object line cap")
+	}
+
+	return &responses.FPDFPageObj_GetLineCap{
+		LineCap: enums.FPDF_LINECAP(lineCap),
+	}, nil
 }
 
 // FPDFPageObj_SetLineCap sets the line cap of the page object.
 func (p *PdfiumImplementation) FPDFPageObj_SetLineCap(request *requests.FPDFPageObj_SetLineCap) (*responses.FPDFPageObj_SetLineCap, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetLineJoin(pageObjectHandle.handle, C.int(request.LineCap))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object line cap")
+	}
 
 	return &responses.FPDFPageObj_SetLineCap{}, nil
 }
@@ -510,6 +786,16 @@ func (p *PdfiumImplementation) FPDFPageObj_SetFillColor(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFPageObj_SetStrokeColor(pageObjectHandle.handle, C.uint(request.FillColor.R), C.uint(request.FillColor.G), C.uint(request.FillColor.B), C.uint(request.FillColor.A))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object fill color")
+	}
+
 	return &responses.FPDFPageObj_SetFillColor{}, nil
 }
 
@@ -518,7 +804,29 @@ func (p *PdfiumImplementation) FPDFPageObj_GetFillColor(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_GetFillColor{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	r := C.uint(0)
+	g := C.uint(0)
+	b := C.uint(0)
+	a := C.uint(0)
+
+	success := C.FPDFPageObj_GetFillColor(pageObjectHandle.handle, &r, &g, &b, &a)
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object fill color")
+	}
+
+	return &responses.FPDFPageObj_GetFillColor{
+		FillColor: structs.FPDF_COLOR{
+			R: uint(r),
+			G: uint(g),
+			B: uint(b),
+			A: uint(a),
+		},
+	}, nil
 }
 
 // FPDFPath_CountSegments returns the number of segments inside the given path.
@@ -528,6 +836,16 @@ func (p *PdfiumImplementation) FPDFPath_CountSegments(request *requests.FPDFPath
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFPath_CountSegments(pageObjectHandle.handle)
+	if int(count) == -1 {
+		return nil, errors.New("could not get path segment count")
+	}
+
 	return &responses.FPDFPath_CountSegments{}, nil
 }
 
@@ -536,7 +854,21 @@ func (p *PdfiumImplementation) FPDFPath_GetPathSegment(request *requests.FPDFPat
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPath_GetPathSegment{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	segment := C.FPDFPath_GetPathSegment(pageObjectHandle.handle, C.int(request.Index))
+	if segment == nil {
+		return nil, errors.New("could not get path segment")
+	}
+
+	pathSegmentHandle := p.registerPathSegment(segment)
+
+	return &responses.FPDFPath_GetPathSegment{
+		PathSegment: pathSegmentHandle.nativeRef,
+	}, nil
 }
 
 // FPDFPathSegment_GetPoint returns the coordinates of the given segment.
@@ -544,7 +876,22 @@ func (p *PdfiumImplementation) FPDFPathSegment_GetPoint(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPathSegment_GetPoint{}, nil
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	x := C.float(0)
+	y := C.float(0)
+	success := C.FPDFPathSegment_GetPoint(pathSegmentHandle.handle, &x, &y)
+	if int(success) == 0 {
+		return nil, errors.New("could not get path segment point")
+	}
+
+	return &responses.FPDFPathSegment_GetPoint{
+		X: float32(x),
+		Y: float32(y),
+	}, nil
 }
 
 // FPDFPathSegment_GetType returns the type of the given segment.
@@ -552,7 +899,16 @@ func (p *PdfiumImplementation) FPDFPathSegment_GetType(request *requests.FPDFPat
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPathSegment_GetType{}, nil
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	segmentType := C.FPDFPathSegment_GetType(pathSegmentHandle.handle)
+
+	return &responses.FPDFPathSegment_GetType{
+		Type: enums.FPDF_SEGMENT(segmentType),
+	}, nil
 }
 
 // FPDFPathSegment_GetClose returns whether the segment closes the current subpath of a given path.
@@ -560,7 +916,16 @@ func (p *PdfiumImplementation) FPDFPathSegment_GetClose(request *requests.FPDFPa
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPathSegment_GetClose{}, nil
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	getClose := C.FPDFPathSegment_GetClose(pathSegmentHandle.handle)
+
+	return &responses.FPDFPathSegment_GetClose{
+		IsClose: int(getClose) == 1,
+	}, nil
 }
 
 // FPDFPath_MoveTo moves a path's current point.
