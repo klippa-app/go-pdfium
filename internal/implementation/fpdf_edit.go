@@ -935,6 +935,16 @@ func (p *PdfiumImplementation) FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPath_MoveTo(pageObjectHandle.handle, C.float(request.X), C.float(request.Y))
+	if int(result) == 0 {
+		return nil, errors.New("could not move path")
+	}
+
 	return &responses.FPDFPath_MoveTo{}, nil
 }
 
@@ -942,6 +952,16 @@ func (p *PdfiumImplementation) FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo
 func (p *PdfiumImplementation) FPDFPath_LineTo(request *requests.FPDFPath_LineTo) (*responses.FPDFPath_LineTo, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPath_LineTo(pageObjectHandle.handle, C.float(request.X), C.float(request.Y))
+	if int(result) == 0 {
+		return nil, errors.New("could not add line")
+	}
 
 	return &responses.FPDFPath_LineTo{}, nil
 }
@@ -951,6 +971,16 @@ func (p *PdfiumImplementation) FPDFPath_BezierTo(request *requests.FPDFPath_Bezi
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPath_BezierTo(pageObjectHandle.handle, C.float(request.X1), C.float(request.Y1), C.float(request.X2), C.float(request.Y2), C.float(request.X3), C.float(request.Y3))
+	if int(result) == 0 {
+		return nil, errors.New("could not add bezier")
+	}
+
 	return &responses.FPDFPath_BezierTo{}, nil
 }
 
@@ -958,6 +988,16 @@ func (p *PdfiumImplementation) FPDFPath_BezierTo(request *requests.FPDFPath_Bezi
 func (p *PdfiumImplementation) FPDFPath_Close(request *requests.FPDFPath_Close) (*responses.FPDFPath_Close, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPath_Close(pageObjectHandle.handle)
+	if int(result) == 0 {
+		return nil, errors.New("could not close path")
+	}
 
 	return &responses.FPDFPath_Close{}, nil
 }
@@ -967,6 +1007,21 @@ func (p *PdfiumImplementation) FPDFPath_SetDrawMode(request *requests.FPDFPath_S
 	p.Lock()
 	defer p.Unlock()
 
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	stroke := 0
+	if request.Stroke {
+		stroke = 1
+	}
+
+	result := C.FPDFPath_SetDrawMode(pageObjectHandle.handle, C.int(request.FillMode), C.FPDF_BOOL(stroke))
+	if int(result) == 0 {
+		return nil, errors.New("could not set draw mode")
+	}
+
 	return &responses.FPDFPath_SetDrawMode{}, nil
 }
 
@@ -975,7 +1030,23 @@ func (p *PdfiumImplementation) FPDFPath_GetDrawMode(request *requests.FPDFPath_G
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPath_GetDrawMode{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	fillMode := C.int(0)
+	stroke := C.FPDF_BOOL(0)
+
+	result := C.FPDFPath_GetDrawMode(pageObjectHandle.handle, &fillMode, &stroke)
+	if int(result) == 0 {
+		return nil, errors.New("could not get draw mode")
+	}
+
+	return &responses.FPDFPath_GetDrawMode{
+		FillMode: enums.FPDF_FILLMODE(fillMode),
+		Stroke:   int(stroke) == 1,
+	}, nil
 }
 
 // FPDFPageObj_NewTextObj creates a new text object using one of the standard PDF fonts.
@@ -983,13 +1054,41 @@ func (p *PdfiumImplementation) FPDFPageObj_NewTextObj(request *requests.FPDFPage
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_NewTextObj{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	font := C.CString(request.Font)
+	defer C.free(unsafe.Pointer(font))
+
+	textObject := C.FPDFPageObj_NewTextObj(documentHandle.handle, font, C.float(request.FontSize))
+	textObjectHandle := p.registerPageObject(textObject)
+
+	return &responses.FPDFPageObj_NewTextObj{
+		PageObject: textObjectHandle.nativeRef,
+	}, nil
 }
 
 // FPDFText_SetText sets the text for a text object. If it had text, it will be replaced.
 func (p *PdfiumImplementation) FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF8ToUTF16LE(request.Text)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFText_SetText(pageObjectHandle.handle, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedText[0])))
+	if int(result) == 0 {
+		return nil, errors.New("could not set text")
+	}
 
 	return &responses.FPDFText_SetText{}, nil
 }
@@ -999,6 +1098,21 @@ func (p *PdfiumImplementation) FPDFText_SetText(request *requests.FPDFText_SetTe
 func (p *PdfiumImplementation) FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	charCodes := make([]C.uint32_t, len(request.CharCodes))
+	for i := range request.CharCodes {
+		charCodes[i] = C.uint32_t(request.CharCodes[i])
+	}
+
+	result := C.FPDFText_SetCharcodes(pageObjectHandle.handle, (*C.uint32_t)(unsafe.Pointer(&charCodes[0])), C.size_t(len(request.CharCodes)))
+	if int(result) == 0 {
+		return nil, errors.New("could not set charcodes")
+	}
 
 	return &responses.FPDFText_SetCharcodes{}, nil
 }
@@ -1010,7 +1124,22 @@ func (p *PdfiumImplementation) FPDFText_LoadFont(request *requests.FPDFText_Load
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFText_LoadFont{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	cid := 0
+	if request.CID {
+		cid = 1
+	}
+
+	font := C.FPDFText_LoadFont(documentHandle.handle, (*C.uchar)(unsafe.Pointer(&request.Data[0])), C.uint32_t(len(request.Data)), C.int(request.FontType), C.FPDF_BOOL(cid))
+	fontHandle := p.registerFont(font)
+
+	return &responses.FPDFText_LoadFont{
+		Font: fontHandle.nativeRef,
+	}, nil
 }
 
 // FPDFTextObj_GetFontSize returns the font size of a text object.
@@ -1018,13 +1147,35 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFontSize(request *requests.FPDFTex
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFTextObj_GetFontSize{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	fontSize := C.float(0)
+	result := C.FPDFTextObj_GetFontSize(pageObjectHandle.handle, &fontSize)
+	if int(result) == 0 {
+		return nil, errors.New("could not get font size")
+	}
+
+	return &responses.FPDFTextObj_GetFontSize{
+		FontSize: float32(fontSize),
+	}, nil
 }
 
 // FPDFFont_Close closes a loaded PDF font
 func (p *PdfiumImplementation) FPDFFont_Close(request *requests.FPDFFont_Close) (*responses.FPDFFont_Close, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFFont_Close(fontHandle.handle)
+
+	delete(p.fontRefs, fontHandle.nativeRef)
 
 	return &responses.FPDFFont_Close{}, nil
 }
@@ -1034,7 +1185,22 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateTextObj(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFPageObj_CreateTextObj{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	textObject := C.FPDFPageObj_CreateTextObj(documentHandle.handle, fontHandle.handle, C.float(request.FontSize))
+	textObjectHandle := p.registerPageObject(textObject)
+
+	return &responses.FPDFPageObj_CreateTextObj{
+		PageObject: textObjectHandle.nativeRef,
+	}, nil
 }
 
 // FPDFTextObj_GetTextRenderMode returns the text rendering mode of a text object.
@@ -1042,7 +1208,16 @@ func (p *PdfiumImplementation) FPDFTextObj_GetTextRenderMode(request *requests.F
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFTextObj_GetTextRenderMode{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	textRenderMode := C.FPDFTextObj_GetTextRenderMode(pageObjectHandle.handle)
+
+	return &responses.FPDFTextObj_GetTextRenderMode{
+		TextRenderMode: enums.FPDF_TEXT_RENDERMODE(textRenderMode),
+	}, nil
 }
 
 // FPDFTextObj_GetText returns the text of a text object.
@@ -1050,7 +1225,33 @@ func (p *PdfiumImplementation) FPDFTextObj_GetText(request *requests.FPDFTextObj
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFTextObj_GetText{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	textPageHandle, err := p.getTextPageHandle(request.TextPage)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	textSize := C.FPDFTextObj_GetText(pageObjectHandle.handle, textPageHandle.handle, nil, 0)
+	if textSize == 0 {
+		return nil, errors.New("Could not get text")
+	}
+
+	charData := make([]byte, textSize)
+	C.FPDFTextObj_GetText(pageObjectHandle.handle, textPageHandle.handle, (*C.ushort)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedName, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFTextObj_GetText{
+		Text: transformedName,
+	}, nil
 }
 
 // FPDFFormObj_CountObjects returns the number of page objects inside the given form object.
@@ -1058,7 +1259,16 @@ func (p *PdfiumImplementation) FPDFFormObj_CountObjects(request *requests.FPDFFo
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFormObj_CountObjects{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFFormObj_CountObjects(pageObjectHandle.handle)
+
+	return &responses.FPDFFormObj_CountObjects{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFFormObj_GetObject returns the page object in the given form object at the given index.
@@ -1066,5 +1276,19 @@ func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormO
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFormObj_GetObject{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	formObject := C.FPDFFormObj_GetObject(pageObjectHandle.handle, C.ulong(request.Index))
+	if formObject == nil {
+		return nil, errors.New("could not get page object")
+	}
+
+	formObjectHandle := p.registerPageObject(formObject)
+
+	return &responses.FPDFFormObj_GetObject{
+		PageObject: formObjectHandle.nativeRef,
+	}, nil
 }

@@ -702,7 +702,20 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFText_LoadStandardFont{}, nil
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	fontName := C.CString(request.Font)
+	defer C.free(unsafe.Pointer(fontName))
+
+	font := C.FPDFText_LoadStandardFont(documentHandle.handle, fontName)
+	fontHandle := p.registerFont(font)
+
+	return &responses.FPDFText_LoadStandardFont{
+		Font: fontHandle.nativeRef,
+	}, nil
 }
 
 // FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.
@@ -710,6 +723,16 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 func (p *PdfiumImplementation) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFTextObj_SetTextRenderMode(pageObjectHandle.handle, C.FPDF_TEXT_RENDERMODE(request.TextRenderMode))
+	if int(result) == 0 {
+		return nil, errors.New("could not set text render mode")
+	}
 
 	return &responses.FPDFTextObj_SetTextRenderMode{}, nil
 }
@@ -720,7 +743,17 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFTextObj_GetFont{}, nil
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	font := C.FPDFTextObj_GetFont(pageObjectHandle.handle)
+	fontHandle := p.registerFont(font)
+
+	return &responses.FPDFTextObj_GetFont{
+		Font: fontHandle.nativeRef,
+	}, nil
 }
 
 // FPDFFont_GetFontName returns the font name of a font.
@@ -729,7 +762,28 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetFontName{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	nameSize := C.FPDFFont_GetFontName(fontHandle.handle, nil, 0)
+	if nameSize == 0 {
+		return nil, errors.New("Could not get font name")
+	}
+
+	charData := make([]byte, nameSize)
+	C.FPDFFont_GetFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedName, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetFontName{
+		FontName: transformedName,
+	}, nil
 }
 
 // FPDFFont_GetFlags returns the descriptor flags of a font.
@@ -740,7 +794,19 @@ func (p *PdfiumImplementation) FPDFFont_GetFlags(request *requests.FPDFFont_GetF
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetFlags{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	fontFlags := C.FPDFFont_GetFlags(fontHandle.handle)
+	if int(fontFlags) == -1 {
+		return nil, errors.New("could not get font flags")
+	}
+
+	return &responses.FPDFFont_GetFlags{
+		Flags: int(fontFlags),
+	}, nil
 }
 
 // FPDFFont_GetWeight returns the font weight of a font.
@@ -750,7 +816,19 @@ func (p *PdfiumImplementation) FPDFFont_GetWeight(request *requests.FPDFFont_Get
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetWeight{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	fontWeight := C.FPDFFont_GetWeight(fontHandle.handle)
+	if int(fontWeight) == -1 {
+		return nil, errors.New("could not get font weight")
+	}
+
+	return &responses.FPDFFont_GetWeight{
+		Weight: int(fontWeight),
+	}, nil
 }
 
 // FPDFFont_GetItalicAngle returns the italic angle of a font.
@@ -761,7 +839,21 @@ func (p *PdfiumImplementation) FPDFFont_GetItalicAngle(request *requests.FPDFFon
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetItalicAngle{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	angle := C.int(0)
+
+	result := C.FPDFFont_GetItalicAngle(fontHandle.handle, &angle)
+	if int(result) == 0 {
+		return nil, errors.New("could not get italic angle")
+	}
+
+	return &responses.FPDFFont_GetItalicAngle{
+		ItalicAngle: int(angle),
+	}, nil
 }
 
 // FPDFFont_GetAscent returns ascent distance of a font.
@@ -772,7 +864,21 @@ func (p *PdfiumImplementation) FPDFFont_GetAscent(request *requests.FPDFFont_Get
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetAscent{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	ascent := C.float(0)
+
+	result := C.FPDFFont_GetAscent(fontHandle.handle, C.float(request.FontSize), &ascent)
+	if int(result) == 0 {
+		return nil, errors.New("could not get ascent")
+	}
+
+	return &responses.FPDFFont_GetAscent{
+		Ascent: float32(ascent),
+	}, nil
 }
 
 // FPDFFont_GetDescent returns the descent distance of a font.
@@ -783,7 +889,21 @@ func (p *PdfiumImplementation) FPDFFont_GetDescent(request *requests.FPDFFont_Ge
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetDescent{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	descent := C.float(0)
+
+	result := C.FPDFFont_GetDescent(fontHandle.handle, C.float(request.FontSize), &descent)
+	if int(result) == 0 {
+		return nil, errors.New("could not get descent")
+	}
+
+	return &responses.FPDFFont_GetDescent{
+		Descent: float32(descent),
+	}, nil
 }
 
 // FPDFFont_GetGlyphWidth returns the width of a glyph in a font.
@@ -794,7 +914,21 @@ func (p *PdfiumImplementation) FPDFFont_GetGlyphWidth(request *requests.FPDFFont
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetGlyphWidth{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	glyphWidth := C.float(0)
+
+	result := C.FPDFFont_GetGlyphWidth(fontHandle.handle, C.uint32_t(request.Glyph), C.float(request.FontSize), &glyphWidth)
+	if int(result) == 0 {
+		return nil, errors.New("could not get glyph width")
+	}
+
+	return &responses.FPDFFont_GetGlyphWidth{
+		GlyphWidth: float32(glyphWidth),
+	}, nil
 }
 
 // FPDFFont_GetGlyphPath returns the glyphpath describing how to draw a font glyph.
@@ -803,7 +937,21 @@ func (p *PdfiumImplementation) FPDFFont_GetGlyphPath(request *requests.FPDFFont_
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFFont_GetGlyphPath{}, nil
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	glyphPath := C.FPDFFont_GetGlyphPath(fontHandle.handle, C.uint32_t(request.Glyph), C.float(request.FontSize))
+	if glyphPath == nil {
+		return nil, errors.New("could not get glyph path")
+	}
+
+	glyphPathHandle := p.registerGlyphPath(glyphPath)
+
+	return &responses.FPDFFont_GetGlyphPath{
+		GlyphPath: glyphPathHandle.nativeRef,
+	}, nil
 }
 
 // FPDFGlyphPath_CountGlyphSegments returns the number of segments inside the given glyphpath.
@@ -812,7 +960,19 @@ func (p *PdfiumImplementation) FPDFGlyphPath_CountGlyphSegments(request *request
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFGlyphPath_CountGlyphSegments{}, nil
+	glyphPathHandle, err := p.getGlyphPathHandle(request.GlyphPath)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFGlyphPath_CountGlyphSegments(glyphPathHandle.handle)
+	if int(count) == -1 {
+		return nil, errors.New("could not get glyph path segment count")
+	}
+
+	return &responses.FPDFGlyphPath_CountGlyphSegments{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFGlyphPath_GetGlyphPathSegment returns the segment in glyphpath at the given index.
@@ -821,5 +981,19 @@ func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *reques
 	p.Lock()
 	defer p.Unlock()
 
-	return &responses.FPDFGlyphPath_GetGlyphPathSegment{}, nil
+	glyphPathHandle, err := p.getGlyphPathHandle(request.GlyphPath)
+	if err != nil {
+		return nil, err
+	}
+
+	segment := C.FPDFGlyphPath_GetGlyphPathSegment(glyphPathHandle.handle, C.int(request.Index))
+	if segment == nil {
+		return nil, errors.New("could not get glyph path segment")
+	}
+
+	segmentHandle := p.registerPathSegment(segment)
+
+	return &responses.FPDFGlyphPath_GetGlyphPathSegment{
+		GlyphPathSegment: segmentHandle.nativeRef,
+	}, nil
 }
