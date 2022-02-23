@@ -305,3 +305,13 @@ type PageObjectMarkHandle struct {
 	handle    C.FPDF_PAGEOBJECTMARK
 	nativeRef references.FPDF_PAGEOBJECTMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
+
+type FontHandle struct {
+	handle    C.FPDF_FONT
+	nativeRef references.FPDF_FONT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type GlyphPathHandle struct {
+	handle    C.FPDF_GLYPHPATH
+	nativeRef references.FPDF_GLYPHPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}

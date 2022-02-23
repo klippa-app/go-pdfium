@@ -189,6 +189,8 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
 		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
+		fontRefs:             map[references.FPDF_FONT]*FontHandle{},
+		glyphPathRefs:        map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -230,6 +232,8 @@ type PdfiumImplementation struct {
 	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
 	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
 	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
+	fontRefs             map[references.FPDF_FONT]*FontHandle
+	glyphPathRefs        map[references.FPDF_GLYPHPATH]*GlyphPathHandle
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -484,6 +488,14 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.pageObjectMarkRefs {
 		delete(p.pageObjectMarkRefs, i)
+	}
+
+	for i := range p.fontRefs {
+		delete(p.fontRefs, i)
+	}
+
+	for i := range p.glyphPathRefs {
+		delete(p.glyphPathRefs, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
@@ -753,4 +765,28 @@ func (p *PdfiumImplementation) getPathSegmentHandle(pathSegment references.FPDF_
 	}
 
 	return nil, errors.New("could not find pathSegment handle, perhaps the pathSegment was already closed or you tried to share pathSegments between instances")
+}
+
+func (p *PdfiumImplementation) getFontHandle(font references.FPDF_FONT) (*FontHandle, error) {
+	if font == "" {
+		return nil, errors.New("font not given")
+	}
+
+	if val, ok := p.fontRefs[font]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find font handle, perhaps the font was already closed or you tried to share fonts between instances")
+}
+
+func (p *PdfiumImplementation) getGlyphPathHandle(glyphPath references.FPDF_GLYPHPATH) (*GlyphPathHandle, error) {
+	if glyphPath == "" {
+		return nil, errors.New("glyphPath not given")
+	}
+
+	if val, ok := p.glyphPathRefs[glyphPath]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find glyphPath handle, perhaps the glyphPath was already closed or you tried to share glyphPaths between instances")
 }
