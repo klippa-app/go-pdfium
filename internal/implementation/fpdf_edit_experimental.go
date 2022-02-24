@@ -214,11 +214,11 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetName(request *requests.FPDFPag
 
 	success := C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, nil, 0, &nameLength)
 	if int(success) == 0 {
-		return nil, errors.New("Could not get name")
+		return nil, errors.New("could not get name")
 	}
 
 	if uint64(nameLength) == 0 {
-		return nil, errors.New("Could not get name")
+		return nil, errors.New("could not get name")
 	}
 
 	charData := make([]byte, uint64(nameLength))
@@ -267,11 +267,11 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamKey(request *requests.FPD
 
 	success := C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), nil, 0, &keyLength)
 	if int(success) == 0 {
-		return nil, errors.New("Could not get key")
+		return nil, errors.New("could not get key")
 	}
 
 	if uint64(keyLength) == 0 {
-		return nil, errors.New("Could not get key")
+		return nil, errors.New("could not get key")
 	}
 
 	charData := make([]byte, uint64(keyLength))
@@ -354,11 +354,11 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requ
 
 	success := C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, nil, 0, &valueLength)
 	if int(success) == 0 {
-		return nil, errors.New("Could not get value")
+		return nil, errors.New("could not get value")
 	}
 
 	if uint64(valueLength) == 0 {
-		return nil, errors.New("Could not get value")
+		return nil, errors.New("could not get value")
 	}
 
 	charData := make([]byte, uint64(valueLength))
@@ -392,11 +392,11 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 
 	success := C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, nil, 0, &valueLength)
 	if int(success) == 0 {
-		return nil, errors.New("Could not get value")
+		return nil, errors.New("could not get value")
 	}
 
 	if uint64(valueLength) == 0 {
-		return nil, errors.New("Could not get value")
+		return nil, errors.New("could not get value")
 	}
 
 	valueData := make([]byte, uint64(valueLength))
@@ -770,7 +770,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	// First get the text value length.
 	nameSize := C.FPDFFont_GetFontName(fontHandle.handle, nil, 0)
 	if nameSize == 0 {
-		return nil, errors.New("Could not get font name")
+		return nil, errors.New("could not get font name")
 	}
 
 	charData := make([]byte, nameSize)
