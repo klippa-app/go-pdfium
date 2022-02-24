@@ -426,7 +426,7 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageDataDecoded(request *request
 
 	imageDataLength := C.FPDFImageObj_GetImageDataDecoded(imageObjectHandle.handle, nil, 0)
 	if int(imageDataLength) == 0 {
-		return nil, errors.New("Could not get raw image data")
+		return nil, errors.New("could not get raw image data")
 	}
 
 	valueData := make([]byte, uint64(imageDataLength))
@@ -450,7 +450,7 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageDataRaw(request *requests.FP
 
 	imageDataLength := C.FPDFImageObj_GetImageDataRaw(imageObjectHandle.handle, nil, 0)
 	if int(imageDataLength) == 0 {
-		return nil, errors.New("Could not get raw image data")
+		return nil, errors.New("could not get raw image data")
 	}
 
 	valueData := make([]byte, uint64(imageDataLength))
@@ -492,7 +492,7 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageFilter(request *requests.FPD
 
 	imageFilterLength := C.FPDFImageObj_GetImageFilter(imageObjectHandle.handle, C.int(request.Index), nil, 0)
 	if int(imageFilterLength) == 0 {
-		return nil, errors.New("Could not get image filter")
+		return nil, errors.New("could not get image filter")
 	}
 
 	charData := make([]byte, uint64(imageFilterLength))
@@ -1238,7 +1238,7 @@ func (p *PdfiumImplementation) FPDFTextObj_GetText(request *requests.FPDFTextObj
 	// First get the text value length.
 	textSize := C.FPDFTextObj_GetText(pageObjectHandle.handle, textPageHandle.handle, nil, 0)
 	if textSize == 0 {
-		return nil, errors.New("Could not get text")
+		return nil, errors.New("could not get text")
 	}
 
 	charData := make([]byte, textSize)
