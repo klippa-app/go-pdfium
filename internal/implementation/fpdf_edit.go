@@ -959,7 +959,9 @@ func (p *PdfiumImplementation) FPDFPath_CountSegments(request *requests.FPDFPath
 		return nil, errors.New("could not get path segment count")
 	}
 
-	return &responses.FPDFPath_CountSegments{}, nil
+	return &responses.FPDFPath_CountSegments{
+		Count: int(count),
+	}, nil
 }
 
 // FPDFPath_GetPathSegment returns the segment in the given path at the given index.
@@ -1396,7 +1398,7 @@ func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormO
 
 	formObject := C.FPDFFormObj_GetObject(pageObjectHandle.handle, C.ulong(request.Index))
 	if formObject == nil {
-		return nil, errors.New("could not get page object")
+		return nil, errors.New("could not get form object")
 	}
 
 	formObjectHandle := p.registerPageObject(formObject)
