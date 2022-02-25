@@ -30,8 +30,6 @@ type DocumentHandle struct {
 	schHandleRefs        map[references.FPDF_SCHHANDLE]*SchHandleHandle
 	textPageRefs         map[references.FPDF_TEXTPAGE]*TextPageHandle
 	pageRangeRefs        map[references.FPDF_PAGERANGE]*PageRangeHandle
-	pageObjectRefs       map[references.FPDF_PAGEOBJECT]*PageObjectHandle
-	clipPathRefs         map[references.FPDF_CLIPPATH]*ClipPathHandle
 	formHandleRefs       map[references.FPDF_FORMHANDLE]*FormHandleHandle
 	annotationRefs       map[references.FPDF_ANNOTATION]*AnnotationHandle
 	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
@@ -115,14 +113,6 @@ func (d *DocumentHandle) Close() error {
 		delete(d.pageRangeRefs, i)
 	}
 
-	for i := range d.pageObjectRefs {
-		delete(d.pageObjectRefs, i)
-	}
-
-	for i := range d.clipPathRefs {
-		delete(d.clipPathRefs, i)
-	}
-
 	for i := range d.formHandleRefs {
 		delete(d.formHandleRefs, i)
 	}
@@ -177,7 +167,7 @@ func (d *DocumentHandle) Close() error {
 
 type PageHandle struct {
 	handle      C.FPDF_PAGE
-	index       int
+	index       int // -1 when unknown.
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
@@ -244,15 +234,13 @@ type PageRangeHandle struct {
 }
 
 type PageObjectHandle struct {
-	handle      C.FPDF_PAGEOBJECT
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_PAGEOBJECT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	handle    C.FPDF_PAGEOBJECT
+	nativeRef references.FPDF_PAGEOBJECT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type ClipPathHandle struct {
-	handle      C.FPDF_CLIPPATH
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_CLIPPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	handle    C.FPDF_CLIPPATH
+	nativeRef references.FPDF_CLIPPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type FormHandleHandle struct {
@@ -311,4 +299,19 @@ type StructElementHandle struct {
 	handle      C.FPDF_STRUCTELEMENT
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_STRUCTELEMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type PageObjectMarkHandle struct {
+	handle    C.FPDF_PAGEOBJECTMARK
+	nativeRef references.FPDF_PAGEOBJECTMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type FontHandle struct {
+	handle    C.FPDF_FONT
+	nativeRef references.FPDF_FONT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type GlyphPathHandle struct {
+	handle    C.FPDF_GLYPHPATH
+	nativeRef references.FPDF_GLYPHPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }

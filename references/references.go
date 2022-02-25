@@ -71,3 +71,12 @@ type FPDF_STRUCTTREE string
 
 // FPDF_STRUCTELEMENT is an internal reference to a C.FPDF_STRUCTELEMENT handle.
 type FPDF_STRUCTELEMENT string
+
+// FPDF_PAGEOBJECTMARK is an internal reference to a C.FPDF_PAGEOBJECTMARK handle.
+type FPDF_PAGEOBJECTMARK string
+
+// FPDF_FONT is an internal reference to a C.FPDF_FONT handle.
+type FPDF_FONT string
+
+// FPDF_GLYPHPATH is an internal reference to a C.FPDF_GLYPHPATH handle.
+type FPDF_GLYPHPATH string

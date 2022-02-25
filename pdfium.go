@@ -357,14 +357,423 @@ type Pdfium interface {
 	// FPDF_CreateNewDocument returns a new document.
 	FPDF_CreateNewDocument(request *requests.FPDF_CreateNewDocument) (*responses.FPDF_CreateNewDocument, error)
 
+	// FPDFPage_New creates a new PDF page.
+	// The page should be closed with FPDF_ClosePage() when finished as
+	// with any other page in the document.
+	FPDFPage_New(request *requests.FPDFPage_New) (*responses.FPDFPage_New, error)
+
+	// FPDFPage_Delete deletes the page at the given index.
+	FPDFPage_Delete(request *requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error)
+
 	// FPDFPage_SetRotation sets the page rotation for a given page.
 	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
 
 	// FPDFPage_GetRotation returns the rotation of the given page.
 	FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
 
+	// FPDFPage_InsertObject inserts the given object into a page.
+	FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
+
+	// FPDFPage_RemoveObject removes an object from a page.
+	// Ownership is transferred to the caller. Call FPDFPageObj_Destroy() to free
+	// it.
+	// Experimental API.
+	FPDFPage_RemoveObject(request *requests.FPDFPage_RemoveObject) (*responses.FPDFPage_RemoveObject, error)
+
+	// FPDFPage_CountObjects returns the number of page objects inside the given page.
+	FPDFPage_CountObjects(request *requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error)
+
+	// FPDFPage_GetObject returns the object at the given index.
+	FPDFPage_GetObject(request *requests.FPDFPage_GetObject) (*responses.FPDFPage_GetObject, error)
+
 	// FPDFPage_HasTransparency returns whether a page has transparency.
 	FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
+
+	// FPDFPage_GenerateContent generates the contents of the page.
+	FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error)
+
+	// FPDFPageObj_Destroy destroys the page object by releasing its resources. The page object must have been
+	// created by FPDFPageObj_CreateNew{Path|Rect}() or
+	// FPDFPageObj_New{Text|Image}Obj(). This function must be called on
+	// newly-created objects if they are not added to a page through
+	// FPDFPage_InsertObject() or to an annotation through FPDFAnnot_AppendObject().
+	FPDFPageObj_Destroy(request *requests.FPDFPageObj_Destroy) (*responses.FPDFPageObj_Destroy, error)
+
+	// FPDFPageObj_HasTransparency returns whether the given page object contains transparency.
+	FPDFPageObj_HasTransparency(request *requests.FPDFPageObj_HasTransparency) (*responses.FPDFPageObj_HasTransparency, error)
+
+	// FPDFPageObj_GetType returns the type of the given page object.
+	FPDFPageObj_GetType(request *requests.FPDFPageObj_GetType) (*responses.FPDFPageObj_GetType, error)
+
+	// FPDFPageObj_Transform transforms the page object by the given matrix.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the page object.
+	FPDFPageObj_Transform(request *requests.FPDFPageObj_Transform) (*responses.FPDFPageObj_Transform, error)
+
+	// FPDFPageObj_GetMatrix returns the transform matrix of a page object.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the page object.
+	// Experimental API.
+	FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error)
+
+	// FPDFPageObj_SetMatrix sets the transform matrix on a page object.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the page object.
+	// Experimental API.
+	FPDFPageObj_SetMatrix(request *requests.FPDFPageObj_SetMatrix) (*responses.FPDFPageObj_SetMatrix, error)
+
+	// FPDFPage_TransformAnnots transforms all annotations in the given page.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the page annotations.
+	FPDFPage_TransformAnnots(request *requests.FPDFPage_TransformAnnots) (*responses.FPDFPage_TransformAnnots, error)
+
+	// FPDFPageObj_NewImageObj creates a new image object.
+	FPDFPageObj_NewImageObj(request *requests.FPDFPageObj_NewImageObj) (*responses.FPDFPageObj_NewImageObj, error)
+
+	// FPDFPageObj_CountMarks returns the count of content marks in a page object.
+	// Experimental API.
+	FPDFPageObj_CountMarks(request *requests.FPDFPageObj_CountMarks) (*responses.FPDFPageObj_CountMarks, error)
+
+	// FPDFPageObj_GetMark returns the content mark of a page object at the given index.
+	// Experimental API.
+	FPDFPageObj_GetMark(request *requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
+
+	// FPDFPageObj_AddMark adds a new content mark to the given page object.
+	// Experimental API.
+	FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error)
+
+	// FPDFPageObj_RemoveMark removes the given content mark from the given page object.
+	// Experimental API.
+	FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error)
+
+	// FPDFPageObjMark_GetName returns the name of a content mark.
+	// Experimental API.
+	FPDFPageObjMark_GetName(request *requests.FPDFPageObjMark_GetName) (*responses.FPDFPageObjMark_GetName, error)
+
+	// FPDFPageObjMark_CountParams returns the number of key/value pair parameters in the given mark.
+	// Experimental API.
+	FPDFPageObjMark_CountParams(request *requests.FPDFPageObjMark_CountParams) (*responses.FPDFPageObjMark_CountParams, error)
+
+	// FPDFPageObjMark_GetParamKey returns the key of a property in a content mark.
+	// Experimental API.
+	FPDFPageObjMark_GetParamKey(request *requests.FPDFPageObjMark_GetParamKey) (*responses.FPDFPageObjMark_GetParamKey, error)
+
+	// FPDFPageObjMark_GetParamValueType returns the type of the value of a property in a content mark by key.
+	// Experimental API.
+	FPDFPageObjMark_GetParamValueType(request *requests.FPDFPageObjMark_GetParamValueType) (*responses.FPDFPageObjMark_GetParamValueType, error)
+
+	// FPDFPageObjMark_GetParamIntValue returns the value of a number property in a content mark by key as int.
+	// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+	// for this property.
+	// Experimental API.
+	FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error)
+
+	// FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
+	// Experimental API.
+	FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error)
+
+	// FPDFPageObjMark_GetParamBlobValue returns the value of a blob property in a content mark by key.
+	// Experimental API.
+	FPDFPageObjMark_GetParamBlobValue(request *requests.FPDFPageObjMark_GetParamBlobValue) (*responses.FPDFPageObjMark_GetParamBlobValue, error)
+
+	// FPDFPageObjMark_SetIntParam sets the value of an int property in a content mark by key. If a parameter
+	// with the given key exists, its value is set to the given value. Otherwise, it is added as
+	// a new parameter.
+	// Experimental API.
+	FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error)
+
+	// FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter
+	// with the given key exists, its value is set to the given value. Otherwise, it is added as
+	// a new parameter.
+	// Experimental API.
+	FPDFPageObjMark_SetStringParam(request *requests.FPDFPageObjMark_SetStringParam) (*responses.FPDFPageObjMark_SetStringParam, error)
+
+	// FPDFPageObjMark_SetBlobParam sets the value of a blob property in a content mark by key. If a parameter
+	// with the given key exists, its value is set to the given value. Otherwise, it is added as
+	// a new parameter.
+	// Experimental API.
+	FPDFPageObjMark_SetBlobParam(request *requests.FPDFPageObjMark_SetBlobParam) (*responses.FPDFPageObjMark_SetBlobParam, error)
+
+	// FPDFPageObjMark_RemoveParam removes a property from a content mark by key.
+	// Experimental API.
+	FPDFPageObjMark_RemoveParam(request *requests.FPDFPageObjMark_RemoveParam) (*responses.FPDFPageObjMark_RemoveParam, error)
+
+	// FPDFImageObj_LoadJpegFile loads an image from a JPEG image file and then set it into the given image object.
+	// The image object might already have an associated image, which is shared and
+	// cached by the loaded pages. In that case, we need to clear the cached image
+	// for all the loaded pages. Pass the pages and page count to this API
+	// to clear the image cache. If the image is not previously shared, nil is a
+	// valid pages value.
+	FPDFImageObj_LoadJpegFile(request *requests.FPDFImageObj_LoadJpegFile) (*responses.FPDFImageObj_LoadJpegFile, error)
+
+	// FPDFImageObj_LoadJpegFileInline
+	// The image object might already have an associated image, which is shared and
+	// cached by the loaded pages. In that case, we need to clear the cached image
+	// for all the loaded pages. Pass the pages and page count to this API
+	// to clear the image cache. If the image is not previously shared, nil is a
+	// valid pages value. This function loads the JPEG image inline, so the image
+	// content is copied to the file. This allows the file access and its associated
+	// data to be deleted after this function returns.
+	FPDFImageObj_LoadJpegFileInline(request *requests.FPDFImageObj_LoadJpegFileInline) (*responses.FPDFImageObj_LoadJpegFileInline, error)
+
+	// FPDFImageObj_SetMatrix sets the transform matrix of the given image object.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the image object.
+	// Will be deprecated once FPDFPageObj_SetMatrix() is stable.
+	FPDFImageObj_SetMatrix(request *requests.FPDFImageObj_SetMatrix) (*responses.FPDFImageObj_SetMatrix, error)
+
+	// FPDFImageObj_SetBitmap sets the given bitmap to the given image object.
+	FPDFImageObj_SetBitmap(request *requests.FPDFImageObj_SetBitmap) (*responses.FPDFImageObj_SetBitmap, error)
+
+	// FPDFImageObj_GetBitmap returns a bitmap rasterization of the given image object. FPDFImageObj_GetBitmap() only
+	// operates on the image object and does not take the associated image mask into
+	// account. It also ignores the matrix for the image object.
+	// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+	// must be called on the returned bitmap when it is no longer needed.
+	FPDFImageObj_GetBitmap(request *requests.FPDFImageObj_GetBitmap) (*responses.FPDFImageObj_GetBitmap, error)
+
+	// FPDFImageObj_GetRenderedBitmap returns a bitmap rasterization of the given image object that takes the image mask and
+	// image matrix into account. To render correctly, the caller must provide the
+	// document associated with the image object. If there is a page associated
+	// with the image object the caller should provide that as well.
+	// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+	// must be called on the returned bitmap when it is no longer needed.
+	// Experimental API.
+	FPDFImageObj_GetRenderedBitmap(request *requests.FPDFImageObj_GetRenderedBitmap) (*responses.FPDFImageObj_GetRenderedBitmap, error)
+
+	// FPDFImageObj_GetImageDataDecoded returns the decoded image data of the image object. The decoded data is the
+	// uncompressed image data, i.e. the raw image data after having all filters
+	// applied.
+	FPDFImageObj_GetImageDataDecoded(request *requests.FPDFImageObj_GetImageDataDecoded) (*responses.FPDFImageObj_GetImageDataDecoded, error)
+
+	// FPDFImageObj_GetImageDataRaw returns the raw image data of the image object. The raw data is the image data as
+	// stored in the PDF without applying any filters.
+	FPDFImageObj_GetImageDataRaw(request *requests.FPDFImageObj_GetImageDataRaw) (*responses.FPDFImageObj_GetImageDataRaw, error)
+
+	// FPDFImageObj_GetImageFilterCount returns the number of filters (i.e. decoders) of the image in image object.
+	FPDFImageObj_GetImageFilterCount(request *requests.FPDFImageObj_GetImageFilterCount) (*responses.FPDFImageObj_GetImageFilterCount, error)
+
+	// FPDFImageObj_GetImageFilter returns the filter at index of the image object's list of filters. Note that the
+	// filters need to be applied in order, i.e. the first filter should be applied
+	// first, then the second, etc.
+	FPDFImageObj_GetImageFilter(request *requests.FPDFImageObj_GetImageFilter) (*responses.FPDFImageObj_GetImageFilter, error)
+
+	// FPDFImageObj_GetImageMetadata returns the image metadata of the image object, including dimension, DPI, bits per
+	// pixel, and colorspace. If the image object is not an image object or if it
+	// does not have an image, then the return value will be false. Otherwise,
+	// failure to retrieve any specific parameter would result in its value being 0.
+	FPDFImageObj_GetImageMetadata(request *requests.FPDFImageObj_GetImageMetadata) (*responses.FPDFImageObj_GetImageMetadata, error)
+
+	// FPDFPageObj_CreateNewPath creates a new path object at an initial position.
+	FPDFPageObj_CreateNewPath(request *requests.FPDFPageObj_CreateNewPath) (*responses.FPDFPageObj_CreateNewPath, error)
+
+	// FPDFPageObj_CreateNewRect creates a closed path consisting of a rectangle.
+	FPDFPageObj_CreateNewRect(request *requests.FPDFPageObj_CreateNewRect) (*responses.FPDFPageObj_CreateNewRect, error)
+
+	// FPDFPageObj_GetBounds returns the bounding box of the given page object.
+	FPDFPageObj_GetBounds(request *requests.FPDFPageObj_GetBounds) (*responses.FPDFPageObj_GetBounds, error)
+
+	// FPDFPageObj_SetBlendMode sets the blend mode of the page object.
+	FPDFPageObj_SetBlendMode(request *requests.FPDFPageObj_SetBlendMode) (*responses.FPDFPageObj_SetBlendMode, error)
+
+	// FPDFPageObj_SetStrokeColor sets the stroke RGBA of a page object.
+	FPDFPageObj_SetStrokeColor(request *requests.FPDFPageObj_SetStrokeColor) (*responses.FPDFPageObj_SetStrokeColor, error)
+
+	// FPDFPageObj_GetStrokeColor returns the stroke RGBA of a page object
+	FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error)
+
+	// FPDFPageObj_SetStrokeWidth sets the stroke width of a page object
+	FPDFPageObj_SetStrokeWidth(request *requests.FPDFPageObj_SetStrokeWidth) (*responses.FPDFPageObj_SetStrokeWidth, error)
+
+	// FPDFPageObj_GetStrokeWidth returns the stroke width of a page object.
+	FPDFPageObj_GetStrokeWidth(request *requests.FPDFPageObj_GetStrokeWidth) (*responses.FPDFPageObj_GetStrokeWidth, error)
+
+	// FPDFPageObj_GetLineJoin returns the line join of the page object.
+	FPDFPageObj_GetLineJoin(request *requests.FPDFPageObj_GetLineJoin) (*responses.FPDFPageObj_GetLineJoin, error)
+
+	// FPDFPageObj_SetLineJoin sets the line join of the page object.
+	FPDFPageObj_SetLineJoin(request *requests.FPDFPageObj_SetLineJoin) (*responses.FPDFPageObj_SetLineJoin, error)
+
+	// FPDFPageObj_GetLineCap returns the line cap of the page object.
+	FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error)
+
+	// FPDFPageObj_SetLineCap sets the line cap of the page object.
+	FPDFPageObj_SetLineCap(request *requests.FPDFPageObj_SetLineCap) (*responses.FPDFPageObj_SetLineCap, error)
+
+	// FPDFPageObj_SetFillColor sets the fill RGBA of a page object
+	FPDFPageObj_SetFillColor(request *requests.FPDFPageObj_SetFillColor) (*responses.FPDFPageObj_SetFillColor, error)
+
+	// FPDFPageObj_GetFillColor returns the fill RGBA of a page object
+	FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_GetFillColor) (*responses.FPDFPageObj_GetFillColor, error)
+
+	// FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
+	// Experimental API.
+	FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error)
+
+	// FPDFPageObj_SetDashPhase sets the line dash phase of the page object.
+	// Experimental API.
+	FPDFPageObj_SetDashPhase(request *requests.FPDFPageObj_SetDashPhase) (*responses.FPDFPageObj_SetDashPhase, error)
+
+	// FPDFPageObj_GetDashCount returns the line dash array size of the page object.
+	// Experimental API.
+	FPDFPageObj_GetDashCount(request *requests.FPDFPageObj_GetDashCount) (*responses.FPDFPageObj_GetDashCount, error)
+
+	// FPDFPageObj_GetDashArray returns the line dash array of the page object.
+	// Experimental API.
+	FPDFPageObj_GetDashArray(request *requests.FPDFPageObj_GetDashArray) (*responses.FPDFPageObj_GetDashArray, error)
+
+	// FPDFPageObj_SetDashArray sets the line dash array of the page object.
+	// Experimental API.
+	FPDFPageObj_SetDashArray(request *requests.FPDFPageObj_SetDashArray) (*responses.FPDFPageObj_SetDashArray, error)
+
+	// FPDFPath_CountSegments returns the number of segments inside the given path.
+	// A segment is a command, created by e.g. FPDFPath_MoveTo(),
+	// FPDFPath_LineTo() or FPDFPath_BezierTo().
+	FPDFPath_CountSegments(request *requests.FPDFPath_CountSegments) (*responses.FPDFPath_CountSegments, error)
+
+	// FPDFPath_GetPathSegment returns the segment in the given path at the given index.
+	FPDFPath_GetPathSegment(request *requests.FPDFPath_GetPathSegment) (*responses.FPDFPath_GetPathSegment, error)
+
+	// FPDFPathSegment_GetPoint returns the coordinates of the given segment.
+	FPDFPathSegment_GetPoint(request *requests.FPDFPathSegment_GetPoint) (*responses.FPDFPathSegment_GetPoint, error)
+
+	// FPDFPathSegment_GetType returns the type of the given segment.
+	FPDFPathSegment_GetType(request *requests.FPDFPathSegment_GetType) (*responses.FPDFPathSegment_GetType, error)
+
+	// FPDFPathSegment_GetClose returns whether the segment closes the current subpath of a given path.
+	FPDFPathSegment_GetClose(request *requests.FPDFPathSegment_GetClose) (*responses.FPDFPathSegment_GetClose, error)
+
+	// FPDFPath_MoveTo moves a path's current point.
+	// Note that no line will be created between the previous current point and the
+	// new one.
+	FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo) (*responses.FPDFPath_MoveTo, error)
+
+	// FPDFPath_LineTo adds a line between the current point and a new point in the path.
+	FPDFPath_LineTo(request *requests.FPDFPath_LineTo) (*responses.FPDFPath_LineTo, error)
+
+	// FPDFPath_BezierTo adds a cubic Bezier curve to the given path, starting at the current point.
+	FPDFPath_BezierTo(request *requests.FPDFPath_BezierTo) (*responses.FPDFPath_BezierTo, error)
+
+	// FPDFPath_Close closes the current subpath of a given path.
+	FPDFPath_Close(request *requests.FPDFPath_Close) (*responses.FPDFPath_Close, error)
+
+	// FPDFPath_SetDrawMode sets the drawing mode of a path.
+	FPDFPath_SetDrawMode(request *requests.FPDFPath_SetDrawMode) (*responses.FPDFPath_SetDrawMode, error)
+
+	// FPDFPath_GetDrawMode returns the drawing mode of a path.
+	FPDFPath_GetDrawMode(request *requests.FPDFPath_GetDrawMode) (*responses.FPDFPath_GetDrawMode, error)
+
+	// FPDFPageObj_NewTextObj creates a new text object using one of the standard PDF fonts.
+	FPDFPageObj_NewTextObj(request *requests.FPDFPageObj_NewTextObj) (*responses.FPDFPageObj_NewTextObj, error)
+
+	// FPDFText_SetText sets the text for a text object. If it had text, it will be replaced.
+	FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error)
+
+	// FPDFText_SetCharcodes sets the text using charcodes for a text object. If it had text, it will be
+	// replaced.
+	FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error)
+
+	// FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
+	// into the document.
+	// The loaded font can be closed using FPDFFont_Close.
+	FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
+
+	// FPDFText_LoadStandardFont loads one of the standard 14 fonts per PDF spec 1.7 page 416. The preferred
+	// way of using font style is using a dash to separate the name from the style,
+	// for example 'Helvetica-BoldItalic'.
+	// The loaded font can be closed using FPDFFont_Close.
+	// Experimental API.
+	FPDFText_LoadStandardFont(request *requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
+
+	// FPDFTextObj_GetFontSize returns the font size of a text object.
+	FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)
+
+	// FPDFFont_Close closes a loaded PDF font
+	FPDFFont_Close(request *requests.FPDFFont_Close) (*responses.FPDFFont_Close, error)
+
+	// FPDFPageObj_CreateTextObj creates a new text object using a loaded font.
+	FPDFPageObj_CreateTextObj(request *requests.FPDFPageObj_CreateTextObj) (*responses.FPDFPageObj_CreateTextObj, error)
+
+	// FPDFTextObj_GetTextRenderMode returns the text rendering mode of a text object.
+	FPDFTextObj_GetTextRenderMode(request *requests.FPDFTextObj_GetTextRenderMode) (*responses.FPDFTextObj_GetTextRenderMode, error)
+
+	// FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.
+	// Experimental API.
+	FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error)
+
+	// FPDFTextObj_GetText returns the text of a text object.
+	FPDFTextObj_GetText(request *requests.FPDFTextObj_GetText) (*responses.FPDFTextObj_GetText, error)
+
+	// FPDFTextObj_GetFont returns the font of a text object.
+	// Experimental API.
+	FPDFTextObj_GetFont(request *requests.FPDFTextObj_GetFont) (*responses.FPDFTextObj_GetFont, error)
+
+	// FPDFFont_GetFontName returns the font name of a font.
+	// Experimental API.
+	FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error)
+
+	// FPDFFont_GetFlags returns the descriptor flags of a font.
+	// Returns the bit flags specifying various characteristics of the font as
+	// defined in ISO 32000-1:2008, table 123.
+	// Experimental API.
+	FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) (*responses.FPDFFont_GetFlags, error)
+
+	// FPDFFont_GetWeight returns the font weight of a font.
+	// Typical values are 400 (normal) and 700 (bold).
+	// Experimental API.
+	FPDFFont_GetWeight(request *requests.FPDFFont_GetWeight) (*responses.FPDFFont_GetWeight, error)
+
+	// FPDFFont_GetItalicAngle returns the italic angle of a font.
+	// The italic angle of a font is defined as degrees counterclockwise
+	// from vertical. For a font that slopes to the right, this will be negative.
+	// Experimental API.
+	FPDFFont_GetItalicAngle(request *requests.FPDFFont_GetItalicAngle) (*responses.FPDFFont_GetItalicAngle, error)
+
+	// FPDFFont_GetAscent returns ascent distance of a font.
+	// Ascent is the maximum distance in points above the baseline reached by the
+	// glyphs of the font. One point is 1/72 inch (around 0.3528 mm).
+	// Experimental API.
+	FPDFFont_GetAscent(request *requests.FPDFFont_GetAscent) (*responses.FPDFFont_GetAscent, error)
+
+	// FPDFFont_GetDescent returns the descent distance of a font.
+	// Descent is the maximum distance in points below the baseline reached by the
+	// glyphs of the font. One point is 1/72 inch (around 0.3528 mm).
+	// Experimental API.
+	FPDFFont_GetDescent(request *requests.FPDFFont_GetDescent) (*responses.FPDFFont_GetDescent, error)
+
+	// FPDFFont_GetGlyphWidth returns the width of a glyph in a font.
+	// Glyph width is the distance from the end of the prior glyph to the next
+	// glyph. This will be the vertical distance for vertical writing.
+	// Experimental API.
+	FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetGlyphWidth) (*responses.FPDFFont_GetGlyphWidth, error)
+
+	// FPDFFont_GetGlyphPath returns the glyphpath describing how to draw a font glyph.
+	// Experimental API.
+	FPDFFont_GetGlyphPath(request *requests.FPDFFont_GetGlyphPath) (*responses.FPDFFont_GetGlyphPath, error)
+
+	// FPDFGlyphPath_CountGlyphSegments returns the number of segments inside the given glyphpath.
+	// Experimental API.
+	FPDFGlyphPath_CountGlyphSegments(request *requests.FPDFGlyphPath_CountGlyphSegments) (*responses.FPDFGlyphPath_CountGlyphSegments, error)
+
+	// FPDFGlyphPath_GetGlyphPathSegment returns the segment in glyphpath at the given index.
+	// Experimental API.
+	FPDFGlyphPath_GetGlyphPathSegment(request *requests.FPDFGlyphPath_GetGlyphPathSegment) (*responses.FPDFGlyphPath_GetGlyphPathSegment, error)
+
+	// FPDFFormObj_CountObjects returns the number of page objects inside the given form object.
+	FPDFFormObj_CountObjects(request *requests.FPDFFormObj_CountObjects) (*responses.FPDFFormObj_CountObjects, error)
+
+	// FPDFFormObj_GetObject returns the page object in the given form object at the given index.
+	FPDFFormObj_GetObject(request *requests.FPDFFormObj_GetObject) (*responses.FPDFFormObj_GetObject, error)
 
 	// End fpdf_edit.h
 
