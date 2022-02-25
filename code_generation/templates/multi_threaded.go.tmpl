@@ -55,6 +55,18 @@ func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }
 	}
 
 	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- else if eq $method.Name "FPDFImageObj_LoadJpegFile" -}}
+	if request.FileReader != nil {
+		return nil, errors.New("using a file-reader is not supported on multi-threaded usage")
+	}
+
+	return i.worker.plugin.{{ $method.Name }}(request)
+	{{- else if eq $method.Name "FPDFImageObj_LoadJpegFileInline" -}}
+	if request.FileReader != nil {
+		return nil, errors.New("using a file-reader is not supported on multi-threaded usage")
+	}
+
+	return i.worker.plugin.{{ $method.Name }}(request)
 	{{- else -}}
 	return i.worker.plugin.{{ $method.Name }}(request)
 	{{- end }}

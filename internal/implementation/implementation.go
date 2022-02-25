@@ -188,6 +188,10 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
 		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
+		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
+		fontRefs:             map[references.FPDF_FONT]*FontHandle{},
+		glyphPathRefs:        map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
+		fileReaders:          map[string]*fileReaderRef{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -228,6 +232,10 @@ type PdfiumImplementation struct {
 	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
 	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
 	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
+	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
+	fontRefs             map[references.FPDF_FONT]*FontHandle
+	glyphPathRefs        map[references.FPDF_GLYPHPATH]*GlyphPathHandle
+	fileReaders          map[string]*fileReaderRef
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -265,8 +273,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
 		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
 		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
 		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
 		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
@@ -480,6 +486,26 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.structElementRefs {
 		delete(p.structElementRefs, i)
+	}
+
+	for i := range p.pageObjectMarkRefs {
+		delete(p.pageObjectMarkRefs, i)
+	}
+
+	for i := range p.fontRefs {
+		delete(p.fontRefs, i)
+	}
+
+	for i := range p.glyphPathRefs {
+		delete(p.glyphPathRefs, i)
+	}
+
+	for i := range p.fileReaders {
+		// Cleanup file handle.
+		Pdfium.fileReaders[i].fileAccess = nil
+		C.free(Pdfium.fileReaders[i].stringRef)
+		delete(Pdfium.fileReaders, i)
+		delete(p.fileReaders, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
@@ -725,4 +751,52 @@ func (p *PdfiumImplementation) getStructElementHandle(structElement references.F
 	}
 
 	return nil, errors.New("could not find structElement handle, perhaps the structElement was already closed or you tried to share structElements between instances")
+}
+
+func (p *PdfiumImplementation) getPageObjectMarkHandle(pageObjectMark references.FPDF_PAGEOBJECTMARK) (*PageObjectMarkHandle, error) {
+	if pageObjectMark == "" {
+		return nil, errors.New("pageObjectMark not given")
+	}
+
+	if val, ok := p.pageObjectMarkRefs[pageObjectMark]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pageObjectMark handle, perhaps the pageObjectMark was already closed or you tried to share pageObjectMarks between instances")
+}
+
+func (p *PdfiumImplementation) getPathSegmentHandle(pathSegment references.FPDF_PATHSEGMENT) (*PathSegmentHandle, error) {
+	if pathSegment == "" {
+		return nil, errors.New("pathSegment not given")
+	}
+
+	if val, ok := p.pathSegmentRefs[pathSegment]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find pathSegment handle, perhaps the pathSegment was already closed or you tried to share pathSegments between instances")
+}
+
+func (p *PdfiumImplementation) getFontHandle(font references.FPDF_FONT) (*FontHandle, error) {
+	if font == "" {
+		return nil, errors.New("font not given")
+	}
+
+	if val, ok := p.fontRefs[font]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find font handle, perhaps the font was already closed or you tried to share fonts between instances")
+}
+
+func (p *PdfiumImplementation) getGlyphPathHandle(glyphPath references.FPDF_GLYPHPATH) (*GlyphPathHandle, error) {
+	if glyphPath == "" {
+		return nil, errors.New("glyphPath not given")
+	}
+
+	if val, ok := p.glyphPathRefs[glyphPath]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find glyphPath handle, perhaps the glyphPath was already closed or you tried to share glyphPaths between instances")
 }
