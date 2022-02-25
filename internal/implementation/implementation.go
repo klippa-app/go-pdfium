@@ -191,6 +191,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 		fontRefs:             map[references.FPDF_FONT]*FontHandle{},
 		glyphPathRefs:        map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
+		fileReaders:          map[string]*fileReaderRef{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -234,6 +235,7 @@ type PdfiumImplementation struct {
 	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 	fontRefs             map[references.FPDF_FONT]*FontHandle
 	glyphPathRefs        map[references.FPDF_GLYPHPATH]*GlyphPathHandle
+	fileReaders          map[string]*fileReaderRef
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -496,6 +498,14 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.glyphPathRefs {
 		delete(p.glyphPathRefs, i)
+	}
+
+	for i := range p.fileReaders {
+		// Cleanup file handle.
+		Pdfium.fileReaders[i].fileAccess = nil
+		C.free(Pdfium.fileReaders[i].stringRef)
+		delete(Pdfium.fileReaders, i)
+		delete(p.fileReaders, i)
 	}
 
 	delete(Pdfium.instanceRefs, p.instanceRef)
