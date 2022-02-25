@@ -72,17 +72,17 @@ type FPDFPage_TransFormWithClip struct {
 }
 
 type FPDFPageObj_TransformClipPath struct {
-	PageObj references.FPDF_PAGEOBJECT
-	A       float64
-	B       float64
-	C       float64
-	D       float64
-	E       float64
-	F       float64
+	PageObject references.FPDF_PAGEOBJECT
+	A          float64
+	B          float64
+	C          float64
+	D          float64
+	E          float64
+	F          float64
 }
 
 type FPDFPageObj_GetClipPath struct {
-	PageObj references.FPDF_PAGEOBJECT
+	PageObject references.FPDF_PAGEOBJECT
 }
 
 type FPDFClipPath_CountPaths struct {
