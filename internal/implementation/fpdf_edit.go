@@ -1,16 +1,31 @@
 package implementation
 
-// #cgo pkg-config: pdfium
-// #include "fpdf_edit.h"
-// #include <stdlib.h>
+/*
+#cgo pkg-config: pdfium
+#include "fpdf_edit.h"
+#include <stdlib.h>
+
+extern int go_read_seeker_cb(void *param, unsigned long position, unsigned char *pBuf, unsigned long size);
+
+static inline void FPDF_FILEACCESS_SET_GET_BLOCK(FPDF_FILEACCESS *fs, char *id) {
+	fs->m_GetBlock = &go_read_seeker_cb;
+	fs->m_Param = id;
+}
+
+*/
 import "C"
 import (
 	"errors"
+	"io"
+	"os"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-	"unsafe"
+
+	"github.com/google/uuid"
 )
 
 // FPDF_CreateNewDocument returns a new document.
@@ -308,7 +323,59 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFile(request *requests.FPDFI
 	p.Lock()
 	defer p.Unlock()
 
-	// @todo: implement me.
+	var pageHandle C.FPDF_PAGE
+	if request.Page != nil {
+		loadedPage, err := p.loadPage(*request.Page)
+		if err != nil {
+			return nil, err
+		}
+
+		pageHandle = loadedPage.handle
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileReader io.ReadSeeker
+	if request.FileReader != nil {
+		fileReader = request.FileReader
+	} else if request.FileData != nil {
+		fileReader = NewBytesReaderCloser(request.FileData)
+	} else {
+		openedFile, err := os.Open(request.FilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		fileReader = openedFile
+	}
+
+	// Create a PDFium file access struct.
+	readerStruct := C.FPDF_FILEACCESS{}
+	readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
+
+	readerRef := uuid.New()
+	readerRefString := readerRef.String()
+	cReaderRef := C.CString(readerRefString)
+
+	// Set the Go callback through cgo.
+	C.FPDF_FILEACCESS_SET_GET_BLOCK(&readerStruct, cReaderRef)
+
+	fileReaderRef := &fileReaderRef{
+		stringRef:  unsafe.Pointer(cReaderRef),
+		reader:     fileReader,
+		fileAccess: &readerStruct,
+	}
+
+	Pdfium.fileReaders[readerRef.String()] = fileReaderRef
+	p.fileReaders[readerRef.String()] = fileReaderRef
+
+	result := C.FPDFImageObj_LoadJpegFile(&pageHandle, C.int(request.Count), pageObjectHandle.handle, &readerStruct)
+	if int(result) == 0 {
+		return nil, errors.New("could not load jpeg file")
+	}
 
 	return &responses.FPDFImageObj_LoadJpegFile{}, nil
 }
@@ -325,7 +392,59 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFileInline(request *requests
 	p.Lock()
 	defer p.Unlock()
 
-	// @todo: implement me.
+	var pageHandle C.FPDF_PAGE
+	if request.Page != nil {
+		loadedPage, err := p.loadPage(*request.Page)
+		if err != nil {
+			return nil, err
+		}
+
+		pageHandle = loadedPage.handle
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileReader io.ReadSeeker
+	if request.FileReader != nil {
+		fileReader = request.FileReader
+	} else if request.FileData != nil {
+		fileReader = NewBytesReaderCloser(request.FileData)
+	} else {
+		openedFile, err := os.Open(request.FilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		fileReader = openedFile
+	}
+
+	// Create a PDFium file access struct.
+	readerStruct := C.FPDF_FILEACCESS{}
+	readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
+
+	readerRef := uuid.New()
+	readerRefString := readerRef.String()
+	cReaderRef := C.CString(readerRefString)
+
+	// Set the Go callback through cgo.
+	C.FPDF_FILEACCESS_SET_GET_BLOCK(&readerStruct, cReaderRef)
+
+	fileReaderRef := &fileReaderRef{
+		stringRef:  unsafe.Pointer(cReaderRef),
+		reader:     fileReader,
+		fileAccess: &readerStruct,
+	}
+
+	Pdfium.fileReaders[readerRef.String()] = fileReaderRef
+	p.fileReaders[readerRef.String()] = fileReaderRef
+
+	result := C.FPDFImageObj_LoadJpegFile(&pageHandle, C.int(request.Count), pageObjectHandle.handle, &readerStruct)
+	if int(result) == 0 {
+		return nil, errors.New("could not load jpeg file")
+	}
 
 	return &responses.FPDFImageObj_LoadJpegFileInline{}, nil
 }
@@ -358,14 +477,14 @@ func (p *PdfiumImplementation) FPDFImageObj_SetBitmap(request *requests.FPDFImag
 	p.Lock()
 	defer p.Unlock()
 
-	var pageHandle *C.FPDF_PAGE
+	var pageHandle C.FPDF_PAGE
 	if request.Page != nil {
 		loadedPage, err := p.loadPage(*request.Page)
 		if err != nil {
 			return nil, err
 		}
 
-		pageHandle = &loadedPage.handle
+		pageHandle = loadedPage.handle
 	}
 
 	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
@@ -378,7 +497,7 @@ func (p *PdfiumImplementation) FPDFImageObj_SetBitmap(request *requests.FPDFImag
 		return nil, err
 	}
 
-	success := C.FPDFImageObj_SetBitmap(pageHandle, C.int(request.Count), imageObjectHandle.handle, bitmapHandle.handle)
+	success := C.FPDFImageObj_SetBitmap(&pageHandle, C.int(request.Count), imageObjectHandle.handle, bitmapHandle.handle)
 	if int(success) == 0 {
 		return nil, errors.New("could not set image object bitmap")
 	}
@@ -426,7 +545,7 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageDataDecoded(request *request
 
 	imageDataLength := C.FPDFImageObj_GetImageDataDecoded(imageObjectHandle.handle, nil, 0)
 	if int(imageDataLength) == 0 {
-		return nil, errors.New("could not get raw image data")
+		return nil, errors.New("could not get decoded image data")
 	}
 
 	valueData := make([]byte, uint64(imageDataLength))
@@ -498,14 +617,8 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageFilter(request *requests.FPD
 	charData := make([]byte, uint64(imageFilterLength))
 	C.FPDFImageObj_GetImageFilter(imageObjectHandle.handle, C.int(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)))
 
-	// @todo: is this UTF16LE?
-	transformedText, err := p.transformUTF16LEToUTF8(charData)
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.FPDFImageObj_GetImageFilter{
-		ImageFilter: transformedText,
+		ImageFilter: string(charData[:len(charData)-1]), // Remove NULL-terminator.
 	}, nil
 }
 

@@ -178,6 +178,7 @@ type FPDFPageObjMark_RemoveParam struct {
 type FPDFImageObj_LoadJpegFile struct {
 	Page           *Page // The start of all loaded pages, may be nil.
 	Count          int   // Number of pages, may be 0.
+	ImageObject    references.FPDF_PAGEOBJECT
 	FileData       []byte
 	FileReader     io.ReadSeeker
 	FileReaderSize int64 // Size of the file when using a reader.
@@ -185,6 +186,9 @@ type FPDFImageObj_LoadJpegFile struct {
 }
 
 type FPDFImageObj_LoadJpegFileInline struct {
+	Page           *Page // The start of all loaded pages, may be nil.
+	Count          int   // Number of pages, may be 0.
+	ImageObject    references.FPDF_PAGEOBJECT
 	FileData       []byte
 	FileReader     io.ReadSeeker
 	FileReaderSize int64 // Size of the file when using a reader.
