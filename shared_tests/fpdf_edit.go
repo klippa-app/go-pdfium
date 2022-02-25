@@ -805,6 +805,10 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from a file reader", func() {
+						if TestType == "multi" {
+							Skip("Multi-threaded usage does not support file readers")
+						}
+
 						file, err := os.Open(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 						defer file.Close()
@@ -890,6 +894,10 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from a file reader", func() {
+						if TestType == "multi" {
+							Skip("Multi-threaded usage does not support file readers")
+						}
+
 						file, err := os.Open(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 						defer file.Close()
