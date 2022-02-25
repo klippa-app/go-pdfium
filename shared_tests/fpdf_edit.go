@@ -1027,6 +1027,58 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(FPDFImageObj_GetImageDataRaw).To(BeNil())
 				})
 			})
+
+			It("allows a path object to be created", func() {
+				FPDFPageObj_CreateNewPath, err := PdfiumInstance.FPDFPageObj_CreateNewPath(&requests.FPDFPageObj_CreateNewPath{
+					X: 100,
+					Y: 100,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateNewPath).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateNewPath.PageObject).To(Not(BeEmpty()))
+			})
+
+			It("allows a rect object to be created", func() {
+				FPDFPageObj_CreateNewRect, err := PdfiumInstance.FPDFPageObj_CreateNewRect(&requests.FPDFPageObj_CreateNewRect{
+					X: 100,
+					Y: 100,
+					W: 100,
+					H: 200,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateNewRect).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateNewRect.PageObject).To(Not(BeEmpty()))
+			})
+
+			It("allows a font to be loaded, a text object to be created with it and to be closed", func() {
+				fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
+				Expect(err).To(BeNil())
+
+				FPDFText_LoadFont, err := PdfiumInstance.FPDFText_LoadFont(&requests.FPDFText_LoadFont{
+					Document: doc,
+					Data:     fontData,
+					FontType: enums.FPDF_FONT_TRUETYPE,
+					CID:      true,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_LoadFont).To(Not(BeNil()))
+				Expect(FPDFText_LoadFont.Font).To(Not(BeEmpty()))
+
+				FPDFPageObj_CreateTextObj, err := PdfiumInstance.FPDFPageObj_CreateTextObj(&requests.FPDFPageObj_CreateTextObj{
+					Font:     FPDFText_LoadFont.Font,
+					Document: doc,
+					FontSize: 20,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateTextObj).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateTextObj.PageObject).To(Not(BeEmpty()))
+
+				FPDFFont_Close, err := PdfiumInstance.FPDFFont_Close(&requests.FPDFFont_Close{
+					Font: FPDFText_LoadFont.Font,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFFont_Close).To(Equal(&responses.FPDFFont_Close{}))
+			})
 		})
 	})
 	Context("a PDF file with images", func() {
@@ -1070,6 +1122,15 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(FPDFPage_GetObject).To(Not(BeNil()))
 					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
 					imageObject = FPDFPage_GetObject.PageObject
+
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_IMAGE,
+					}))
 				})
 
 				It("returns the correct decoded image data", func() {
@@ -1156,6 +1217,677 @@ var _ = Describe("fpdf_edit", func() {
 							MarkedContentID: 5,
 						},
 					}))
+				})
+
+				It("allows getting the bounds of a page object", func() {
+					FPDFPageObj_GetBounds, err := PdfiumInstance.FPDFPageObj_GetBounds(&requests.FPDFPageObj_GetBounds{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetBounds).To(Equal(&responses.FPDFPageObj_GetBounds{
+						Left:   72,
+						Bottom: 646.510009765625,
+						Right:  125,
+						Top:    689.510009765625,
+					}))
+				})
+
+				It("allows setting the blend mode of a page object", func() {
+					FPDFPageObj_SetBlendMode, err := PdfiumInstance.FPDFPageObj_SetBlendMode(&requests.FPDFPageObj_SetBlendMode{
+						PageObject: imageObject,
+						BlendMode:  enums.PDF_BLEND_MODE_DARKEN,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetBlendMode).To(Equal(&responses.FPDFPageObj_SetBlendMode{}))
+				})
+
+				It("allows setting the stroke color of a page object", func() {
+					FPDFPageObj_SetStrokeColor, err := PdfiumInstance.FPDFPageObj_SetStrokeColor(&requests.FPDFPageObj_SetStrokeColor{
+						PageObject: imageObject,
+						StrokeColor: structs.FPDF_COLOR{
+							R: 255,
+							G: 255,
+							B: 255,
+							A: 255,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetStrokeColor).To(Equal(&responses.FPDFPageObj_SetStrokeColor{}))
+				})
+
+				It("returns an error when the object has no stroke color", func() {
+					FPDFPageObj_GetStrokeColor, err := PdfiumInstance.FPDFPageObj_GetStrokeColor(&requests.FPDFPageObj_GetStrokeColor{
+						PageObject: imageObject,
+					})
+					Expect(err).To(MatchError("could not get page object stroke color"))
+					Expect(FPDFPageObj_GetStrokeColor).To(BeNil())
+				})
+
+				It("allows setting the stroke color of a page object and then retrieving it again", func() {
+					FPDFPageObj_SetStrokeColor, err := PdfiumInstance.FPDFPageObj_SetStrokeColor(&requests.FPDFPageObj_SetStrokeColor{
+						PageObject: imageObject,
+						StrokeColor: structs.FPDF_COLOR{
+							R: 255,
+							G: 255,
+							B: 255,
+							A: 255,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetStrokeColor).To(Equal(&responses.FPDFPageObj_SetStrokeColor{}))
+
+					FPDFPageObj_GetStrokeColor, err := PdfiumInstance.FPDFPageObj_GetStrokeColor(&requests.FPDFPageObj_GetStrokeColor{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetStrokeColor).To(Equal(&responses.FPDFPageObj_GetStrokeColor{
+						StrokeColor: structs.FPDF_COLOR{
+							R: 255,
+							G: 255,
+							B: 255,
+							A: 255,
+						},
+					}))
+				})
+
+				It("allows setting the stroke width of a page object", func() {
+					FPDFPageObj_SetStrokeWidth, err := PdfiumInstance.FPDFPageObj_SetStrokeWidth(&requests.FPDFPageObj_SetStrokeWidth{
+						PageObject:  imageObject,
+						StrokeWidth: 3,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetStrokeWidth).To(Equal(&responses.FPDFPageObj_SetStrokeWidth{}))
+				})
+
+				It("allows setting the stroke width of a page object and then retrieving it again", func() {
+					FPDFPageObj_GetStrokeWidth, err := PdfiumInstance.FPDFPageObj_GetStrokeWidth(&requests.FPDFPageObj_GetStrokeWidth{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetStrokeWidth).To(Equal(&responses.FPDFPageObj_GetStrokeWidth{
+						StrokeWidth: 1,
+					}))
+
+					FPDFPageObj_SetStrokeWidth, err := PdfiumInstance.FPDFPageObj_SetStrokeWidth(&requests.FPDFPageObj_SetStrokeWidth{
+						PageObject:  imageObject,
+						StrokeWidth: 3,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetStrokeWidth).To(Equal(&responses.FPDFPageObj_SetStrokeWidth{}))
+
+					FPDFPageObj_GetStrokeWidth, err = PdfiumInstance.FPDFPageObj_GetStrokeWidth(&requests.FPDFPageObj_GetStrokeWidth{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetStrokeWidth).To(Equal(&responses.FPDFPageObj_GetStrokeWidth{
+						StrokeWidth: 3,
+					}))
+				})
+
+				It("allows getting the line join of a page object", func() {
+					FPDFPageObj_GetLineJoin, err := PdfiumInstance.FPDFPageObj_GetLineJoin(&requests.FPDFPageObj_GetLineJoin{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetLineJoin).To(Equal(&responses.FPDFPageObj_GetLineJoin{
+						LineJoin: enums.FPDF_LINEJOIN_MITER,
+					}))
+				})
+
+				It("allows setting the line join of a page object", func() {
+					FPDFPageObj_SetLineJoin, err := PdfiumInstance.FPDFPageObj_SetLineJoin(&requests.FPDFPageObj_SetLineJoin{
+						PageObject: imageObject,
+						LineJoin:   enums.FPDF_LINEJOIN_BEVEL,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetLineJoin).To(Equal(&responses.FPDFPageObj_SetLineJoin{}))
+				})
+
+				It("allows setting the line join of a page object and then retrieving it again", func() {
+					FPDFPageObj_SetLineJoin, err := PdfiumInstance.FPDFPageObj_SetLineJoin(&requests.FPDFPageObj_SetLineJoin{
+						PageObject: imageObject,
+						LineJoin:   enums.FPDF_LINEJOIN_BEVEL,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetLineJoin).To(Equal(&responses.FPDFPageObj_SetLineJoin{}))
+
+					FPDFPageObj_GetLineJoin, err := PdfiumInstance.FPDFPageObj_GetLineJoin(&requests.FPDFPageObj_GetLineJoin{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetLineJoin).To(Equal(&responses.FPDFPageObj_GetLineJoin{
+						LineJoin: enums.FPDF_LINEJOIN_BEVEL,
+					}))
+				})
+
+				It("allows getting the line cap of a page object", func() {
+					FPDFPageObj_GetLineCap, err := PdfiumInstance.FPDFPageObj_GetLineCap(&requests.FPDFPageObj_GetLineCap{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetLineCap).To(Equal(&responses.FPDFPageObj_GetLineCap{
+						LineCap: enums.FPDF_LINECAP_BUTT,
+					}))
+				})
+
+				It("allows setting the line cap of a page object", func() {
+					FPDFPageObj_SetLineCap, err := PdfiumInstance.FPDFPageObj_SetLineCap(&requests.FPDFPageObj_SetLineCap{
+						PageObject: imageObject,
+						LineCap:    enums.FPDF_LINECAP_PROJECTING_SQUAR,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetLineCap).To(Equal(&responses.FPDFPageObj_SetLineCap{}))
+				})
+
+				It("allows setting the line cap of a page object and then retrieving it again", func() {
+					FPDFPageObj_SetLineCap, err := PdfiumInstance.FPDFPageObj_SetLineCap(&requests.FPDFPageObj_SetLineCap{
+						PageObject: imageObject,
+						LineCap:    enums.FPDF_LINECAP_PROJECTING_SQUAR,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetLineCap).To(Equal(&responses.FPDFPageObj_SetLineCap{}))
+
+					FPDFPageObj_GetLineCap, err := PdfiumInstance.FPDFPageObj_GetLineCap(&requests.FPDFPageObj_GetLineCap{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetLineCap).To(Equal(&responses.FPDFPageObj_GetLineCap{
+						LineCap: enums.FPDF_LINECAP_BUTT,
+					}))
+				})
+
+				It("allows setting the fill color of a page object", func() {
+					FPDFPageObj_SetFillColor, err := PdfiumInstance.FPDFPageObj_SetFillColor(&requests.FPDFPageObj_SetFillColor{
+						PageObject: imageObject,
+						FillColor: structs.FPDF_COLOR{
+							R: 255,
+							G: 255,
+							B: 255,
+							A: 255,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetFillColor).To(Equal(&responses.FPDFPageObj_SetFillColor{}))
+				})
+
+				It("returns an error when the object has no fill color", func() {
+					FPDFPageObj_GetFillColor, err := PdfiumInstance.FPDFPageObj_GetFillColor(&requests.FPDFPageObj_GetFillColor{
+						PageObject: imageObject,
+					})
+					Expect(err).To(MatchError("could not get page object fill color"))
+					Expect(FPDFPageObj_GetFillColor).To(BeNil())
+				})
+
+				It("allows setting the fill color of a page object and then retrieving it again", func() {
+					FPDFPageObj_SetFillColor, err := PdfiumInstance.FPDFPageObj_SetFillColor(&requests.FPDFPageObj_SetFillColor{
+						PageObject: imageObject,
+						FillColor: structs.FPDF_COLOR{
+							R: 255,
+							G: 255,
+							B: 255,
+							A: 255,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetFillColor).To(Equal(&responses.FPDFPageObj_SetFillColor{}))
+
+					FPDFPageObj_GetFillColor, err := PdfiumInstance.FPDFPageObj_GetFillColor(&requests.FPDFPageObj_GetFillColor{
+						PageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetFillColor).To(Equal(&responses.FPDFPageObj_GetFillColor{
+						FillColor: structs.FPDF_COLOR{
+							R: 0,
+							G: 0,
+							B: 0,
+							A: 255,
+						},
+					}))
+				})
+
+				It("returns an error when trying to get the path segments on an image", func() {
+					FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{
+						PageObject: imageObject,
+					})
+					Expect(err).To(MatchError("could not get path segment count"))
+					Expect(FPDFPath_CountSegments).To(BeNil())
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with a clip path", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/clip_path.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when an page object has been loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_PATH,
+					}))
+				})
+
+				It("allows getting the count of segments of a path", func() {
+					FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_CountSegments).To(Equal(&responses.FPDFPath_CountSegments{
+						Count: 4,
+					}))
+				})
+
+				It("returns an error when trying to load an invalid path segment", func() {
+					FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
+						PageObject: pageObject,
+						Index:      35,
+					})
+					Expect(err).To(MatchError("could not get path segment"))
+					Expect(FPDFPath_GetPathSegment).To(BeNil())
+				})
+
+				It("allows getting a path segments", func() {
+					FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
+						PageObject: pageObject,
+						Index:      0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_GetPathSegment).To(Not(BeNil()))
+					Expect(FPDFPath_GetPathSegment.PathSegment).To(Not(BeEmpty()))
+				})
+
+				Context("when an path segment has been loaded", func() {
+					var pathSegment references.FPDF_PATHSEGMENT
+
+					BeforeEach(func() {
+						FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
+							PageObject: pageObject,
+							Index:      0,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFPath_GetPathSegment).To(Not(BeNil()))
+						Expect(FPDFPath_GetPathSegment.PathSegment).To(Not(BeEmpty()))
+						pathSegment = FPDFPath_GetPathSegment.PathSegment
+					})
+
+					It("allows getting the point of a path segment", func() {
+						FPDFPathSegment_GetPoint, err := PdfiumInstance.FPDFPathSegment_GetPoint(&requests.FPDFPathSegment_GetPoint{
+							PathSegment: pathSegment,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFPathSegment_GetPoint).To(Equal(&responses.FPDFPathSegment_GetPoint{
+							X: 10,
+							Y: 10,
+						}))
+					})
+
+					It("allows getting the type of a path segment", func() {
+						FPDFPathSegment_GetType, err := PdfiumInstance.FPDFPathSegment_GetType(&requests.FPDFPathSegment_GetType{
+							PathSegment: pathSegment,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFPathSegment_GetType).To(Equal(&responses.FPDFPathSegment_GetType{
+							Type: enums.FPDF_SEGMENT_MOVETO,
+						}))
+					})
+
+					It("allows getting the close of a path segment", func() {
+						FPDFPathSegment_GetClose, err := PdfiumInstance.FPDFPathSegment_GetClose(&requests.FPDFPathSegment_GetClose{
+							PathSegment: pathSegment,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFPathSegment_GetClose).To(Equal(&responses.FPDFPathSegment_GetClose{
+							IsClose: false,
+						}))
+					})
+				})
+
+				It("allows moving the path to a point", func() {
+					FPDFPath_MoveTo, err := PdfiumInstance.FPDFPath_MoveTo(&requests.FPDFPath_MoveTo{
+						PageObject: pageObject,
+						X:          100,
+						Y:          100,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_MoveTo).To(Equal(&responses.FPDFPath_MoveTo{}))
+				})
+
+				It("allows adding a line to a path", func() {
+					FPDFPath_LineTo, err := PdfiumInstance.FPDFPath_LineTo(&requests.FPDFPath_LineTo{
+						PageObject: pageObject,
+						X:          100,
+						Y:          100,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_LineTo).To(Equal(&responses.FPDFPath_LineTo{}))
+				})
+
+				It("allows adding a bezier to a path", func() {
+					FPDFPath_BezierTo, err := PdfiumInstance.FPDFPath_BezierTo(&requests.FPDFPath_BezierTo{
+						PageObject: pageObject,
+						X1:         100,
+						Y1:         100,
+						X2:         200,
+						Y2:         200,
+						X3:         300,
+						Y3:         300,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_BezierTo).To(Equal(&responses.FPDFPath_BezierTo{}))
+				})
+
+				It("allows closing a path", func() {
+					FPDFPath_Close, err := PdfiumInstance.FPDFPath_Close(&requests.FPDFPath_Close{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_Close).To(Equal(&responses.FPDFPath_Close{}))
+				})
+
+				It("allows setting the draw mode of a path", func() {
+					FPDFPath_SetDrawMode, err := PdfiumInstance.FPDFPath_SetDrawMode(&requests.FPDFPath_SetDrawMode{
+						PageObject: pageObject,
+						FillMode:   enums.FPDF_FILLMODE_ALTERNATE,
+						Stroke:     true,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_SetDrawMode).To(Equal(&responses.FPDFPath_SetDrawMode{}))
+				})
+
+				It("allows getting the draw mode of a path", func() {
+					FPDFPath_GetDrawMode, err := PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_GetDrawMode).To(Equal(&responses.FPDFPath_GetDrawMode{
+						FillMode: enums.FPDF_FILLMODE_NONE,
+						Stroke:   true,
+					}))
+				})
+
+				It("allows setting the draw mode of a path and then getting it again", func() {
+					FPDFPath_GetDrawMode, err := PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_GetDrawMode).To(Equal(&responses.FPDFPath_GetDrawMode{
+						FillMode: enums.FPDF_FILLMODE_NONE,
+						Stroke:   true,
+					}))
+
+					FPDFPath_SetDrawMode, err := PdfiumInstance.FPDFPath_SetDrawMode(&requests.FPDFPath_SetDrawMode{
+						PageObject: pageObject,
+						FillMode:   enums.FPDF_FILLMODE_ALTERNATE,
+						Stroke:     true,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_SetDrawMode).To(Equal(&responses.FPDFPath_SetDrawMode{}))
+
+					FPDFPath_GetDrawMode, err = PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPath_GetDrawMode).To(Equal(&responses.FPDFPath_GetDrawMode{
+						FillMode: enums.FPDF_FILLMODE_ALTERNATE,
+						Stroke:   true,
+					}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with hello world", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when an page object has been loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_TEXT,
+					}))
+				})
+
+				It("allows us changing the text using a string", func() {
+					FPDFText_SetText, err := PdfiumInstance.FPDFText_SetText(&requests.FPDFText_SetText{
+						PageObject: pageObject,
+						Text:       "Changed for SetText test",
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_SetText).To(Equal(&responses.FPDFText_SetText{}))
+				})
+
+				It("allows us changing the text using charcodes", func() {
+					FPDFText_SetCharcodes, err := PdfiumInstance.FPDFText_SetCharcodes(&requests.FPDFText_SetCharcodes{
+						PageObject: pageObject,
+						CharCodes: []uint32{
+							9, 6, 7, 3, 5, 2, 1,
+							9, 6, 7, 4, 8, 2,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_SetCharcodes).To(Equal(&responses.FPDFText_SetCharcodes{}))
+				})
+
+				It("allows getting the font size", func() {
+					FPDFTextObj_GetFontSize, err := PdfiumInstance.FPDFTextObj_GetFontSize(&requests.FPDFTextObj_GetFontSize{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetFontSize).To(Equal(&responses.FPDFTextObj_GetFontSize{
+						FontSize: 12,
+					}))
+				})
+
+				It("allows getting the text render mode", func() {
+					FPDFTextObj_GetTextRenderMode, err := PdfiumInstance.FPDFTextObj_GetTextRenderMode(&requests.FPDFTextObj_GetTextRenderMode{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetTextRenderMode).To(Equal(&responses.FPDFTextObj_GetTextRenderMode{
+						TextRenderMode: enums.FPDF_TEXTRENDERMODE_FILL,
+					}))
+				})
+
+				It("returns an error when getting the text without a tex page", func() {
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+					})
+					Expect(err).To(MatchError("textPage not given"))
+					Expect(FPDFTextObj_GetText).To(BeNil())
+				})
+
+				It("allows getting the text", func() {
+					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_LoadPage).To(Not(BeNil()))
+					Expect(FPDFText_LoadPage.TextPage).To(Not(BeEmpty()))
+
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+						TextPage:   FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetText).To(Equal(&responses.FPDFTextObj_GetText{
+						Text: "Hello, world!",
+					}))
+
+					FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_ClosePage).To(Equal(&responses.FPDFText_ClosePage{}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with form objects", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/form_object.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when an page object has been loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_FORM,
+					}))
+				})
+
+				It("allows to get the form object count", func() {
+					FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
+						Count: 2,
+					}))
+				})
+
+				It("returns an error when getting an invalid form object", func() {
+					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
+						PageObject: pageObject,
+						Index:      23,
+					})
+					Expect(err).To(MatchError("could not get form object"))
+					Expect(FPDFFormObj_GetObject).To(BeNil())
+				})
+
+				It("allows to get a form object", func() {
+					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
+						PageObject: pageObject,
+						Index:      0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_GetObject).To(Not(BeNil()))
+					Expect(FPDFFormObj_GetObject.PageObject).To(Not(BeEmpty()))
 				})
 			})
 		})
