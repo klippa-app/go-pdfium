@@ -329,11 +329,11 @@ var _ = Describe("fpdf_edit", func() {
 		})
 	})
 
-	Context("a PDF file with hello world", func() {
+	Context("a PDF file with an embedded font", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_font.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -443,7 +443,7 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetFontName).To(Equal(&responses.FPDFFont_GetFontName{
-							FontName: "Chrom Serif OTF",
+							FontName: "Liberation Serif",
 						}))
 					})
 
@@ -453,7 +453,7 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetFlags).To(Equal(&responses.FPDFFont_GetFlags{
-							Flags: 32,
+							Flags: 4,
 						}))
 					})
 
@@ -462,7 +462,9 @@ var _ = Describe("fpdf_edit", func() {
 							Font: font,
 						})
 						Expect(err).To(BeNil())
-						Expect(FPDFFont_GetWeight).To(Equal(&responses.FPDFFont_GetWeight{}))
+						Expect(FPDFFont_GetWeight).To(Equal(&responses.FPDFFont_GetWeight{
+							Weight: 400,
+						}))
 					})
 
 					It("allows us getting the font italic angle", func() {
@@ -480,7 +482,7 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetAscent).To(Equal(&responses.FPDFFont_GetAscent{
-							Ascent: 14.04800033569336,
+							Ascent: 14.255999565124512,
 						}))
 					})
 
@@ -491,7 +493,7 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetDescent).To(Equal(&responses.FPDFFont_GetDescent{
-							Descent: -3.9839999675750732,
+							Descent: -3.4560000896453857,
 						}))
 					})
 
@@ -550,7 +552,7 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFGlyphPath_CountGlyphSegments).To(Equal(&responses.FPDFGlyphPath_CountGlyphSegments{
-							Count: 57,
+							Count: 74,
 						}))
 
 						FPDFGlyphPath_GetGlyphPathSegment, err := PdfiumInstance.FPDFGlyphPath_GetGlyphPathSegment(&requests.FPDFGlyphPath_GetGlyphPathSegment{
