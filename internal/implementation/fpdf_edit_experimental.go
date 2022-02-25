@@ -798,14 +798,44 @@ func (p *PdfiumImplementation) FPDFFont_GetFlags(request *requests.FPDFFont_GetF
 		return nil, err
 	}
 
-	fontFlags := C.FPDFFont_GetFlags(fontHandle.handle)
-	if int(fontFlags) == -1 {
+	flags := C.FPDFFont_GetFlags(fontHandle.handle)
+	if int(flags) == -1 {
 		return nil, errors.New("could not get font flags")
 	}
 
-	return &responses.FPDFFont_GetFlags{
-		Flags: int(fontFlags),
-	}, nil
+	fontFlags := &responses.FPDFFont_GetFlags{
+		Flags: uint32(flags),
+	}
+
+	FixedPitch := uint32(1 << 1)
+	Serif := uint32(1 << 2)
+	Symbolic := uint32(1 << 3)
+	Script := uint32(1 << 4)
+	Nonsymbolic := uint32(1 << 6)
+	Italic := uint32(1 << 7)
+	AllCap := uint32(1 << 17)
+	SmallCap := uint32(1 << 18)
+	ForceBold := uint32(1 << 19)
+
+	hasFlag := func(flag uint32) bool {
+		if fontFlags.Flags&flag > 0 {
+			return true
+		}
+
+		return false
+	}
+
+	fontFlags.FixedPitch = hasFlag(FixedPitch)
+	fontFlags.Serif = hasFlag(Serif)
+	fontFlags.Symbolic = hasFlag(Symbolic)
+	fontFlags.Script = hasFlag(Script)
+	fontFlags.Nonsymbolic = hasFlag(Nonsymbolic)
+	fontFlags.Italic = hasFlag(Italic)
+	fontFlags.AllCap = hasFlag(AllCap)
+	fontFlags.SmallCap = hasFlag(SmallCap)
+	fontFlags.ForceBold = hasFlag(ForceBold)
+
+	return fontFlags, nil
 }
 
 // FPDFFont_GetWeight returns the font weight of a font.

@@ -453,7 +453,16 @@ var _ = Describe("fpdf_edit", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetFlags).To(Equal(&responses.FPDFFont_GetFlags{
-							Flags: 4,
+							Flags:       4,
+							FixedPitch:  false,
+							Serif:       true,
+							Symbolic:    false,
+							Script:      false,
+							Nonsymbolic: false,
+							Italic:      false,
+							AllCap:      false,
+							SmallCap:    false,
+							ForceBold:   false,
 						}))
 					})
 
