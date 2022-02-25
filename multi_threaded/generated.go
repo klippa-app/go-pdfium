@@ -532,12 +532,20 @@ func (i *pdfiumInstance) FPDFImageObj_LoadJpegFile(request *requests.FPDFImageOb
 		return nil, errors.New("instance is closed")
 	}
 
+	if request.FileReader != nil {
+		return nil, errors.New("using a file-reader is not supported on multi-threaded usage")
+	}
+
 	return i.worker.plugin.FPDFImageObj_LoadJpegFile(request)
 }
 
 func (i *pdfiumInstance) FPDFImageObj_LoadJpegFileInline(request *requests.FPDFImageObj_LoadJpegFileInline) (*responses.FPDFImageObj_LoadJpegFileInline, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
+	}
+
+	if request.FileReader != nil {
+		return nil, errors.New("using a file-reader is not supported on multi-threaded usage")
 	}
 
 	return i.worker.plugin.FPDFImageObj_LoadJpegFileInline(request)
