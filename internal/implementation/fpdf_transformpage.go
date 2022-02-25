@@ -272,7 +272,7 @@ func (p *PdfiumImplementation) FPDFPageObj_TransformClipPath(request *requests.F
 	p.Lock()
 	defer p.Unlock()
 
-	pageObjectHandle, err := p.getPageObjectHandle(request.PageObj)
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
 	if err != nil {
 		return nil, err
 	}

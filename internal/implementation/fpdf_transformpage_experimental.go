@@ -9,6 +9,8 @@ package implementation
 */
 import "C"
 import (
+	"errors"
+
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -19,7 +21,7 @@ func (p *PdfiumImplementation) FPDFPageObj_GetClipPath(request *requests.FPDFPag
 	p.Lock()
 	defer p.Unlock()
 
-	pageObjectHandle, err := p.getPageObjectHandle(request.PageObj)
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +46,10 @@ func (p *PdfiumImplementation) FPDFClipPath_CountPaths(request *requests.FPDFCli
 	}
 
 	count := C.FPDFClipPath_CountPaths(clipPathHandle.handle)
+	if int(count) == -1 {
+		return nil, errors.New("could not get clip path path count")
+	}
+
 	return &responses.FPDFClipPath_CountPaths{
 		Count: int(count),
 	}, nil
@@ -61,6 +67,11 @@ func (p *PdfiumImplementation) FPDFClipPath_CountPathSegments(request *requests.
 	}
 
 	count := C.FPDFClipPath_CountPathSegments(clipPathHandle.handle, C.int(request.PathIndex))
+
+	if int(count) == -1 {
+		return nil, errors.New("could not get clip path path segment count")
+	}
+
 	return &responses.FPDFClipPath_CountPathSegments{
 		Count: int(count),
 	}, nil
@@ -78,6 +89,9 @@ func (p *PdfiumImplementation) FPDFClipPath_GetPathSegment(request *requests.FPD
 	}
 
 	pathSegment := C.FPDFClipPath_GetPathSegment(clipPathHandle.handle, C.int(request.PathIndex), C.int(request.SegmentIndex))
+	if pathSegment == nil {
+		return nil, errors.New("could not get clip path segment")
+	}
 
 	pathSegmentHandle := p.registerPathSegment(pathSegment)
 
