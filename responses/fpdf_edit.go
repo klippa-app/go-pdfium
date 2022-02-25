@@ -295,7 +295,16 @@ type FPDFFont_GetFontName struct {
 }
 
 type FPDFFont_GetFlags struct {
-	Flags int
+	Flags       uint32
+	FixedPitch  bool // Whether all glyphs have the same width (as opposed to proportional or variable-pitch fonts, which have different widths).
+	Serif       bool // Whether glyphs have serifs, which are short strokes drawn at an angle on the top and bottom of glyph stems. (Sans serif fonts do not have serifs.)
+	Symbolic    bool // Whether the font contains glyphs outside the Adobe standard Latin character set. This flag and the Nonsymbolic flag shall not both be set or both be clear.
+	Script      bool // Whether the glyphs resemble cursive handwriting.
+	Nonsymbolic bool // Whether the font uses the Adobe standard Latin character set or a subset of it.
+	Italic      bool // Whether the glyphs have dominant vertical strokes that are slanted.
+	AllCap      bool // Whether the font contains no lowercase letters; typically used for display purposes, such as for titles or headlines.
+	SmallCap    bool // Whether the font contains both uppercase and lowercase letters. The uppercase letters are similar to those in the regular version of the same typeface family. The glyphs for the lowercase letters have the same shapes as the corresponding uppercase letters, but they are sized and their proportions adjusted so that they have the same size and stroke weight as lowercase glyphs in the same typeface family.
+	ForceBold   bool // Whether bold glyphs shall be painted with extra pixels even at very small text sizes by a conforming reader. If the ForceBold flag is set, features of bold glyphs may be thickened at small text sizes.
 }
 
 type FPDFFont_GetWeight struct {
