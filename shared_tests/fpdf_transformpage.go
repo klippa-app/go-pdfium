@@ -440,62 +440,6 @@ var _ = Describe("fpdf_transformpage", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_TransformClipPath).To(Equal(&responses.FPDFPageObj_TransformClipPath{}))
 				})
-
-				It("returns the correct clip path info", func() {
-					By("loading the clip path")
-					FPDFPageObj_GetClipPath, err := PdfiumInstance.FPDFPageObj_GetClipPath(&requests.FPDFPageObj_GetClipPath{
-						PageObject: pageObject,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFPageObj_GetClipPath).ToNot(BeNil())
-					Expect(FPDFPageObj_GetClipPath.ClipPath).ToNot(BeEmpty())
-
-					By("counting the paths in the clip path")
-					FPDFClipPath_CountPaths, err := PdfiumInstance.FPDFClipPath_CountPaths(&requests.FPDFClipPath_CountPaths{
-						ClipPath: FPDFPageObj_GetClipPath.ClipPath,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFClipPath_CountPaths).To(Equal(&responses.FPDFClipPath_CountPaths{
-						Count: 1,
-					}))
-
-					By("receiving an error when giving an invalid index")
-					FPDFClipPath_CountPathSegments, err := PdfiumInstance.FPDFClipPath_CountPathSegments(&requests.FPDFClipPath_CountPathSegments{
-						ClipPath:  FPDFPageObj_GetClipPath.ClipPath,
-						PathIndex: 25,
-					})
-					Expect(err).To(MatchError("could not get clip path path segment count"))
-					Expect(FPDFClipPath_CountPathSegments).To(BeNil())
-
-					By("counting the path segments in the clip path")
-					FPDFClipPath_CountPathSegments, err = PdfiumInstance.FPDFClipPath_CountPathSegments(&requests.FPDFClipPath_CountPathSegments{
-						ClipPath:  FPDFPageObj_GetClipPath.ClipPath,
-						PathIndex: 0,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFClipPath_CountPathSegments).To(Equal(&responses.FPDFClipPath_CountPathSegments{
-						Count: 4,
-					}))
-
-					By("getting an error when requesting an invalid path segment in the clip path")
-					FPDFClipPath_GetPathSegment, err := PdfiumInstance.FPDFClipPath_GetPathSegment(&requests.FPDFClipPath_GetPathSegment{
-						ClipPath:     FPDFPageObj_GetClipPath.ClipPath,
-						PathIndex:    25,
-						SegmentIndex: 25,
-					})
-					Expect(err).To(MatchError("could not get clip path segment"))
-					Expect(FPDFClipPath_GetPathSegment).To(BeNil())
-
-					By("getting a path segment in the clip path")
-					FPDFClipPath_GetPathSegment, err = PdfiumInstance.FPDFClipPath_GetPathSegment(&requests.FPDFClipPath_GetPathSegment{
-						ClipPath:     FPDFPageObj_GetClipPath.ClipPath,
-						PathIndex:    0,
-						SegmentIndex: 0,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFClipPath_GetPathSegment).ToNot(BeNil())
-					Expect(FPDFClipPath_GetPathSegment.PathSegment).ToNot(BeEmpty())
-				})
 			})
 		})
 	})
