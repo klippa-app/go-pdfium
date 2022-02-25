@@ -711,6 +711,10 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 	defer C.free(unsafe.Pointer(fontName))
 
 	font := C.FPDFText_LoadStandardFont(documentHandle.handle, fontName)
+	if font == nil {
+		return nil, errors.New("could not load standard font")
+	}
+
 	fontHandle := p.registerFont(font)
 
 	return &responses.FPDFText_LoadStandardFont{
@@ -776,13 +780,8 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	charData := make([]byte, nameSize)
 	C.FPDFFont_GetFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
 
-	transformedName, err := p.transformUTF16LEToUTF8(charData)
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.FPDFFont_GetFontName{
-		FontName: transformedName,
+		FontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
 	}, nil
 }
 

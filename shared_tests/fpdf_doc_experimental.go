@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("fpdf_doc", func() {
+var _ = Describe("fpdf_doc_experimental", func() {
 	BeforeEach(func() {
 		Locker.Lock()
 	})
