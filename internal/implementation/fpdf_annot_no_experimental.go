@@ -1,15 +1,10 @@
-//go:build pdfium_experimental
-// +build pdfium_experimental
+//go:build !pdfium_experimental
+// +build !pdfium_experimental
 
 package implementation
 
-/*
-#cgo pkg-config: pdfium
-#include "fpdf_annot.h"
-#include <stdlib.h>
-*/
-import "C"
 import (
+	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -17,10 +12,7 @@ import (
 // FPDFAnnot_IsSupportedSubtype returns whether an annotation subtype is currently supported for creation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_IsSupportedSubtype(request *requests.FPDFAnnot_IsSupportedSubtype) (*responses.FPDFAnnot_IsSupportedSubtype, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_IsSupportedSubtype{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_CreateAnnot creates an annotation in the given page of the given subtype. If the specified
@@ -29,39 +21,27 @@ func (p *PdfiumImplementation) FPDFAnnot_IsSupportedSubtype(request *requests.FP
 // function is no longer needed.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_CreateAnnot(request *requests.FPDFPage_CreateAnnot) (*responses.FPDFPage_CreateAnnot, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_CreateAnnot{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_GetAnnotCount returns the number of annotations in a given page.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_GetAnnotCount(request *requests.FPDFPage_GetAnnotCount) (*responses.FPDFPage_GetAnnotCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_GetAnnotCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_GetAnnot returns annotation at the given page and index. Must call FPDFPage_CloseAnnot() when the
 // annotation returned by this function is no longer needed.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_GetAnnot(request *requests.FPDFPage_GetAnnot) (*responses.FPDFPage_GetAnnot, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_GetAnnot{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_GetAnnotIndex returns the index of the given annotation in the given page. This is the opposite of
 // FPDFPage_GetAnnot().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_GetAnnotIndex(request *requests.FPDFPage_GetAnnotIndex) (*responses.FPDFPage_GetAnnotIndex, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_GetAnnotIndex{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_CloseAnnot closes an annotation. Must be called when the annotation returned by
@@ -69,38 +49,26 @@ func (p *PdfiumImplementation) FPDFPage_GetAnnotIndex(request *requests.FPDFPage
 // function does not remove the annotation from the document.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_CloseAnnot(request *requests.FPDFPage_CloseAnnot) (*responses.FPDFPage_CloseAnnot, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_CloseAnnot{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFPage_RemoveAnnot removes the annotation in the given page at the given index.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPage_RemoveAnnot(request *requests.FPDFPage_RemoveAnnot) (*responses.FPDFPage_RemoveAnnot, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFPage_RemoveAnnot{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetSubtype returns the subtype of an annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetSubtype(request *requests.FPDFAnnot_GetSubtype) (*responses.FPDFAnnot_GetSubtype, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetSubtype{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_IsObjectSupportedSubtype checks whether an annotation subtype is currently supported for object extraction,
 // update, and removal.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_IsObjectSupportedSubtype(request *requests.FPDFAnnot_IsObjectSupportedSubtype) (*responses.FPDFAnnot_IsObjectSupportedSubtype, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_IsObjectSupportedSubtype{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_UpdateObject updates the given object in the given annotation. The object must be in the annotation already and must have
@@ -110,10 +78,7 @@ func (p *PdfiumImplementation) FPDFAnnot_IsObjectSupportedSubtype(request *reque
 // FPDFImageObj_*().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_UpdateObject) (*responses.FPDFAnnot_UpdateObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_UpdateObject{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_AddInkStroke adds a new InkStroke, represented by an array of points, to the InkList of
@@ -122,20 +87,14 @@ func (p *PdfiumImplementation) FPDFAnnot_UpdateObject(request *requests.FPDFAnno
 // spec, section 12.5.6.13.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_AddInkStroke(request *requests.FPDFAnnot_AddInkStroke) (*responses.FPDFAnnot_AddInkStroke, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_AddInkStroke{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_RemoveInkList removes an InkList in the given annotation.
 // This API works only for ink annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_RemoveInkList(request *requests.FPDFAnnot_RemoveInkList) (*responses.FPDFAnnot_RemoveInkList, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_RemoveInkList{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_AppendObject adds the given object to the given annotation. The object must have been created by
@@ -145,38 +104,26 @@ func (p *PdfiumImplementation) FPDFAnnot_RemoveInkList(request *requests.FPDFAnn
 // Also note that only path, image, and text objects have APIs for creation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_AppendObject(request *requests.FPDFAnnot_AppendObject) (*responses.FPDFAnnot_AppendObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_AppendObject{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetObjectCount returns the total number of objects in the given annotation, including path objects, text
 // objects, external objects, image objects, and shading objects.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetObjectCount(request *requests.FPDFAnnot_GetObjectCount) (*responses.FPDFAnnot_GetObjectCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetObjectCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetObject returns the object in the given annotation at the given index.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetObject(request *requests.FPDFAnnot_GetObject) (*responses.FPDFAnnot_GetObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetObject{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_RemoveObject removes the object in the given annotation at the given index.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_RemoveObject(request *requests.FPDFAnnot_RemoveObject) (*responses.FPDFAnnot_RemoveObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_RemoveObject{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetColor sets the color of an annotation. Fails when called on annotations with
@@ -184,10 +131,7 @@ func (p *PdfiumImplementation) FPDFAnnot_RemoveObject(request *requests.FPDFAnno
 // FPDFPath_Set{Stroke|Fill}Color().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetColor(request *requests.FPDFAnnot_SetColor) (*responses.FPDFAnnot_SetColor, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetColor{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetColor returns the color of an annotation. If no color is specified, default to yellow
@@ -196,10 +140,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetColor(request *requests.FPDFAnnot_Se
 // FPDFPath_Get{Stroke|Fill}Color().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetColor(request *requests.FPDFAnnot_GetColor) (*responses.FPDFAnnot_GetColor, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetColor{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_HasAttachmentPoints returns whether the annotation is of a type that has attachment points
@@ -210,10 +151,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetColor(request *requests.FPDFAnnot_Ge
 // annotations have quadpoints.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_HasAttachmentPoints(request *requests.FPDFAnnot_HasAttachmentPoints) (*responses.FPDFAnnot_HasAttachmentPoints, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_HasAttachmentPoints{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetAttachmentPoints replaces the attachment points (i.e. quadpoints) set of an annotation at
@@ -224,10 +162,7 @@ func (p *PdfiumImplementation) FPDFAnnot_HasAttachmentPoints(request *requests.F
 // define a bigger one.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetAttachmentPoints(request *requests.FPDFAnnot_SetAttachmentPoints) (*responses.FPDFAnnot_SetAttachmentPoints, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetAttachmentPoints{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_AppendAttachmentPoints appends to the list of attachment points (i.e. quadpoints) of an annotation.
@@ -236,28 +171,19 @@ func (p *PdfiumImplementation) FPDFAnnot_SetAttachmentPoints(request *requests.F
 // define a bigger one.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_AppendAttachmentPoints(request *requests.FPDFAnnot_AppendAttachmentPoints) (*responses.FPDFAnnot_AppendAttachmentPoints, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_AppendAttachmentPoints{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_CountAttachmentPoints returns the number of sets of quadpoints of an annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_CountAttachmentPoints(request *requests.FPDFAnnot_CountAttachmentPoints) (*responses.FPDFAnnot_CountAttachmentPoints, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_CountAttachmentPoints{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetAttachmentPoints returns the attachment points (i.e. quadpoints) of an annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetAttachmentPoints(request *requests.FPDFAnnot_GetAttachmentPoints) (*responses.FPDFAnnot_GetAttachmentPoints, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetAttachmentPoints{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetRect sets the annotation rectangle defining the location of the annotation. If the
@@ -266,91 +192,61 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAttachmentPoints(request *requests.F
 // defines a bigger one.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetRect(request *requests.FPDFAnnot_SetRect) (*responses.FPDFAnnot_SetRect, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetRect{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetRect returns the annotation rectangle defining the location of the annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetRect(request *requests.FPDFAnnot_GetRect) (*responses.FPDFAnnot_GetRect, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetRect{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetVertices returns the vertices of a polygon or polyline annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetVertices(request *requests.FPDFAnnot_GetVertices) (*responses.FPDFAnnot_GetVertices, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetVertices{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetInkListCount returns the number of paths in the ink list of an ink annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetInkListCount(request *requests.FPDFAnnot_GetInkListCount) (*responses.FPDFAnnot_GetInkListCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetInkListCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetInkListPath returns a path in the ink list of an ink annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetInkListPath(request *requests.FPDFAnnot_GetInkListPath) (*responses.FPDFAnnot_GetInkListPath, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetInkListPath{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetLine returns the starting and ending coordinates of a line annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetLine(request *requests.FPDFAnnot_GetLine) (*responses.FPDFAnnot_GetLine, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetLine{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetBorder sets the characteristics of the annotation's border (rounded rectangle).
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetBorder(request *requests.FPDFAnnot_SetBorder) (*responses.FPDFAnnot_SetBorder, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetBorder{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetBorder returns the characteristics of the annotation's border (rounded rectangle).
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetBorder(request *requests.FPDFAnnot_GetBorder) (*responses.FPDFAnnot_GetBorder, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetBorder{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_HasKey checks whether the given annotation's dictionary has the given key as a key.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_HasKey(request *requests.FPDFAnnot_HasKey) (*responses.FPDFAnnot_HasKey, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_HasKey{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetValueType returns the type of the value corresponding to the given key the annotation's dictionary.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetValueType(request *requests.FPDFAnnot_GetValueType) (*responses.FPDFAnnot_GetValueType, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetValueType{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetStringValue sets the string value corresponding to the given key in the annotations's dictionary,
@@ -358,47 +254,32 @@ func (p *PdfiumImplementation) FPDFAnnot_GetValueType(request *requests.FPDFAnno
 // FPDF_OBJECT_STRING after this function call succeeds.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetStringValue(request *requests.FPDFAnnot_SetStringValue) (*responses.FPDFAnnot_SetStringValue, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetStringValue{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetStringValue returns the string value corresponding to the given key in the annotations's dictionary.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetStringValue(request *requests.FPDFAnnot_GetStringValue) (*responses.FPDFAnnot_GetStringValue, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetStringValue{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetNumberValue returns the float value corresponding to the given key in the annotations's dictionary.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetNumberValue(request *requests.FPDFAnnot_GetNumberValue) (*responses.FPDFAnnot_GetNumberValue, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetNumberValue{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetAP sets the AP (appearance string) in annotations's dictionary for a given appearance mode.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetAP(request *requests.FPDFAnnot_SetAP) (*responses.FPDFAnnot_SetAP, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetAP{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetAP returns the AP (appearance string) from annotation's dictionary for a given
 // appearance mode.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetAP(request *requests.FPDFAnnot_GetAP) (*responses.FPDFAnnot_GetAP, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetAP{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetLinkedAnnot returns the annotation corresponding to the given key in the annotations's dictionary. Common
@@ -407,37 +288,25 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAP(request *requests.FPDFAnnot_GetAP
 // longer needed.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetLinkedAnnot(request *requests.FPDFAnnot_GetLinkedAnnot) (*responses.FPDFAnnot_GetLinkedAnnot, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetLinkedAnnot{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFlags returns the annotation flags of the given annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFlags(request *requests.FPDFAnnot_GetFlags) (*responses.FPDFAnnot_GetFlags, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFlags{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetFlags sets the annotation flags of the given annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetFlags(request *requests.FPDFAnnot_SetFlags) (*responses.FPDFAnnot_SetFlags, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetFlags{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldFlags returns the form field annotation flags of the given annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPDFAnnot_GetFormFieldFlags) (*responses.FPDFAnnot_GetFormFieldFlags, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldFlags{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldAtPoint returns an interactive form annotation whose rectangle contains a given
@@ -445,47 +314,32 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 // is no longer needed.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAtPoint(request *requests.FPDFAnnot_GetFormFieldAtPoint) (*responses.FPDFAnnot_GetFormFieldAtPoint, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldAtPoint{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldName returns the name of the given annotation, which is an interactive form annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldName(request *requests.FPDFAnnot_GetFormFieldName) (*responses.FPDFAnnot_GetFormFieldName, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldName{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldType returns the form field type of the given annotation, which is an interactive form annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldType(request *requests.FPDFAnnot_GetFormFieldType) (*responses.FPDFAnnot_GetFormFieldType, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldType{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldValue returns the value of the given annotation, which is an interactive form annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldValue(request *requests.FPDFAnnot_GetFormFieldValue) (*responses.FPDFAnnot_GetFormFieldValue, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldValue{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetOptionCount returns the number of options in the annotation's "Opt" dictionary. Intended for
 // use with listbox and combobox widget annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetOptionCount(request *requests.FPDFAnnot_GetOptionCount) (*responses.FPDFAnnot_GetOptionCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetOptionCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetOptionLabel returns the string value for the label of the option at the given index in annotation's
@@ -493,20 +347,14 @@ func (p *PdfiumImplementation) FPDFAnnot_GetOptionCount(request *requests.FPDFAn
 // annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetOptionLabel(request *requests.FPDFAnnot_GetOptionLabel) (*responses.FPDFAnnot_GetOptionLabel, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetOptionLabel{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_IsOptionSelected returns whether or not the option at the given index in annotation's "Opt" dictionary
 // is selected. Intended for use with listbox and combobox widget annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_IsOptionSelected(request *requests.FPDFAnnot_IsOptionSelected) (*responses.FPDFAnnot_IsOptionSelected, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_IsOptionSelected{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFontSize returns the float value of the font size for an annotation with variable text.
@@ -514,20 +362,14 @@ func (p *PdfiumImplementation) FPDFAnnot_IsOptionSelected(request *requests.FPDF
 // the height of the annotation rectangle.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFontSize) (*responses.FPDFAnnot_GetFontSize, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFontSize{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_IsChecked returns whether the given annotation is a form widget that is checked. Intended for use with
 // checkbox and radio button widgets.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_IsChecked(request *requests.FPDFAnnot_IsChecked) (*responses.FPDFAnnot_IsChecked, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_IsChecked{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetFocusableSubtypes returns the list of focusable annotation subtypes. Annotations of subtype
@@ -535,37 +377,25 @@ func (p *PdfiumImplementation) FPDFAnnot_IsChecked(request *requests.FPDFAnnot_I
 // will override the existing subtypes.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetFocusableSubtypes(request *requests.FPDFAnnot_SetFocusableSubtypes) (*responses.FPDFAnnot_SetFocusableSubtypes, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetFocusableSubtypes{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFocusableSubtypesCount returns the count of focusable annotation subtypes as set by host.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypesCount(request *requests.FPDFAnnot_GetFocusableSubtypesCount) (*responses.FPDFAnnot_GetFocusableSubtypesCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFocusableSubtypesCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFocusableSubtypes returns the list of focusable annotation subtype as set by host.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypes(request *requests.FPDFAnnot_GetFocusableSubtypes) (*responses.FPDFAnnot_GetFocusableSubtypes, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFocusableSubtypes{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetLink returns FPDF_LINK object for the given annotation. Intended to use for link annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetLink(request *requests.FPDFAnnot_GetLink) (*responses.FPDFAnnot_GetLink, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetLink{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormControlCount returns the count of annotations in the annotation's control group.
@@ -574,10 +404,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetLink(request *requests.FPDFAnnot_Get
 // either a radio button or a checkbox.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount) (*responses.FPDFAnnot_GetFormControlCount, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormControlCount{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormControlIndex returns the index of the given annotation it's control group.
@@ -586,27 +413,18 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormControlCount(request *requests.F
 // either a radio button or a checkbox.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormControlIndex(request *requests.FPDFAnnot_GetFormControlIndex) (*responses.FPDFAnnot_GetFormControlIndex, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormControlIndex{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_GetFormFieldExportValue returns the export value of the given annotation which is an interactive form annotation.
 // Intended for use with radio button and checkbox widget annotations.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldExportValue(request *requests.FPDFAnnot_GetFormFieldExportValue) (*responses.FPDFAnnot_GetFormFieldExportValue, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_GetFormFieldExportValue{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFAnnot_SetURI adds a URI action to the given annotation, overwriting the existing action, if any.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	return &responses.FPDFAnnot_SetURI{}, nil
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
