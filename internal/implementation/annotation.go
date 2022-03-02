@@ -8,15 +8,13 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerAnnotation(annotation C.FPDF_ANNOTATION, documentHandle *DocumentHandle) *AnnotationHandle {
+func (p *PdfiumImplementation) registerAnnotation(annotation C.FPDF_ANNOTATION) *AnnotationHandle {
 	ref := uuid.New()
 	handle := &AnnotationHandle{
-		handle:      annotation,
-		nativeRef:   references.FPDF_ANNOTATION(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    annotation,
+		nativeRef: references.FPDF_ANNOTATION(ref.String()),
 	}
 
-	documentHandle.annotationRefs[handle.nativeRef] = handle
 	p.annotationRefs[handle.nativeRef] = handle
 
 	return handle
