@@ -61,3 +61,8 @@ type FPDF_IMAGEOBJ_METADATA struct {
 	Colorspace      enums.FPDF_COLORSPACE
 	MarkedContentID int
 }
+
+type FPDF_FS_POINTF struct {
+	X float32
+	Y float32
+}

@@ -24,14 +24,11 @@ type DocumentHandle struct {
 	pageRefs             map[references.FPDF_PAGE]*PageHandle
 	bookmarkRefs         map[references.FPDF_BOOKMARK]*BookmarkHandle
 	destRefs             map[references.FPDF_DEST]*DestHandle
-	actionRefs           map[references.FPDF_ACTION]*ActionHandle
-	linkRefs             map[references.FPDF_LINK]*LinkHandle
 	pageLinkRefs         map[references.FPDF_PAGELINK]*PageLinkHandle
 	schHandleRefs        map[references.FPDF_SCHHANDLE]*SchHandleHandle
 	textPageRefs         map[references.FPDF_TEXTPAGE]*TextPageHandle
 	pageRangeRefs        map[references.FPDF_PAGERANGE]*PageRangeHandle
 	formHandleRefs       map[references.FPDF_FORMHANDLE]*FormHandleHandle
-	annotationRefs       map[references.FPDF_ANNOTATION]*AnnotationHandle
 	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
 	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
 	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
@@ -89,14 +86,6 @@ func (d *DocumentHandle) Close() error {
 		delete(d.destRefs, i)
 	}
 
-	for i := range d.actionRefs {
-		delete(d.actionRefs, i)
-	}
-
-	for i := range d.linkRefs {
-		delete(d.linkRefs, i)
-	}
-
 	for i := range d.pageLinkRefs {
 		delete(d.pageLinkRefs, i)
 	}
@@ -115,10 +104,6 @@ func (d *DocumentHandle) Close() error {
 
 	for i := range d.formHandleRefs {
 		delete(d.formHandleRefs, i)
-	}
-
-	for i := range d.annotationRefs {
-		delete(d.annotationRefs, i)
 	}
 
 	for i := range d.signatureRefs {
@@ -199,9 +184,8 @@ type ActionHandle struct {
 }
 
 type LinkHandle struct {
-	handle      C.FPDF_LINK
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_LINK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	handle    C.FPDF_LINK
+	nativeRef references.FPDF_LINK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PageLinkHandle struct {
@@ -250,9 +234,8 @@ type FormHandleHandle struct {
 }
 
 type AnnotationHandle struct {
-	handle      C.FPDF_ANNOTATION
-	documentRef references.FPDF_DOCUMENT
-	nativeRef   references.FPDF_ANNOTATION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	handle    C.FPDF_ANNOTATION
+	nativeRef references.FPDF_ANNOTATION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type XObjectHandle struct {
