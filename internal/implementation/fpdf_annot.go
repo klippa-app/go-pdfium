@@ -251,7 +251,7 @@ func (p *PdfiumImplementation) FPDFAnnot_AddInkStroke(request *requests.FPDFAnno
 		}
 	}
 
-	index := C.FPDFAnnot_AddInkStroke(annotationHandle.handle, &pointArray[0], C.ulong(len(pointArray)))
+	index := C.FPDFAnnot_AddInkStroke(annotationHandle.handle, &pointArray[0], C.size_t(len(pointArray)))
 	if int(index) == -1 {
 		return nil, errors.New("could not add ink stroke")
 	}
