@@ -267,14 +267,11 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
 		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
 		destRefs:             map[references.FPDF_DEST]*DestHandle{},
-		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
-		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
 		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
 		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
 		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
 		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
 		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
-		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
 		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
 		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
 		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
@@ -799,4 +796,28 @@ func (p *PdfiumImplementation) getGlyphPathHandle(glyphPath references.FPDF_GLYP
 	}
 
 	return nil, errors.New("could not find glyphPath handle, perhaps the glyphPath was already closed or you tried to share glyphPaths between instances")
+}
+
+func (p *PdfiumImplementation) getAnnotationHandle(annotation references.FPDF_ANNOTATION) (*AnnotationHandle, error) {
+	if annotation == "" {
+		return nil, errors.New("annotation not given")
+	}
+
+	if val, ok := p.annotationRefs[annotation]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find annotation handle, perhaps the annotation was already closed or you tried to share annotations between instances")
+}
+
+func (p *PdfiumImplementation) getFormHandleHandle(formHandle references.FPDF_FORMHANDLE) (*FormHandleHandle, error) {
+	if formHandle == "" {
+		return nil, errors.New("formHandle not given")
+	}
+
+	if val, ok := p.formHandleRefs[formHandle]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find formHandle handle, perhaps the formHandle was already closed or you tried to share formHandles between instances")
 }

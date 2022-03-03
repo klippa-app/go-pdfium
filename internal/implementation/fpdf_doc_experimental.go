@@ -63,12 +63,7 @@ func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetA
 		return &responses.FPDFLink_GetAnnot{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	annotationHandle := p.registerAnnotation(annotation, documentHandle)
+	annotationHandle := p.registerAnnotation(annotation)
 
 	return &responses.FPDFLink_GetAnnot{
 		Annotation: &annotationHandle.nativeRef,
@@ -88,12 +83,7 @@ func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPag
 		return &responses.FPDF_GetPageAAction{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	actionHandle := p.registerAction(action, documentHandle)
+	actionHandle := p.registerAction(action)
 
 	return &responses.FPDF_GetPageAAction{
 		AAType: &request.AAType,

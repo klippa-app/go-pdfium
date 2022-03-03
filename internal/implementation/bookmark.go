@@ -101,7 +101,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 
 		action := C.FPDFBookmark_GetAction(bookmarkHandle.handle)
 		if action == nil {
-			actionHandle := p.registerAction(action, documentHandle)
+			actionHandle := p.registerAction(action)
 			actionInfo, err := p.getActionInfo(actionHandle, documentHandle)
 			if err != nil {
 				return nil, err

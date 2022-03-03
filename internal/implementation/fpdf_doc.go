@@ -177,12 +177,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetAction(request *requests.FPDFBook
 		return &responses.FPDFBookmark_GetAction{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(bookmarkHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	actionHandle := p.registerAction(action, documentHandle)
+	actionHandle := p.registerAction(action)
 
 	return &responses.FPDFBookmark_GetAction{
 		Action: &actionHandle.nativeRef,
@@ -439,12 +434,7 @@ func (p *PdfiumImplementation) FPDFLink_GetLinkAtPoint(request *requests.FPDFLin
 		return &responses.FPDFLink_GetLinkAtPoint{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	linkHandle := p.registerLink(link, documentHandle)
+	linkHandle := p.registerLink(link)
 
 	return &responses.FPDFLink_GetLinkAtPoint{
 		Link: &linkHandle.nativeRef,
@@ -509,12 +499,7 @@ func (p *PdfiumImplementation) FPDFLink_GetAction(request *requests.FPDFLink_Get
 		return &responses.FPDFLink_GetAction{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(linkHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	actionHandle := p.registerAction(action, documentHandle)
+	actionHandle := p.registerAction(action)
 
 	return &responses.FPDFLink_GetAction{
 		Action: &actionHandle.nativeRef,
@@ -536,12 +521,7 @@ func (p *PdfiumImplementation) FPDFLink_Enumerate(request *requests.FPDFLink_Enu
 		return &responses.FPDFLink_Enumerate{}, nil
 	}
 
-	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
-	if err != nil {
-		return nil, err
-	}
-
-	linkHandle := p.registerLink(link, documentHandle)
+	linkHandle := p.registerLink(link)
 
 	nextStartPos := int(startPos)
 	return &responses.FPDFLink_Enumerate{

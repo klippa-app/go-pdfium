@@ -8,15 +8,13 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerLink(dest C.FPDF_LINK, documentHandle *DocumentHandle) *LinkHandle {
+func (p *PdfiumImplementation) registerLink(dest C.FPDF_LINK) *LinkHandle {
 	ref := uuid.New()
 	handle := &LinkHandle{
-		handle:      dest,
-		nativeRef:   references.FPDF_LINK(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    dest,
+		nativeRef: references.FPDF_LINK(ref.String()),
 	}
 
-	documentHandle.linkRefs[handle.nativeRef] = handle
 	p.linkRefs[handle.nativeRef] = handle
 
 	return handle
