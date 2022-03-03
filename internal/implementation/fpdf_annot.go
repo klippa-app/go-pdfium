@@ -89,7 +89,7 @@ func (p *PdfiumImplementation) FPDFPage_GetAnnot(request *requests.FPDFPage_GetA
 
 	annotation := C.FPDFPage_GetAnnot(pageHandle.handle, C.int(request.Index))
 	if annotation == nil {
-		return nil, errors.New("could not create annotation")
+		return nil, errors.New("could not get annotation")
 	}
 
 	annotationHandle := p.registerAnnotation(annotation)
@@ -200,7 +200,7 @@ func (p *PdfiumImplementation) FPDFAnnot_IsObjectSupportedSubtype(request *reque
 // FPDFAnnot_UpdateObject updates the given object in the given annotation. The object must be in the annotation already and must have
 // been retrieved by FPDFAnnot_GetObject(). Currently, only ink and stamp
 // annotations are supported by this API. Also note that only path, image, and
-///text objects have APIs for modification; see FPDFPath_*(), FPDFText_*(), and
+// text objects have APIs for modification; see FPDFPath_*(), FPDFText_*(), and
 // FPDFImageObj_*().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_UpdateObject) (*responses.FPDFAnnot_UpdateObject, error) {
@@ -966,7 +966,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAP(request *requests.FPDFAnnot_GetAP
 	}
 
 	return &responses.FPDFAnnot_GetAP{
-		AppearanceMode: transformedText,
+		Value: transformedText,
 	}, nil
 }
 
@@ -1013,7 +1013,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFlags(request *requests.FPDFAnnot_Ge
 	flags := C.FPDFAnnot_GetFlags(annotationHandle.handle)
 
 	return &responses.FPDFAnnot_GetFlags{
-		Flags: int(flags),
+		Flags: enums.FPDF_ANNOT_FLAG(flags),
 	}, nil
 }
 
@@ -1055,7 +1055,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 	flags := C.FPDFAnnot_GetFormFieldFlags(formHandle.handle, annotationHandle.handle)
 
 	return &responses.FPDFAnnot_GetFormFieldFlags{
-		Flags: int(flags),
+		Flags: enums.FPDF_FORMFLAG(flags),
 	}, nil
 }
 

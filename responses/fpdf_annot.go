@@ -135,7 +135,7 @@ type FPDFAnnot_GetNumberValue struct {
 type FPDFAnnot_SetAP struct{}
 
 type FPDFAnnot_GetAP struct {
-	AppearanceMode string
+	Value string
 }
 
 type FPDFAnnot_GetLinkedAnnot struct {
@@ -143,13 +143,13 @@ type FPDFAnnot_GetLinkedAnnot struct {
 }
 
 type FPDFAnnot_GetFlags struct {
-	Flags int
+	Flags enums.FPDF_ANNOT_FLAG
 }
 
 type FPDFAnnot_SetFlags struct{}
 
 type FPDFAnnot_GetFormFieldFlags struct {
-	Flags int
+	Flags enums.FPDF_FORMFLAG
 }
 
 type FPDFAnnot_GetFormFieldAtPoint struct {
