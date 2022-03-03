@@ -201,7 +201,7 @@ type FPDFAnnot_GetFlags struct {
 
 type FPDFAnnot_SetFlags struct {
 	Annotation references.FPDF_ANNOTATION
-	Flags      int
+	Flags      enums.FPDF_ANNOT_FLAG
 }
 
 type FPDFAnnot_GetFormFieldFlags struct {
