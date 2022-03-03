@@ -13,15 +13,13 @@ import (
 	"unsafe"
 )
 
-func (p *PdfiumImplementation) registerAction(action C.FPDF_ACTION, documentHandle *DocumentHandle) *ActionHandle {
+func (p *PdfiumImplementation) registerAction(action C.FPDF_ACTION) *ActionHandle {
 	ref := uuid.New()
 	handle := &ActionHandle{
-		handle:      action,
-		nativeRef:   references.FPDF_ACTION(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    action,
+		nativeRef: references.FPDF_ACTION(ref.String()),
 	}
 
-	documentHandle.actionRefs[handle.nativeRef] = handle
 	p.actionRefs[handle.nativeRef] = handle
 
 	return handle
