@@ -12,6 +12,36 @@ import (
 
 type Pdfium interface {
 	Ping() (string, error)
+	FORM_CanRedo(*requests.FORM_CanRedo) (*responses.FORM_CanRedo, error)
+	FORM_CanUndo(*requests.FORM_CanUndo) (*responses.FORM_CanUndo, error)
+	FORM_DoDocumentAAction(*requests.FORM_DoDocumentAAction) (*responses.FORM_DoDocumentAAction, error)
+	FORM_DoDocumentJSAction(*requests.FORM_DoDocumentJSAction) (*responses.FORM_DoDocumentJSAction, error)
+	FORM_DoDocumentOpenAction(*requests.FORM_DoDocumentOpenAction) (*responses.FORM_DoDocumentOpenAction, error)
+	FORM_DoPageAAction(*requests.FORM_DoPageAAction) (*responses.FORM_DoPageAAction, error)
+	FORM_ForceToKillFocus(*requests.FORM_ForceToKillFocus) (*responses.FORM_ForceToKillFocus, error)
+	FORM_GetFocusedAnnot(*requests.FORM_GetFocusedAnnot) (*responses.FORM_GetFocusedAnnot, error)
+	FORM_GetFocusedText(*requests.FORM_GetFocusedText) (*responses.FORM_GetFocusedText, error)
+	FORM_GetSelectedText(*requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error)
+	FORM_IsIndexSelected(*requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error)
+	FORM_OnAfterLoadPage(*requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error)
+	FORM_OnBeforeClosePage(*requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error)
+	FORM_OnChar(*requests.FORM_OnChar) (*responses.FORM_OnChar, error)
+	FORM_OnFocus(*requests.FORM_OnFocus) (*responses.FORM_OnFocus, error)
+	FORM_OnKeyDown(*requests.FORM_OnKeyDown) (*responses.FORM_OnKeyDown, error)
+	FORM_OnKeyUp(*requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error)
+	FORM_OnLButtonDoubleClick(*requests.FORM_OnLButtonDoubleClick) (*responses.FORM_OnLButtonDoubleClick, error)
+	FORM_OnLButtonDown(*requests.FORM_OnLButtonDown) (*responses.FORM_OnLButtonDown, error)
+	FORM_OnLButtonUp(*requests.FORM_OnLButtonUp) (*responses.FORM_OnLButtonUp, error)
+	FORM_OnMouseMove(*requests.FORM_OnMouseMove) (*responses.FORM_OnMouseMove, error)
+	FORM_OnMouseWheel(*requests.FORM_OnMouseWheel) (*responses.FORM_OnMouseWheel, error)
+	FORM_OnRButtonDown(*requests.FORM_OnRButtonDown) (*responses.FORM_OnRButtonDown, error)
+	FORM_OnRButtonUp(*requests.FORM_OnRButtonUp) (*responses.FORM_OnRButtonUp, error)
+	FORM_Redo(*requests.FORM_Redo) (*responses.FORM_Redo, error)
+	FORM_ReplaceSelection(*requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error)
+	FORM_SelectAllText(*requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error)
+	FORM_SetFocusedAnnot(*requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error)
+	FORM_SetIndexSelected(*requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error)
+	FORM_Undo(*requests.FORM_Undo) (*responses.FORM_Undo, error)
 	FPDFAction_GetDest(*requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error)
 	FPDFAction_GetFilePath(*requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
 	FPDFAction_GetType(*requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error)
@@ -103,6 +133,8 @@ type Pdfium interface {
 	FPDFClipPath_CountPathSegments(*requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error)
 	FPDFClipPath_CountPaths(*requests.FPDFClipPath_CountPaths) (*responses.FPDFClipPath_CountPaths, error)
 	FPDFClipPath_GetPathSegment(*requests.FPDFClipPath_GetPathSegment) (*responses.FPDFClipPath_GetPathSegment, error)
+	FPDFDOC_ExitFormFillEnvironment(*requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error)
+	FPDFDOC_InitFormFillEnvironment(*requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error)
 	FPDFDest_GetDestPageIndex(*requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error)
 	FPDFDest_GetLocationInPage(*requests.FPDFDest_GetLocationInPage) (*responses.FPDFDest_GetLocationInPage, error)
 	FPDFDest_GetView(*requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error)
@@ -206,6 +238,7 @@ type Pdfium interface {
 	FPDFPage_CreateAnnot(*requests.FPDFPage_CreateAnnot) (*responses.FPDFPage_CreateAnnot, error)
 	FPDFPage_Delete(*requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error)
 	FPDFPage_Flatten(*requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
+	FPDFPage_FormFieldZOrderAtPoint(*requests.FPDFPage_FormFieldZOrderAtPoint) (*responses.FPDFPage_FormFieldZOrderAtPoint, error)
 	FPDFPage_GenerateContent(*requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error)
 	FPDFPage_GetAnnot(*requests.FPDFPage_GetAnnot) (*responses.FPDFPage_GetAnnot, error)
 	FPDFPage_GetAnnotCount(*requests.FPDFPage_GetAnnotCount) (*responses.FPDFPage_GetAnnotCount, error)
@@ -220,6 +253,7 @@ type Pdfium interface {
 	FPDFPage_GetRotation(*requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error)
 	FPDFPage_GetThumbnailAsBitmap(*requests.FPDFPage_GetThumbnailAsBitmap) (*responses.FPDFPage_GetThumbnailAsBitmap, error)
 	FPDFPage_GetTrimBox(*requests.FPDFPage_GetTrimBox) (*responses.FPDFPage_GetTrimBox, error)
+	FPDFPage_HasFormFieldAtPoint(*requests.FPDFPage_HasFormFieldAtPoint) (*responses.FPDFPage_HasFormFieldAtPoint, error)
 	FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
 	FPDFPage_InsertClipPath(*requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error)
 	FPDFPage_InsertObject(*requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
@@ -298,9 +332,11 @@ type Pdfium interface {
 	FPDF_DestroyClipPath(*requests.FPDF_DestroyClipPath) (*responses.FPDF_DestroyClipPath, error)
 	FPDF_DeviceToPage(*requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error)
 	FPDF_DocumentHasValidCrossReferenceTable(*requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
+	FPDF_FFLDraw(*requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error)
 	FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
 	FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
 	FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
+	FPDF_GetFormType(*requests.FPDF_GetFormType) (*responses.FPDF_GetFormType, error)
 	FPDF_GetLastError(*requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 	FPDF_GetMetaText(*requests.FPDF_GetMetaText) (*responses.FPDF_GetMetaText, error)
 	FPDF_GetNamedDest(*requests.FPDF_GetNamedDest) (*responses.FPDF_GetNamedDest, error)
@@ -330,9 +366,11 @@ type Pdfium interface {
 	FPDF_LoadMemDocument(*requests.FPDF_LoadMemDocument) (*responses.FPDF_LoadMemDocument, error)
 	FPDF_LoadMemDocument64(*requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
 	FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
+	FPDF_LoadXFA(*requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error)
 	FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
 	FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
 	FPDF_PageToDevice(*requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
+	FPDF_RemoveFormFieldHighlight(*requests.FPDF_RemoveFormFieldHighlight) (*responses.FPDF_RemoveFormFieldHighlight, error)
 	FPDF_RenderPage(*requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error)
 	FPDF_RenderPageBitmap(*requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error)
 	FPDF_RenderPageBitmapWithColorScheme_Start(*requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error)
@@ -342,6 +380,8 @@ type Pdfium interface {
 	FPDF_RenderPage_Continue(*requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error)
 	FPDF_SaveAsCopy(*requests.FPDF_SaveAsCopy) (*responses.FPDF_SaveAsCopy, error)
 	FPDF_SaveWithVersion(*requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error)
+	FPDF_SetFormFieldHighlightAlpha(*requests.FPDF_SetFormFieldHighlightAlpha) (*responses.FPDF_SetFormFieldHighlightAlpha, error)
+	FPDF_SetFormFieldHighlightColor(*requests.FPDF_SetFormFieldHighlightColor) (*responses.FPDF_SetFormFieldHighlightColor, error)
 	FPDF_SetPrintMode(*requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error)
 	FPDF_SetSandBoxPolicy(*requests.FPDF_SetSandBoxPolicy) (*responses.FPDF_SetSandBoxPolicy, error)
 	FPDF_StructElement_CountChildren(*requests.FPDF_StructElement_CountChildren) (*responses.FPDF_StructElement_CountChildren, error)
@@ -384,6 +424,306 @@ type Pdfium interface {
 	RenderPagesInPixels(*requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, error)
 	RenderToFile(*requests.RenderToFile) (*responses.RenderToFile, error)
 	Close() error
+}
+
+func (g *PdfiumRPC) FORM_CanRedo(request *requests.FORM_CanRedo) (*responses.FORM_CanRedo, error) {
+	resp := &responses.FORM_CanRedo{}
+	err := g.client.Call("Plugin.FORM_CanRedo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_CanUndo(request *requests.FORM_CanUndo) (*responses.FORM_CanUndo, error) {
+	resp := &responses.FORM_CanUndo{}
+	err := g.client.Call("Plugin.FORM_CanUndo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_DoDocumentAAction(request *requests.FORM_DoDocumentAAction) (*responses.FORM_DoDocumentAAction, error) {
+	resp := &responses.FORM_DoDocumentAAction{}
+	err := g.client.Call("Plugin.FORM_DoDocumentAAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_DoDocumentJSAction(request *requests.FORM_DoDocumentJSAction) (*responses.FORM_DoDocumentJSAction, error) {
+	resp := &responses.FORM_DoDocumentJSAction{}
+	err := g.client.Call("Plugin.FORM_DoDocumentJSAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_DoDocumentOpenAction(request *requests.FORM_DoDocumentOpenAction) (*responses.FORM_DoDocumentOpenAction, error) {
+	resp := &responses.FORM_DoDocumentOpenAction{}
+	err := g.client.Call("Plugin.FORM_DoDocumentOpenAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_DoPageAAction(request *requests.FORM_DoPageAAction) (*responses.FORM_DoPageAAction, error) {
+	resp := &responses.FORM_DoPageAAction{}
+	err := g.client.Call("Plugin.FORM_DoPageAAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_ForceToKillFocus(request *requests.FORM_ForceToKillFocus) (*responses.FORM_ForceToKillFocus, error) {
+	resp := &responses.FORM_ForceToKillFocus{}
+	err := g.client.Call("Plugin.FORM_ForceToKillFocus", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_GetFocusedAnnot(request *requests.FORM_GetFocusedAnnot) (*responses.FORM_GetFocusedAnnot, error) {
+	resp := &responses.FORM_GetFocusedAnnot{}
+	err := g.client.Call("Plugin.FORM_GetFocusedAnnot", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_GetFocusedText(request *requests.FORM_GetFocusedText) (*responses.FORM_GetFocusedText, error) {
+	resp := &responses.FORM_GetFocusedText{}
+	err := g.client.Call("Plugin.FORM_GetFocusedText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_GetSelectedText(request *requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error) {
+	resp := &responses.FORM_GetSelectedText{}
+	err := g.client.Call("Plugin.FORM_GetSelectedText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error) {
+	resp := &responses.FORM_IsIndexSelected{}
+	err := g.client.Call("Plugin.FORM_IsIndexSelected", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error) {
+	resp := &responses.FORM_OnAfterLoadPage{}
+	err := g.client.Call("Plugin.FORM_OnAfterLoadPage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error) {
+	resp := &responses.FORM_OnBeforeClosePage{}
+	err := g.client.Call("Plugin.FORM_OnBeforeClosePage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnChar(request *requests.FORM_OnChar) (*responses.FORM_OnChar, error) {
+	resp := &responses.FORM_OnChar{}
+	err := g.client.Call("Plugin.FORM_OnChar", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnFocus(request *requests.FORM_OnFocus) (*responses.FORM_OnFocus, error) {
+	resp := &responses.FORM_OnFocus{}
+	err := g.client.Call("Plugin.FORM_OnFocus", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) (*responses.FORM_OnKeyDown, error) {
+	resp := &responses.FORM_OnKeyDown{}
+	err := g.client.Call("Plugin.FORM_OnKeyDown", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error) {
+	resp := &responses.FORM_OnKeyUp{}
+	err := g.client.Call("Plugin.FORM_OnKeyUp", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnLButtonDoubleClick(request *requests.FORM_OnLButtonDoubleClick) (*responses.FORM_OnLButtonDoubleClick, error) {
+	resp := &responses.FORM_OnLButtonDoubleClick{}
+	err := g.client.Call("Plugin.FORM_OnLButtonDoubleClick", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnLButtonDown(request *requests.FORM_OnLButtonDown) (*responses.FORM_OnLButtonDown, error) {
+	resp := &responses.FORM_OnLButtonDown{}
+	err := g.client.Call("Plugin.FORM_OnLButtonDown", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnLButtonUp(request *requests.FORM_OnLButtonUp) (*responses.FORM_OnLButtonUp, error) {
+	resp := &responses.FORM_OnLButtonUp{}
+	err := g.client.Call("Plugin.FORM_OnLButtonUp", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnMouseMove(request *requests.FORM_OnMouseMove) (*responses.FORM_OnMouseMove, error) {
+	resp := &responses.FORM_OnMouseMove{}
+	err := g.client.Call("Plugin.FORM_OnMouseMove", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnMouseWheel(request *requests.FORM_OnMouseWheel) (*responses.FORM_OnMouseWheel, error) {
+	resp := &responses.FORM_OnMouseWheel{}
+	err := g.client.Call("Plugin.FORM_OnMouseWheel", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnRButtonDown(request *requests.FORM_OnRButtonDown) (*responses.FORM_OnRButtonDown, error) {
+	resp := &responses.FORM_OnRButtonDown{}
+	err := g.client.Call("Plugin.FORM_OnRButtonDown", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp) (*responses.FORM_OnRButtonUp, error) {
+	resp := &responses.FORM_OnRButtonUp{}
+	err := g.client.Call("Plugin.FORM_OnRButtonUp", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_Redo(request *requests.FORM_Redo) (*responses.FORM_Redo, error) {
+	resp := &responses.FORM_Redo{}
+	err := g.client.Call("Plugin.FORM_Redo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error) {
+	resp := &responses.FORM_ReplaceSelection{}
+	err := g.client.Call("Plugin.FORM_ReplaceSelection", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_SelectAllText(request *requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error) {
+	resp := &responses.FORM_SelectAllText{}
+	err := g.client.Call("Plugin.FORM_SelectAllText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error) {
+	resp := &responses.FORM_SetFocusedAnnot{}
+	err := g.client.Call("Plugin.FORM_SetFocusedAnnot", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error) {
+	resp := &responses.FORM_SetIndexSelected{}
+	err := g.client.Call("Plugin.FORM_SetIndexSelected", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_Undo(request *requests.FORM_Undo) (*responses.FORM_Undo, error) {
+	resp := &responses.FORM_Undo{}
+	err := g.client.Call("Plugin.FORM_Undo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func (g *PdfiumRPC) FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error) {
@@ -1289,6 +1629,26 @@ func (g *PdfiumRPC) FPDFClipPath_CountPaths(request *requests.FPDFClipPath_Count
 func (g *PdfiumRPC) FPDFClipPath_GetPathSegment(request *requests.FPDFClipPath_GetPathSegment) (*responses.FPDFClipPath_GetPathSegment, error) {
 	resp := &responses.FPDFClipPath_GetPathSegment{}
 	err := g.client.Call("Plugin.FPDFClipPath_GetPathSegment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error) {
+	resp := &responses.FPDFDOC_ExitFormFillEnvironment{}
+	err := g.client.Call("Plugin.FPDFDOC_ExitFormFillEnvironment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error) {
+	resp := &responses.FPDFDOC_InitFormFillEnvironment{}
+	err := g.client.Call("Plugin.FPDFDOC_InitFormFillEnvironment", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2326,6 +2686,16 @@ func (g *PdfiumRPC) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*respo
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFPage_FormFieldZOrderAtPoint(request *requests.FPDFPage_FormFieldZOrderAtPoint) (*responses.FPDFPage_FormFieldZOrderAtPoint, error) {
+	resp := &responses.FPDFPage_FormFieldZOrderAtPoint{}
+	err := g.client.Call("Plugin.FPDFPage_FormFieldZOrderAtPoint", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error) {
 	resp := &responses.FPDFPage_GenerateContent{}
 	err := g.client.Call("Plugin.FPDFPage_GenerateContent", request, resp)
@@ -2459,6 +2829,16 @@ func (g *PdfiumRPC) FPDFPage_GetThumbnailAsBitmap(request *requests.FPDFPage_Get
 func (g *PdfiumRPC) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimBox) (*responses.FPDFPage_GetTrimBox, error) {
 	resp := &responses.FPDFPage_GetTrimBox{}
 	err := g.client.Call("Plugin.FPDFPage_GetTrimBox", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint) (*responses.FPDFPage_HasFormFieldAtPoint, error) {
+	resp := &responses.FPDFPage_HasFormFieldAtPoint{}
+	err := g.client.Call("Plugin.FPDFPage_HasFormFieldAtPoint", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3246,6 +3626,16 @@ func (g *PdfiumRPC) FPDF_DocumentHasValidCrossReferenceTable(request *requests.F
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error) {
+	resp := &responses.FPDF_FFLDraw{}
+	err := g.client.Call("Plugin.FPDF_FFLDraw", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	resp := &responses.FPDF_GetDocPermissions{}
 	err := g.client.Call("Plugin.FPDF_GetDocPermissions", request, resp)
@@ -3269,6 +3659,16 @@ func (g *PdfiumRPC) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentif
 func (g *PdfiumRPC) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error) {
 	resp := &responses.FPDF_GetFileVersion{}
 	err := g.client.Call("Plugin.FPDF_GetFileVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_GetFormType(request *requests.FPDF_GetFormType) (*responses.FPDF_GetFormType, error) {
+	resp := &responses.FPDF_GetFormType{}
+	err := g.client.Call("Plugin.FPDF_GetFormType", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3566,6 +3966,16 @@ func (g *PdfiumRPC) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*responses.F
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error) {
+	resp := &responses.FPDF_LoadXFA{}
+	err := g.client.Call("Plugin.FPDF_LoadXFA", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
 	resp := &responses.FPDF_NewFormObjectFromXObject{}
 	err := g.client.Call("Plugin.FPDF_NewFormObjectFromXObject", request, resp)
@@ -3589,6 +3999,16 @@ func (g *PdfiumRPC) FPDF_NewXObjectFromPage(request *requests.FPDF_NewXObjectFro
 func (g *PdfiumRPC) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error) {
 	resp := &responses.FPDF_PageToDevice{}
 	err := g.client.Call("Plugin.FPDF_PageToDevice", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_RemoveFormFieldHighlight(request *requests.FPDF_RemoveFormFieldHighlight) (*responses.FPDF_RemoveFormFieldHighlight, error) {
+	resp := &responses.FPDF_RemoveFormFieldHighlight{}
+	err := g.client.Call("Plugin.FPDF_RemoveFormFieldHighlight", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3679,6 +4099,26 @@ func (g *PdfiumRPC) FPDF_SaveAsCopy(request *requests.FPDF_SaveAsCopy) (*respons
 func (g *PdfiumRPC) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVersion) (*responses.FPDF_SaveWithVersion, error) {
 	resp := &responses.FPDF_SaveWithVersion{}
 	err := g.client.Call("Plugin.FPDF_SaveWithVersion", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SetFormFieldHighlightAlpha(request *requests.FPDF_SetFormFieldHighlightAlpha) (*responses.FPDF_SetFormFieldHighlightAlpha, error) {
+	resp := &responses.FPDF_SetFormFieldHighlightAlpha{}
+	err := g.client.Call("Plugin.FPDF_SetFormFieldHighlightAlpha", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_SetFormFieldHighlightColor(request *requests.FPDF_SetFormFieldHighlightColor) (*responses.FPDF_SetFormFieldHighlightColor, error) {
+	resp := &responses.FPDF_SetFormFieldHighlightColor{}
+	err := g.client.Call("Plugin.FPDF_SetFormFieldHighlightColor", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -4094,6 +4534,546 @@ func (g *PdfiumRPC) RenderToFile(request *requests.RenderToFile) (*responses.Ren
 	}
 
 	return resp, nil
+}
+
+func (s *PdfiumRPCServer) FORM_CanRedo(request *requests.FORM_CanRedo, resp *responses.FORM_CanRedo) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_CanRedo", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_CanRedo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_CanUndo(request *requests.FORM_CanUndo, resp *responses.FORM_CanUndo) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_CanUndo", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_CanUndo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_DoDocumentAAction(request *requests.FORM_DoDocumentAAction, resp *responses.FORM_DoDocumentAAction) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentAAction", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_DoDocumentAAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_DoDocumentJSAction(request *requests.FORM_DoDocumentJSAction, resp *responses.FORM_DoDocumentJSAction) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentJSAction", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_DoDocumentJSAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_DoDocumentOpenAction(request *requests.FORM_DoDocumentOpenAction, resp *responses.FORM_DoDocumentOpenAction) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentOpenAction", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_DoDocumentOpenAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_DoPageAAction(request *requests.FORM_DoPageAAction, resp *responses.FORM_DoPageAAction) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoPageAAction", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_DoPageAAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_ForceToKillFocus(request *requests.FORM_ForceToKillFocus, resp *responses.FORM_ForceToKillFocus) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ForceToKillFocus", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_ForceToKillFocus(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_GetFocusedAnnot(request *requests.FORM_GetFocusedAnnot, resp *responses.FORM_GetFocusedAnnot) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetFocusedAnnot", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_GetFocusedAnnot(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_GetFocusedText(request *requests.FORM_GetFocusedText, resp *responses.FORM_GetFocusedText) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetFocusedText", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_GetFocusedText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_GetSelectedText(request *requests.FORM_GetSelectedText, resp *responses.FORM_GetSelectedText) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetSelectedText", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_GetSelectedText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected, resp *responses.FORM_IsIndexSelected) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_IsIndexSelected", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_IsIndexSelected(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage, resp *responses.FORM_OnAfterLoadPage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnAfterLoadPage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnAfterLoadPage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage, resp *responses.FORM_OnBeforeClosePage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnBeforeClosePage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnBeforeClosePage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnChar(request *requests.FORM_OnChar, resp *responses.FORM_OnChar) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnChar", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnChar(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnFocus(request *requests.FORM_OnFocus, resp *responses.FORM_OnFocus) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnFocus", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnFocus(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnKeyDown(request *requests.FORM_OnKeyDown, resp *responses.FORM_OnKeyDown) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnKeyDown", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnKeyDown(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnKeyUp(request *requests.FORM_OnKeyUp, resp *responses.FORM_OnKeyUp) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnKeyUp", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnKeyUp(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnLButtonDoubleClick(request *requests.FORM_OnLButtonDoubleClick, resp *responses.FORM_OnLButtonDoubleClick) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonDoubleClick", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnLButtonDoubleClick(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnLButtonDown(request *requests.FORM_OnLButtonDown, resp *responses.FORM_OnLButtonDown) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonDown", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnLButtonDown(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnLButtonUp(request *requests.FORM_OnLButtonUp, resp *responses.FORM_OnLButtonUp) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonUp", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnLButtonUp(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnMouseMove(request *requests.FORM_OnMouseMove, resp *responses.FORM_OnMouseMove) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnMouseMove", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnMouseMove(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnMouseWheel(request *requests.FORM_OnMouseWheel, resp *responses.FORM_OnMouseWheel) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnMouseWheel", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnMouseWheel(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnRButtonDown(request *requests.FORM_OnRButtonDown, resp *responses.FORM_OnRButtonDown) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnRButtonDown", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnRButtonDown(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp, resp *responses.FORM_OnRButtonUp) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnRButtonUp", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_OnRButtonUp(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_Redo(request *requests.FORM_Redo, resp *responses.FORM_Redo) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_Redo", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_Redo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection, resp *responses.FORM_ReplaceSelection) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ReplaceSelection", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_ReplaceSelection(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_SelectAllText(request *requests.FORM_SelectAllText, resp *responses.FORM_SelectAllText) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SelectAllText", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_SelectAllText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot, resp *responses.FORM_SetFocusedAnnot) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetFocusedAnnot", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_SetFocusedAnnot(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected, resp *responses.FORM_SetIndexSelected) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetIndexSelected", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_SetIndexSelected(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_Undo(request *requests.FORM_Undo, resp *responses.FORM_Undo) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_Undo", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_Undo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
 }
 
 func (s *PdfiumRPCServer) FPDFAction_GetDest(request *requests.FPDFAction_GetDest, resp *responses.FPDFAction_GetDest) (err error) {
@@ -5724,6 +6704,42 @@ func (s *PdfiumRPCServer) FPDFClipPath_GetPathSegment(request *requests.FPDFClip
 	}()
 
 	implResp, err := s.Impl.FPDFClipPath_GetPathSegment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment, resp *responses.FPDFDOC_ExitFormFillEnvironment) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFDOC_ExitFormFillEnvironment", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFDOC_ExitFormFillEnvironment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment, resp *responses.FPDFDOC_InitFormFillEnvironment) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFDOC_InitFormFillEnvironment", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFDOC_InitFormFillEnvironment(request)
 	if err != nil {
 		return err
 	}
@@ -7588,6 +8604,24 @@ func (s *PdfiumRPCServer) FPDFPage_Flatten(request *requests.FPDFPage_Flatten, r
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFPage_FormFieldZOrderAtPoint(request *requests.FPDFPage_FormFieldZOrderAtPoint, resp *responses.FPDFPage_FormFieldZOrderAtPoint) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_FormFieldZOrderAtPoint", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPage_FormFieldZOrderAtPoint(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent, resp *responses.FPDFPage_GenerateContent) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -7830,6 +8864,24 @@ func (s *PdfiumRPCServer) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrim
 	}()
 
 	implResp, err := s.Impl.FPDFPage_GetTrimBox(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint, resp *responses.FPDFPage_HasFormFieldAtPoint) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_HasFormFieldAtPoint", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPage_HasFormFieldAtPoint(request)
 	if err != nil {
 		return err
 	}
@@ -9244,6 +10296,24 @@ func (s *PdfiumRPCServer) FPDF_DocumentHasValidCrossReferenceTable(request *requ
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_FFLDraw(request *requests.FPDF_FFLDraw, resp *responses.FPDF_FFLDraw) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_FFLDraw", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_FFLDraw(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions, resp *responses.FPDF_GetDocPermissions) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -9288,6 +10358,24 @@ func (s *PdfiumRPCServer) FPDF_GetFileVersion(request *requests.FPDF_GetFileVers
 	}()
 
 	implResp, err := s.Impl.FPDF_GetFileVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_GetFormType(request *requests.FPDF_GetFormType, resp *responses.FPDF_GetFormType) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetFormType", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetFormType(request)
 	if err != nil {
 		return err
 	}
@@ -9820,6 +10908,24 @@ func (s *PdfiumRPCServer) FPDF_LoadPage(request *requests.FPDF_LoadPage, resp *r
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_LoadXFA(request *requests.FPDF_LoadXFA, resp *responses.FPDF_LoadXFA) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadXFA", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_LoadXFA(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject, resp *responses.FPDF_NewFormObjectFromXObject) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -9864,6 +10970,24 @@ func (s *PdfiumRPCServer) FPDF_PageToDevice(request *requests.FPDF_PageToDevice,
 	}()
 
 	implResp, err := s.Impl.FPDF_PageToDevice(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_RemoveFormFieldHighlight(request *requests.FPDF_RemoveFormFieldHighlight, resp *responses.FPDF_RemoveFormFieldHighlight) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RemoveFormFieldHighlight", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_RemoveFormFieldHighlight(request)
 	if err != nil {
 		return err
 	}
@@ -10026,6 +11150,42 @@ func (s *PdfiumRPCServer) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVe
 	}()
 
 	implResp, err := s.Impl.FPDF_SaveWithVersion(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SetFormFieldHighlightAlpha(request *requests.FPDF_SetFormFieldHighlightAlpha, resp *responses.FPDF_SetFormFieldHighlightAlpha) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetFormFieldHighlightAlpha", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_SetFormFieldHighlightAlpha(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_SetFormFieldHighlightColor(request *requests.FPDF_SetFormFieldHighlightColor, resp *responses.FPDF_SetFormFieldHighlightColor) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetFormFieldHighlightColor", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_SetFormFieldHighlightColor(request)
 	if err != nil {
 		return err
 	}
