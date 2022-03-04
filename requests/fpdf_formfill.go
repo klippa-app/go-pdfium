@@ -1,42 +1,248 @@
 package requests
 
-type FPDFDOC_InitFormFillEnvironment struct{}
-type FPDFDOC_ExitFormFillEnvironment struct{}
-type FORM_OnAfterLoadPage struct{}
-type FORM_OnBeforeClosePage struct{}
-type FORM_DoDocumentJSAction struct{}
-type FORM_DoDocumentOpenAction struct{}
-type FORM_DoDocumentAAction struct{}
-type FORM_DoPageAAction struct{}
-type FORM_OnMouseMove struct{}
-type FORM_OnMouseWheel struct{}
-type FORM_OnFocus struct{}
-type FORM_OnLButtonDown struct{}
-type FORM_OnRButtonDown struct{}
-type FORM_OnLButtonUp struct{}
-type FORM_OnRButtonUp struct{}
-type FORM_OnLButtonDoubleClick struct{}
-type FORM_OnKeyDown struct{}
-type FORM_OnKeyUp struct{}
-type FORM_OnChar struct{}
-type FORM_GetFocusedText struct{}
-type FORM_GetSelectedText struct{}
-type FORM_ReplaceSelection struct{}
-type FORM_SelectAllText struct{}
-type FORM_CanUndo struct{}
-type FORM_CanRedo struct{}
-type FORM_Undo struct{}
-type FORM_Redo struct{}
-type FORM_ForceToKillFocus struct{}
-type FORM_GetFocusedAnnot struct{}
-type FORM_SetFocusedAnnot struct{}
-type FPDFPage_HasFormFieldAtPoint struct{}
-type FPDFPage_FormFieldZOrderAtPoint struct{}
-type FPDF_SetFormFieldHighlightColor struct{}
-type FPDF_SetFormFieldHighlightAlpha struct{}
-type FPDF_RemoveFormFieldHighlight struct{}
-type FPDF_FFLDraw struct{}
-type FPDF_GetFormType struct{}
-type FORM_SetIndexSelected struct{}
-type FORM_IsIndexSelected struct{}
-type FPDF_LoadXFA struct{}
+import (
+	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/references"
+	"github.com/klippa-app/go-pdfium/structs"
+)
+
+type FPDFDOC_InitFormFillEnvironment struct {
+	Document     references.FPDF_DOCUMENT
+	FormFillInfo structs.FPDF_FORMFILLINFO
+}
+
+type FPDFDOC_ExitFormFillEnvironment struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_OnAfterLoadPage struct {
+	Page       references.FPDF_PAGE
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_OnBeforeClosePage struct {
+	Page       references.FPDF_PAGE
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_DoDocumentJSAction struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_DoDocumentOpenAction struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_DoDocumentAAction struct {
+	FormHandle references.FPDF_FORMHANDLE
+	AAType     enums.FPDFDOC_AACTION
+}
+
+type FORM_DoPageAAction struct {
+	Page       references.FPDF_PAGE
+	FormHandle references.FPDF_FORMHANDLE
+	AAType     enums.FPDFPAGE_AACTION
+}
+
+type FORM_OnMouseMove struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnMouseWheel struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int                    // Indicates whether various virtual keys are down.
+	PageCoord  structs.FPDF_FS_POINTF // Specifies the coordinates of the cursor in PDF user space.
+	DeltaX     int                    // Specifies the amount of wheel movement on the x-axis, in units of platform-agnostic wheel deltas. Negative values mean left.
+	DeltaY     int                    // Specifies the amount of wheel movement on the y-axis, in units of platform-agnostic wheel deltas. Negative values mean down.
+
+}
+
+type FORM_OnFocus struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnLButtonDown struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnRButtonDown struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnLButtonUp struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnRButtonUp struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnLButtonDoubleClick struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Modifier   int     // Indicates whether various virtual keys are down.
+	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
+	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
+}
+
+type FORM_OnKeyDown struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
+	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+}
+
+type FORM_OnKeyUp struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
+	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+}
+
+type FORM_OnChar struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	NChar      int // The character code value itself.
+	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+}
+
+type FORM_GetFocusedText struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_GetSelectedText struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_ReplaceSelection struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Text       string
+}
+
+type FORM_SelectAllText struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_CanUndo struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_CanRedo struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_Undo struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_Redo struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+}
+
+type FORM_ForceToKillFocus struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_GetFocusedAnnot struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FORM_SetFocusedAnnot struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+}
+
+type FPDFPage_HasFormFieldAtPoint struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	PageX      float64 // X position in PDF "user space".
+	PageY      float64 // Y position in PDF "user space".
+}
+
+type FPDFPage_FormFieldZOrderAtPoint struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	PageX      float64 // X position in PDF "user space".
+	PageY      float64 // Y position in PDF "user space".
+}
+
+type FPDF_SetFormFieldHighlightColor struct {
+	FormHandle references.FPDF_FORMHANDLE
+	FieldType  enums.FPDF_FORMFIELD
+	Color      uint64 // The highlight color of the form field. Constructed by 0xxxrrggbb
+}
+
+type FPDF_SetFormFieldHighlightAlpha struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Alpha      uint8
+}
+
+type FPDF_RemoveFormFieldHighlight struct {
+	FormHandle references.FPDF_FORMHANDLE
+}
+
+type FPDF_FFLDraw struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Bitmap     references.FPDF_BITMAP
+	Page       references.FPDF_PAGE
+	StartX     int
+	StartY     int
+	SizeX      int
+	SizeY      int
+	Rotate     enums.FPDF_PAGE_ROTATION
+	Flags      enums.FPDF_RENDER_FLAG
+}
+
+type FPDF_GetFormType struct {
+	Document references.FPDF_DOCUMENT
+}
+
+type FORM_SetIndexSelected struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Index      int
+	Selected   bool
+}
+
+type FORM_IsIndexSelected struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       references.FPDF_PAGE
+	Index      int
+}
+
+type FPDF_LoadXFA struct {
+	Document references.FPDF_DOCUMENT
+}

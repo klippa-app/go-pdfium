@@ -952,11 +952,7 @@ func (i *pdfiumInstance) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFD
 }
 
 func (i *pdfiumInstance) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FPDFDOC_InitFormFillEnvironment(request)
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error) {

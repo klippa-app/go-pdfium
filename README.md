@@ -42,11 +42,11 @@
     * Struct trees
     * Page/Page object editing
     * Annotations
-    * Form filling/XFA
+    * Form filling
 * Methods that won't be implemented for now:
     * fpdf_sysfontinfo.h (probably too complicated)
-    * Some Skia renderer methods
-    * Methods that require v8
+    * Skia methods ([not in pre-built binaries](https://github.com/bblanchon/pdfium-binaries/issues/29))
+    * XFA/v8 JS methods ([not in pre-built binaries due to build issues](https://github.com/bblanchon/pdfium-binaries/issues/62))
 * Useful helpers to make your life easier:
     * Get all document metadata
     * Get all document bookmarks

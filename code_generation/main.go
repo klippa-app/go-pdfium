@@ -32,6 +32,7 @@ func (m *GenerateDataMethod) BlockForMultiThreaded() bool {
 		m.Name == "FPDF_RenderPageBitmap_Start" ||
 		m.Name == "FPDF_RenderPage_Continue" ||
 		m.Name == "FPDF_RenderPage_Close" ||
+		m.Name == "FPDFDOC_InitFormFillEnvironment" ||
 		strings.HasPrefix(m.Name, "FPDFAvail_") {
 		return true
 	}
