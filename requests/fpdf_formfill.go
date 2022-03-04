@@ -16,12 +16,12 @@ type FPDFDOC_ExitFormFillEnvironment struct {
 }
 
 type FORM_OnAfterLoadPage struct {
-	Page       references.FPDF_PAGE
+	Page       Page
 	FormHandle references.FPDF_FORMHANDLE
 }
 
 type FORM_OnBeforeClosePage struct {
-	Page       references.FPDF_PAGE
+	Page       Page
 	FormHandle references.FPDF_FORMHANDLE
 }
 
@@ -39,14 +39,14 @@ type FORM_DoDocumentAAction struct {
 }
 
 type FORM_DoPageAAction struct {
-	Page       references.FPDF_PAGE
+	Page       Page
 	FormHandle references.FPDF_FORMHANDLE
 	AAType     enums.FPDFPAGE_AACTION
 }
 
 type FORM_OnMouseMove struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -54,7 +54,7 @@ type FORM_OnMouseMove struct {
 
 type FORM_OnMouseWheel struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int                    // Indicates whether various virtual keys are down.
 	PageCoord  structs.FPDF_FS_POINTF // Specifies the coordinates of the cursor in PDF user space.
 	DeltaX     int                    // Specifies the amount of wheel movement on the x-axis, in units of platform-agnostic wheel deltas. Negative values mean left.
@@ -64,7 +64,7 @@ type FORM_OnMouseWheel struct {
 
 type FORM_OnFocus struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -72,7 +72,7 @@ type FORM_OnFocus struct {
 
 type FORM_OnLButtonDown struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -80,7 +80,7 @@ type FORM_OnLButtonDown struct {
 
 type FORM_OnRButtonDown struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -88,7 +88,7 @@ type FORM_OnRButtonDown struct {
 
 type FORM_OnLButtonUp struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -96,7 +96,7 @@ type FORM_OnLButtonUp struct {
 
 type FORM_OnRButtonUp struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -104,7 +104,7 @@ type FORM_OnRButtonUp struct {
 
 type FORM_OnLButtonDoubleClick struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Modifier   int     // Indicates whether various virtual keys are down.
 	PageX      float64 // Specifies the x-coordinate of the cursor in PDF user space.
 	PageY      float64 // Specifies the y-coordinate of the cursor in PDF user space.
@@ -112,64 +112,64 @@ type FORM_OnLButtonDoubleClick struct {
 
 type FORM_OnKeyDown struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
 	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_OnKeyUp struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
 	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_OnChar struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	NChar      int // The character code value itself.
 	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_GetFocusedText struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_GetSelectedText struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_ReplaceSelection struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Text       string
 }
 
 type FORM_SelectAllText struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_CanUndo struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_CanRedo struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_Undo struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_Redo struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 }
 
 type FORM_ForceToKillFocus struct {
@@ -187,14 +187,14 @@ type FORM_SetFocusedAnnot struct {
 
 type FPDFPage_HasFormFieldAtPoint struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	PageX      float64 // X position in PDF "user space".
 	PageY      float64 // Y position in PDF "user space".
 }
 
 type FPDFPage_FormFieldZOrderAtPoint struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	PageX      float64 // X position in PDF "user space".
 	PageY      float64 // Y position in PDF "user space".
 }
@@ -217,7 +217,7 @@ type FPDF_RemoveFormFieldHighlight struct {
 type FPDF_FFLDraw struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Bitmap     references.FPDF_BITMAP
-	Page       references.FPDF_PAGE
+	Page       Page
 	StartX     int
 	StartY     int
 	SizeX      int
@@ -232,14 +232,14 @@ type FPDF_GetFormType struct {
 
 type FORM_SetIndexSelected struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Index      int
 	Selected   bool
 }
 
 type FORM_IsIndexSelected struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Page       references.FPDF_PAGE
+	Page       Page
 	Index      int
 }
 
