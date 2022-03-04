@@ -373,7 +373,13 @@ func go_formfill_FFI_DoGoToAction_cb(me *C.FPDF_FORMFILLINFO, nPageIndex C.int, 
 		return
 	}
 
-	//formFillInfoHandle.FormFillInfo.FFI_DoGoToAction(C.GoString((*C.char)(bsURI)))
+	target := (*[1<<25 - 1]float32)(unsafe.Pointer(fPosArray))[:sizeofArray:sizeofArray]
+	pos := make([]float32, int(sizeofArray))
+	for i := range pos {
+		pos[i] = float32(target[i])
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_DoGoToAction(int(nPageIndex), enums.FPDF_ZOOM_MODE(zoomMode), pos)
 
 	return
 }
@@ -393,6 +399,11 @@ var formFillInfoHandles = map[unsafe.Pointer]*FormFillInfo{}
 func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
 
 	if request.FormFillInfo.FFI_Invalidate == nil {
 		return nil, errors.New("FormFillInfo callback FFI_Invalidate is required")
@@ -426,15 +437,6 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
 	}
 
-	if request.FormFillInfo.FFI_ExecuteNamedAction == nil {
-		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
-	}
-
-	documentHandle, err := p.getDocumentHandle(request.Document)
-	if err != nil {
-		return nil, err
-	}
-
 	formInfoStruct := &C.FPDF_FORMFILLINFO{}
 	formInfoStruct.version = 1
 	C.FPDF_FORMFILLINFO_SET_CB(formInfoStruct)
@@ -444,7 +446,7 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, errors.New("could not init form fill environment")
 	}
 
-	formHandleHandle := p.registerFormHandle(formHandle)
+	formHandleHandle := p.registerFormHandle(formHandle, unsafe.Pointer(formInfoStruct))
 
 	formFillInfo := &FormFillInfo{
 		Struct:       formInfoStruct,
@@ -472,6 +474,12 @@ func (p *PdfiumImplementation) FPDFDOC_ExitFormFillEnvironment(request *requests
 
 	C.FPDFDOC_ExitFormFillEnvironment(formHandleHandle.handle)
 
+	if _, ok := formFillInfoHandles[formHandleHandle.formInfo]; ok {
+		delete(formFillInfoHandles, formHandleHandle.formInfo)
+	}
+
+	delete(p.formHandleRefs, request.FormHandle)
+
 	return &responses.FPDFDOC_ExitFormFillEnvironment{}, nil
 }
 
@@ -483,7 +491,7 @@ func (p *PdfiumImplementation) FORM_OnAfterLoadPage(request *requests.FORM_OnAft
 	p.Lock()
 	defer p.Unlock()
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +513,7 @@ func (p *PdfiumImplementation) FORM_OnBeforeClosePage(request *requests.FORM_OnB
 	p.Lock()
 	defer p.Unlock()
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -587,7 +595,7 @@ func (p *PdfiumImplementation) FORM_DoPageAAction(request *requests.FORM_DoPageA
 	p.Lock()
 	defer p.Unlock()
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -613,7 +621,7 @@ func (p *PdfiumImplementation) FORM_OnMouseMove(request *requests.FORM_OnMouseMo
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -639,7 +647,7 @@ func (p *PdfiumImplementation) FORM_OnFocus(request *requests.FORM_OnFocus) (*re
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -664,7 +672,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonDown(request *requests.FORM_OnLButt
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -691,7 +699,7 @@ func (p *PdfiumImplementation) FORM_OnRButtonDown(request *requests.FORM_OnRButt
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -716,7 +724,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonUp(request *requests.FORM_OnLButton
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -743,7 +751,7 @@ func (p *PdfiumImplementation) FORM_OnRButtonUp(request *requests.FORM_OnRButton
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -768,7 +776,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonDoubleClick(request *requests.FORM_
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -792,7 +800,7 @@ func (p *PdfiumImplementation) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) 
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -816,7 +824,7 @@ func (p *PdfiumImplementation) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*re
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -841,7 +849,7 @@ func (p *PdfiumImplementation) FORM_OnChar(request *requests.FORM_OnChar) (*resp
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -866,7 +874,7 @@ func (p *PdfiumImplementation) FORM_GetSelectedText(request *requests.FORM_GetSe
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -905,7 +913,7 @@ func (p *PdfiumImplementation) FORM_ReplaceSelection(request *requests.FORM_Repl
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -932,7 +940,7 @@ func (p *PdfiumImplementation) FORM_CanUndo(request *requests.FORM_CanUndo) (*re
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -956,7 +964,7 @@ func (p *PdfiumImplementation) FORM_CanRedo(request *requests.FORM_CanRedo) (*re
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -979,7 +987,7 @@ func (p *PdfiumImplementation) FORM_Undo(request *requests.FORM_Undo) (*response
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -1003,7 +1011,7 @@ func (p *PdfiumImplementation) FORM_Redo(request *requests.FORM_Redo) (*response
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -1047,7 +1055,7 @@ func (p *PdfiumImplementation) FPDFPage_HasFormFieldAtPoint(request *requests.FP
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -1069,7 +1077,7 @@ func (p *PdfiumImplementation) FPDFPage_FormFieldZOrderAtPoint(request *requests
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -1155,7 +1163,7 @@ func (p *PdfiumImplementation) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*re
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}

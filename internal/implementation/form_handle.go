@@ -4,16 +4,18 @@ package implementation
 // #include "fpdf_formfill.h"
 import "C"
 import (
-	"github.com/klippa-app/go-pdfium/references"
+	"unsafe"
 
 	"github.com/google/uuid"
+	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerFormHandle(formHandle C.FPDF_FORMHANDLE) *FormHandleHandle {
+func (p *PdfiumImplementation) registerFormHandle(formHandle C.FPDF_FORMHANDLE, formInfo unsafe.Pointer) *FormHandleHandle {
 	ref := uuid.New()
 	handle := &FormHandleHandle{
 		handle:    formHandle,
 		nativeRef: references.FPDF_FORMHANDLE(ref.String()),
+		formInfo:  formInfo,
 	}
 
 	p.formHandleRefs[handle.nativeRef] = handle

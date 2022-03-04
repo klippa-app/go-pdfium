@@ -33,7 +33,7 @@ func (p *PdfiumImplementation) FORM_OnMouseWheel(request *requests.FORM_OnMouseW
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (p *PdfiumImplementation) FORM_GetFocusedText(request *requests.FORM_GetFoc
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (p *PdfiumImplementation) FORM_SelectAllText(request *requests.FORM_SelectA
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (p *PdfiumImplementation) FORM_SetIndexSelected(request *requests.FORM_SetI
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (p *PdfiumImplementation) FORM_IsIndexSelected(request *requests.FORM_IsInd
 		return nil, err
 	}
 
-	pageHandle, err := p.getPageHandle(request.Page)
+	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
 	}
