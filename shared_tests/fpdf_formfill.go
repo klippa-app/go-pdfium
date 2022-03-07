@@ -1,15 +1,19 @@
 package shared_tests
 
+import "C"
 import (
-	"io/ioutil"
-	"log"
-	"time"
-
+	"bytes"
+	"fmt"
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
+	"image"
+	"image/jpeg"
+	"io/ioutil"
+	"log"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -215,14 +219,91 @@ var _ = Describe("fpdf_formfill", func() {
 		Done  chan bool
 	}
 
-	Context("a normal PDF file", func() {
+	Context("a PDF file with a text form", func() {
 		var doc references.FPDF_DOCUMENT
 		var formHandle references.FPDF_FORMHANDLE
 		formHistory := []FormHistory{}
 		timers := map[int]*FormTicker{}
+		var bitmap references.FPDF_BITMAP
+		bitmapWidth := 100
+		bitmapHeight := 1000
+		var img *image.RGBA
+		renderCount := 0
+
+		addToHistory := func(history FormHistory) {
+			formHistory = append(formHistory, history)
+			log.Printf("New history: %s: %v", history.Name, history.Args)
+		}
+
+		renderFormImage := func(page references.FPDF_PAGE, left, top, right, bottom float64) {
+			FPDFBitmap_FillRect, err := PdfiumInstance.FPDFBitmap_FillRect(&requests.FPDFBitmap_FillRect{
+				Bitmap: bitmap,
+				Color:  0xFFFFFFFF,
+				Left:   0,
+				Top:    0,
+				Width:  1000,
+				Height: 1000,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_FillRect).To(Equal(&responses.FPDFBitmap_FillRect{}))
+
+			FPDF_RenderPageBitmap, err := PdfiumInstance.FPDF_RenderPageBitmap(&requests.FPDF_RenderPageBitmap{
+				Bitmap: bitmap,
+				Page: requests.Page{
+					ByReference: &page,
+				},
+				StartX: 0,
+				StartY: 0,
+				SizeX:  1000,
+				SizeY:  1000,
+				Rotate: enums.FPDF_PAGE_ROTATION_NONE,
+				Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
+			})
+
+			Expect(err).To(BeNil())
+			Expect(FPDF_RenderPageBitmap).To(Equal(&responses.FPDF_RenderPageBitmap{}))
+
+			FPDF_FFLDraw, err := PdfiumInstance.FPDF_FFLDraw(&requests.FPDF_FFLDraw{
+				FormHandle: formHandle,
+				Bitmap:     bitmap,
+				Page: requests.Page{
+					ByReference: &page,
+				},
+				StartX: 0,
+				StartY: 0,
+				SizeX:  1000,
+				SizeY:  1000,
+				Rotate: enums.FPDF_PAGE_ROTATION_NONE,
+				Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
+			})
+
+			Expect(err).To(BeNil())
+			Expect(FPDF_FFLDraw).To(Equal(&responses.FPDF_FFLDraw{}))
+
+			FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
+				Bitmap: bitmap,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
+
+			var opt jpeg.Options
+			opt.Quality = 95
+
+			var imgBuf bytes.Buffer
+			err = jpeg.Encode(&imgBuf, img, &opt)
+			if err != nil {
+				return
+			}
+
+			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("form-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			renderCount++
+			log.Println("did render")
+		}
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
+			renderCount = 0
+			img = image.NewRGBA(image.Rect(0, 0, bitmapWidth, bitmapHeight))
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form.pdf")
 			Expect(err).To(BeNil())
 
@@ -237,30 +318,32 @@ var _ = Describe("fpdf_formfill", func() {
 				Document: doc,
 				FormFillInfo: structs.FPDF_FORMFILLINFO{
 					Release: func() {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "Release",
 						})
 					},
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
 							Args: []interface{}{page, left, top, right, bottom},
 						})
+
+						go renderFormImage(page, left, top, right, bottom)
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
 							Args: []interface{}{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
 							Args: []interface{}{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
 							Args: []interface{}{elapse},
 						})
@@ -288,7 +371,7 @@ var _ = Describe("fpdf_formfill", func() {
 						return id
 					},
 					FFI_KillTimer: func(timerID int) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
 							Args: []interface{}{timerID},
 						})
@@ -302,18 +385,18 @@ var _ = Describe("fpdf_formfill", func() {
 						timers[timerID].Done <- true
 					},
 					FFI_GetLocalTime: func() structs.FPDF_SYSTEMTIME {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_GetLocalTime",
 						})
 						return structs.FPDF_SYSTEMTIME{}
 					},
 					FFI_OnChange: func() {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_OnChange",
 						})
 					},
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
 							Args: []interface{}{document, index},
 						})
@@ -321,39 +404,39 @@ var _ = Describe("fpdf_formfill", func() {
 						return nil
 					},
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
 							Args: []interface{}{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
 							Args: []interface{}{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
 							Args: []interface{}{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
 							Args: []interface{}{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
 							Args: []interface{}{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
-						formHistory = append(formHistory, FormHistory{
+						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
 							Args: []interface{}{pageIndex, zoomMode, pos},
 						})
@@ -364,6 +447,17 @@ var _ = Describe("fpdf_formfill", func() {
 			Expect(FPDFDOC_InitFormFillEnvironment).ToNot(BeNil())
 			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
 			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
+
+			FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
+				Width:  bitmapWidth,
+				Height: bitmapHeight,
+				Format: enums.FPDF_BITMAP_FORMAT_BGRA,
+				Buffer: img.Pix,
+				Stride: img.Stride,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_CreateEx).To(Not(BeNil()))
+			bitmap = FPDFBitmap_CreateEx.Bitmap
 		})
 
 		AfterEach(func() {
@@ -909,29 +1003,7 @@ var _ = Describe("fpdf_formfill", func() {
 						ByReference: &FPDF_LoadPage.Page,
 					},
 					FormHandle: formHandle,
-					NChar:      'A',
-					Modifier:   0,
-				})
-				Expect(err).To(BeNil())
-				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
-
-				FORM_OnChar, err = PdfiumInstance.FORM_OnChar(&requests.FORM_OnChar{
-					Page: requests.Page{
-						ByReference: &FPDF_LoadPage.Page,
-					},
-					FormHandle: formHandle,
-					NChar:      'B',
-					Modifier:   0,
-				})
-				Expect(err).To(BeNil())
-				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
-
-				FORM_OnChar, err = PdfiumInstance.FORM_OnChar(&requests.FORM_OnChar{
-					Page: requests.Page{
-						ByReference: &FPDF_LoadPage.Page,
-					},
-					FormHandle: formHandle,
-					NChar:      'C',
+					NChar:      int('A'),
 					Modifier:   0,
 				})
 				Expect(err).To(BeNil())

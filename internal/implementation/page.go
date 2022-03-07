@@ -5,6 +5,7 @@ package implementation
 import "C"
 import (
 	"errors"
+	"unsafe"
 
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
@@ -59,6 +60,15 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*PageHandle, error)
 }
 
 func (p *PdfiumImplementation) registerPage(page C.FPDF_PAGE, index int, documentHandle *DocumentHandle) *PageHandle {
+	// @todo: figure out why this doesn't work.
+	/*
+		if pagePointerRef, ok := p.pagePointers[unsafe.Pointer(page)]; ok {
+			if _, ok := p.pageRefs[pagePointerRef]; ok {
+				return p.pageRefs[pagePointerRef]
+			}
+		}
+	*/
+
 	pageRef := uuid.New()
 	pageHandle := &PageHandle{
 		handle:    page,
@@ -72,6 +82,7 @@ func (p *PdfiumImplementation) registerPage(page C.FPDF_PAGE, index int, documen
 	}
 
 	p.pageRefs[pageHandle.nativeRef] = pageHandle
+	p.pagePointers[unsafe.Pointer(page)] = pageHandle.nativeRef
 
 	return pageHandle
 }

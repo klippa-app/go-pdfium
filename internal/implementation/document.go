@@ -9,6 +9,15 @@ import (
 )
 
 func (p *PdfiumImplementation) registerDocument(document C.FPDF_DOCUMENT) *DocumentHandle {
+	// @todo: figure out why this doesn't work.
+	/*
+		if documentPointerRef, ok := p.documentPointers[unsafe.Pointer(document)]; ok {
+			if _, ok := p.documentRefs[documentPointerRef]; ok {
+				return p.documentRefs[documentPointerRef]
+			}
+		}
+	*/
+
 	documentRef := uuid.New()
 	documentHandle := &DocumentHandle{
 		handle:               document,

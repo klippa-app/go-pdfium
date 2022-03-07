@@ -39,6 +39,10 @@ static inline void FPDF_FORMFILLINFO_SET_CB(FPDF_FORMFILLINFO *f) {
 	f->FFI_DoGoToAction = &go_formfill_FFI_DoGoToAction_cb;
 }
 
+static inline void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
+	t(id);
+}
+
 */
 import "C"
 import (
@@ -140,7 +144,7 @@ func go_formfill_FFI_SetTimer_cb(me *C.FPDF_FORMFILLINFO, uElapse C.int, lpTimer
 	}
 
 	timerFunc := func(idEvent int) {
-		// @todo: implement TimerCallback
+		C.FPDF_FORMFILLINFO_CALL_TIMER(lpTimerFunc, C.int(idEvent))
 	}
 
 	timerID := formFillInfoHandle.FormFillInfo.FFI_SetTimer(int(uElapse), timerFunc)
