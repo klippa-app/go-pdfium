@@ -225,8 +225,6 @@ var _ = Describe("fpdf_formfill", func() {
 		formHistory := []FormHistory{}
 		timers := map[int]*FormTicker{}
 		var bitmap references.FPDF_BITMAP
-		bitmapWidth := 100
-		bitmapHeight := 1000
 		var img *image.RGBA
 		renderCount := 0
 
@@ -235,14 +233,14 @@ var _ = Describe("fpdf_formfill", func() {
 			log.Printf("New history: %s: %v", history.Name, history.Args)
 		}
 
-		renderFormImage := func(page references.FPDF_PAGE, left, top, right, bottom float64) {
+		renderFormImage := func(page references.FPDF_PAGE) {
 			FPDFBitmap_FillRect, err := PdfiumInstance.FPDFBitmap_FillRect(&requests.FPDFBitmap_FillRect{
 				Bitmap: bitmap,
 				Color:  0xFFFFFFFF,
 				Left:   0,
 				Top:    0,
-				Width:  1000,
-				Height: 1000,
+				Width:  300,
+				Height: 300,
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDFBitmap_FillRect).To(Equal(&responses.FPDFBitmap_FillRect{}))
@@ -254,8 +252,8 @@ var _ = Describe("fpdf_formfill", func() {
 				},
 				StartX: 0,
 				StartY: 0,
-				SizeX:  1000,
-				SizeY:  1000,
+				SizeX:  300,
+				SizeY:  300,
 				Rotate: enums.FPDF_PAGE_ROTATION_NONE,
 				Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
 			})
@@ -271,20 +269,14 @@ var _ = Describe("fpdf_formfill", func() {
 				},
 				StartX: 0,
 				StartY: 0,
-				SizeX:  1000,
-				SizeY:  1000,
+				SizeX:  300,
+				SizeY:  300,
 				Rotate: enums.FPDF_PAGE_ROTATION_NONE,
 				Flags:  enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER,
 			})
 
 			Expect(err).To(BeNil())
 			Expect(FPDF_FFLDraw).To(Equal(&responses.FPDF_FFLDraw{}))
-
-			FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
-				Bitmap: bitmap,
-			})
-			Expect(err).To(BeNil())
-			Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
 
 			var opt jpeg.Options
 			opt.Quality = 95
@@ -302,8 +294,6 @@ var _ = Describe("fpdf_formfill", func() {
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			renderCount = 0
-			img = image.NewRGBA(image.Rect(0, 0, bitmapWidth, bitmapHeight))
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form.pdf")
 			Expect(err).To(BeNil())
 
@@ -327,8 +317,6 @@ var _ = Describe("fpdf_formfill", func() {
 							Name: "FFI_Invalidate",
 							Args: []interface{}{page, left, top, right, bottom},
 						})
-
-						go renderFormImage(page, left, top, right, bottom)
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
@@ -448,9 +436,11 @@ var _ = Describe("fpdf_formfill", func() {
 			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
 			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
 
+			renderCount = 0
+			img = image.NewRGBA(image.Rect(0, 0, 300, 300))
 			FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
-				Width:  bitmapWidth,
-				Height: bitmapHeight,
+				Width:  300,
+				Height: 300,
 				Format: enums.FPDF_BITMAP_FORMAT_BGRA,
 				Buffer: img.Pix,
 				Stride: img.Stride,
@@ -472,6 +462,12 @@ var _ = Describe("fpdf_formfill", func() {
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+
+			FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
+				Bitmap: bitmap,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
 
 			log.Println(formHistory)
 		})
@@ -962,6 +958,15 @@ var _ = Describe("fpdf_formfill", func() {
 				Expect(FPDF_LoadPage).ToNot(BeNil())
 				Expect(FPDF_LoadPage.Page).ToNot(BeEmpty())
 
+				FORM_OnAfterLoadPage, err := PdfiumInstance.FORM_OnAfterLoadPage(&requests.FORM_OnAfterLoadPage{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnAfterLoadPage).To(Equal(&responses.FORM_OnAfterLoadPage{}))
+
 				FORM_OnMouseMove, err := PdfiumInstance.FORM_OnMouseMove(&requests.FORM_OnMouseMove{
 					Page: requests.Page{
 						ByReference: &FPDF_LoadPage.Page,
@@ -998,16 +1003,68 @@ var _ = Describe("fpdf_formfill", func() {
 				Expect(err).To(BeNil())
 				Expect(FORM_OnLButtonUp).To(Equal(&responses.FORM_OnLButtonUp{}))
 
+				FORM_ReplaceSelection, err := PdfiumInstance.FORM_ReplaceSelection(&requests.FORM_ReplaceSelection{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					Text:       "Jeroen",
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_ReplaceSelection).To(Equal(&responses.FORM_ReplaceSelection{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
 				FORM_OnChar, err := PdfiumInstance.FORM_OnChar(&requests.FORM_OnChar{
 					Page: requests.Page{
 						ByReference: &FPDF_LoadPage.Page,
 					},
 					FormHandle: formHandle,
-					NChar:      int('A'),
+					NChar:      'A',
 					Modifier:   0,
 				})
 				Expect(err).To(BeNil())
 				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnChar, err = PdfiumInstance.FORM_OnChar(&requests.FORM_OnChar{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					NChar:      'B',
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnChar, err = PdfiumInstance.FORM_OnChar(&requests.FORM_OnChar{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					NChar:      'C',
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnBeforeClosePage, err := PdfiumInstance.FORM_OnBeforeClosePage(&requests.FORM_OnBeforeClosePage{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnBeforeClosePage).To(Equal(&responses.FORM_OnBeforeClosePage{}))
+
+				FPDF_ClosePage, err := PdfiumInstance.FPDF_ClosePage(&requests.FPDF_ClosePage{
+					Page: FPDF_LoadPage.Page,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_ClosePage).ToNot(BeNil())
+				Expect(FPDF_ClosePage).To(Equal(&responses.FPDF_ClosePage{}))
 			})
 		})
 	})
