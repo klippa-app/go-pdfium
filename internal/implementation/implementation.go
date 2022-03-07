@@ -165,7 +165,9 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		logger:               p.logger,
 		documentRefs:         map[references.FPDF_DOCUMENT]*DocumentHandle{},
+		documentPointers:     map[unsafe.Pointer]references.FPDF_DOCUMENT{},
 		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
+		pagePointers:         map[unsafe.Pointer]references.FPDF_PAGE{},
 		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
 		destRefs:             map[references.FPDF_DEST]*DestHandle{},
 		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
@@ -209,7 +211,9 @@ type PdfiumImplementation struct {
 	// we need this for handle lookups and in case of closing the instance
 
 	documentRefs         map[references.FPDF_DOCUMENT]*DocumentHandle
+	documentPointers     map[unsafe.Pointer]references.FPDF_DOCUMENT
 	pageRefs             map[references.FPDF_PAGE]*PageHandle
+	pagePointers         map[unsafe.Pointer]references.FPDF_PAGE
 	bookmarkRefs         map[references.FPDF_BOOKMARK]*BookmarkHandle
 	destRefs             map[references.FPDF_DEST]*DestHandle
 	actionRefs           map[references.FPDF_ACTION]*ActionHandle
