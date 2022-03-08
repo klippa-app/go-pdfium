@@ -39,15 +39,3 @@ func (p *PdfiumImplementation) registerStructElement(structElement C.FPDF_STRUCT
 
 	return handle
 }
-
-func (p *PdfiumImplementation) registerStructElementAttribute(structElementAttribute C.FPDF_STRUCTELEMENT_ATTR) *StructElementAttributeHandle {
-	ref := uuid.New()
-	handle := &StructElementAttributeHandle{
-		handle:    structElementAttribute,
-		nativeRef: references.FPDF_STRUCTELEMENT_ATTR(ref.String()),
-	}
-
-	p.structElementAttributeRefs[handle.nativeRef] = handle
-
-	return handle
-}
