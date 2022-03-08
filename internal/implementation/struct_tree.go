@@ -26,13 +26,28 @@ func (p *PdfiumImplementation) registerStructTree(structTree C.FPDF_STRUCTTREE, 
 func (p *PdfiumImplementation) registerStructElement(structElement C.FPDF_STRUCTELEMENT, documentHandle *DocumentHandle) *StructElementHandle {
 	ref := uuid.New()
 	handle := &StructElementHandle{
-		handle:      structElement,
-		nativeRef:   references.FPDF_STRUCTELEMENT(ref.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    structElement,
+		nativeRef: references.FPDF_STRUCTELEMENT(ref.String()),
 	}
 
-	documentHandle.structElementRefs[handle.nativeRef] = handle
+	if documentHandle != nil {
+		handle.documentRef = documentHandle.nativeRef
+		documentHandle.structElementRefs[handle.nativeRef] = handle
+	}
+
 	p.structElementRefs[handle.nativeRef] = handle
+
+	return handle
+}
+
+func (p *PdfiumImplementation) registerStructElementAttribute(structElementAttribute C.FPDF_STRUCTELEMENT_ATTR) *StructElementAttributeHandle {
+	ref := uuid.New()
+	handle := &StructElementAttributeHandle{
+		handle:    structElementAttribute,
+		nativeRef: references.FPDF_STRUCTELEMENT_ATTR(ref.String()),
+	}
+
+	p.structElementAttributeRefs[handle.nativeRef] = handle
 
 	return handle
 }

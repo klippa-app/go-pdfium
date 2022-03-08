@@ -843,6 +843,8 @@ type Pdfium interface {
 	FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 
 	// FPDFBookmark_GetNextSibling returns the next bookmark item at the same level.
+	// Note that the caller is responsible for handling circular bookmark
+	// references, as may arise from malformed documents.
 	FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
 
 	// FPDFBookmark_GetTitle returns the title of a bookmark.
@@ -856,6 +858,8 @@ type Pdfium interface {
 	FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
 
 	// FPDFBookmark_GetAction returns the action associated with a bookmark item.
+	// If this function returns a valid handle, it is valid as long as the bookmark is
+	// valid.
 	// If the returned action is nil, you should try FPDFBookmark_GetDest.
 	FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
 
@@ -909,6 +913,8 @@ type Pdfium interface {
 	FPDFLink_GetDest(request *requests.FPDFLink_GetDest) (*responses.FPDFLink_GetDest, error)
 
 	// FPDFLink_GetAction returns the action info for a link
+	// If this function returns a valid handle, it is valid as long as the link is
+	// valid.
 	FPDFLink_GetAction(request *requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error)
 
 	// FPDFLink_Enumerate Enumerates all the link annotations in a page.
@@ -928,6 +934,8 @@ type Pdfium interface {
 	FPDFLink_GetQuadPoints(request *requests.FPDFLink_GetQuadPoints) (*responses.FPDFLink_GetQuadPoints, error)
 
 	// FPDF_GetPageAAction returns an additional-action from page.
+	// If this function returns a valid handle, it is valid as long as the page is
+	// valid.
 	// Experimental API
 	FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error)
 
@@ -1408,6 +1416,10 @@ type Pdfium interface {
 	// FPDF_StructElement_GetAltText returns the alt text for a given element.
 	FPDF_StructElement_GetAltText(request *requests.FPDF_StructElement_GetAltText) (*responses.FPDF_StructElement_GetAltText, error)
 
+	// FPDF_StructElement_GetActualText returns the actual text for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetActualText(request *requests.FPDF_StructElement_GetActualText) (*responses.FPDF_StructElement_GetActualText, error)
+
 	// FPDF_StructElement_GetID returns the ID for a given element.
 	// Experimental API.
 	FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error)
@@ -1426,6 +1438,10 @@ type Pdfium interface {
 	// FPDF_StructElement_GetType returns the type (/S) for a given element.
 	FPDF_StructElement_GetType(request *requests.FPDF_StructElement_GetType) (*responses.FPDF_StructElement_GetType, error)
 
+	// FPDF_StructElement_GetObjType returns the object type (/Type) for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetObjType(request *requests.FPDF_StructElement_GetObjType) (*responses.FPDF_StructElement_GetObjType, error)
+
 	// FPDF_StructElement_GetTitle returns the title (/T) for a given element.
 	FPDF_StructElement_GetTitle(request *requests.FPDF_StructElement_GetTitle) (*responses.FPDF_StructElement_GetTitle, error)
 
@@ -1436,6 +1452,65 @@ type Pdfium interface {
 	// If the child exists but is not an element, then this function will
 	// return an error. This will also return an error for out of bounds indices.
 	FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error)
+
+	// FPDF_StructElement_GetParent returns the parent of the structure element.
+	// If structure element is StructTreeRoot, then this function will return an error.
+	// Experimental API.
+	FPDF_StructElement_GetParent(request *requests.FPDF_StructElement_GetParent) (*responses.FPDF_StructElement_GetParent, error)
+
+	// FPDF_StructElement_GetAttributeCount returns the number of attributes for the structure element.
+	// Experimental API.
+	FPDF_StructElement_GetAttributeCount(request *requests.FPDF_StructElement_GetAttributeCount) (*responses.FPDF_StructElement_GetAttributeCount, error)
+
+	// FPDF_StructElement_GetAttributeAtIndex returns an attribute object in the structure element.
+	// If the attribute object exists but is not a dict, then this
+	// function will return an error. This will also return an error for out of
+	// bounds indices.
+	// Experimental API.
+	FPDF_StructElement_GetAttributeAtIndex(request *requests.FPDF_StructElement_GetAttributeAtIndex) (*responses.FPDF_StructElement_GetAttributeAtIndex, error)
+
+	// FPDF_StructElement_Attr_GetCount returns the number of attributes in a structure element attribute map.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetCount(request *requests.FPDF_StructElement_Attr_GetCount) (*responses.FPDF_StructElement_Attr_GetCount, error)
+
+	// FPDF_StructElement_Attr_GetName returns the name of an attribute in a structure element attribute map.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetName(request *requests.FPDF_StructElement_Attr_GetName) (*responses.FPDF_StructElement_Attr_GetName, error)
+
+	// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error)
+
+	// FPDF_StructElement_Attr_GetBooleanValue returns the value of a boolean attribute in an attribute map by name as
+	// FPDF_BOOL. FPDF_StructElement_Attr_GetType() should have returned
+	// FPDF_OBJECT_BOOLEAN for this property.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetBooleanValue(request *requests.FPDF_StructElement_Attr_GetBooleanValue) (*responses.FPDF_StructElement_Attr_GetBooleanValue, error)
+
+	// FPDF_StructElement_Attr_GetNumberValue returns the value of a number attribute in an attribute map by name as
+	// float. FPDF_StructElement_Attr_GetType() should have returned
+	// FPDF_OBJECT_NUMBER for this property.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetNumberValue(request *requests.FPDF_StructElement_Attr_GetNumberValue) (*responses.FPDF_StructElement_Attr_GetNumberValue, error)
+
+	// FPDF_StructElement_Attr_GetStringValue returns the value of a string attribute in an attribute map by name as
+	// string. FPDF_StructElement_Attr_GetType() should have returned
+	// FPDF_OBJECT_STRING or FPDF_OBJECT_NAME for this property.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetStringValue(request *requests.FPDF_StructElement_Attr_GetStringValue) (*responses.FPDF_StructElement_Attr_GetStringValue, error)
+
+	// FPDF_StructElement_Attr_GetBlobValue returns the value of a blob attribute in an attribute map by name as
+	// string.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetBlobValue(request *requests.FPDF_StructElement_Attr_GetBlobValue) (*responses.FPDF_StructElement_Attr_GetBlobValue, error)
+
+	// FPDF_StructElement_GetMarkedContentIdCount returns the count of marked content ids for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetMarkedContentIdCount(request *requests.FPDF_StructElement_GetMarkedContentIdCount) (*responses.FPDF_StructElement_GetMarkedContentIdCount, error)
+
+	// FPDF_StructElement_GetMarkedContentIdAtIndex returns the marked content id at a given index for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetMarkedContentIdAtIndex(request *requests.FPDF_StructElement_GetMarkedContentIdAtIndex) (*responses.FPDF_StructElement_GetMarkedContentIdAtIndex, error)
 
 	// End fpdf_structtree.h
 
