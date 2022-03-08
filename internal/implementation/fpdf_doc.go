@@ -47,6 +47,8 @@ func (p *PdfiumImplementation) FPDFBookmark_GetFirstChild(request *requests.FPDF
 }
 
 // FPDFBookmark_GetNextSibling returns the next bookmark item at the same level.
+// Note that the caller is responsible for handling circular bookmark
+// references, as may arise from malformed documents.
 func (p *PdfiumImplementation) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error) {
 	p.Lock()
 	defer p.Unlock()
@@ -162,6 +164,8 @@ func (p *PdfiumImplementation) FPDFBookmark_GetDest(request *requests.FPDFBookma
 }
 
 // FPDFBookmark_GetAction returns the action associated with a bookmark item.
+// If this function returns a valid handle, it is valid as long as the bookmark is
+// valid.
 // If the returned action is nil, you should try FPDFBookmark_GetDest.
 func (p *PdfiumImplementation) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error) {
 	p.Lock()
@@ -485,6 +489,8 @@ func (p *PdfiumImplementation) FPDFLink_GetDest(request *requests.FPDFLink_GetDe
 }
 
 // FPDFLink_GetAction returns the action info for a link
+// If this function returns a valid handle, it is valid as long as the link is
+// valid.
 func (p *PdfiumImplementation) FPDFLink_GetAction(request *requests.FPDFLink_GetAction) (*responses.FPDFLink_GetAction, error) {
 	p.Lock()
 	defer p.Unlock()

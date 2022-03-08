@@ -163,35 +163,36 @@ type mainPdfium struct {
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
-		logger:               p.logger,
-		documentRefs:         map[references.FPDF_DOCUMENT]*DocumentHandle{},
-		pageRefs:             map[references.FPDF_PAGE]*PageHandle{},
-		bookmarkRefs:         map[references.FPDF_BOOKMARK]*BookmarkHandle{},
-		destRefs:             map[references.FPDF_DEST]*DestHandle{},
-		actionRefs:           map[references.FPDF_ACTION]*ActionHandle{},
-		linkRefs:             map[references.FPDF_LINK]*LinkHandle{},
-		pageLinkRefs:         map[references.FPDF_PAGELINK]*PageLinkHandle{},
-		schHandleRefs:        map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
-		bitmapRefs:           map[references.FPDF_BITMAP]*BitmapHandle{},
-		textPageRefs:         map[references.FPDF_TEXTPAGE]*TextPageHandle{},
-		pageRangeRefs:        map[references.FPDF_PAGERANGE]*PageRangeHandle{},
-		pageObjectRefs:       map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
-		clipPathRefs:         map[references.FPDF_CLIPPATH]*ClipPathHandle{},
-		formHandleRefs:       map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
-		annotationRefs:       map[references.FPDF_ANNOTATION]*AnnotationHandle{},
-		xObjectRefs:          map[references.FPDF_XOBJECT]*XObjectHandle{},
-		signatureRefs:        map[references.FPDF_SIGNATURE]*SignatureHandle{},
-		attachmentRefs:       map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
-		javaScriptActionRefs: map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
-		searchRefs:           map[references.FPDF_SCHHANDLE]*SearchHandle{},
-		pathSegmentRefs:      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle{},
-		dataAvailRefs:        map[references.FPDF_AVAIL]*DataAvailHandle{},
-		structTreeRefs:       map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
-		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
-		pageObjectMarkRefs:   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
-		fontRefs:             map[references.FPDF_FONT]*FontHandle{},
-		glyphPathRefs:        map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
-		fileReaders:          map[string]*fileReaderRef{},
+		logger:                     p.logger,
+		documentRefs:               map[references.FPDF_DOCUMENT]*DocumentHandle{},
+		pageRefs:                   map[references.FPDF_PAGE]*PageHandle{},
+		bookmarkRefs:               map[references.FPDF_BOOKMARK]*BookmarkHandle{},
+		destRefs:                   map[references.FPDF_DEST]*DestHandle{},
+		actionRefs:                 map[references.FPDF_ACTION]*ActionHandle{},
+		linkRefs:                   map[references.FPDF_LINK]*LinkHandle{},
+		pageLinkRefs:               map[references.FPDF_PAGELINK]*PageLinkHandle{},
+		schHandleRefs:              map[references.FPDF_SCHHANDLE]*SchHandleHandle{},
+		bitmapRefs:                 map[references.FPDF_BITMAP]*BitmapHandle{},
+		textPageRefs:               map[references.FPDF_TEXTPAGE]*TextPageHandle{},
+		pageRangeRefs:              map[references.FPDF_PAGERANGE]*PageRangeHandle{},
+		pageObjectRefs:             map[references.FPDF_PAGEOBJECT]*PageObjectHandle{},
+		clipPathRefs:               map[references.FPDF_CLIPPATH]*ClipPathHandle{},
+		formHandleRefs:             map[references.FPDF_FORMHANDLE]*FormHandleHandle{},
+		annotationRefs:             map[references.FPDF_ANNOTATION]*AnnotationHandle{},
+		xObjectRefs:                map[references.FPDF_XOBJECT]*XObjectHandle{},
+		signatureRefs:              map[references.FPDF_SIGNATURE]*SignatureHandle{},
+		attachmentRefs:             map[references.FPDF_ATTACHMENT]*AttachmentHandle{},
+		javaScriptActionRefs:       map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle{},
+		searchRefs:                 map[references.FPDF_SCHHANDLE]*SearchHandle{},
+		pathSegmentRefs:            map[references.FPDF_PATHSEGMENT]*PathSegmentHandle{},
+		dataAvailRefs:              map[references.FPDF_AVAIL]*DataAvailHandle{},
+		structTreeRefs:             map[references.FPDF_STRUCTTREE]*StructTreeHandle{},
+		structElementRefs:          map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
+		structElementAttributeRefs: map[references.FPDF_STRUCTELEMENT_ATTR]*StructElementAttributeHandle{},
+		pageObjectMarkRefs:         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
+		fontRefs:                   map[references.FPDF_FONT]*FontHandle{},
+		glyphPathRefs:              map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
+		fileReaders:                map[string]*fileReaderRef{},
 	}
 
 	newInstance.instanceRef = len(p.instanceRefs)
@@ -208,34 +209,35 @@ type PdfiumImplementation struct {
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
 
-	documentRefs         map[references.FPDF_DOCUMENT]*DocumentHandle
-	pageRefs             map[references.FPDF_PAGE]*PageHandle
-	bookmarkRefs         map[references.FPDF_BOOKMARK]*BookmarkHandle
-	destRefs             map[references.FPDF_DEST]*DestHandle
-	actionRefs           map[references.FPDF_ACTION]*ActionHandle
-	linkRefs             map[references.FPDF_LINK]*LinkHandle
-	pageLinkRefs         map[references.FPDF_PAGELINK]*PageLinkHandle
-	schHandleRefs        map[references.FPDF_SCHHANDLE]*SchHandleHandle
-	textPageRefs         map[references.FPDF_TEXTPAGE]*TextPageHandle
-	pageRangeRefs        map[references.FPDF_PAGERANGE]*PageRangeHandle
-	pageObjectRefs       map[references.FPDF_PAGEOBJECT]*PageObjectHandle
-	clipPathRefs         map[references.FPDF_CLIPPATH]*ClipPathHandle
-	formHandleRefs       map[references.FPDF_FORMHANDLE]*FormHandleHandle
-	bitmapRefs           map[references.FPDF_BITMAP]*BitmapHandle
-	annotationRefs       map[references.FPDF_ANNOTATION]*AnnotationHandle
-	xObjectRefs          map[references.FPDF_XOBJECT]*XObjectHandle
-	signatureRefs        map[references.FPDF_SIGNATURE]*SignatureHandle
-	attachmentRefs       map[references.FPDF_ATTACHMENT]*AttachmentHandle
-	javaScriptActionRefs map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
-	searchRefs           map[references.FPDF_SCHHANDLE]*SearchHandle
-	pathSegmentRefs      map[references.FPDF_PATHSEGMENT]*PathSegmentHandle
-	dataAvailRefs        map[references.FPDF_AVAIL]*DataAvailHandle
-	structTreeRefs       map[references.FPDF_STRUCTTREE]*StructTreeHandle
-	structElementRefs    map[references.FPDF_STRUCTELEMENT]*StructElementHandle
-	pageObjectMarkRefs   map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
-	fontRefs             map[references.FPDF_FONT]*FontHandle
-	glyphPathRefs        map[references.FPDF_GLYPHPATH]*GlyphPathHandle
-	fileReaders          map[string]*fileReaderRef
+	documentRefs               map[references.FPDF_DOCUMENT]*DocumentHandle
+	pageRefs                   map[references.FPDF_PAGE]*PageHandle
+	bookmarkRefs               map[references.FPDF_BOOKMARK]*BookmarkHandle
+	destRefs                   map[references.FPDF_DEST]*DestHandle
+	actionRefs                 map[references.FPDF_ACTION]*ActionHandle
+	linkRefs                   map[references.FPDF_LINK]*LinkHandle
+	pageLinkRefs               map[references.FPDF_PAGELINK]*PageLinkHandle
+	schHandleRefs              map[references.FPDF_SCHHANDLE]*SchHandleHandle
+	textPageRefs               map[references.FPDF_TEXTPAGE]*TextPageHandle
+	pageRangeRefs              map[references.FPDF_PAGERANGE]*PageRangeHandle
+	pageObjectRefs             map[references.FPDF_PAGEOBJECT]*PageObjectHandle
+	clipPathRefs               map[references.FPDF_CLIPPATH]*ClipPathHandle
+	formHandleRefs             map[references.FPDF_FORMHANDLE]*FormHandleHandle
+	bitmapRefs                 map[references.FPDF_BITMAP]*BitmapHandle
+	annotationRefs             map[references.FPDF_ANNOTATION]*AnnotationHandle
+	xObjectRefs                map[references.FPDF_XOBJECT]*XObjectHandle
+	signatureRefs              map[references.FPDF_SIGNATURE]*SignatureHandle
+	attachmentRefs             map[references.FPDF_ATTACHMENT]*AttachmentHandle
+	javaScriptActionRefs       map[references.FPDF_JAVASCRIPT_ACTION]*JavaScriptActionHandle
+	searchRefs                 map[references.FPDF_SCHHANDLE]*SearchHandle
+	pathSegmentRefs            map[references.FPDF_PATHSEGMENT]*PathSegmentHandle
+	dataAvailRefs              map[references.FPDF_AVAIL]*DataAvailHandle
+	structTreeRefs             map[references.FPDF_STRUCTTREE]*StructTreeHandle
+	structElementRefs          map[references.FPDF_STRUCTELEMENT]*StructElementHandle
+	structElementAttributeRefs map[references.FPDF_STRUCTELEMENT_ATTR]*StructElementAttributeHandle
+	pageObjectMarkRefs         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
+	fontRefs                   map[references.FPDF_FONT]*FontHandle
+	glyphPathRefs              map[references.FPDF_GLYPHPATH]*GlyphPathHandle
+	fileReaders                map[string]*fileReaderRef
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -483,6 +485,10 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.structElementRefs {
 		delete(p.structElementRefs, i)
+	}
+
+	for i := range p.structElementAttributeRefs {
+		delete(p.structElementAttributeRefs, i)
 	}
 
 	for i := range p.pageObjectMarkRefs {
@@ -748,6 +754,18 @@ func (p *PdfiumImplementation) getStructElementHandle(structElement references.F
 	}
 
 	return nil, errors.New("could not find structElement handle, perhaps the structElement was already closed or you tried to share structElements between instances")
+}
+
+func (p *PdfiumImplementation) getStructElementAttributeHandle(structElementAttribute references.FPDF_STRUCTELEMENT_ATTR) (*StructElementAttributeHandle, error) {
+	if structElementAttribute == "" {
+		return nil, errors.New("structElementAttribute not given")
+	}
+
+	if val, ok := p.structElementAttributeRefs[structElementAttribute]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find structElementAttribute handle, perhaps the structElementAttribute was already closed or you tried to share structElementAttributes between instances")
 }
 
 func (p *PdfiumImplementation) getPageObjectMarkHandle(pageObjectMark references.FPDF_PAGEOBJECTMARK) (*PageObjectMarkHandle, error) {

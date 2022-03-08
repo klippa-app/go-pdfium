@@ -268,7 +268,7 @@ type FPDFText_LoadStandardFont struct {
 }
 
 type FPDFTextObj_GetFontSize struct {
-	FontSize float32
+	FontSize float32 // The font size of the text object, measured in points (about 1/72 inch)
 }
 
 type FPDFFont_Close struct{}

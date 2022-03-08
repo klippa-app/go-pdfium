@@ -71,6 +71,8 @@ func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetA
 }
 
 // FPDF_GetPageAAction returns an additional-action from page.
+// If this function returns a valid handle, it is valid as long as the page is
+// valid.
 // Experimental API
 func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
 	pageHandle, err := p.loadPage(request.Page)

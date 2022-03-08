@@ -15,6 +15,19 @@ import (
 	"github.com/klippa-app/go-pdfium"
 )
 
+var skipMethods = map[string]bool{
+	"FPDF_InitLibrary":                           true, // Implemented internally
+	"FPDF_InitLibraryWithConfig":                 true, // Implemented internally
+	"FPDF_DestroyLibrary":                        true, // Implemented internally
+	"FPDF_RenderPageSkp":                         true, // Skia render engine method
+	"FPDF_FFLRecord":                             true, // Skia render engine method
+	"FPDF_GetRecommendedV8Flags":                 true, // V8 method
+	"FPDF_GetArrayBufferAllocatorSharedInstance": true, // V8 method
+	"FPDF_BStr_Init":                             true, // XFA method
+	"FPDF_BStr_Set":                              true, // XFA method
+	"FPDF_BStr_Clear":                            true, // XFA method
+}
+
 func main() {
 	implementedMethods := map[string]bool{}
 	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()
@@ -66,7 +79,7 @@ func main() {
 						method = methodParts[0]
 
 						// Skip methods that should never be implemented.
-						if method == "FPDF_InitLibrary" || method == "FPDF_InitLibraryWithConfig" || method == "FPDF_DestroyLibrary" {
+						if _, ok := skipMethods[method]; ok {
 							continue
 						}
 
