@@ -113,22 +113,22 @@ type FORM_OnLButtonDoubleClick struct {
 type FORM_OnKeyDown struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page
-	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
-	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+	NKeyCode   enums.FWL_VKEYCODE  // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
+	Modifier   enums.FWL_EVENTFLAG // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_OnKeyUp struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page
-	NKeyCode   int // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
-	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+	NKeyCode   enums.FWL_VKEYCODE  // The virtual-key code of the given key (see fpdf_fwlevent.h for virtual key codes).
+	Modifier   enums.FWL_EVENTFLAG // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_OnChar struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page
-	NChar      int // The character code value itself.
-	Modifier   int // Mask of key flags (see fpdf_fwlevent.h for key flag values).
+	NChar      int                 // The character code value itself.
+	Modifier   enums.FWL_EVENTFLAG // Mask of key flags (see fpdf_fwlevent.h for key flag values).
 }
 
 type FORM_GetFocusedText struct {

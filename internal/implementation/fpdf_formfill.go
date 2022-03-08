@@ -89,9 +89,15 @@ func go_formfill_FFI_Invalidate_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, le
 		return
 	}
 
-	// @todo: is this the best way? Maybe handles should be based on the pointer to prevent duplicate handles.
-	pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
-	formFillInfoHandle.FormFillInfo.FFI_Invalidate(pageHandle.nativeRef, float64(left), float64(top), float64(right), float64(bottom))
+	var pageRef references.FPDF_PAGE
+	if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+		pageRef = pointerPageRef
+	} else {
+		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+		pageRef = pageHandle.nativeRef
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_Invalidate(pageRef, float64(left), float64(top), float64(right), float64(bottom))
 }
 
 // go_formfill_FFI_OutputSelectedRect_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_OutputSelectedRect.
@@ -108,9 +114,15 @@ func go_formfill_FFI_OutputSelectedRect_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_
 	}
 
 	if formFillInfoHandle.FormFillInfo.FFI_OutputSelectedRect != nil {
-		// @todo: is this the best way? Maybe handles should be based on the pointer to prevent duplicate handles.
-		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
-		formFillInfoHandle.FormFillInfo.FFI_OutputSelectedRect(pageHandle.nativeRef, float64(left), float64(top), float64(right), float64(bottom))
+		var pageRef references.FPDF_PAGE
+		if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+			pageRef = pointerPageRef
+		} else {
+			pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+			pageRef = pageHandle.nativeRef
+		}
+
+		formFillInfoHandle.FormFillInfo.FFI_OutputSelectedRect(pageRef, float64(left), float64(top), float64(right), float64(bottom))
 	}
 }
 
@@ -225,9 +237,15 @@ func go_formfill_FFI_GetPage_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_DOCUMEN
 		return nil
 	}
 
-	documentHandle := formFillInfoHandle.Instance.registerDocument(document)
+	var documentRef references.FPDF_DOCUMENT
+	if pointerDocumentRef, ok := formFillInfoHandle.FormHandleHandle.documentPointers[unsafe.Pointer(document)]; ok {
+		documentRef = pointerDocumentRef
+	} else {
+		documentHandle := formFillInfoHandle.Instance.registerDocument(document)
+		documentRef = documentHandle.nativeRef
+	}
 
-	page := formFillInfoHandle.FormFillInfo.FFI_GetPage(documentHandle.nativeRef, int(nPageIndex))
+	page := formFillInfoHandle.FormFillInfo.FFI_GetPage(documentRef, int(nPageIndex))
 	if page == nil {
 		return nil
 	}
@@ -284,9 +302,15 @@ func go_formfill_FFI_GetRotation_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE) C
 		return C.int(0)
 	}
 
-	// @todo: is this the best way? Maybe handles should be based on the pointer to prevent duplicate handles.
-	pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
-	rotation := formFillInfoHandle.FormFillInfo.FFI_GetRotation(pageHandle.nativeRef)
+	var pageRef references.FPDF_PAGE
+	if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+		pageRef = pointerPageRef
+	} else {
+		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+		pageRef = pageHandle.nativeRef
+	}
+
+	rotation := formFillInfoHandle.FormFillInfo.FFI_GetRotation(pageRef)
 
 	return C.int(rotation)
 }
@@ -389,10 +413,10 @@ func go_formfill_FFI_DoGoToAction_cb(me *C.FPDF_FORMFILLINFO, nPageIndex C.int, 
 }
 
 type FormFillInfo struct {
-	Struct       *C.FPDF_FORMFILLINFO
-	FormFillInfo *structs.FPDF_FORMFILLINFO
-	NativeRef    references.FPDF_FORMHANDLE
-	Instance     *PdfiumImplementation
+	Struct           *C.FPDF_FORMFILLINFO
+	FormFillInfo     *structs.FPDF_FORMFILLINFO
+	FormHandleHandle *FormHandleHandle
+	Instance         *PdfiumImplementation
 }
 
 var formFillInfoHandles = map[unsafe.Pointer]*FormFillInfo{}
@@ -453,10 +477,10 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 	formHandleHandle := p.registerFormHandle(formHandle, unsafe.Pointer(formInfoStruct))
 
 	formFillInfo := &FormFillInfo{
-		Struct:       formInfoStruct,
-		FormFillInfo: &request.FormFillInfo,
-		NativeRef:    formHandleHandle.nativeRef,
-		Instance:     p,
+		Struct:           formInfoStruct,
+		FormFillInfo:     &request.FormFillInfo,
+		FormHandleHandle: formHandleHandle,
+		Instance:         p,
 	}
 
 	formFillInfoHandles[unsafe.Pointer(formInfoStruct)] = formFillInfo
@@ -500,12 +524,22 @@ func (p *PdfiumImplementation) FORM_OnAfterLoadPage(request *requests.FORM_OnAft
 		return nil, err
 	}
 
+	documentHandle, err := p.getDocumentHandle(pageHandle.documentRef)
+	if err != nil {
+		return nil, err
+	}
+
 	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
 	}
 
 	C.FORM_OnAfterLoadPage(pageHandle.handle, formHandleHandle.handle)
+
+	// Store pointers so that we can reference them in the events to prevent
+	// leaving a lot of references to the same page/document.
+	formHandleHandle.pagePointers[unsafe.Pointer(pageHandle.handle)] = pageHandle.nativeRef
+	formHandleHandle.documentPointers[unsafe.Pointer(documentHandle.handle)] = documentHandle.nativeRef
 
 	return &responses.FORM_OnAfterLoadPage{}, nil
 }
@@ -528,6 +562,11 @@ func (p *PdfiumImplementation) FORM_OnBeforeClosePage(request *requests.FORM_OnB
 	}
 
 	C.FORM_OnBeforeClosePage(pageHandle.handle, formHandleHandle.handle)
+
+	// Remove pointer reference.
+	if _, ok := formHandleHandle.pagePointers[unsafe.Pointer(pageHandle.handle)]; ok {
+		delete(formHandleHandle.pagePointers, unsafe.Pointer(pageHandle.handle))
+	}
 
 	return &responses.FORM_OnBeforeClosePage{}, nil
 }
@@ -657,11 +696,10 @@ func (p *PdfiumImplementation) FORM_OnFocus(request *requests.FORM_OnFocus) (*re
 	}
 
 	success := C.FORM_OnFocus(formHandleHandle.handle, pageHandle.handle, C.int(request.Modifier), C.double(request.PageX), C.double(request.PageY))
-	if int(success) == 0 {
-		return nil, errors.New("could not do focus")
-	}
 
-	return &responses.FORM_OnFocus{}, nil
+	return &responses.FORM_OnFocus{
+		HasFocus: int(success) == 1,
+	}, nil
 }
 
 // FORM_OnLButtonDown

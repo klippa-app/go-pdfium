@@ -13,9 +13,11 @@ import (
 func (p *PdfiumImplementation) registerFormHandle(formHandle C.FPDF_FORMHANDLE, formInfo unsafe.Pointer) *FormHandleHandle {
 	ref := uuid.New()
 	handle := &FormHandleHandle{
-		handle:    formHandle,
-		nativeRef: references.FPDF_FORMHANDLE(ref.String()),
-		formInfo:  formInfo,
+		handle:           formHandle,
+		nativeRef:        references.FPDF_FORMHANDLE(ref.String()),
+		formInfo:         formInfo,
+		pagePointers:     map[unsafe.Pointer]references.FPDF_PAGE{},
+		documentPointers: map[unsafe.Pointer]references.FPDF_DOCUMENT{},
 	}
 
 	p.formHandleRefs[handle.nativeRef] = handle

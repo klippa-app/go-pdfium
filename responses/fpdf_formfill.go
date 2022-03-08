@@ -27,7 +27,9 @@ type FORM_OnMouseMove struct{}
 
 type FORM_OnMouseWheel struct{}
 
-type FORM_OnFocus struct{}
+type FORM_OnFocus struct {
+	HasFocus bool
+}
 
 type FORM_OnLButtonDown struct{}
 
