@@ -1331,7 +1331,7 @@ func (p *PdfiumImplementation) FPDFAnnot_IsChecked(request *requests.FPDFAnnot_I
 	}, nil
 }
 
-// FPDFAnnot_SetFocusableSubtypes returns the list of focusable annotation subtypes. Annotations of subtype
+// FPDFAnnot_SetFocusableSubtypes sets the list of focusable annotation subtypes. Annotations of subtype
 // FPDF_ANNOT_WIDGET are by default focusable. New subtypes set using this API
 // will override the existing subtypes.
 // Experimental API.
@@ -1377,7 +1377,9 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypesCount(request *requ
 		return nil, errors.New("could net get focusable subtypes count")
 	}
 
-	return &responses.FPDFAnnot_GetFocusableSubtypesCount{}, nil
+	return &responses.FPDFAnnot_GetFocusableSubtypesCount{
+		FocusableSubtypesCount: int(count),
+	}, nil
 }
 
 // FPDFAnnot_GetFocusableSubtypes returns the list of focusable annotation subtype as set by host.
@@ -1401,7 +1403,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypes(request *requests.
 	if int(count) > 0 {
 		focusableSubtypes := make([]C.FPDF_ANNOTATION_SUBTYPE, int(count))
 
-		success := C.FPDFAnnot_SetFocusableSubtypes(formHandle.handle, &focusableSubtypes[0], C.size_t(len(focusableSubtypes)))
+		success := C.FPDFAnnot_GetFocusableSubtypes(formHandle.handle, &focusableSubtypes[0], C.size_t(len(focusableSubtypes)))
 		if int(success) == 0 {
 			return nil, errors.New("could net get focusable subtypes")
 		}
@@ -1487,7 +1489,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormControlIndex(request *requests.F
 		return nil, err
 	}
 
-	formControlIndex := C.FPDFAnnot_GetFormControlCount(formHandle.handle, annotationHandle.handle)
+	formControlIndex := C.FPDFAnnot_GetFormControlIndex(formHandle.handle, annotationHandle.handle)
 	if int(formControlIndex) == -1 {
 		return nil, errors.New("could net get form control index")
 	}

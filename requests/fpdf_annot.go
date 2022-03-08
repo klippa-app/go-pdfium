@@ -259,7 +259,6 @@ type FPDFAnnot_IsChecked struct {
 
 type FPDFAnnot_SetFocusableSubtypes struct {
 	FormHandle references.FPDF_FORMHANDLE
-	Annotation references.FPDF_ANNOTATION
 	Subtypes   []enums.FPDF_ANNOTATION_SUBTYPE
 }
 
