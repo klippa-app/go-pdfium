@@ -1702,7 +1702,7 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAnnot_IsChecked(request *requests.FPDFAnnot_IsChecked) (*responses.FPDFAnnot_IsChecked, error)
 
-	// FPDFAnnot_SetFocusableSubtypes returns the list of focusable annotation subtypes. Annotations of subtype
+	// FPDFAnnot_SetFocusableSubtypes sets the list of focusable annotation subtypes. Annotations of subtype
 	// FPDF_ANNOT_WIDGET are by default focusable. New subtypes set using this API
 	// will override the existing subtypes.
 	// Experimental API.
@@ -1744,4 +1744,238 @@ type Pdfium interface {
 	FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error)
 
 	// End fpdf_annot.h
+
+	// Start fpdf_formfill.h
+
+	// FPDFDOC_InitFormFillEnvironment initializes form fill environment
+	// This function should be called before any form fill operation.
+	FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error)
+
+	// FPDFDOC_ExitFormFillEnvironment takes ownership of the handle and exits form fill environment.
+	FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error)
+
+	// FORM_OnAfterLoadPage
+	// This method is required for implementing all the form related
+	// functions. Should be invoked after user successfully loaded a
+	// PDF page, and FPDFDOC_InitFormFillEnvironment() has been invoked.
+	FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error)
+
+	// FORM_OnBeforeClosePage
+	// This method is required for implementing all the form related
+	// functions. Should be invoked before user closes the PDF page.
+	FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error)
+
+	// FORM_DoDocumentJSAction
+	// This method is required for performing document-level JavaScript
+	// actions. It should be invoked after the PDF document has been loaded.
+	// If there is document-level JavaScript action embedded in the
+	// document, this method will execute the JavaScript action. Otherwise,
+	// the method will do nothing.
+	FORM_DoDocumentJSAction(request *requests.FORM_DoDocumentJSAction) (*responses.FORM_DoDocumentJSAction, error)
+
+	// FORM_DoDocumentOpenAction
+	// This method is required for performing open-action when the document
+	// is opened.
+	// This method will do nothing if there are no open-actions embedded
+	// in the document.
+	FORM_DoDocumentOpenAction(request *requests.FORM_DoDocumentOpenAction) (*responses.FORM_DoDocumentOpenAction, error)
+
+	// FORM_DoDocumentAAction
+	// This method is required for performing the document's
+	// additional-action.
+	// This method will do nothing if there is no document
+	// additional-action corresponding to the specified type.
+	FORM_DoDocumentAAction(request *requests.FORM_DoDocumentAAction) (*responses.FORM_DoDocumentAAction, error)
+
+	// FORM_DoPageAAction
+	// This method is required for performing the page object's
+	// additional-action when opened or closed.
+	// This method will do nothing if no additional-action corresponding
+	// to the specified type exists.
+	FORM_DoPageAAction(request *requests.FORM_DoPageAAction) (*responses.FORM_DoPageAAction, error)
+
+	// FORM_OnMouseMove
+	// Call this member function when the mouse cursor moves.
+	FORM_OnMouseMove(request *requests.FORM_OnMouseMove) (*responses.FORM_OnMouseMove, error)
+
+	// FORM_OnMouseWheel
+	// Call this member function when the user scrolls the mouse wheel.
+	// For X and Y delta, the caller must normalize
+	// platform-specific wheel deltas. e.g. On Windows, a delta value of 240
+	// for a WM_MOUSEWHEEL event normalizes to 2, since Windows defines
+	// WHEEL_DELTA as 120.
+	// Experimental API
+	FORM_OnMouseWheel(request *requests.FORM_OnMouseWheel) (*responses.FORM_OnMouseWheel, error)
+
+	// FORM_OnFocus
+	// This function focuses the form annotation at a given point. If the
+	// annotation at the point already has focus, nothing happens. If there
+	// is no annotation at the point, removes form focus.
+	FORM_OnFocus(request *requests.FORM_OnFocus) (*responses.FORM_OnFocus, error)
+
+	// FORM_OnLButtonDown
+	// Call this member function when the user presses the left
+	// mouse button.
+	FORM_OnLButtonDown(request *requests.FORM_OnLButtonDown) (*responses.FORM_OnLButtonDown, error)
+
+	// FORM_OnRButtonDown
+	// Call this member function when the user presses the right
+	// mouse button.
+	// At the present time, has no effect except in XFA builds, but is
+	// included for the sake of symmetry.
+	FORM_OnRButtonDown(request *requests.FORM_OnRButtonDown) (*responses.FORM_OnRButtonDown, error)
+
+	// FORM_OnLButtonUp
+	// Call this member function when the user releases the left
+	// mouse button.
+	FORM_OnLButtonUp(request *requests.FORM_OnLButtonUp) (*responses.FORM_OnLButtonUp, error)
+
+	// FORM_OnRButtonUp
+	// Call this member function when the user releases the right
+	// mouse button.
+	// At the present time, has no effect except in XFA builds, but is
+	// included for the sake of symmetry.
+	FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp) (*responses.FORM_OnRButtonUp, error)
+
+	// FORM_OnLButtonDoubleClick
+	// Call this member function when the user double clicks the
+	// left mouse button.
+	FORM_OnLButtonDoubleClick(request *requests.FORM_OnLButtonDoubleClick) (*responses.FORM_OnLButtonDoubleClick, error)
+
+	// FORM_OnKeyDown
+	// Call this member function when a nonsystem key is pressed.
+	FORM_OnKeyDown(request *requests.FORM_OnKeyDown) (*responses.FORM_OnKeyDown, error)
+
+	// FORM_OnKeyUp
+	// Call this member function when a nonsystem key is released.
+	FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error)
+
+	// FORM_OnChar
+	// Call this member function when a keystroke translates to a
+	// nonsystem character.
+	FORM_OnChar(request *requests.FORM_OnChar) (*responses.FORM_OnChar, error)
+
+	// FORM_GetFocusedText
+	// Call this function to obtain the text within the current focused
+	// field, if any.
+	// Experimental API
+	FORM_GetFocusedText(request *requests.FORM_GetFocusedText) (*responses.FORM_GetFocusedText, error)
+
+	// FORM_GetSelectedText
+	// Call this function to obtain selected text within a form text
+	// field or form combobox text field.
+	FORM_GetSelectedText(request *requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error)
+
+	// FORM_ReplaceSelection
+	// Call this function to replace the selected text in a form
+	// text field or user-editable form combobox text field with another
+	// text string (which can be empty or non-empty). If there is no
+	// selected text, this function will append the replacement text after
+	// the current caret position.
+	FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error)
+
+	// FORM_SelectAllText
+	// Call this function to select all the text within the currently focused
+	// form text field or form combobox text field.
+	// Experimental API
+	FORM_SelectAllText(request *requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error)
+
+	// FORM_CanUndo
+	// Find out if it is possible for the current focused widget in a given
+	// form to perform an undo operation.
+	FORM_CanUndo(request *requests.FORM_CanUndo) (*responses.FORM_CanUndo, error)
+
+	// FORM_CanRedo
+	// Find out if it is possible for the current focused widget in a given
+	// form to perform a redo operation.
+	FORM_CanRedo(request *requests.FORM_CanRedo) (*responses.FORM_CanRedo, error)
+
+	// FORM_Undo
+	// Make the current focussed widget perform an undo operation.
+	FORM_Undo(request *requests.FORM_Undo) (*responses.FORM_Undo, error)
+
+	// FORM_Redo
+	// Make the current focussed widget perform a redo operation.
+	FORM_Redo(request *requests.FORM_Redo) (*responses.FORM_Redo, error)
+
+	// FORM_ForceToKillFocus
+	// Call this member function to force to kill the focus of the form
+	// field which has focus. If it would kill the focus of a form field,
+	// save the value of form field if was changed by theuser.
+	FORM_ForceToKillFocus(request *requests.FORM_ForceToKillFocus) (*responses.FORM_ForceToKillFocus, error)
+
+	// FORM_GetFocusedAnnot
+	// Call this member function to get the currently focused annotation.
+	// Not currently supported for XFA forms - will report no focused
+	// annotation. Must call FPDFPage_CloseAnnot() when the annotation returned
+	// by this function is no longer needed.
+	// Experimental API.
+	FORM_GetFocusedAnnot(request *requests.FORM_GetFocusedAnnot) (*responses.FORM_GetFocusedAnnot, error)
+
+	// FORM_SetFocusedAnnot
+	// Call this member function to set the currently focused annotation.
+	// The annotation can't be nil. To kill focus, use FORM_ForceToKillFocus() instead.
+	// Experimental API.
+	FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error)
+
+	// FPDFPage_HasFormFieldAtPoint returns the form field type by point.
+	FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint) (*responses.FPDFPage_HasFormFieldAtPoint, error)
+
+	// FPDFPage_FormFieldZOrderAtPoint returns the form field z-order by point.
+	FPDFPage_FormFieldZOrderAtPoint(request *requests.FPDFPage_FormFieldZOrderAtPoint) (*responses.FPDFPage_FormFieldZOrderAtPoint, error)
+
+	// FPDF_SetFormFieldHighlightColor sets the highlight color of the specified (or all) form fields
+	// in the document.
+	FPDF_SetFormFieldHighlightColor(request *requests.FPDF_SetFormFieldHighlightColor) (*responses.FPDF_SetFormFieldHighlightColor, error)
+
+	// FPDF_SetFormFieldHighlightAlpha sets the transparency of the form field highlight color in the
+	// document.
+	FPDF_SetFormFieldHighlightAlpha(request *requests.FPDF_SetFormFieldHighlightAlpha) (*responses.FPDF_SetFormFieldHighlightAlpha, error)
+
+	// FPDF_RemoveFormFieldHighlight removes the form field highlight color in the document.
+	FPDF_RemoveFormFieldHighlight(request *requests.FPDF_RemoveFormFieldHighlight) (*responses.FPDF_RemoveFormFieldHighlight, error)
+
+	// FPDF_FFLDraw renders FormFields and popup window on a page to a device independent
+	// bitmap.
+	// This function is designed to render annotations that are
+	// user-interactive, which are widget annotations (for FormFields) and
+	// popup annotations.
+	// With the FPDF_ANNOT flag, this function will render a popup annotation
+	// when users mouse-hover on a non-widget annotation. Regardless of
+	// FPDF_ANNOT flag, this function will always render widget annotations
+	// for FormFields.
+	// In order to implement the FormFill functions, implementation should
+	// call this function after rendering functions, such as
+	// FPDF_RenderPageBitmap() or FPDF_RenderPageBitmap_Start(), have
+	// finished rendering the page contents.
+	FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error)
+
+	// FPDF_GetFormType returns the type of form contained in the PDF document.
+	// If document is nil, then the return value is FORMTYPE_NONE.
+	// Experimental API
+	FPDF_GetFormType(request *requests.FPDF_GetFormType) (*responses.FPDF_GetFormType, error)
+
+	// FORM_SetIndexSelected selects/deselects the value at the given index of the focused
+	// annotation.
+	// Intended for use with listbox/combobox widget types. Comboboxes
+	// have at most a single value selected at a time which cannot be
+	// deselected. Deselect on a combobox is a no-op that returns false.
+	// Default implementation is a no-op that will return false for
+	// other types.
+	// Not currently supported for XFA forms - will return false.
+	// Experimental API
+	FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error)
+
+	// FORM_IsIndexSelected returns whether or not the value at index of the focused
+	// annotation is currently selected.
+	// Intended for use with listbox/combobox widget types. Default
+	// implementation is a no-op that will return false for other types.
+	// Not currently supported for XFA forms - will return false.
+	// Experimental API
+	FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error)
+
+	// FPDF_LoadXFA load XFA fields of the document if it consists of XFA fields.
+	FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error)
+
+	// End fpdf_formfill.h
 }
