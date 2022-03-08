@@ -4,16 +4,16 @@ import "C"
 import (
 	"bytes"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"io/ioutil"
+	"time"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-	"image"
-	"image/jpeg"
-	"io/ioutil"
-	"log"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -230,7 +230,7 @@ var _ = Describe("fpdf_formfill", func() {
 
 		addToHistory := func(history FormHistory) {
 			formHistory = append(formHistory, history)
-			log.Printf("New history: %s: %v", history.Name, history.Args)
+			//log.Printf("New history: %s: %v", history.Name, history.Args)
 		}
 
 		renderFormImage := func(page references.FPDF_PAGE) {
@@ -287,9 +287,9 @@ var _ = Describe("fpdf_formfill", func() {
 				return
 			}
 
-			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("form-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
 			renderCount++
-			log.Println("did render")
+			//log.Println("did render")
 		}
 
 		BeforeEach(func() {
@@ -469,7 +469,10 @@ var _ = Describe("fpdf_formfill", func() {
 			Expect(err).To(BeNil())
 			Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
 
-			log.Println(formHistory)
+			//formattedHistory, _ := json.MarshalIndent(formHistory, "", "  ")
+
+			//log.Println(formHistory)
+			//log.Printf(string(formattedHistory))
 		})
 
 		When("required callbacks are missing", func() {
@@ -967,6 +970,24 @@ var _ = Describe("fpdf_formfill", func() {
 				Expect(err).To(BeNil())
 				Expect(FORM_OnAfterLoadPage).To(Equal(&responses.FORM_OnAfterLoadPage{}))
 
+				FORM_Undo, err := PdfiumInstance.FORM_Undo(&requests.FORM_Undo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(MatchError("could not undo"))
+				Expect(FORM_Undo).To(BeNil())
+
+				FORM_Redo, err := PdfiumInstance.FORM_Redo(&requests.FORM_Redo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(MatchError("could not redo"))
+				Expect(FORM_Redo).To(BeNil())
+
 				FORM_OnMouseMove, err := PdfiumInstance.FORM_OnMouseMove(&requests.FORM_OnMouseMove{
 					Page: requests.Page{
 						ByReference: &FPDF_LoadPage.Page,
@@ -1049,6 +1070,304 @@ var _ = Describe("fpdf_formfill", func() {
 				Expect(err).To(BeNil())
 				Expect(FORM_OnChar).To(Equal(&responses.FORM_OnChar{}))
 				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_CanUndo, err := PdfiumInstance.FORM_CanUndo(&requests.FORM_CanUndo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_CanUndo).To(Equal(&responses.FORM_CanUndo{
+					CanUndo: true,
+				}))
+				FORM_Undo, err = PdfiumInstance.FORM_Undo(&requests.FORM_Undo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_Undo).To(Equal(&responses.FORM_Undo{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_CanRedo, err := PdfiumInstance.FORM_CanRedo(&requests.FORM_CanRedo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_CanRedo).To(Equal(&responses.FORM_CanRedo{
+					CanRedo: true,
+				}))
+				FORM_Redo, err = PdfiumInstance.FORM_Redo(&requests.FORM_Redo{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_Redo).To(Equal(&responses.FORM_Redo{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnFocus, err := PdfiumInstance.FORM_OnFocus(&requests.FORM_OnFocus{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      0,
+					PageY:      0,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnFocus).To(Equal(&responses.FORM_OnFocus{
+					HasFocus: false,
+				}))
+
+				FPDF_SetFormFieldHighlightColor, err := PdfiumInstance.FPDF_SetFormFieldHighlightColor(&requests.FPDF_SetFormFieldHighlightColor{
+					FormHandle: formHandle,
+					Color:      0xFFE4DD,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_SetFormFieldHighlightColor).To(Equal(&responses.FPDF_SetFormFieldHighlightColor{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FPDF_SetFormFieldHighlightAlpha, err := PdfiumInstance.FPDF_SetFormFieldHighlightAlpha(&requests.FPDF_SetFormFieldHighlightAlpha{
+					FormHandle: formHandle,
+					Alpha:      100,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_SetFormFieldHighlightAlpha).To(Equal(&responses.FPDF_SetFormFieldHighlightAlpha{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FPDF_RemoveFormFieldHighlight, err := PdfiumInstance.FPDF_RemoveFormFieldHighlight(&requests.FPDF_RemoveFormFieldHighlight{
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_RemoveFormFieldHighlight).To(Equal(&responses.FPDF_RemoveFormFieldHighlight{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnFocus, err = PdfiumInstance.FORM_OnFocus(&requests.FORM_OnFocus{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      120,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnFocus).To(Equal(&responses.FORM_OnFocus{
+					HasFocus: true,
+				}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_GetSelectedText, err := PdfiumInstance.FORM_GetSelectedText(&requests.FORM_GetSelectedText{
+					FormHandle: formHandle,
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_GetSelectedText).To(Equal(&responses.FORM_GetSelectedText{}))
+
+				FORM_ForceToKillFocus, err := PdfiumInstance.FORM_ForceToKillFocus(&requests.FORM_ForceToKillFocus{
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_ForceToKillFocus).To(Equal(&responses.FORM_ForceToKillFocus{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_ForceToKillFocus, err = PdfiumInstance.FORM_ForceToKillFocus(&requests.FORM_ForceToKillFocus{
+					FormHandle: formHandle,
+				})
+				Expect(err).To(MatchError("could not kill focus"))
+				Expect(FORM_ForceToKillFocus).To(BeNil())
+
+				FORM_OnMouseMove, err = PdfiumInstance.FORM_OnMouseMove(&requests.FORM_OnMouseMove{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      120,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnMouseMove).To(Equal(&responses.FORM_OnMouseMove{}))
+
+				FORM_OnLButtonDown, err = PdfiumInstance.FORM_OnLButtonDown(&requests.FORM_OnLButtonDown{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      120,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnLButtonDown).To(Equal(&responses.FORM_OnLButtonDown{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnLButtonUp, err = PdfiumInstance.FORM_OnLButtonUp(&requests.FORM_OnLButtonUp{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      120,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnLButtonUp).To(Equal(&responses.FORM_OnLButtonUp{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnLButtonDown, err = PdfiumInstance.FORM_OnLButtonDown(&requests.FORM_OnLButtonDown{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      120,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnLButtonDown).To(Equal(&responses.FORM_OnLButtonDown{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnMouseMove, err = PdfiumInstance.FORM_OnMouseMove(&requests.FORM_OnMouseMove{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      150,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnMouseMove).To(Equal(&responses.FORM_OnMouseMove{}))
+
+				FORM_OnLButtonUp, err = PdfiumInstance.FORM_OnLButtonUp(&requests.FORM_OnLButtonUp{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      150,
+					PageY:      120,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnLButtonUp).To(Equal(&responses.FORM_OnLButtonUp{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_GetSelectedText, err = PdfiumInstance.FORM_GetSelectedText(&requests.FORM_GetSelectedText{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_GetSelectedText).To(Equal(&responses.FORM_GetSelectedText{
+					SelectedText: "oenAB",
+				}))
+
+				_, err = PdfiumInstance.FORM_OnKeyDown(&requests.FORM_OnKeyDown{
+					FormHandle: formHandle,
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					NKeyCode: enums.FWL_VKEY_Shift,
+					Modifier: 0,
+				})
+
+				for i := 1; i <= 2; i++ {
+					_, err = PdfiumInstance.FORM_OnKeyDown(&requests.FORM_OnKeyDown{
+						FormHandle: formHandle,
+						Page: requests.Page{
+							ByReference: &FPDF_LoadPage.Page,
+						},
+						NKeyCode: enums.FWL_VKEY_Right,
+						Modifier: enums.FWL_EVENTFLAG_ShiftKey,
+					})
+					_, err = PdfiumInstance.FORM_OnKeyUp(&requests.FORM_OnKeyUp{
+						FormHandle: formHandle,
+						Page: requests.Page{
+							ByReference: &FPDF_LoadPage.Page,
+						},
+						NKeyCode: enums.FWL_VKEY_Right,
+						Modifier: enums.FWL_EVENTFLAG_ShiftKey,
+					})
+				}
+
+				_, err = PdfiumInstance.FORM_OnKeyUp(&requests.FORM_OnKeyUp{
+					FormHandle: formHandle,
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					NKeyCode: enums.FWL_VKEY_Shift,
+					Modifier: 0,
+				})
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_GetSelectedText, err = PdfiumInstance.FORM_GetSelectedText(&requests.FORM_GetSelectedText{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_GetSelectedText).To(Equal(&responses.FORM_GetSelectedText{
+					SelectedText: "oenABC",
+				}))
+
+				FORM_OnRButtonDown, err := PdfiumInstance.FORM_OnRButtonDown(&requests.FORM_OnRButtonDown{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      100,
+					PageY:      100,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnRButtonDown).To(Equal(&responses.FORM_OnRButtonDown{}))
+
+				renderFormImage(FPDF_LoadPage.Page)
+
+				FORM_OnRButtonUp, err := PdfiumInstance.FORM_OnRButtonUp(&requests.FORM_OnRButtonUp{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      100,
+					PageY:      100,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnRButtonUp).To(Equal(&responses.FORM_OnRButtonUp{}))
+
+				FORM_OnLButtonDoubleClick, err := PdfiumInstance.FORM_OnLButtonDoubleClick(&requests.FORM_OnLButtonDoubleClick{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					PageX:      100,
+					PageY:      100,
+					Modifier:   0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_OnLButtonDoubleClick).To(Equal(&responses.FORM_OnLButtonDoubleClick{}))
 
 				FORM_OnBeforeClosePage, err := PdfiumInstance.FORM_OnBeforeClosePage(&requests.FORM_OnBeforeClosePage{
 					Page: requests.Page{
