@@ -5219,6 +5219,104 @@ func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBox
 	return i.pdfium.FPDF_SetSandBoxPolicy(request)
 }
 
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetBlobValue(request *requests.FPDF_StructElement_Attr_GetBlobValue) (resp *responses.FPDF_StructElement_Attr_GetBlobValue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetBlobValue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetBlobValue(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetBooleanValue(request *requests.FPDF_StructElement_Attr_GetBooleanValue) (resp *responses.FPDF_StructElement_Attr_GetBooleanValue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetBooleanValue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetBooleanValue(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetCount(request *requests.FPDF_StructElement_Attr_GetCount) (resp *responses.FPDF_StructElement_Attr_GetCount, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetCount", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetCount(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetName(request *requests.FPDF_StructElement_Attr_GetName) (resp *responses.FPDF_StructElement_Attr_GetName, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetName", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetName(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetNumberValue(request *requests.FPDF_StructElement_Attr_GetNumberValue) (resp *responses.FPDF_StructElement_Attr_GetNumberValue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetNumberValue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetNumberValue(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetStringValue(request *requests.FPDF_StructElement_Attr_GetStringValue) (resp *responses.FPDF_StructElement_Attr_GetStringValue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetStringValue", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetStringValue(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (resp *responses.FPDF_StructElement_Attr_GetType, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_Attr_GetType", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_Attr_GetType(request)
+}
+
 func (i *pdfiumInstance) FPDF_StructElement_CountChildren(request *requests.FPDF_StructElement_CountChildren) (resp *responses.FPDF_StructElement_CountChildren, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -5233,6 +5331,20 @@ func (i *pdfiumInstance) FPDF_StructElement_CountChildren(request *requests.FPDF
 	return i.pdfium.FPDF_StructElement_CountChildren(request)
 }
 
+func (i *pdfiumInstance) FPDF_StructElement_GetActualText(request *requests.FPDF_StructElement_GetActualText) (resp *responses.FPDF_StructElement_GetActualText, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetActualText", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetActualText(request)
+}
+
 func (i *pdfiumInstance) FPDF_StructElement_GetAltText(request *requests.FPDF_StructElement_GetAltText) (resp *responses.FPDF_StructElement_GetAltText, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -5245,6 +5357,34 @@ func (i *pdfiumInstance) FPDF_StructElement_GetAltText(request *requests.FPDF_St
 	}()
 
 	return i.pdfium.FPDF_StructElement_GetAltText(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetAttributeAtIndex(request *requests.FPDF_StructElement_GetAttributeAtIndex) (resp *responses.FPDF_StructElement_GetAttributeAtIndex, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetAttributeAtIndex", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetAttributeAtIndex(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetAttributeCount(request *requests.FPDF_StructElement_GetAttributeCount) (resp *responses.FPDF_StructElement_GetAttributeCount, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetAttributeCount", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetAttributeCount(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_StructElement_GetChildAtIndex) (resp *responses.FPDF_StructElement_GetChildAtIndex, err error) {
@@ -5301,6 +5441,62 @@ func (i *pdfiumInstance) FPDF_StructElement_GetMarkedContentID(request *requests
 	}()
 
 	return i.pdfium.FPDF_StructElement_GetMarkedContentID(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetMarkedContentIdAtIndex(request *requests.FPDF_StructElement_GetMarkedContentIdAtIndex) (resp *responses.FPDF_StructElement_GetMarkedContentIdAtIndex, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetMarkedContentIdAtIndex", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetMarkedContentIdAtIndex(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetMarkedContentIdCount(request *requests.FPDF_StructElement_GetMarkedContentIdCount) (resp *responses.FPDF_StructElement_GetMarkedContentIdCount, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetMarkedContentIdCount", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetMarkedContentIdCount(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetObjType(request *requests.FPDF_StructElement_GetObjType) (resp *responses.FPDF_StructElement_GetObjType, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetObjType", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetObjType(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetParent(request *requests.FPDF_StructElement_GetParent) (resp *responses.FPDF_StructElement_GetParent, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetParent", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetParent(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetStringAttribute(request *requests.FPDF_StructElement_GetStringAttribute) (resp *responses.FPDF_StructElement_GetStringAttribute, err error) {

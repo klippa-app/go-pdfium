@@ -80,3 +80,6 @@ type FPDF_FONT string
 
 // FPDF_GLYPHPATH is an internal reference to a C.FPDF_GLYPHPATH handle.
 type FPDF_GLYPHPATH string
+
+// FPDF_STRUCTELEMENT_ATTR is an internal reference to a C.FPDF_STRUCTELEMENT_ATTR handle.
+type FPDF_STRUCTELEMENT_ATTR string
