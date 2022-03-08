@@ -130,14 +130,14 @@ func (p *PdfiumImplementation) FORM_GetFocusedAnnot(request *requests.FORM_GetFo
 	}
 
 	pageIndex := C.int(0)
-	var annotation *C.FPDF_ANNOTATION
+	var annotation C.FPDF_ANNOTATION
 
-	success := C.FORM_GetFocusedAnnot(formHandleHandle.handle, &pageIndex, annotation)
+	success := C.FORM_GetFocusedAnnot(formHandleHandle.handle, &pageIndex, &annotation)
 	if int(success) == 0 {
 		return nil, errors.New("could not get focused annotation")
 	}
 
-	annotationHandle := p.registerAnnotation(*annotation)
+	annotationHandle := p.registerAnnotation(annotation)
 
 	return &responses.FORM_GetFocusedAnnot{
 		PageIndex:  int(pageIndex),
