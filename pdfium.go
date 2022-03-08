@@ -1702,7 +1702,7 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAnnot_IsChecked(request *requests.FPDFAnnot_IsChecked) (*responses.FPDFAnnot_IsChecked, error)
 
-	// FPDFAnnot_SetFocusableSubtypes returns the list of focusable annotation subtypes. Annotations of subtype
+	// FPDFAnnot_SetFocusableSubtypes sets the list of focusable annotation subtypes. Annotations of subtype
 	// FPDF_ANNOT_WIDGET are by default focusable. New subtypes set using this API
 	// will override the existing subtypes.
 	// Experimental API.
