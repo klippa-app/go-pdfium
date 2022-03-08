@@ -268,25 +268,23 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetName(request *requests
 		return nil, err
 	}
 
+	// For some reason this does not work as said in the documentation.
+	// You can't pass a nil buffer.
+	charData := make([]byte, uint64(1))
 	objTypeLength := C.ulong(0)
-	success := C.FPDF_StructElement_Attr_GetName(structElementAttributeHandle.handle, C.int(request.Index), nil, 0, &objTypeLength)
+	success := C.FPDF_StructElement_Attr_GetName(structElementAttributeHandle.handle, C.int(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &objTypeLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get attribute name")
 	}
 
-	charData := make([]byte, uint64(objTypeLength))
+	charData = make([]byte, uint64(objTypeLength))
 	success = C.FPDF_StructElement_Attr_GetName(structElementAttributeHandle.handle, C.int(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &objTypeLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get attribute name")
 	}
 
-	transformedText, err := p.transformUTF16LEToUTF8(charData)
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.FPDF_StructElement_Attr_GetName{
-		Name: transformedText,
+		Name: string(charData[:len(charData)-1]), // Remove NULL terminator.
 	}, nil
 }
 
@@ -331,7 +329,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBooleanValue(request *
 
 	success := C.FPDF_StructElement_Attr_GetBooleanValue(structElementAttributeHandle.handle, attributeName, &outValue)
 	if int(success) == 0 {
-		return nil, errors.New("could net get boolean value")
+		return nil, errors.New("could not get boolean value")
 	}
 
 	return &responses.FPDF_StructElement_Attr_GetBooleanValue{
@@ -359,7 +357,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetNumberValue(request *r
 
 	success := C.FPDF_StructElement_Attr_GetNumberValue(structElementAttributeHandle.handle, attributeName, &outValue)
 	if int(success) == 0 {
-		return nil, errors.New("could net get number value")
+		return nil, errors.New("could not get number value")
 	}
 
 	return &responses.FPDF_StructElement_Attr_GetNumberValue{
