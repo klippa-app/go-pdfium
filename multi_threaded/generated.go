@@ -11,6 +11,246 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (i *pdfiumInstance) FORM_CanRedo(request *requests.FORM_CanRedo) (*responses.FORM_CanRedo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_CanRedo(request)
+}
+
+func (i *pdfiumInstance) FORM_CanUndo(request *requests.FORM_CanUndo) (*responses.FORM_CanUndo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_CanUndo(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentAAction(request *requests.FORM_DoDocumentAAction) (*responses.FORM_DoDocumentAAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_DoDocumentAAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentJSAction(request *requests.FORM_DoDocumentJSAction) (*responses.FORM_DoDocumentJSAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_DoDocumentJSAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentOpenAction(request *requests.FORM_DoDocumentOpenAction) (*responses.FORM_DoDocumentOpenAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_DoDocumentOpenAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoPageAAction(request *requests.FORM_DoPageAAction) (*responses.FORM_DoPageAAction, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_DoPageAAction(request)
+}
+
+func (i *pdfiumInstance) FORM_ForceToKillFocus(request *requests.FORM_ForceToKillFocus) (*responses.FORM_ForceToKillFocus, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_ForceToKillFocus(request)
+}
+
+func (i *pdfiumInstance) FORM_GetFocusedAnnot(request *requests.FORM_GetFocusedAnnot) (*responses.FORM_GetFocusedAnnot, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_GetFocusedAnnot(request)
+}
+
+func (i *pdfiumInstance) FORM_GetFocusedText(request *requests.FORM_GetFocusedText) (*responses.FORM_GetFocusedText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_GetFocusedText(request)
+}
+
+func (i *pdfiumInstance) FORM_GetSelectedText(request *requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_GetSelectedText(request)
+}
+
+func (i *pdfiumInstance) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_IsIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnAfterLoadPage(request)
+}
+
+func (i *pdfiumInstance) FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnBeforeClosePage(request)
+}
+
+func (i *pdfiumInstance) FORM_OnChar(request *requests.FORM_OnChar) (*responses.FORM_OnChar, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnChar(request)
+}
+
+func (i *pdfiumInstance) FORM_OnFocus(request *requests.FORM_OnFocus) (*responses.FORM_OnFocus, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnFocus(request)
+}
+
+func (i *pdfiumInstance) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) (*responses.FORM_OnKeyDown, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnKeyDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnKeyUp(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonDoubleClick(request *requests.FORM_OnLButtonDoubleClick) (*responses.FORM_OnLButtonDoubleClick, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnLButtonDoubleClick(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonDown(request *requests.FORM_OnLButtonDown) (*responses.FORM_OnLButtonDown, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnLButtonDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonUp(request *requests.FORM_OnLButtonUp) (*responses.FORM_OnLButtonUp, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnLButtonUp(request)
+}
+
+func (i *pdfiumInstance) FORM_OnMouseMove(request *requests.FORM_OnMouseMove) (*responses.FORM_OnMouseMove, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnMouseMove(request)
+}
+
+func (i *pdfiumInstance) FORM_OnMouseWheel(request *requests.FORM_OnMouseWheel) (*responses.FORM_OnMouseWheel, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnMouseWheel(request)
+}
+
+func (i *pdfiumInstance) FORM_OnRButtonDown(request *requests.FORM_OnRButtonDown) (*responses.FORM_OnRButtonDown, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnRButtonDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp) (*responses.FORM_OnRButtonUp, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_OnRButtonUp(request)
+}
+
+func (i *pdfiumInstance) FORM_Redo(request *requests.FORM_Redo) (*responses.FORM_Redo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_Redo(request)
+}
+
+func (i *pdfiumInstance) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_ReplaceSelection(request)
+}
+
+func (i *pdfiumInstance) FORM_SelectAllText(request *requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_SelectAllText(request)
+}
+
+func (i *pdfiumInstance) FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_SetFocusedAnnot(request)
+}
+
+func (i *pdfiumInstance) FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_SetIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_Undo(request *requests.FORM_Undo) (*responses.FORM_Undo, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_Undo(request)
+}
+
 func (i *pdfiumInstance) FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -701,6 +941,18 @@ func (i *pdfiumInstance) FPDFClipPath_GetPathSegment(request *requests.FPDFClipP
 	}
 
 	return i.worker.plugin.FPDFClipPath_GetPathSegment(request)
+}
+
+func (i *pdfiumInstance) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFDOC_ExitFormFillEnvironment(request)
+}
+
+func (i *pdfiumInstance) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error) {
+	return nil, errors.New("unsupported method on multi-threaded usage")
 }
 
 func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (*responses.FPDFDest_GetDestPageIndex, error) {
@@ -1535,6 +1787,14 @@ func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*
 	return i.worker.plugin.FPDFPage_Flatten(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_FormFieldZOrderAtPoint(request *requests.FPDFPage_FormFieldZOrderAtPoint) (*responses.FPDFPage_FormFieldZOrderAtPoint, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_FormFieldZOrderAtPoint(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (*responses.FPDFPage_GenerateContent, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1645,6 +1905,14 @@ func (i *pdfiumInstance) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimB
 	}
 
 	return i.worker.plugin.FPDFPage_GetTrimBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint) (*responses.FPDFPage_HasFormFieldAtPoint, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_HasFormFieldAtPoint(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error) {
@@ -2271,6 +2539,14 @@ func (i *pdfiumInstance) FPDF_DocumentHasValidCrossReferenceTable(request *reque
 	return i.worker.plugin.FPDF_DocumentHasValidCrossReferenceTable(request)
 }
 
+func (i *pdfiumInstance) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_FFLDraw(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2293,6 +2569,14 @@ func (i *pdfiumInstance) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersi
 	}
 
 	return i.worker.plugin.FPDF_GetFileVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetFormType(request *requests.FPDF_GetFormType) (*responses.FPDF_GetFormType, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_GetFormType(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error) {
@@ -2539,6 +2823,14 @@ func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*respon
 	return i.worker.plugin.FPDF_LoadPage(request)
 }
 
+func (i *pdfiumInstance) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_LoadXFA(request)
+}
+
 func (i *pdfiumInstance) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2561,6 +2853,14 @@ func (i *pdfiumInstance) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) 
 	}
 
 	return i.worker.plugin.FPDF_PageToDevice(request)
+}
+
+func (i *pdfiumInstance) FPDF_RemoveFormFieldHighlight(request *requests.FPDF_RemoveFormFieldHighlight) (*responses.FPDF_RemoveFormFieldHighlight, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_RemoveFormFieldHighlight(request)
 }
 
 func (i *pdfiumInstance) FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error) {
@@ -2617,6 +2917,22 @@ func (i *pdfiumInstance) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVer
 	}
 
 	return i.worker.plugin.FPDF_SaveWithVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetFormFieldHighlightAlpha(request *requests.FPDF_SetFormFieldHighlightAlpha) (*responses.FPDF_SetFormFieldHighlightAlpha, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_SetFormFieldHighlightAlpha(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetFormFieldHighlightColor(request *requests.FPDF_SetFormFieldHighlightColor) (*responses.FPDF_SetFormFieldHighlightColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_SetFormFieldHighlightColor(request)
 }
 
 func (i *pdfiumInstance) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error) {

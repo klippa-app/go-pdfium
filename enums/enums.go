@@ -397,8 +397,268 @@ const (
 type FPDF_FORMFLAG int
 
 const (
-	FPDF_FORMFLAG_NONE     FPDF_ANNOT_FLAG = 0
-	FPDF_FORMFLAG_READONLY FPDF_ANNOT_FLAG = (1 << 0)
-	FPDF_FORMFLAG_REQUIRED FPDF_ANNOT_FLAG = (1 << 1)
-	FPDF_FORMFLAG_NOEXPORT FPDF_ANNOT_FLAG = (1 << 2)
+	FPDF_FORMFLAG_NONE     FPDF_FORMFLAG = 0
+	FPDF_FORMFLAG_READONLY FPDF_FORMFLAG = (1 << 0)
+	FPDF_FORMFLAG_REQUIRED FPDF_FORMFLAG = (1 << 1)
+	FPDF_FORMFLAG_NOEXPORT FPDF_FORMFLAG = (1 << 2)
+)
+
+type FXCT int
+
+const (
+	FXCT_ARROW FXCT = 0
+	FXCT_NESW  FXCT = 1
+	FXCT_NWSE  FXCT = 2
+	FXCT_VBEAM FXCT = 3
+	FXCT_HBEAM FXCT = 4
+	FXCT_HAND  FXCT = 5
+)
+
+type FPDF_ZOOM_MODE int
+
+const (
+	FPDF_ZOOM_MODE_XYZ      FPDF_ZOOM_MODE = 1
+	FPDF_ZOOM_MODE_FITPAGE  FPDF_ZOOM_MODE = 2
+	FPDF_ZOOM_MODE_FITHORZ  FPDF_ZOOM_MODE = 3
+	FPDF_ZOOM_MODE_FITVERT  FPDF_ZOOM_MODE = 4
+	FPDF_ZOOM_MODE_FITRECT  FPDF_ZOOM_MODE = 5
+	FPDF_ZOOM_MODE_FITBBOX  FPDF_ZOOM_MODE = 6
+	FPDF_ZOOM_MODE_FITBHORZ FPDF_ZOOM_MODE = 7
+	FPDF_ZOOM_MODE_FITBVERT FPDF_ZOOM_MODE = 8
+)
+
+type FPDFDOC_AACTION int
+
+const (
+	FPDFDOC_AACTION_WC FPDFDOC_AACTION = 0x10
+	FPDFDOC_AACTION_WS FPDFDOC_AACTION = 0x11
+	FPDFDOC_AACTION_DS FPDFDOC_AACTION = 0x12
+	FPDFDOC_AACTION_WP FPDFDOC_AACTION = 0x13
+	FPDFDOC_AACTION_DP FPDFDOC_AACTION = 0x14
+)
+
+type FPDFPAGE_AACTION int
+
+const (
+	FPDFPAGE_AACTION_OPEN  FPDFPAGE_AACTION = 0 // OPEN (/O) -- An action to be performed when the page is opened
+	FPDFPAGE_AACTION_CLOSE FPDFPAGE_AACTION = 1 // CLOSE (/C) -- An action to be performed when the page is closed
+)
+
+type FPDF_FORMFIELD int
+
+const (
+	FPDF_FORMFIELD_NO_FIELD       FPDF_FORMFIELD = -1
+	FPDF_FORMFIELD_UNKNOWN        FPDF_FORMFIELD = 0
+	FPDF_FORMFIELD_PUSHBUTTON     FPDF_FORMFIELD = 1
+	FPDF_FORMFIELD_CHECKBOX       FPDF_FORMFIELD = 2
+	FPDF_FORMFIELD_RADIOBUTTON    FPDF_FORMFIELD = 3
+	FPDF_FORMFIELD_COMBOBOX       FPDF_FORMFIELD = 4
+	FPDF_FORMFIELD_LISTBOX        FPDF_FORMFIELD = 5
+	FPDF_FORMFIELD_TEXTFIELD      FPDF_FORMFIELD = 6
+	FPDF_FORMFIELD_SIGNATURE      FPDF_FORMFIELD = 7
+	FPDF_FORMFIELD_XFA            FPDF_FORMFIELD = 8
+	FPDF_FORMFIELD_XFA_CHECKBOX   FPDF_FORMFIELD = 9
+	FPDF_FORMFIELD_XFA_COMBOBOX   FPDF_FORMFIELD = 10
+	FPDF_FORMFIELD_XFA_IMAGEFIELD FPDF_FORMFIELD = 11
+	FPDF_FORMFIELD_XFA_LISTBOX    FPDF_FORMFIELD = 12
+	FPDF_FORMFIELD_XFA_PUSHBUTTON FPDF_FORMFIELD = 13
+	FPDF_FORMFIELD_XFA_SIGNATURE  FPDF_FORMFIELD = 14
+	FPDF_FORMFIELD_XFA_TEXTFIELD  FPDF_FORMFIELD = 15
+)
+
+type FPDF_FORMTYPE int
+
+const (
+	FPDF_FORMTYPE_NONE           FPDF_FORMTYPE = 0
+	FPDF_FORMTYPE_ACRO_FORM      FPDF_FORMTYPE = 1
+	FPDF_FORMTYPE_XFA_FULL       FPDF_FORMTYPE = 2
+	FPDF_FORMTYPE_XFA_FOREGROUND FPDF_FORMTYPE = 3
+)
+
+type FWL_EVENTFLAG int
+
+const (
+	FWL_EVENTFLAG_ShiftKey         FWL_EVENTFLAG = 1 << 0
+	FWL_EVENTFLAG_ControlKey       FWL_EVENTFLAG = 1 << 1
+	FWL_EVENTFLAG_AltKey           FWL_EVENTFLAG = 1 << 2
+	FWL_EVENTFLAG_MetaKey          FWL_EVENTFLAG = 1 << 3
+	FWL_EVENTFLAG_KeyPad           FWL_EVENTFLAG = 1 << 4
+	FWL_EVENTFLAG_AutoRepeat       FWL_EVENTFLAG = 1 << 5
+	FWL_EVENTFLAG_LeftButtonDown   FWL_EVENTFLAG = 1 << 6
+	FWL_EVENTFLAG_MiddleButtonDown FWL_EVENTFLAG = 1 << 7
+	FWL_EVENTFLAG_RightButtonDown  FWL_EVENTFLAG = 1 << 8
+)
+
+type FWL_VKEYCODE int
+
+const (
+	FWL_VKEY_Back                      FWL_VKEYCODE = 0x08
+	FWL_VKEY_Tab                       FWL_VKEYCODE = 0x09
+	FWL_VKEY_NewLine                   FWL_VKEYCODE = 0x0A
+	FWL_VKEY_Clear                     FWL_VKEYCODE = 0x0C
+	FWL_VKEY_Return                    FWL_VKEYCODE = 0x0D
+	FWL_VKEY_Shift                     FWL_VKEYCODE = 0x10
+	FWL_VKEY_Control                   FWL_VKEYCODE = 0x11
+	FWL_VKEY_Menu                      FWL_VKEYCODE = 0x12
+	FWL_VKEY_Pause                     FWL_VKEYCODE = 0x13
+	FWL_VKEY_Capital                   FWL_VKEYCODE = 0x14
+	FWL_VKEY_Kana                      FWL_VKEYCODE = 0x15
+	FWL_VKEY_Hangul                    FWL_VKEYCODE = 0x15
+	FWL_VKEY_Junja                     FWL_VKEYCODE = 0x17
+	FWL_VKEY_Final                     FWL_VKEYCODE = 0x18
+	FWL_VKEY_Hanja                     FWL_VKEYCODE = 0x19
+	FWL_VKEY_Kanji                     FWL_VKEYCODE = 0x19
+	FWL_VKEY_Escape                    FWL_VKEYCODE = 0x1B
+	FWL_VKEY_Convert                   FWL_VKEYCODE = 0x1C
+	FWL_VKEY_NonConvert                FWL_VKEYCODE = 0x1D
+	FWL_VKEY_Accept                    FWL_VKEYCODE = 0x1E
+	FWL_VKEY_ModeChange                FWL_VKEYCODE = 0x1F
+	FWL_VKEY_Space                     FWL_VKEYCODE = 0x20
+	FWL_VKEY_Prior                     FWL_VKEYCODE = 0x21
+	FWL_VKEY_Next                      FWL_VKEYCODE = 0x22
+	FWL_VKEY_End                       FWL_VKEYCODE = 0x23
+	FWL_VKEY_Home                      FWL_VKEYCODE = 0x24
+	FWL_VKEY_Left                      FWL_VKEYCODE = 0x25
+	FWL_VKEY_Up                        FWL_VKEYCODE = 0x26
+	FWL_VKEY_Right                     FWL_VKEYCODE = 0x27
+	FWL_VKEY_Down                      FWL_VKEYCODE = 0x28
+	FWL_VKEY_Select                    FWL_VKEYCODE = 0x29
+	FWL_VKEY_Print                     FWL_VKEYCODE = 0x2A
+	FWL_VKEY_Execute                   FWL_VKEYCODE = 0x2B
+	FWL_VKEY_Snapshot                  FWL_VKEYCODE = 0x2C
+	FWL_VKEY_Insert                    FWL_VKEYCODE = 0x2D
+	FWL_VKEY_Delete                    FWL_VKEYCODE = 0x2E
+	FWL_VKEY_Help                      FWL_VKEYCODE = 0x2F
+	FWL_VKEY_0                         FWL_VKEYCODE = 0x30
+	FWL_VKEY_1                         FWL_VKEYCODE = 0x31
+	FWL_VKEY_2                         FWL_VKEYCODE = 0x32
+	FWL_VKEY_3                         FWL_VKEYCODE = 0x33
+	FWL_VKEY_4                         FWL_VKEYCODE = 0x34
+	FWL_VKEY_5                         FWL_VKEYCODE = 0x35
+	FWL_VKEY_6                         FWL_VKEYCODE = 0x36
+	FWL_VKEY_7                         FWL_VKEYCODE = 0x37
+	FWL_VKEY_8                         FWL_VKEYCODE = 0x38
+	FWL_VKEY_9                         FWL_VKEYCODE = 0x39
+	FWL_VKEY_A                         FWL_VKEYCODE = 0x41
+	FWL_VKEY_B                         FWL_VKEYCODE = 0x42
+	FWL_VKEY_C                         FWL_VKEYCODE = 0x43
+	FWL_VKEY_D                         FWL_VKEYCODE = 0x44
+	FWL_VKEY_E                         FWL_VKEYCODE = 0x45
+	FWL_VKEY_F                         FWL_VKEYCODE = 0x46
+	FWL_VKEY_G                         FWL_VKEYCODE = 0x47
+	FWL_VKEY_H                         FWL_VKEYCODE = 0x48
+	FWL_VKEY_I                         FWL_VKEYCODE = 0x49
+	FWL_VKEY_J                         FWL_VKEYCODE = 0x4A
+	FWL_VKEY_K                         FWL_VKEYCODE = 0x4B
+	FWL_VKEY_L                         FWL_VKEYCODE = 0x4C
+	FWL_VKEY_M                         FWL_VKEYCODE = 0x4D
+	FWL_VKEY_N                         FWL_VKEYCODE = 0x4E
+	FWL_VKEY_O                         FWL_VKEYCODE = 0x4F
+	FWL_VKEY_P                         FWL_VKEYCODE = 0x50
+	FWL_VKEY_Q                         FWL_VKEYCODE = 0x51
+	FWL_VKEY_R                         FWL_VKEYCODE = 0x52
+	FWL_VKEY_S                         FWL_VKEYCODE = 0x53
+	FWL_VKEY_T                         FWL_VKEYCODE = 0x54
+	FWL_VKEY_U                         FWL_VKEYCODE = 0x55
+	FWL_VKEY_V                         FWL_VKEYCODE = 0x56
+	FWL_VKEY_W                         FWL_VKEYCODE = 0x57
+	FWL_VKEY_X                         FWL_VKEYCODE = 0x58
+	FWL_VKEY_Y                         FWL_VKEYCODE = 0x59
+	FWL_VKEY_Z                         FWL_VKEYCODE = 0x5A
+	FWL_VKEY_LWin                      FWL_VKEYCODE = 0x5B
+	FWL_VKEY_Command                   FWL_VKEYCODE = 0x5B
+	FWL_VKEY_RWin                      FWL_VKEYCODE = 0x5C
+	FWL_VKEY_Apps                      FWL_VKEYCODE = 0x5D
+	FWL_VKEY_Sleep                     FWL_VKEYCODE = 0x5F
+	FWL_VKEY_NumPad0                   FWL_VKEYCODE = 0x60
+	FWL_VKEY_NumPad1                   FWL_VKEYCODE = 0x61
+	FWL_VKEY_NumPad2                   FWL_VKEYCODE = 0x62
+	FWL_VKEY_NumPad3                   FWL_VKEYCODE = 0x63
+	FWL_VKEY_NumPad4                   FWL_VKEYCODE = 0x64
+	FWL_VKEY_NumPad5                   FWL_VKEYCODE = 0x65
+	FWL_VKEY_NumPad6                   FWL_VKEYCODE = 0x66
+	FWL_VKEY_NumPad7                   FWL_VKEYCODE = 0x67
+	FWL_VKEY_NumPad8                   FWL_VKEYCODE = 0x68
+	FWL_VKEY_NumPad9                   FWL_VKEYCODE = 0x69
+	FWL_VKEY_Multiply                  FWL_VKEYCODE = 0x6A
+	FWL_VKEY_Add                       FWL_VKEYCODE = 0x6B
+	FWL_VKEY_Separator                 FWL_VKEYCODE = 0x6C
+	FWL_VKEY_Subtract                  FWL_VKEYCODE = 0x6D
+	FWL_VKEY_Decimal                   FWL_VKEYCODE = 0x6E
+	FWL_VKEY_Divide                    FWL_VKEYCODE = 0x6F
+	FWL_VKEY_F1                        FWL_VKEYCODE = 0x70
+	FWL_VKEY_F2                        FWL_VKEYCODE = 0x71
+	FWL_VKEY_F3                        FWL_VKEYCODE = 0x72
+	FWL_VKEY_F4                        FWL_VKEYCODE = 0x73
+	FWL_VKEY_F5                        FWL_VKEYCODE = 0x74
+	FWL_VKEY_F6                        FWL_VKEYCODE = 0x75
+	FWL_VKEY_F7                        FWL_VKEYCODE = 0x76
+	FWL_VKEY_F8                        FWL_VKEYCODE = 0x77
+	FWL_VKEY_F9                        FWL_VKEYCODE = 0x78
+	FWL_VKEY_F10                       FWL_VKEYCODE = 0x79
+	FWL_VKEY_F11                       FWL_VKEYCODE = 0x7A
+	FWL_VKEY_F12                       FWL_VKEYCODE = 0x7B
+	FWL_VKEY_F13                       FWL_VKEYCODE = 0x7C
+	FWL_VKEY_F14                       FWL_VKEYCODE = 0x7D
+	FWL_VKEY_F15                       FWL_VKEYCODE = 0x7E
+	FWL_VKEY_F16                       FWL_VKEYCODE = 0x7F
+	FWL_VKEY_F17                       FWL_VKEYCODE = 0x80
+	FWL_VKEY_F18                       FWL_VKEYCODE = 0x81
+	FWL_VKEY_F19                       FWL_VKEYCODE = 0x82
+	FWL_VKEY_F20                       FWL_VKEYCODE = 0x83
+	FWL_VKEY_F21                       FWL_VKEYCODE = 0x84
+	FWL_VKEY_F22                       FWL_VKEYCODE = 0x85
+	FWL_VKEY_F23                       FWL_VKEYCODE = 0x86
+	FWL_VKEY_F24                       FWL_VKEYCODE = 0x87
+	FWL_VKEY_NunLock                   FWL_VKEYCODE = 0x90
+	FWL_VKEY_Scroll                    FWL_VKEYCODE = 0x91
+	FWL_VKEY_LShift                    FWL_VKEYCODE = 0xA0
+	FWL_VKEY_RShift                    FWL_VKEYCODE = 0xA1
+	FWL_VKEY_LControl                  FWL_VKEYCODE = 0xA2
+	FWL_VKEY_RControl                  FWL_VKEYCODE = 0xA3
+	FWL_VKEY_LMenu                     FWL_VKEYCODE = 0xA4
+	FWL_VKEY_RMenu                     FWL_VKEYCODE = 0xA5
+	FWL_VKEY_BROWSER_Back              FWL_VKEYCODE = 0xA6
+	FWL_VKEY_BROWSER_Forward           FWL_VKEYCODE = 0xA7
+	FWL_VKEY_BROWSER_Refresh           FWL_VKEYCODE = 0xA8
+	FWL_VKEY_BROWSER_Stop              FWL_VKEYCODE = 0xA9
+	FWL_VKEY_BROWSER_Search            FWL_VKEYCODE = 0xAA
+	FWL_VKEY_BROWSER_Favorites         FWL_VKEYCODE = 0xAB
+	FWL_VKEY_BROWSER_Home              FWL_VKEYCODE = 0xAC
+	FWL_VKEY_VOLUME_Mute               FWL_VKEYCODE = 0xAD
+	FWL_VKEY_VOLUME_Down               FWL_VKEYCODE = 0xAE
+	FWL_VKEY_VOLUME_Up                 FWL_VKEYCODE = 0xAF
+	FWL_VKEY_MEDIA_NEXT_Track          FWL_VKEYCODE = 0xB0
+	FWL_VKEY_MEDIA_PREV_Track          FWL_VKEYCODE = 0xB1
+	FWL_VKEY_MEDIA_Stop                FWL_VKEYCODE = 0xB2
+	FWL_VKEY_MEDIA_PLAY_Pause          FWL_VKEYCODE = 0xB3
+	FWL_VKEY_MEDIA_LAUNCH_Mail         FWL_VKEYCODE = 0xB4
+	FWL_VKEY_MEDIA_LAUNCH_MEDIA_Select FWL_VKEYCODE = 0xB5
+	FWL_VKEY_MEDIA_LAUNCH_APP1         FWL_VKEYCODE = 0xB6
+	FWL_VKEY_MEDIA_LAUNCH_APP2         FWL_VKEYCODE = 0xB7
+	FWL_VKEY_OEM_1                     FWL_VKEYCODE = 0xBA
+	FWL_VKEY_OEM_Plus                  FWL_VKEYCODE = 0xBB
+	FWL_VKEY_OEM_Comma                 FWL_VKEYCODE = 0xBC
+	FWL_VKEY_OEM_Minus                 FWL_VKEYCODE = 0xBD
+	FWL_VKEY_OEM_Period                FWL_VKEYCODE = 0xBE
+	FWL_VKEY_OEM_2                     FWL_VKEYCODE = 0xBF
+	FWL_VKEY_OEM_3                     FWL_VKEYCODE = 0xC0
+	FWL_VKEY_OEM_4                     FWL_VKEYCODE = 0xDB
+	FWL_VKEY_OEM_5                     FWL_VKEYCODE = 0xDC
+	FWL_VKEY_OEM_6                     FWL_VKEYCODE = 0xDD
+	FWL_VKEY_OEM_7                     FWL_VKEYCODE = 0xDE
+	FWL_VKEY_OEM_8                     FWL_VKEYCODE = 0xDF
+	FWL_VKEY_OEM_102                   FWL_VKEYCODE = 0xE2
+	FWL_VKEY_ProcessKey                FWL_VKEYCODE = 0xE5
+	FWL_VKEY_Packet                    FWL_VKEYCODE = 0xE7
+	FWL_VKEY_Attn                      FWL_VKEYCODE = 0xF6
+	FWL_VKEY_Crsel                     FWL_VKEYCODE = 0xF7
+	FWL_VKEY_Exsel                     FWL_VKEYCODE = 0xF8
+	FWL_VKEY_Ereof                     FWL_VKEYCODE = 0xF9
+	FWL_VKEY_Play                      FWL_VKEYCODE = 0xFA
+	FWL_VKEY_Zoom                      FWL_VKEYCODE = 0xFB
+	FWL_VKEY_NoName                    FWL_VKEYCODE = 0xFC
+	FWL_VKEY_PA1                       FWL_VKEYCODE = 0xFD
+	FWL_VKEY_OEM_Clear                 FWL_VKEYCODE = 0xFE
+	FWL_VKEY_Unknown                   FWL_VKEYCODE = 0
 )

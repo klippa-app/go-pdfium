@@ -11,6 +11,426 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
+func (i *pdfiumInstance) FORM_CanRedo(request *requests.FORM_CanRedo) (resp *responses.FORM_CanRedo, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_CanRedo", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_CanRedo(request)
+}
+
+func (i *pdfiumInstance) FORM_CanUndo(request *requests.FORM_CanUndo) (resp *responses.FORM_CanUndo, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_CanUndo", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_CanUndo(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentAAction(request *requests.FORM_DoDocumentAAction) (resp *responses.FORM_DoDocumentAAction, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentAAction", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_DoDocumentAAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentJSAction(request *requests.FORM_DoDocumentJSAction) (resp *responses.FORM_DoDocumentJSAction, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentJSAction", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_DoDocumentJSAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoDocumentOpenAction(request *requests.FORM_DoDocumentOpenAction) (resp *responses.FORM_DoDocumentOpenAction, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoDocumentOpenAction", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_DoDocumentOpenAction(request)
+}
+
+func (i *pdfiumInstance) FORM_DoPageAAction(request *requests.FORM_DoPageAAction) (resp *responses.FORM_DoPageAAction, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_DoPageAAction", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_DoPageAAction(request)
+}
+
+func (i *pdfiumInstance) FORM_ForceToKillFocus(request *requests.FORM_ForceToKillFocus) (resp *responses.FORM_ForceToKillFocus, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ForceToKillFocus", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_ForceToKillFocus(request)
+}
+
+func (i *pdfiumInstance) FORM_GetFocusedAnnot(request *requests.FORM_GetFocusedAnnot) (resp *responses.FORM_GetFocusedAnnot, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetFocusedAnnot", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_GetFocusedAnnot(request)
+}
+
+func (i *pdfiumInstance) FORM_GetFocusedText(request *requests.FORM_GetFocusedText) (resp *responses.FORM_GetFocusedText, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetFocusedText", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_GetFocusedText(request)
+}
+
+func (i *pdfiumInstance) FORM_GetSelectedText(request *requests.FORM_GetSelectedText) (resp *responses.FORM_GetSelectedText, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetSelectedText", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_GetSelectedText(request)
+}
+
+func (i *pdfiumInstance) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (resp *responses.FORM_IsIndexSelected, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_IsIndexSelected", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_IsIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage) (resp *responses.FORM_OnAfterLoadPage, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnAfterLoadPage", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnAfterLoadPage(request)
+}
+
+func (i *pdfiumInstance) FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (resp *responses.FORM_OnBeforeClosePage, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnBeforeClosePage", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnBeforeClosePage(request)
+}
+
+func (i *pdfiumInstance) FORM_OnChar(request *requests.FORM_OnChar) (resp *responses.FORM_OnChar, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnChar", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnChar(request)
+}
+
+func (i *pdfiumInstance) FORM_OnFocus(request *requests.FORM_OnFocus) (resp *responses.FORM_OnFocus, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnFocus", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnFocus(request)
+}
+
+func (i *pdfiumInstance) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) (resp *responses.FORM_OnKeyDown, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnKeyDown", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnKeyDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (resp *responses.FORM_OnKeyUp, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnKeyUp", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnKeyUp(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonDoubleClick(request *requests.FORM_OnLButtonDoubleClick) (resp *responses.FORM_OnLButtonDoubleClick, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonDoubleClick", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnLButtonDoubleClick(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonDown(request *requests.FORM_OnLButtonDown) (resp *responses.FORM_OnLButtonDown, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonDown", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnLButtonDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnLButtonUp(request *requests.FORM_OnLButtonUp) (resp *responses.FORM_OnLButtonUp, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnLButtonUp", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnLButtonUp(request)
+}
+
+func (i *pdfiumInstance) FORM_OnMouseMove(request *requests.FORM_OnMouseMove) (resp *responses.FORM_OnMouseMove, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnMouseMove", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnMouseMove(request)
+}
+
+func (i *pdfiumInstance) FORM_OnMouseWheel(request *requests.FORM_OnMouseWheel) (resp *responses.FORM_OnMouseWheel, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnMouseWheel", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnMouseWheel(request)
+}
+
+func (i *pdfiumInstance) FORM_OnRButtonDown(request *requests.FORM_OnRButtonDown) (resp *responses.FORM_OnRButtonDown, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnRButtonDown", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnRButtonDown(request)
+}
+
+func (i *pdfiumInstance) FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp) (resp *responses.FORM_OnRButtonUp, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_OnRButtonUp", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_OnRButtonUp(request)
+}
+
+func (i *pdfiumInstance) FORM_Redo(request *requests.FORM_Redo) (resp *responses.FORM_Redo, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_Redo", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_Redo(request)
+}
+
+func (i *pdfiumInstance) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (resp *responses.FORM_ReplaceSelection, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ReplaceSelection", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_ReplaceSelection(request)
+}
+
+func (i *pdfiumInstance) FORM_SelectAllText(request *requests.FORM_SelectAllText) (resp *responses.FORM_SelectAllText, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SelectAllText", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_SelectAllText(request)
+}
+
+func (i *pdfiumInstance) FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot) (resp *responses.FORM_SetFocusedAnnot, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetFocusedAnnot", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_SetFocusedAnnot(request)
+}
+
+func (i *pdfiumInstance) FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected) (resp *responses.FORM_SetIndexSelected, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetIndexSelected", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_SetIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_Undo(request *requests.FORM_Undo) (resp *responses.FORM_Undo, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_Undo", panicError)
+		}
+	}()
+
+	return i.pdfium.FORM_Undo(request)
+}
+
 func (i *pdfiumInstance) FPDFAction_GetDest(request *requests.FPDFAction_GetDest) (resp *responses.FPDFAction_GetDest, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1283,6 +1703,34 @@ func (i *pdfiumInstance) FPDFClipPath_GetPathSegment(request *requests.FPDFClipP
 	}()
 
 	return i.pdfium.FPDFClipPath_GetPathSegment(request)
+}
+
+func (i *pdfiumInstance) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (resp *responses.FPDFDOC_ExitFormFillEnvironment, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFDOC_ExitFormFillEnvironment", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFDOC_ExitFormFillEnvironment(request)
+}
+
+func (i *pdfiumInstance) FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (resp *responses.FPDFDOC_InitFormFillEnvironment, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFDOC_InitFormFillEnvironment", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFDOC_InitFormFillEnvironment(request)
 }
 
 func (i *pdfiumInstance) FPDFDest_GetDestPageIndex(request *requests.FPDFDest_GetDestPageIndex) (resp *responses.FPDFDest_GetDestPageIndex, err error) {
@@ -2727,6 +3175,20 @@ func (i *pdfiumInstance) FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (r
 	return i.pdfium.FPDFPage_Flatten(request)
 }
 
+func (i *pdfiumInstance) FPDFPage_FormFieldZOrderAtPoint(request *requests.FPDFPage_FormFieldZOrderAtPoint) (resp *responses.FPDFPage_FormFieldZOrderAtPoint, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_FormFieldZOrderAtPoint", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_FormFieldZOrderAtPoint(request)
+}
+
 func (i *pdfiumInstance) FPDFPage_GenerateContent(request *requests.FPDFPage_GenerateContent) (resp *responses.FPDFPage_GenerateContent, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2921,6 +3383,20 @@ func (i *pdfiumInstance) FPDFPage_GetTrimBox(request *requests.FPDFPage_GetTrimB
 	}()
 
 	return i.pdfium.FPDFPage_GetTrimBox(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint) (resp *responses.FPDFPage_HasFormFieldAtPoint, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_HasFormFieldAtPoint", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPage_HasFormFieldAtPoint(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_HasTransparency(request *requests.FPDFPage_HasTransparency) (resp *responses.FPDFPage_HasTransparency, err error) {
@@ -4015,6 +4491,20 @@ func (i *pdfiumInstance) FPDF_DocumentHasValidCrossReferenceTable(request *reque
 	return i.pdfium.FPDF_DocumentHasValidCrossReferenceTable(request)
 }
 
+func (i *pdfiumInstance) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (resp *responses.FPDF_FFLDraw, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_FFLDraw", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_FFLDraw(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (resp *responses.FPDF_GetDocPermissions, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4055,6 +4545,20 @@ func (i *pdfiumInstance) FPDF_GetFileVersion(request *requests.FPDF_GetFileVersi
 	}()
 
 	return i.pdfium.FPDF_GetFileVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetFormType(request *requests.FPDF_GetFormType) (resp *responses.FPDF_GetFormType, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetFormType", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_GetFormType(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetLastError(request *requests.FPDF_GetLastError) (resp *responses.FPDF_GetLastError, err error) {
@@ -4463,6 +4967,20 @@ func (i *pdfiumInstance) FPDF_LoadPage(request *requests.FPDF_LoadPage) (resp *r
 	return i.pdfium.FPDF_LoadPage(request)
 }
 
+func (i *pdfiumInstance) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (resp *responses.FPDF_LoadXFA, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_LoadXFA", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_LoadXFA(request)
+}
+
 func (i *pdfiumInstance) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (resp *responses.FPDF_NewFormObjectFromXObject, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4503,6 +5021,20 @@ func (i *pdfiumInstance) FPDF_PageToDevice(request *requests.FPDF_PageToDevice) 
 	}()
 
 	return i.pdfium.FPDF_PageToDevice(request)
+}
+
+func (i *pdfiumInstance) FPDF_RemoveFormFieldHighlight(request *requests.FPDF_RemoveFormFieldHighlight) (resp *responses.FPDF_RemoveFormFieldHighlight, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_RemoveFormFieldHighlight", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_RemoveFormFieldHighlight(request)
 }
 
 func (i *pdfiumInstance) FPDF_RenderPage(request *requests.FPDF_RenderPage) (resp *responses.FPDF_RenderPage, err error) {
@@ -4629,6 +5161,34 @@ func (i *pdfiumInstance) FPDF_SaveWithVersion(request *requests.FPDF_SaveWithVer
 	}()
 
 	return i.pdfium.FPDF_SaveWithVersion(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetFormFieldHighlightAlpha(request *requests.FPDF_SetFormFieldHighlightAlpha) (resp *responses.FPDF_SetFormFieldHighlightAlpha, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetFormFieldHighlightAlpha", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_SetFormFieldHighlightAlpha(request)
+}
+
+func (i *pdfiumInstance) FPDF_SetFormFieldHighlightColor(request *requests.FPDF_SetFormFieldHighlightColor) (resp *responses.FPDF_SetFormFieldHighlightColor, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_SetFormFieldHighlightColor", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_SetFormFieldHighlightColor(request)
 }
 
 func (i *pdfiumInstance) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (resp *responses.FPDF_SetPrintMode, err error) {

@@ -5,7 +5,6 @@ package implementation
 import "C"
 import (
 	"errors"
-
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -61,13 +60,16 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*PageHandle, error)
 func (p *PdfiumImplementation) registerPage(page C.FPDF_PAGE, index int, documentHandle *DocumentHandle) *PageHandle {
 	pageRef := uuid.New()
 	pageHandle := &PageHandle{
-		handle:      page,
-		index:       index,
-		nativeRef:   references.FPDF_PAGE(pageRef.String()),
-		documentRef: documentHandle.nativeRef,
+		handle:    page,
+		index:     index,
+		nativeRef: references.FPDF_PAGE(pageRef.String()),
 	}
 
-	documentHandle.pageRefs[pageHandle.nativeRef] = pageHandle
+	if documentHandle != nil {
+		pageHandle.documentRef = documentHandle.nativeRef
+		documentHandle.pageRefs[pageHandle.nativeRef] = pageHandle
+	}
+
 	p.pageRefs[pageHandle.nativeRef] = pageHandle
 
 	return pageHandle
