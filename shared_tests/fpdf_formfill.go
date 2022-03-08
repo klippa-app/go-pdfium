@@ -22,7 +22,7 @@ import (
 var _ = Describe("fpdf_formfill", func() {
 	BeforeEach(func() {
 		if TestType == "multi" {
-			Skip("Form filling bitmap is not supported on multi-threaded usage")
+			Skip("Form filling is not supported on multi-threaded usage")
 		}
 		Locker.Lock()
 	})
@@ -1384,6 +1384,40 @@ var _ = Describe("fpdf_formfill", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDF_ClosePage).ToNot(BeNil())
 				Expect(FPDF_ClosePage).To(Equal(&responses.FPDF_ClosePage{}))
+			})
+		})
+	})
+
+	Context("a normal PDF file", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/xfa_multiline_textfield.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			It("does not allow loading of XFA forms", func() {
+				FPDF_LoadXFA, err := PdfiumInstance.FPDF_LoadXFA(&requests.FPDF_LoadXFA{
+					Document: doc,
+				})
+				Expect(err).To(MatchError("could not load XFA"))
+				Expect(FPDF_LoadXFA).To(BeNil())
 			})
 		})
 	})
