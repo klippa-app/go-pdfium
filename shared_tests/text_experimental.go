@@ -58,7 +58,7 @@ var _ = Describe("text", func() {
 							CollectFontInformation: true,
 						})
 						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_with_font_information.json", pageTextStructured)))
+						Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information.json", pageTextStructured)))
 					})
 
 					Context("and PixelPositions is enabled", func() {
@@ -78,7 +78,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", pageTextStructured)))
+							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions.json", pageTextStructured)))
 						})
 					})
 				})
