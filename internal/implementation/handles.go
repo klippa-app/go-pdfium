@@ -289,11 +289,6 @@ type StructElementHandle struct {
 	nativeRef   references.FPDF_STRUCTELEMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
-type StructElementAttributeHandle struct {
-	handle    C.FPDF_STRUCTELEMENT_ATTR
-	nativeRef references.FPDF_STRUCTELEMENT_ATTR // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
-}
-
 type PageObjectMarkHandle struct {
 	handle    C.FPDF_PAGEOBJECTMARK
 	nativeRef references.FPDF_PAGEOBJECTMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
