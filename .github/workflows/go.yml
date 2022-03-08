@@ -58,6 +58,7 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
+          export IS_EXPERIMENTAL="1"
           go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
