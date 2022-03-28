@@ -234,6 +234,8 @@ type pdfiumInstance struct {
 	lock        *sync.Mutex
 }
 
+// Close will close the instance and will clean up the underlying PDFium resources
+// by calling i.worker.plugin.Close().
 func (i *pdfiumInstance) Close() (err error) {
 	i.lock.Lock()
 
@@ -258,4 +260,31 @@ func (i *pdfiumInstance) Close() (err error) {
 	}()
 
 	return i.worker.plugin.Close()
+}
+
+// Kill will kill the actual subprocess and return the worker to the pool
+// so that the pool system can re-create the process.
+func (i *pdfiumInstance) Kill() (err error) {
+	// Kill should not be protected by a lock, since Kill is a last-effort
+	// to "recover" a broken process.
+	if i.closed {
+		return errors.New("instance is already closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "Close", panicError)
+		}
+	}()
+
+	defer func() {
+		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
+		i.worker = nil
+		delete(i.pool.instanceRefs, i.instanceRef)
+		i.pool = nil
+		i.closed = true
+	}()
+
+	i.worker.pluginClient.Kill()
+	return
 }

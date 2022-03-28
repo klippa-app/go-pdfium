@@ -145,3 +145,8 @@ func (i *pdfiumInstance) Close() (err error) {
 
 	return nil
 }
+
+// Kill is the same as Close on single-threaded usage.
+func (i *pdfiumInstance) Kill() (err error) {
+	return i.Close()
+}
