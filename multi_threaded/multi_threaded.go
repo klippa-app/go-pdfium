@@ -74,6 +74,11 @@ func Init(config Config) pdfium.Pool {
 		"pdfium": &commons.PdfiumPlugin{},
 	}
 
+	// If we don't have a log callback, make the callback no-op.
+	if config.LogCallback == nil {
+		config.LogCallback = func(s string) {}
+	}
+
 	factory := pool.NewPooledObjectFactory(
 		func(goctx.Context) (interface{}, error) {
 			newWorker := &worker{}
