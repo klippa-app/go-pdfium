@@ -48,6 +48,12 @@ type Pdfium interface {
 	// For multi-threaded it will give back the worker to the pool.
 	Close() error
 
+	// Kill kills the instance.
+	// On multi-thread this will kill the subprocess.
+	// On single-threaded this is the same as Close().
+	// Use this when you detected that your process has hung.
+	Kill() error
+
 	// End instance functions.
 
 	// Start text: text helpers
