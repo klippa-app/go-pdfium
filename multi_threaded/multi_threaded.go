@@ -155,6 +155,8 @@ func Init(config Config) pdfium.Pool {
 		TestOnCreate:       true,
 	}
 
+	p.PreparePool(goctx.Background())
+
 	multiThreadedMutex.Lock()
 	defer multiThreadedMutex.Unlock()
 
