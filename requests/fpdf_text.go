@@ -91,7 +91,7 @@ type FPDFText_GetText struct {
 type FPDFText_CountRects struct {
 	TextPage   references.FPDF_TEXTPAGE
 	StartIndex int // Index for the start characters.
-	Count      int // Number of characters to be extracted.
+	Count      int // Number of characters to be extracted, or -1 for all remaining.
 }
 
 type FPDFText_GetRect struct {

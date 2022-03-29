@@ -95,7 +95,7 @@ type FPDFText_GetText struct {
 }
 
 type FPDFText_CountRects struct {
-	Count int
+	Count int // Number of rectangles, 0 if TextPage is null, or -1 on bad StartIndex.
 }
 
 type FPDFText_GetRect struct {

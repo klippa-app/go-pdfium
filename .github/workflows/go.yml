@@ -16,8 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        go: [ 1.16, 1.17 ]
-        pdfium: [ 4849, 4874, 4929 ]
+        go: [ 1.16, 1.17, 1.18 ]
+        pdfium: [ 4849, 4874, 4929, 4969 ]
+    env:
+      PDFIUM_EXPERIMENTAL_VERSION: 4969
+      PDFIUM_EXPERIMENTAL_GO_VERSION: 1.18
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -54,7 +57,7 @@ jobs:
           export GODEBUG=cgocheck=2
           go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Linux & MacOS) - Experimental
-        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == '4929'
+        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
@@ -67,26 +70,26 @@ jobs:
           $env:Path += ";D:\opt\pdfium\bin"
           go test ./... -v
       - name: Test all packages (Windows) - Experimental
-        if: matrix.os == 'windows-latest' && matrix.pdfium == '4929'
+        if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
           $env:IS_EXPERIMENTAL = '1'
           go test ./... -tags pdfium_experimental -v
       - name: Test implementation for coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4929'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export IS_EXPERIMENTAL="1"
           go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
       - name: Archive code coverage results
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4929'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
           path: ./coverage.out
       - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17' && matrix.pdfium == '4929'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         uses: codecov/codecov-action@v2
         with:
           files: coverage.out

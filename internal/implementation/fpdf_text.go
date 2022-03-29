@@ -217,12 +217,13 @@ func (p *PdfiumImplementation) FPDFText_GetText(request *requests.FPDFText_GetTe
 	}, nil
 }
 
-// FPDFText_CountRects returns the count of rectangular areas occupied by a segment of texts.
+// FPDFText_CountRects returns the count of rectangular areas occupied by
+// a segment of text, and caches the result for subsequent FPDFText_GetRect() calls.
 // This function, along with FPDFText_GetRect can be used by
 // applications to detect the position on the page for a text segment,
-// so proper areas can be highlighted. FPDFTEXT will automatically
-// merge small character boxes into bigger one if those characters
-// are on the same line and use same font settings.
+// so proper areas can be highlighted. The FPDFText_* functions will
+// automatically merge small character boxes into bigger one if those
+// characters are on the same line and use same font settings.
 func (p *PdfiumImplementation) FPDFText_CountRects(request *requests.FPDFText_CountRects) (*responses.FPDFText_CountRects, error) {
 	p.Lock()
 	defer p.Unlock()
