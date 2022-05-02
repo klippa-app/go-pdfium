@@ -1930,6 +1930,8 @@ type Pdfium interface {
 
 	// FORM_OnKeyUp
 	// Call this member function when a nonsystem key is released.
+	// Currently unimplemented and always returns false. PDFium reserves this
+	// API and may implement it in the future on an as-needed basis.
 	FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error)
 
 	// FORM_OnChar
