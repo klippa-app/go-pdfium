@@ -857,6 +857,8 @@ func (p *PdfiumImplementation) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) 
 
 // FORM_OnKeyUp
 // Call this member function when a nonsystem key is released.
+// Currently unimplemented and always returns false. PDFium reserves this
+// API and may implement it in the future on an as-needed basis.
 func (p *PdfiumImplementation) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*responses.FORM_OnKeyUp, error) {
 	p.Lock()
 	defer p.Unlock()
