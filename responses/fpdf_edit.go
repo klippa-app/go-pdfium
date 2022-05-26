@@ -303,7 +303,7 @@ type FPDFFont_GetFontData struct {
 }
 
 type FPDFFont_GetIsEmbedded struct {
-	IsEmbedded bool
+	IsEmbedded bool // Whether the font is embedded or not.
 }
 
 type FPDFFont_GetFlags struct {
