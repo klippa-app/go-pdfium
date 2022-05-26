@@ -105,6 +105,12 @@ var _ = Describe("fpdf_doc_experimental", func() {
 				Expect(err).To(MatchError("bookmark not given"))
 				Expect(FPDFBookmark_GetTitle).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFBookmark_GetCount", func() {
+				FPDFBookmark_GetCount, err := PdfiumInstance.FPDFBookmark_GetCount(&requests.FPDFBookmark_GetCount{})
+				Expect(err).To(MatchError("bookmark not given"))
+				Expect(FPDFBookmark_GetCount).To(BeNil())
+			})
 		})
 	})
 
@@ -443,6 +449,14 @@ var _ = Describe("fpdf_doc_experimental", func() {
 				Expect(topLevelBookmarkTitle).To(Equal(&responses.FPDFBookmark_GetTitle{
 					Title: "A Good Beginning",
 				}))
+
+				// Check that we have no children
+				FPDFBookmark_GetCount, err := PdfiumInstance.FPDFBookmark_GetCount(&requests.FPDFBookmark_GetCount{
+					Bookmark: *topLevelBookmark.Bookmark,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFBookmark_GetCount).To(Not(BeNil()))
+				Expect(FPDFBookmark_GetCount.Count).To(Equal(0))
 
 				// Check that we have no children
 				topLevelBookmarkSibling, err := PdfiumInstance.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
