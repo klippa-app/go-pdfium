@@ -215,6 +215,18 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFFont_GetFontName).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFFont_GetFontData", func() {
+				FPDFFont_GetFontData, err := PdfiumInstance.FPDFFont_GetFontData(&requests.FPDFFont_GetFontData{})
+				Expect(err).To(MatchError("font not given"))
+				Expect(FPDFFont_GetFontData).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFFont_GetIsEmbedded", func() {
+				FPDFFont_GetIsEmbedded, err := PdfiumInstance.FPDFFont_GetIsEmbedded(&requests.FPDFFont_GetIsEmbedded{})
+				Expect(err).To(MatchError("font not given"))
+				Expect(FPDFFont_GetIsEmbedded).To(BeNil())
+			})
+
 			It("returns an error when calling FPDFFont_GetFlags", func() {
 				FPDFFont_GetFlags, err := PdfiumInstance.FPDFFont_GetFlags(&requests.FPDFFont_GetFlags{})
 				Expect(err).To(MatchError("font not given"))
@@ -444,6 +456,26 @@ var _ = Describe("fpdf_edit", func() {
 						Expect(err).To(BeNil())
 						Expect(FPDFFont_GetFontName).To(Equal(&responses.FPDFFont_GetFontName{
 							FontName: "Liberation Serif",
+						}))
+					})
+
+					It("allows us getting the font data", func() {
+						FPDFFont_GetFontData, err := PdfiumInstance.FPDFFont_GetFontData(&requests.FPDFFont_GetFontData{
+							Font: font,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFFont_GetFontData).ToNot(BeNil())
+						Expect(FPDFFont_GetFontData.FontData).ToNot(BeEmpty())
+						Expect(FPDFFont_GetFontData.FontData).To(HaveLen(8268))
+					})
+
+					It("allows us getting whether the font is embedded", func() {
+						FPDFFont_GetIsEmbedded, err := PdfiumInstance.FPDFFont_GetIsEmbedded(&requests.FPDFFont_GetIsEmbedded{
+							Font: font,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFFont_GetIsEmbedded).To(Equal(&responses.FPDFFont_GetIsEmbedded{
+							IsEmbedded: true,
 						}))
 					})
 

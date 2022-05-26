@@ -18,6 +18,15 @@ type FPDFBookmark_GetTitle struct {
 	Title string // The title of the bookmark.
 }
 
+type FPDFBookmark_GetCount struct {
+	// A signed integer that represents the number of sub-items the given
+	// bookmark has. If the value is positive, child items shall be shown by default
+	// (open state). If the value is negative, child items shall be hidden by
+	// default (closed state). Please refer to PDF 32000-1:2008, Table 153.
+	// Returns 0 if the bookmark has no children or is invalid.
+	Count int
+}
+
 type FPDFBookmark_Find struct {
 	Bookmark *references.FPDF_BOOKMARK // Reference to the found bookmark. nil if the title can't be found.
 }

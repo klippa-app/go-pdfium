@@ -32,3 +32,9 @@ func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPag
 func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFBookmark_GetCount returns the number of children of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

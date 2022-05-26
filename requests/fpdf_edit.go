@@ -448,6 +448,14 @@ type FPDFFont_GetFontName struct {
 	Font references.FPDF_FONT
 }
 
+type FPDFFont_GetFontData struct {
+	Font references.FPDF_FONT
+}
+
+type FPDFFont_GetIsEmbedded struct {
+	Font references.FPDF_FONT
+}
+
 type FPDFFont_GetFlags struct {
 	Font references.FPDF_FONT
 }

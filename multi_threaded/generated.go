@@ -879,6 +879,14 @@ func (i *pdfiumInstance) FPDFBookmark_GetAction(request *requests.FPDFBookmark_G
 	return i.worker.plugin.FPDFBookmark_GetAction(request)
 }
 
+func (i *pdfiumInstance) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFBookmark_GetCount(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1075,6 +1083,14 @@ func (i *pdfiumInstance) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) 
 	return i.worker.plugin.FPDFFont_GetFlags(request)
 }
 
+func (i *pdfiumInstance) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFFont_GetFontData(request)
+}
+
 func (i *pdfiumInstance) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1097,6 +1113,14 @@ func (i *pdfiumInstance) FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetGl
 	}
 
 	return i.worker.plugin.FPDFFont_GetGlyphWidth(request)
+}
+
+func (i *pdfiumInstance) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFFont_GetIsEmbedded(request)
 }
 
 func (i *pdfiumInstance) FPDFFont_GetItalicAngle(request *requests.FPDFFont_GetItalicAngle) (*responses.FPDFFont_GetItalicAngle, error) {
