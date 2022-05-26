@@ -1593,6 +1593,20 @@ func (i *pdfiumInstance) FPDFBookmark_GetAction(request *requests.FPDFBookmark_G
 	return i.pdfium.FPDFBookmark_GetAction(request)
 }
 
+func (i *pdfiumInstance) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (resp *responses.FPDFBookmark_GetCount, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetCount", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFBookmark_GetCount(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (resp *responses.FPDFBookmark_GetDest, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1943,6 +1957,20 @@ func (i *pdfiumInstance) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) 
 	return i.pdfium.FPDFFont_GetFlags(request)
 }
 
+func (i *pdfiumInstance) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (resp *responses.FPDFFont_GetFontData, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetFontData", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFFont_GetFontData(request)
+}
+
 func (i *pdfiumInstance) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (resp *responses.FPDFFont_GetFontName, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1983,6 +2011,20 @@ func (i *pdfiumInstance) FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetGl
 	}()
 
 	return i.pdfium.FPDFFont_GetGlyphWidth(request)
+}
+
+func (i *pdfiumInstance) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (resp *responses.FPDFFont_GetIsEmbedded, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetIsEmbedded", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFFont_GetIsEmbedded(request)
 }
 
 func (i *pdfiumInstance) FPDFFont_GetItalicAngle(request *requests.FPDFFont_GetItalicAngle) (resp *responses.FPDFFont_GetItalicAngle, err error) {

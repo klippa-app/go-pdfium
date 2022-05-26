@@ -125,6 +125,7 @@ type Pdfium interface {
 	FPDFBitmap_GetWidth(*requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error)
 	FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
 	FPDFBookmark_GetAction(*requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
+	FPDFBookmark_GetCount(*requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error)
 	FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
 	FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 	FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
@@ -150,9 +151,11 @@ type Pdfium interface {
 	FPDFFont_GetAscent(*requests.FPDFFont_GetAscent) (*responses.FPDFFont_GetAscent, error)
 	FPDFFont_GetDescent(*requests.FPDFFont_GetDescent) (*responses.FPDFFont_GetDescent, error)
 	FPDFFont_GetFlags(*requests.FPDFFont_GetFlags) (*responses.FPDFFont_GetFlags, error)
+	FPDFFont_GetFontData(*requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error)
 	FPDFFont_GetFontName(*requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error)
 	FPDFFont_GetGlyphPath(*requests.FPDFFont_GetGlyphPath) (*responses.FPDFFont_GetGlyphPath, error)
 	FPDFFont_GetGlyphWidth(*requests.FPDFFont_GetGlyphWidth) (*responses.FPDFFont_GetGlyphWidth, error)
+	FPDFFont_GetIsEmbedded(*requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error)
 	FPDFFont_GetItalicAngle(*requests.FPDFFont_GetItalicAngle) (*responses.FPDFFont_GetItalicAngle, error)
 	FPDFFont_GetWeight(*requests.FPDFFont_GetWeight) (*responses.FPDFFont_GetWeight, error)
 	FPDFFormObj_CountObjects(*requests.FPDFFormObj_CountObjects) (*responses.FPDFFormObj_CountObjects, error)
@@ -1570,6 +1573,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAct
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
+	resp := &responses.FPDFBookmark_GetCount{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetCount", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error) {
 	resp := &responses.FPDFBookmark_GetDest{}
 	err := g.client.Call("Plugin.FPDFBookmark_GetDest", request, resp)
@@ -1820,6 +1833,16 @@ func (g *PdfiumRPC) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) (*res
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error) {
+	resp := &responses.FPDFFont_GetFontData{}
+	err := g.client.Call("Plugin.FPDFFont_GetFontData", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
 	resp := &responses.FPDFFont_GetFontName{}
 	err := g.client.Call("Plugin.FPDFFont_GetFontName", request, resp)
@@ -1843,6 +1866,16 @@ func (g *PdfiumRPC) FPDFFont_GetGlyphPath(request *requests.FPDFFont_GetGlyphPat
 func (g *PdfiumRPC) FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetGlyphWidth) (*responses.FPDFFont_GetGlyphWidth, error) {
 	resp := &responses.FPDFFont_GetGlyphWidth{}
 	err := g.client.Call("Plugin.FPDFFont_GetGlyphWidth", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error) {
+	resp := &responses.FPDFFont_GetIsEmbedded{}
+	err := g.client.Call("Plugin.FPDFFont_GetIsEmbedded", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -6724,6 +6757,24 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount, resp *responses.FPDFBookmark_GetCount) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetCount", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBookmark_GetCount(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFBookmark_GetDest(request *requests.FPDFBookmark_GetDest, resp *responses.FPDFBookmark_GetDest) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -7174,6 +7225,24 @@ func (s *PdfiumRPCServer) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags,
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData, resp *responses.FPDFFont_GetFontData) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetFontData", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFFont_GetFontData(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName, resp *responses.FPDFFont_GetFontName) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -7218,6 +7287,24 @@ func (s *PdfiumRPCServer) FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetG
 	}()
 
 	implResp, err := s.Impl.FPDFFont_GetGlyphWidth(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded, resp *responses.FPDFFont_GetIsEmbedded) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetIsEmbedded", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFFont_GetIsEmbedded(request)
 	if err != nil {
 		return err
 	}

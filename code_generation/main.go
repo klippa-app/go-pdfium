@@ -60,7 +60,7 @@ func main() {
 		method := docType.Method(i)
 
 		// These are special, don't generate them
-		if method.Name == "Close" {
+		if method.Name == "Close" || method.Name == "Kill" {
 			continue
 		}
 

@@ -128,3 +128,21 @@ func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_Get
 		Identifier: charData,
 	}, nil
 }
+
+// FPDFBookmark_GetCount returns the number of children of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	count := C.FPDFBookmark_GetCount(bookmarkHandle.handle)
+
+	return &responses.FPDFBookmark_GetCount{
+		Count: int(count),
+	}, nil
+}

@@ -294,6 +294,18 @@ type FPDFFont_GetFontName struct {
 	FontName string
 }
 
+type FPDFFont_GetFontData struct {
+	// The uncompressed font data. i.e. the raw font data after
+	// having all stream filters applied, when the data is embedded.
+	// If the font is not embedded, then this API will instead return the data for
+	// the substitution font it is using.
+	FontData []byte
+}
+
+type FPDFFont_GetIsEmbedded struct {
+	IsEmbedded bool
+}
+
 type FPDFFont_GetFlags struct {
 	Flags       uint32
 	FixedPitch  bool // Whether all glyphs have the same width (as opposed to proportional or variable-pitch fonts, which have different widths).

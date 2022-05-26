@@ -785,6 +785,57 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}, nil
 }
 
+// FPDFFont_GetFontData returns the decoded data from the given font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	outBufLen := C.size_t(0)
+
+	// First get the font data length.
+	success := C.FPDFFont_GetFontData(fontHandle.handle, (*C.uchar)(nil), 0, &outBufLen)
+	if int(success) != 1 {
+		return nil, errors.New("could not get font data")
+	}
+
+	if int(outBufLen) == 0 {
+		return nil, errors.New("could not get font data")
+	}
+
+	fontData := make([]byte, outBufLen)
+	success = C.FPDFFont_GetFontData(fontHandle.handle, (*C.uchar)(unsafe.Pointer(&fontData[0])), C.size_t(len(fontData)), &outBufLen)
+	if int(success) != 1 {
+		return nil, errors.New("could not get font data")
+	}
+
+	return &responses.FPDFFont_GetFontData{
+		FontData: fontData,
+	}, nil
+}
+
+// FPDFFont_GetIsEmbedded returns whether the given font is embedded or not.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	isEmbedded := C.FPDFFont_GetIsEmbedded(fontHandle.handle)
+	return &responses.FPDFFont_GetIsEmbedded{
+		IsEmbedded: int(isEmbedded) == 1,
+	}, nil
+}
+
 // FPDFFont_GetFlags returns the descriptor flags of a font.
 // Returns the bit flags specifying various characteristics of the font as
 // defined in ISO 32000-1:2008, table 123.

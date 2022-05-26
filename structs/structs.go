@@ -162,8 +162,9 @@ type FPDF_FORMFILLINFO struct {
 	FFI_GetRotation func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION
 
 	// This method will execute a named action.
-	// See the named actions description of <<PDF Reference, version 1.7>>
-	// for more details.
+	// See ISO 32000-1:2008, section 12.6.4.11 for descriptions of the
+	// standard named actions, but note that a document may supply any
+	// name of its choosing.
 	//
 	// Implementation required!
 	FFI_ExecuteNamedAction func(namedAction string)

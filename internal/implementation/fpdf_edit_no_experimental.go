@@ -203,6 +203,18 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFFont_GetFontData returns the decoded data from the given font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFFont_GetIsEmbedded returns whether the given font is embedded or not.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFFont_GetFlags returns the descriptor flags of a font.
 // Returns the bit flags specifying various characteristics of the font as
 // defined in ISO 32000-1:2008, table 123.

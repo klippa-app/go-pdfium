@@ -728,6 +728,14 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error)
 
+	// FPDFFont_GetFontData returns the decoded data from the given font.
+	// Experimental API.
+	FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error)
+
+	// FPDFFont_GetIsEmbedded returns whether the given font is embedded or not.
+	// Experimental API.
+	FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error)
+
 	// FPDFFont_GetFlags returns the descriptor flags of a font.
 	// Returns the bit flags specifying various characteristics of the font as
 	// defined in ISO 32000-1:2008, table 123.
@@ -855,6 +863,10 @@ type Pdfium interface {
 
 	// FPDFBookmark_GetTitle returns the title of a bookmark.
 	FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
+
+	// FPDFBookmark_GetCount returns the number of children of a bookmark.
+	// Experimental API.
+	FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error)
 
 	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
 	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
