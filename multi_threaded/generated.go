@@ -1627,6 +1627,14 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	return i.worker.plugin.FPDFPageObj_GetMatrix(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_GetRotatedBounds(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2201,6 +2209,14 @@ func (i *pdfiumInstance) FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_G
 	}
 
 	return i.worker.plugin.FPDFTextObj_GetFontSize(request)
+}
+
+func (i *pdfiumInstance) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFTextObj_GetRenderedBitmap(request)
 }
 
 func (i *pdfiumInstance) FPDFTextObj_GetText(request *requests.FPDFTextObj_GetText) (*responses.FPDFTextObj_GetText, error) {

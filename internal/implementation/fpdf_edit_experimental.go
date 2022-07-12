@@ -581,6 +581,45 @@ func (p *PdfiumImplementation) FPDFImageObj_GetRenderedBitmap(request *requests.
 	}, nil
 }
 
+// FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
+// Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
+// object. When the object is rotated by a non-multiple of 90 degrees, this API
+// returns a tighter bound that cannot be represented with just the 4 sides of
+// a rectangle.
+//
+// Currently only works the following page object types: FPDF_PAGEOBJ_TEXT and
+// FPDF_PAGEOBJ_IMAGE.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	var quadPoints C.FS_QUADPOINTSF
+
+	success := C.FPDFPageObj_GetRotatedBounds(pageObjectHandle.handle, &quadPoints)
+	if int(success) == 0 {
+		return nil, errors.New("could not get rotated bounds for page object")
+	}
+
+	return &responses.FPDFPageObj_GetRotatedBounds{
+		QuadPoints: structs.FPDF_FS_QUADPOINTSF{
+			X1: float32(quadPoints.x1),
+			Y1: float32(quadPoints.y1),
+			X2: float32(quadPoints.x2),
+			Y2: float32(quadPoints.y2),
+			X3: float32(quadPoints.x3),
+			Y3: float32(quadPoints.y3),
+			X4: float32(quadPoints.x4),
+			Y4: float32(quadPoints.y4),
+		},
+	}, nil
+}
+
 // FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error) {
@@ -739,6 +778,48 @@ func (p *PdfiumImplementation) FPDFTextObj_SetTextRenderMode(request *requests.F
 	}
 
 	return &responses.FPDFTextObj_SetTextRenderMode{}, nil
+}
+
+// FPDFTextObj_GetRenderedBitmap returns a bitmap rasterization of the given text object.
+// To render correctly, the caller must provide the document associated with the text object.
+// If there is a page associated with text object, the caller should provide that as well.
+// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+// must be called on the returned bitmap when it is no longer needed.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	var pageHandle C.FPDF_PAGE
+	if request.Page != "" {
+		pageHandleReference, err := p.getPageHandle(request.Page)
+		if err != nil {
+			return nil, err
+		}
+
+		pageHandle = pageHandleReference.handle
+	}
+
+	bitmap := C.FPDFTextObj_GetRenderedBitmap(documentHandle.handle, pageHandle, pageObjectHandle.handle, C.float(request.Scale))
+	if bitmap == nil {
+		return nil, errors.New("could not render text object as bitmap")
+	}
+
+	bitmapHandle := p.registerBitmap(bitmap)
+
+	return &responses.FPDFTextObj_GetRenderedBitmap{
+		Bitmap: bitmapHandle.nativeRef,
+	}, nil
 }
 
 // FPDFTextObj_GetFont returns the font of a text object.

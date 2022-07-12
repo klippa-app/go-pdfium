@@ -154,6 +154,8 @@ type Pdfium interface {
 
 	// FPDF_GetLastError returns the last error code of a PDFium function, which is just called.
 	// Usually, this function is called after a PDFium function returns, in order to check the error code of the previous PDFium function.
+	// If the previous SDK call succeeded, the return value of this function is not defined. This function only works in conjunction
+	// with APIs that mention FPDF_GetLastError() in their documentation.
 	// Please note that when using go-pdfium from the same instance (on single-threaded any instance)
 	// from different subroutines, FPDF_GetLastError might already be reset from
 	// executing another PDFium method.
@@ -622,6 +624,17 @@ type Pdfium interface {
 	// FPDFPageObj_GetFillColor returns the fill RGBA of a page object
 	FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_GetFillColor) (*responses.FPDFPageObj_GetFillColor, error)
 
+	// FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
+	// Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
+	// object. When the object is rotated by a non-multiple of 90 degrees, this API
+	// returns a tighter bound that cannot be represented with just the 4 sides of
+	// a rectangle.
+	//
+	// Currently only works the following page object types: FPDF_PAGEOBJ_TEXT and
+	// FPDF_PAGEOBJ_IMAGE.
+	// Experimental API.
+	FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
+
 	// FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
 	// Experimental API.
 	FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error)
@@ -719,6 +732,14 @@ type Pdfium interface {
 
 	// FPDFTextObj_GetText returns the text of a text object.
 	FPDFTextObj_GetText(request *requests.FPDFTextObj_GetText) (*responses.FPDFTextObj_GetText, error)
+
+	// FPDFTextObj_GetRenderedBitmap returns a bitmap rasterization of the given text object.
+	// To render correctly, the caller must provide the document associated with the text object.
+	// If there is a page associated with text object, the caller should provide that as well.
+	// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+	// must be called on the returned bitmap when it is no longer needed.
+	// Experimental API.
+	FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error)
 
 	// FPDFTextObj_GetFont returns the font of a text object.
 	// Experimental API.

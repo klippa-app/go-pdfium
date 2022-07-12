@@ -54,6 +54,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFText_LoadStandardFont).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFTextObj_GetRenderedBitmap", func() {
+				FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
+			})
 		})
 	})
 
@@ -157,6 +163,12 @@ var _ = Describe("fpdf_edit", func() {
 				FPDFTextObj_GetFont, err := PdfiumInstance.FPDFTextObj_GetFont(&requests.FPDFTextObj_GetFont{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFTextObj_GetFont).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFPageObj_GetRotatedBounds", func() {
+				FPDFPageObj_GetRotatedBounds, err := PdfiumInstance.FPDFPageObj_GetRotatedBounds(&requests.FPDFPageObj_GetRotatedBounds{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_GetRotatedBounds).To(BeNil())
 			})
 		})
 	})
@@ -390,6 +402,14 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFText_LoadStandardFont).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFTextObj_GetRenderedBitmap without a page object", func() {
+				FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{
+					Document: doc,
+				})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
+			})
+
 			Context("when an page object has been loaded", func() {
 				var pageObject references.FPDF_PAGEOBJECT
 
@@ -425,6 +445,76 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFTextObj_GetFont).ToNot(BeNil())
 					Expect(FPDFTextObj_GetFont.Font).ToNot(BeEmpty())
+				})
+
+				It("allows us getting the rotated bounds", func() {
+					FPDFPageObj_GetRotatedBounds, err := PdfiumInstance.FPDFPageObj_GetRotatedBounds(&requests.FPDFPageObj_GetRotatedBounds{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetRotatedBounds).ToNot(BeNil())
+					Expect(FPDFPageObj_GetRotatedBounds.QuadPoints).To(Equal(structs.FPDF_FS_QUADPOINTSF{
+						X1: 57.21999740600586,
+						Y1: 723.9920043945312,
+						X2: 76.79199981689453,
+						Y2: 723.9920043945312,
+						X3: 76.79199981689453,
+						Y3: 732.5479736328125,
+						X4: 57.21999740600586,
+						Y4: 732.5479736328125,
+					}))
+				})
+
+				It("allows us getting the rendered bitmap", func() {
+					FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{
+						Document:   doc,
+						PageObject: pageObject,
+						Scale:      0.5,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetRenderedBitmap).ToNot(BeNil())
+					Expect(FPDFTextObj_GetRenderedBitmap.Bitmap).ToNot(BeNil())
+				})
+
+				It("allows us getting the rendered bitmap when giving the page object", func() {
+					FPDF_LoadPage, err := PdfiumInstance.FPDF_LoadPage(&requests.FPDF_LoadPage{
+						Document: doc,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_LoadPage).ToNot(BeNil())
+					Expect(FPDF_LoadPage.Page).ToNot(BeNil())
+
+					FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{
+						Document:   doc,
+						Page:       FPDF_LoadPage.Page,
+						PageObject: pageObject,
+						Scale:      0.5,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetRenderedBitmap).ToNot(BeNil())
+					Expect(FPDFTextObj_GetRenderedBitmap.Bitmap).ToNot(BeNil())
+				})
+
+				It("returns an error when getting the rendered bitmap when giving an invalid page object", func() {
+					FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{
+						Document:   doc,
+						Page:       "fake",
+						PageObject: pageObject,
+						Scale:      0.5,
+					})
+					Expect(err).To(MatchError("could not find page handle, perhaps the page was already closed or you tried to share pages between instances or documents"))
+					Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
+				})
+
+				It("returns an error when getting the rendered bitmap when giving an invalid scale", func() {
+					FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{
+						Document:   doc,
+						PageObject: pageObject,
+						Scale:      0,
+					})
+					Expect(err).To(MatchError("could not render text object as bitmap"))
+					Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
 				})
 
 				It("allows us setting the text render mode", func() {
