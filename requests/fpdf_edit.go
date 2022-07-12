@@ -305,6 +305,10 @@ type FPDFPageObj_GetFillColor struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
+type FPDFPageObj_GetRotatedBounds struct {
+	PageObject references.FPDF_PAGEOBJECT
+}
+
 type FPDFPageObj_GetDashPhase struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
@@ -438,6 +442,13 @@ type FPDFTextObj_SetTextRenderMode struct {
 type FPDFTextObj_GetText struct {
 	PageObject references.FPDF_PAGEOBJECT
 	TextPage   references.FPDF_TEXTPAGE
+}
+
+type FPDFTextObj_GetRenderedBitmap struct {
+	Document   references.FPDF_DOCUMENT   // Handle to a document associated with the page object.
+	Page       references.FPDF_PAGE       // Handle to an optional page associated with the page object.
+	PageObject references.FPDF_PAGEOBJECT // Handle to the page object.
+	Scale      float32                    // The scaling factor, which must be greater than 0.
 }
 
 type FPDFTextObj_GetFont struct {

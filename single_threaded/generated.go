@@ -2895,6 +2895,20 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	return i.pdfium.FPDFPageObj_GetMatrix(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (resp *responses.FPDFPageObj_GetRotatedBounds, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRotatedBounds", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_GetRotatedBounds(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor) (resp *responses.FPDFPageObj_GetStrokeColor, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3901,6 +3915,20 @@ func (i *pdfiumInstance) FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_G
 	}()
 
 	return i.pdfium.FPDFTextObj_GetFontSize(request)
+}
+
+func (i *pdfiumInstance) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (resp *responses.FPDFTextObj_GetRenderedBitmap, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFTextObj_GetRenderedBitmap", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFTextObj_GetRenderedBitmap(request)
 }
 
 func (i *pdfiumInstance) FPDFTextObj_GetText(request *requests.FPDFTextObj_GetText) (resp *responses.FPDFTextObj_GetText, err error) {

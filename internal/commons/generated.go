@@ -218,6 +218,7 @@ type Pdfium interface {
 	FPDFPageObj_GetLineJoin(*requests.FPDFPageObj_GetLineJoin) (*responses.FPDFPageObj_GetLineJoin, error)
 	FPDFPageObj_GetMark(*requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
 	FPDFPageObj_GetMatrix(*requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error)
+	FPDFPageObj_GetRotatedBounds(*requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
 	FPDFPageObj_GetStrokeColor(*requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error)
 	FPDFPageObj_GetStrokeWidth(*requests.FPDFPageObj_GetStrokeWidth) (*responses.FPDFPageObj_GetStrokeWidth, error)
 	FPDFPageObj_GetType(*requests.FPDFPageObj_GetType) (*responses.FPDFPageObj_GetType, error)
@@ -290,6 +291,7 @@ type Pdfium interface {
 	FPDFSignatureObj_GetTime(*requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error)
 	FPDFTextObj_GetFont(*requests.FPDFTextObj_GetFont) (*responses.FPDFTextObj_GetFont, error)
 	FPDFTextObj_GetFontSize(*requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)
+	FPDFTextObj_GetRenderedBitmap(*requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error)
 	FPDFTextObj_GetText(*requests.FPDFTextObj_GetText) (*responses.FPDFTextObj_GetText, error)
 	FPDFTextObj_GetTextRenderMode(*requests.FPDFTextObj_GetTextRenderMode) (*responses.FPDFTextObj_GetTextRenderMode, error)
 	FPDFTextObj_SetTextRenderMode(*requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error)
@@ -2503,6 +2505,16 @@ func (g *PdfiumRPC) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatri
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
+	resp := &responses.FPDFPageObj_GetRotatedBounds{}
+	err := g.client.Call("Plugin.FPDFPageObj_GetRotatedBounds", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error) {
 	resp := &responses.FPDFPageObj_GetStrokeColor{}
 	err := g.client.Call("Plugin.FPDFPageObj_GetStrokeColor", request, resp)
@@ -3216,6 +3228,16 @@ func (g *PdfiumRPC) FPDFTextObj_GetFont(request *requests.FPDFTextObj_GetFont) (
 func (g *PdfiumRPC) FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error) {
 	resp := &responses.FPDFTextObj_GetFontSize{}
 	err := g.client.Call("Plugin.FPDFTextObj_GetFontSize", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error) {
+	resp := &responses.FPDFTextObj_GetRenderedBitmap{}
+	err := g.client.Call("Plugin.FPDFTextObj_GetRenderedBitmap", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -8431,6 +8453,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Ge
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds, resp *responses.FPDFPageObj_GetRotatedBounds) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRotatedBounds", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_GetRotatedBounds(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor, resp *responses.FPDFPageObj_GetStrokeColor) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -9717,6 +9757,24 @@ func (s *PdfiumRPCServer) FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_
 	}()
 
 	implResp, err := s.Impl.FPDFTextObj_GetFontSize(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap, resp *responses.FPDFTextObj_GetRenderedBitmap) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFTextObj_GetRenderedBitmap", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFTextObj_GetRenderedBitmap(request)
 	if err != nil {
 		return err
 	}

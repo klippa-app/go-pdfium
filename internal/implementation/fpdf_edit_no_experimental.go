@@ -146,6 +146,19 @@ func (p *PdfiumImplementation) FPDFImageObj_GetRenderedBitmap(request *requests.
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
+// Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
+// object. When the object is rotated by a non-multiple of 90 degrees, this API
+// returns a tighter bound that cannot be represented with just the 4 sides of
+// a rectangle.
+//
+// Currently only works the following page object types: FPDF_PAGEOBJ_TEXT and
+// FPDF_PAGEOBJ_IMAGE.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error) {
@@ -188,6 +201,16 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 // FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFTextObj_GetRenderedBitmap returns a bitmap rasterization of the given text object.
+// To render correctly, the caller must provide the document associated with the text object.
+// If there is a page associated with text object, the caller should provide that as well.
+// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+// must be called on the returned bitmap when it is no longer needed.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

@@ -199,6 +199,10 @@ type FPDFPageObj_GetFillColor struct {
 	FillColor structs.FPDF_COLOR
 }
 
+type FPDFPageObj_GetRotatedBounds struct {
+	QuadPoints structs.FPDF_FS_QUADPOINTSF
+}
+
 type FPDFPageObj_GetDashPhase struct {
 	DashPhase float32
 }
@@ -265,6 +269,10 @@ type FPDFText_LoadFont struct {
 
 type FPDFText_LoadStandardFont struct {
 	Font references.FPDF_FONT
+}
+
+type FPDFTextObj_GetRenderedBitmap struct {
+	Bitmap references.FPDF_BITMAP
 }
 
 type FPDFTextObj_GetFontSize struct {
