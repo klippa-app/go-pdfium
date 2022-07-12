@@ -55,33 +55,33 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
-          go test ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+          go test -timeout 30m ./... -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Linux & MacOS) - Experimental
         if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
           export IS_EXPERIMENTAL="1"
-          go test ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+          go test -timeout 30m ./... -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go test ./... -v
+          go test -timeout 30m ./... -v
       - name: Test all packages (Windows) - Experimental
         if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
           $env:IS_EXPERIMENTAL = '1'
-          go test ./... -tags pdfium_experimental -v
+          go test -timeout 30m ./... -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export IS_EXPERIMENTAL="1"
-          go test ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
+          go test -timeout 30m ./internal/implementation -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
       - name: Archive code coverage results
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         uses: actions/upload-artifact@v2
