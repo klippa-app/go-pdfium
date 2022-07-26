@@ -478,9 +478,11 @@ func (p *PdfiumImplementation) FPDFBitmap_Create(request *requests.FPDFBitmap_Cr
 // function can be used in any place that a FPDF_BITMAP handle is
 // required.
 //
-// If an external buffer is used, then the application should destroy
-// the buffer by itself. FPDFBitmap_Destroy function will not destroy
-// the buffer.
+// If an external buffer is used, then the caller should destroy the
+// buffer. FPDFBitmap_Destroy() will not destroy the buffer.
+//
+// It is recommended to use FPDFBitmap_GetStride() to get the stride
+// value.
 //
 // Not supported on multi-threaded usage.
 func (p *PdfiumImplementation) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error) {

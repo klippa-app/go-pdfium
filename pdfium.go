@@ -258,9 +258,11 @@ type Pdfium interface {
 	// function can be used in any place that a FPDF_BITMAP handle is
 	// required.
 	//
-	// If an external buffer is used, then the application should destroy
-	// the buffer by itself. FPDFBitmap_Destroy function will not destroy
-	// the buffer.
+	// If an external buffer is used, then the caller should destroy the
+	// buffer. FPDFBitmap_Destroy() will not destroy the buffer.
+	//
+	// It is recommended to use FPDFBitmap_GetStride() to get the stride
+	// value.
 	//
 	// Not supported on multi-threaded usage.
 	FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error)
@@ -1228,6 +1230,11 @@ type Pdfium interface {
 	FPDFText_GetCharIndexAtPos(request *requests.FPDFText_GetCharIndexAtPos) (*responses.FPDFText_GetCharIndexAtPos, error)
 
 	// FPDFText_GetText extracts unicode text string from the page.
+	// This function ignores characters without unicode information.
+	// It returns all characters on the page, even those that are not
+	// visible when the page has a cropbox. To filter out the characters
+	// outside of the cropbox, use FPDF_GetPageBoundingBox() and
+	// FPDFText_GetCharBox().
 	FPDFText_GetText(request *requests.FPDFText_GetText) (*responses.FPDFText_GetText, error)
 
 	// FPDFText_CountRects returns the count of rectangular areas occupied by

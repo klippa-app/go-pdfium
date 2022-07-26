@@ -195,6 +195,11 @@ func (p *PdfiumImplementation) FPDFText_GetCharIndexAtPos(request *requests.FPDF
 }
 
 // FPDFText_GetText extracts unicode text string from the page.
+// This function ignores characters without unicode information.
+// It returns all characters on the page, even those that are not
+// visible when the page has a cropbox. To filter out the characters
+// outside of the cropbox, use FPDF_GetPageBoundingBox() and
+// FPDFText_GetCharBox().
 func (p *PdfiumImplementation) FPDFText_GetText(request *requests.FPDFText_GetText) (*responses.FPDFText_GetText, error) {
 	p.Lock()
 	defer p.Unlock()
