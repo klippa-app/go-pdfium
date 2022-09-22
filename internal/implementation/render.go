@@ -366,7 +366,7 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 	hasTransparency := int(alpha) == 1
 
 	// When the page has transparency, fill with black, not white.
-	if int(alpha) == 1 {
+	if hasTransparency {
 		// Black
 		fillColor = 0x00000000
 	}
