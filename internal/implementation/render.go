@@ -489,10 +489,10 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		// rendered PDF will look the same as in a PDF viewer, those generally
 		// have a white background on the page viewer.
 		if hasTransparency {
-			dst := image.NewRGBA(renderedImage.Bounds())
-			draw.Draw(dst, dst.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-			draw.Draw(dst, dst.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
-			renderedImage = dst
+			imageWithWhiteBackground := image.NewRGBA(renderedImage.Bounds())
+			draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
+			draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
+			renderedImage = imageWithWhiteBackground
 		}
 
 		for {
