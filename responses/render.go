@@ -10,6 +10,7 @@ type RenderPage struct {
 	Image             *image.RGBA // The rendered image.
 	Width             int         // The width of the rendered image.
 	Height            int         // The height of the rendered image.
+	HasTransparency   bool        // Whether the page has transparency.
 }
 
 type RenderPagesPage struct {
@@ -19,6 +20,7 @@ type RenderPagesPage struct {
 	Height            int     // The height of the rendered page inside the image.
 	X                 int     // The X start position of this page inside the image.
 	Y                 int     // The Y start position of this page inside the image.
+	HasTransparency   bool    // Whether the page has transparency.
 }
 
 type RenderPages struct {
