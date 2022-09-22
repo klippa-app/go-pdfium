@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"image/color"
+	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
@@ -328,11 +330,12 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
+		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
 		if err != nil {
 			return nil, err
 		}
 		pagesInfo[i].Page = index
+		pagesInfo[i].HasTransparency = hasTransparency
 		currentOffset += pages[i].Height + padding
 	}
 
@@ -349,16 +352,18 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, error) {
+func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, bool, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
-		return 0, err
+		return 0, false, err
 	}
 
 	alpha := C.FPDFPage_HasTransparency(pageHandle.handle)
 
 	// White
 	fillColor := 0xFFFFFFFF
+
+	hasTransparency := int(alpha) == 1
 
 	// When the page has transparency, fill with black, not white.
 	if int(alpha) == 1 {
@@ -373,13 +378,15 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 	// in reverse order so that BGRA becomes RGBA.
 	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
 
-	return pageHandle.index, nil
+	return pageHandle.index, hasTransparency, nil
 }
 
 func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
 	var renderedImage *image.RGBA
 
 	var myResp *responses.RenderToFile
+	hasTransparency := false
+
 	if request.RenderPageInDPI != nil {
 		resp, err := p.RenderPageInDPI(request.RenderPageInDPI)
 		if err != nil {
@@ -387,6 +394,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		renderedImage = resp.Result.Image
+		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
 			Height:            resp.Result.Height,
@@ -399,6 +407,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 					Height:            resp.Result.Image.Bounds().Max.Y,
 					X:                 0,
 					Y:                 0,
+					HasTransparency:   resp.Result.HasTransparency,
 				},
 			},
 		}
@@ -409,6 +418,13 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		renderedImage = resp.Result.Image
+
+		for _, page := range resp.Result.Pages {
+			if page.HasTransparency {
+				hasTransparency = true
+			}
+		}
+
 		myResp = &responses.RenderToFile{
 			Width:  resp.Result.Width,
 			Height: resp.Result.Height,
@@ -421,6 +437,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		renderedImage = resp.Result.Image
+		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
 			Height:            resp.Result.Height,
@@ -433,6 +450,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 					Height:            resp.Result.Image.Bounds().Max.Y,
 					X:                 0,
 					Y:                 0,
+					HasTransparency:   resp.Result.HasTransparency,
 				},
 			},
 		}
@@ -443,6 +461,13 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		renderedImage = resp.Result.Image
+
+		for _, page := range resp.Result.Pages {
+			if page.HasTransparency {
+				hasTransparency = true
+			}
+		}
+
 		myResp = &responses.RenderToFile{
 			Width:  resp.Result.Width,
 			Height: resp.Result.Height,
@@ -457,6 +482,18 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
 		var opt jpeg.Options
 		opt.Quality = 95
+
+		// If any of the pages have transparency, place a white background under
+		// the image. When you render a JPG image in Go, it will make the transparent
+		// background black. With the added background we make sure that the
+		// rendered PDF will look the same as in a PDF viewer, those generally
+		// have a white background on the page viewer.
+		if hasTransparency {
+			dst := image.NewRGBA(renderedImage.Bounds())
+			draw.Draw(dst, dst.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
+			draw.Draw(dst, dst.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
+			renderedImage = dst
+		}
 
 		for {
 			err := jpeg.Encode(&imgBuf, renderedImage, &opt)
