@@ -2459,6 +2459,14 @@ func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnico
 	return i.worker.plugin.FPDFText_GetUnicode(request)
 }
 
+func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_IsGenerated(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

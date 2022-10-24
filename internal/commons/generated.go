@@ -322,6 +322,7 @@ type Pdfium interface {
 	FPDFText_GetTextIndexFromCharIndex(*requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
 	FPDFText_GetTextRenderMode(*requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
 	FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
+	FPDFText_IsGenerated(*requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 	FPDFText_LoadFont(*requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
 	FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
 	FPDFText_LoadStandardFont(*requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
@@ -3538,6 +3539,16 @@ func (g *PdfiumRPC) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTex
 func (g *PdfiumRPC) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error) {
 	resp := &responses.FPDFText_GetUnicode{}
 	err := g.client.Call("Plugin.FPDFText_GetUnicode", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {
+	resp := &responses.FPDFText_IsGenerated{}
+	err := g.client.Call("Plugin.FPDFText_IsGenerated", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -10315,6 +10326,24 @@ func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnic
 	}()
 
 	implResp, err := s.Impl.FPDFText_GetUnicode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated, resp *responses.FPDFText_IsGenerated) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_IsGenerated", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFText_IsGenerated(request)
 	if err != nil {
 		return err
 	}

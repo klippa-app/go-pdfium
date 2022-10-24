@@ -4351,6 +4351,20 @@ func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnico
 	return i.pdfium.FPDFText_GetUnicode(request)
 }
 
+func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (resp *responses.FPDFText_IsGenerated, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_IsGenerated", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFText_IsGenerated(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (resp *responses.FPDFText_LoadFont, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
