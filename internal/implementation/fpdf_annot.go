@@ -1094,6 +1094,41 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAtPoint(request *requests.F
 	}, nil
 }
 
+// FPDFAnnot_GetFormAdditionalActionJavaScript returns the JavaScript of an event of the annotation's additional actions.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the value length
+	length := C.FPDFAnnot_GetFormAdditionalActionJavaScript(formHandle.handle, annotationHandle.handle, C.int(request.Event), nil, 0)
+	if uint64(length) == 0 {
+		return nil, errors.New("could not get form additional action JavaScript")
+	}
+
+	charData := make([]byte, length)
+	C.FPDFAnnot_GetFormAdditionalActionJavaScript(formHandle.handle, annotationHandle.handle, C.int(request.Event), (*C.ushort)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFAnnot_GetFormAdditionalActionJavaScript{
+		FormAdditionalActionJavaScript: transformedText,
+	}, nil
+}
+
 // FPDFAnnot_GetFormFieldName returns the name of the given annotation, which is an interactive form annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldName(request *requests.FPDFAnnot_GetFormFieldName) (*responses.FPDFAnnot_GetFormFieldName, error) {
@@ -1126,6 +1161,41 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldName(request *requests.FPDF
 
 	return &responses.FPDFAnnot_GetFormFieldName{
 		FormFieldName: transformedText,
+	}, nil
+}
+
+// FPDFAnnot_GetFormFieldAlternateName returns the alternate name of an annotation, which is an interactive form annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the value length
+	length := C.FPDFAnnot_GetFormFieldAlternateName(formHandle.handle, annotationHandle.handle, nil, 0)
+	if uint64(length) == 0 {
+		return nil, errors.New("could not get form field alternate name")
+	}
+
+	charData := make([]byte, length)
+	C.FPDFAnnot_GetFormFieldAlternateName(formHandle.handle, annotationHandle.handle, (*C.ushort)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFAnnot_GetFormFieldAlternateName{
+		FormFieldAlternateName: transformedText,
 	}, nil
 }
 

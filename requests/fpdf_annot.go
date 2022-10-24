@@ -215,7 +215,18 @@ type FPDFAnnot_GetFormFieldAtPoint struct {
 	Point      structs.FPDF_FS_POINTF
 }
 
+type FPDFAnnot_GetFormAdditionalActionJavaScript struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+	Event      enums.FPDF_ANNOT_AACTION
+}
+
 type FPDFAnnot_GetFormFieldName struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+}
+
+type FPDFAnnot_GetFormFieldAlternateName struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Annotation references.FPDF_ANNOTATION
 }

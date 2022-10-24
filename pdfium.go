@@ -1789,9 +1789,17 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAnnot_GetFormFieldAtPoint(request *requests.FPDFAnnot_GetFormFieldAtPoint) (*responses.FPDFAnnot_GetFormFieldAtPoint, error)
 
+	// FPDFAnnot_GetFormAdditionalActionJavaScript returns the JavaScript of an event of the annotation's additional actions.
+	// Experimental API.
+	FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error)
+
 	// FPDFAnnot_GetFormFieldName returns the name of the given annotation, which is an interactive form annotation.
 	// Experimental API.
 	FPDFAnnot_GetFormFieldName(request *requests.FPDFAnnot_GetFormFieldName) (*responses.FPDFAnnot_GetFormFieldName, error)
+
+	// FPDFAnnot_GetFormFieldAlternateName returns the alternate name of an annotation, which is an interactive form annotation.
+	// Experimental API.
+	FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error)
 
 	// FPDFAnnot_GetFormFieldType returns the form field type of the given annotation, which is an interactive form annotation.
 	// Experimental API.

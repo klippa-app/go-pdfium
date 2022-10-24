@@ -379,6 +379,14 @@ func (i *pdfiumInstance) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFo
 	return i.worker.plugin.FPDFAnnot_GetFontSize(request)
 }
 
+func (i *pdfiumInstance) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_GetFormAdditionalActionJavaScript(request)
+}
+
 func (i *pdfiumInstance) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount) (*responses.FPDFAnnot_GetFormControlCount, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -393,6 +401,14 @@ func (i *pdfiumInstance) FPDFAnnot_GetFormControlIndex(request *requests.FPDFAnn
 	}
 
 	return i.worker.plugin.FPDFAnnot_GetFormControlIndex(request)
+}
+
+func (i *pdfiumInstance) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_GetFormFieldAlternateName(request)
 }
 
 func (i *pdfiumInstance) FPDFAnnot_GetFormFieldAtPoint(request *requests.FPDFAnnot_GetFormFieldAtPoint) (*responses.FPDFAnnot_GetFormFieldAtPoint, error) {
