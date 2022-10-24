@@ -58,8 +58,10 @@ type Pdfium interface {
 	FPDFAnnot_GetFocusableSubtypes(*requests.FPDFAnnot_GetFocusableSubtypes) (*responses.FPDFAnnot_GetFocusableSubtypes, error)
 	FPDFAnnot_GetFocusableSubtypesCount(*requests.FPDFAnnot_GetFocusableSubtypesCount) (*responses.FPDFAnnot_GetFocusableSubtypesCount, error)
 	FPDFAnnot_GetFontSize(*requests.FPDFAnnot_GetFontSize) (*responses.FPDFAnnot_GetFontSize, error)
+	FPDFAnnot_GetFormAdditionalActionJavaScript(*requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error)
 	FPDFAnnot_GetFormControlCount(*requests.FPDFAnnot_GetFormControlCount) (*responses.FPDFAnnot_GetFormControlCount, error)
 	FPDFAnnot_GetFormControlIndex(*requests.FPDFAnnot_GetFormControlIndex) (*responses.FPDFAnnot_GetFormControlIndex, error)
+	FPDFAnnot_GetFormFieldAlternateName(*requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error)
 	FPDFAnnot_GetFormFieldAtPoint(*requests.FPDFAnnot_GetFormFieldAtPoint) (*responses.FPDFAnnot_GetFormFieldAtPoint, error)
 	FPDFAnnot_GetFormFieldExportValue(*requests.FPDFAnnot_GetFormFieldExportValue) (*responses.FPDFAnnot_GetFormFieldExportValue, error)
 	FPDFAnnot_GetFormFieldFlags(*requests.FPDFAnnot_GetFormFieldFlags) (*responses.FPDFAnnot_GetFormFieldFlags, error)
@@ -322,6 +324,7 @@ type Pdfium interface {
 	FPDFText_GetTextIndexFromCharIndex(*requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
 	FPDFText_GetTextRenderMode(*requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
 	FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
+	FPDFText_IsGenerated(*requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 	FPDFText_LoadFont(*requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
 	FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
 	FPDFText_LoadStandardFont(*requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
@@ -905,6 +908,16 @@ func (g *PdfiumRPC) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFontSiz
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error) {
+	resp := &responses.FPDFAnnot_GetFormAdditionalActionJavaScript{}
+	err := g.client.Call("Plugin.FPDFAnnot_GetFormAdditionalActionJavaScript", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount) (*responses.FPDFAnnot_GetFormControlCount, error) {
 	resp := &responses.FPDFAnnot_GetFormControlCount{}
 	err := g.client.Call("Plugin.FPDFAnnot_GetFormControlCount", request, resp)
@@ -918,6 +931,16 @@ func (g *PdfiumRPC) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_Ge
 func (g *PdfiumRPC) FPDFAnnot_GetFormControlIndex(request *requests.FPDFAnnot_GetFormControlIndex) (*responses.FPDFAnnot_GetFormControlIndex, error) {
 	resp := &responses.FPDFAnnot_GetFormControlIndex{}
 	err := g.client.Call("Plugin.FPDFAnnot_GetFormControlIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error) {
+	resp := &responses.FPDFAnnot_GetFormFieldAlternateName{}
+	err := g.client.Call("Plugin.FPDFAnnot_GetFormFieldAlternateName", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3545,6 +3568,16 @@ func (g *PdfiumRPC) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {
+	resp := &responses.FPDFText_IsGenerated{}
+	err := g.client.Call("Plugin.FPDFText_IsGenerated", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
 	resp := &responses.FPDFText_LoadFont{}
 	err := g.client.Call("Plugin.FPDFText_LoadFont", request, resp)
@@ -5573,6 +5606,24 @@ func (s *PdfiumRPCServer) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetF
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript, resp *responses.FPDFAnnot_GetFormAdditionalActionJavaScript) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_GetFormAdditionalActionJavaScript", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_GetFormAdditionalActionJavaScript(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount, resp *responses.FPDFAnnot_GetFormControlCount) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -5599,6 +5650,24 @@ func (s *PdfiumRPCServer) FPDFAnnot_GetFormControlIndex(request *requests.FPDFAn
 	}()
 
 	implResp, err := s.Impl.FPDFAnnot_GetFormControlIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName, resp *responses.FPDFAnnot_GetFormFieldAlternateName) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_GetFormFieldAlternateName", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_GetFormFieldAlternateName(request)
 	if err != nil {
 		return err
 	}
@@ -10315,6 +10384,24 @@ func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnic
 	}()
 
 	implResp, err := s.Impl.FPDFText_GetUnicode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated, resp *responses.FPDFText_IsGenerated) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_IsGenerated", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFText_IsGenerated(request)
 	if err != nil {
 		return err
 	}

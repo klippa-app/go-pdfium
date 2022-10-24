@@ -4,7 +4,6 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/structs"
 	"io/ioutil"
 	"strconv"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -253,10 +253,20 @@ var _ = Describe("fpdf_annot", func() {
 			Expect(err).To(MatchError("formHandle not given"))
 			Expect(FPDFAnnot_GetFormFieldAtPoint).To(BeNil())
 		})
+		It("returns an error when FPDFAnnot_GetFormAdditionalActionJavaScript is called", func() {
+			FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{})
+			Expect(err).To(MatchError("formHandle not given"))
+			Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(BeNil())
+		})
 		It("returns an error when FPDFAnnot_GetFormFieldName is called", func() {
 			FPDFAnnot_GetFormFieldName, err := PdfiumInstance.FPDFAnnot_GetFormFieldName(&requests.FPDFAnnot_GetFormFieldName{})
 			Expect(err).To(MatchError("formHandle not given"))
 			Expect(FPDFAnnot_GetFormFieldName).To(BeNil())
+		})
+		It("returns an error when FPDFAnnot_GetFormFieldAlternateName is called", func() {
+			FPDFAnnot_GetFormFieldAlternateName, err := PdfiumInstance.FPDFAnnot_GetFormFieldAlternateName(&requests.FPDFAnnot_GetFormFieldAlternateName{})
+			Expect(err).To(MatchError("formHandle not given"))
+			Expect(FPDFAnnot_GetFormFieldAlternateName).To(BeNil())
 		})
 		It("returns an error when FPDFAnnot_GetFormFieldType is called", func() {
 			FPDFAnnot_GetFormFieldType, err := PdfiumInstance.FPDFAnnot_GetFormFieldType(&requests.FPDFAnnot_GetFormFieldType{})
@@ -1612,6 +1622,242 @@ var _ = Describe("fpdf_annot", func() {
 			})
 			Expect(err).To(MatchError("could net set uri"))
 			Expect(FPDFAnnot_SetURI).To(BeNil())
+		})
+	})
+
+	Context("a PDF file with alternate form names", func() {
+		var doc references.FPDF_DOCUMENT
+		var formHandle references.FPDF_FORMHANDLE
+
+		BeforeEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+
+			FPDFDOC_InitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_InitFormFillEnvironment(&requests.FPDFDOC_InitFormFillEnvironment{
+				Document: doc,
+				FormFillInfo: structs.FPDF_FORMFILLINFO{
+					FFI_Invalidate:         func(page references.FPDF_PAGE, left, top, right, bottom float64) {},
+					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {},
+					FFI_SetCursor:          func(cursorType enums.FXCT) {},
+					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
+						return 0
+					},
+					FFI_KillTimer: func(timerID int) {},
+					FFI_GetLocalTime: func() structs.FPDF_SYSTEMTIME {
+						return structs.FPDF_SYSTEMTIME{}
+					},
+					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
+						return nil
+					},
+					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
+						return enums.FPDF_PAGE_ROTATION_NONE
+					},
+					FFI_ExecuteNamedAction: func(namedAction string) {},
+				},
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment).ToNot(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
+			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
+		})
+
+		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFormFieldAlternateName without an annotation", func() {
+			FPDFAnnot_GetFormFieldAlternateName, err := PdfiumInstance.FPDFAnnot_GetFormFieldAlternateName(&requests.FPDFAnnot_GetFormFieldAlternateName{
+				FormHandle: formHandle,
+			})
+			Expect(err).To(MatchError("annotation not given"))
+			Expect(FPDFAnnot_GetFormFieldAlternateName).To(BeNil())
+		})
+
+		It("returns an error calling FPDFAnnot_GetFormFieldAlternateName without valid annotation", func() {
+			FPDFAnnot_GetFormFieldAlternateName, err := PdfiumInstance.FPDFAnnot_GetFormFieldAlternateName(&requests.FPDFAnnot_GetFormFieldAlternateName{
+				FormHandle: formHandle,
+				Annotation: "test123",
+			})
+			Expect(err).To(MatchError("could not find annotation handle, perhaps the annotation was already closed or you tried to share annotations between instances"))
+			Expect(FPDFAnnot_GetFormFieldAlternateName).To(BeNil())
+		})
+
+		When("an annotation has been loaded", func() {
+			var annotation references.FPDF_ANNOTATION
+			BeforeEach(func() {
+				FPDFPage_GetAnnot, err := PdfiumInstance.FPDFPage_GetAnnot(&requests.FPDFPage_GetAnnot{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					Index: 0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnot).To(Not(BeNil()))
+				Expect(FPDFPage_GetAnnot.Annotation).To(Not(BeNil()))
+				annotation = FPDFPage_GetAnnot.Annotation
+			})
+
+			It("returns an alternate form name for an annotation that has one", func() {
+				FPDFAnnot_GetFormFieldAlternateName, err := PdfiumInstance.FPDFAnnot_GetFormFieldAlternateName(&requests.FPDFAnnot_GetFormFieldAlternateName{
+					FormHandle: formHandle,
+					Annotation: annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetFormFieldAlternateName).To(Equal(&responses.FPDFAnnot_GetFormFieldAlternateName{
+					FormFieldAlternateName: "readOnlyCheckbox",
+				}))
+			})
+		})
+	})
+
+	Context("a PDF file with form additional action JavaScript", func() {
+		var doc references.FPDF_DOCUMENT
+		var formHandle references.FPDF_FORMHANDLE
+
+		BeforeEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annot_javascript.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+
+			FPDFDOC_InitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_InitFormFillEnvironment(&requests.FPDFDOC_InitFormFillEnvironment{
+				Document: doc,
+				FormFillInfo: structs.FPDF_FORMFILLINFO{
+					FFI_Invalidate:         func(page references.FPDF_PAGE, left, top, right, bottom float64) {},
+					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {},
+					FFI_SetCursor:          func(cursorType enums.FXCT) {},
+					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
+						return 0
+					},
+					FFI_KillTimer: func(timerID int) {},
+					FFI_GetLocalTime: func() structs.FPDF_SYSTEMTIME {
+						return structs.FPDF_SYSTEMTIME{}
+					},
+					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
+						return nil
+					},
+					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
+						return enums.FPDF_PAGE_ROTATION_NONE
+					},
+					FFI_ExecuteNamedAction: func(namedAction string) {},
+				},
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment).ToNot(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
+			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
+		})
+
+		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFormAdditionalActionJavaScript without an annotation", func() {
+			FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{
+				FormHandle: formHandle,
+			})
+			Expect(err).To(MatchError("annotation not given"))
+			Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(BeNil())
+		})
+
+		It("returns an error calling FPDFAnnot_GetFormAdditionalActionJavaScript without valid annotation", func() {
+			FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{
+				FormHandle: formHandle,
+				Annotation: "test123",
+			})
+			Expect(err).To(MatchError("could not find annotation handle, perhaps the annotation was already closed or you tried to share annotations between instances"))
+			Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(BeNil())
+		})
+
+		When("an annotation has been loaded", func() {
+			var annotation references.FPDF_ANNOTATION
+			BeforeEach(func() {
+				FPDFPage_GetAnnot, err := PdfiumInstance.FPDFPage_GetAnnot(&requests.FPDFPage_GetAnnot{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					Index: 0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnot).To(Not(BeNil()))
+				Expect(FPDFPage_GetAnnot.Annotation).To(Not(BeNil()))
+				annotation = FPDFPage_GetAnnot.Annotation
+			})
+
+			It("returns an error when requesting a form additional action JavaScript without an event type", func() {
+				FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{
+					FormHandle: formHandle,
+					Annotation: annotation,
+				})
+				Expect(err).To(MatchError("could not get form additional action JavaScript"))
+				Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(BeNil())
+			})
+
+			It("returns an empty javascript when requesting a form additional action JavaScript that doesn't have one for the given type", func() {
+				FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{
+					FormHandle: formHandle,
+					Annotation: annotation,
+					Event:      enums.FPDF_ANNOT_AACTION_KEY_STROKE,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(Equal(&responses.FPDFAnnot_GetFormAdditionalActionJavaScript{
+					FormAdditionalActionJavaScript: "",
+				}))
+			})
+
+			It("returns a form additional action JavaScript for an annotation that has one of the given type", func() {
+				FPDFAnnot_GetFormAdditionalActionJavaScript, err := PdfiumInstance.FPDFAnnot_GetFormAdditionalActionJavaScript(&requests.FPDFAnnot_GetFormAdditionalActionJavaScript{
+					FormHandle: formHandle,
+					Annotation: annotation,
+					Event:      enums.FPDF_ANNOT_AACTION_FORMAT,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(Equal(&responses.FPDFAnnot_GetFormAdditionalActionJavaScript{
+					FormAdditionalActionJavaScript: "AFDate_FormatEx(\"yyyy-mm-dd\");",
+				}))
+			})
 		})
 	})
 })

@@ -912,4 +912,121 @@ var _ = Describe("fpdf_text", func() {
 			})
 		})
 	})
+
+	Context("a PDF file with generated text", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("a text page is opened", func() {
+			var textPage references.FPDF_TEXTPAGE
+
+			BeforeEach(func() {
+				textPageResp, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(textPageResp).To(Not(BeNil()))
+
+				textPage = textPageResp.TextPage
+			})
+
+			AfterEach(func() {
+				resp, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(resp).To(Not(BeNil()))
+			})
+
+			It("returns correctly whether character at index 0 is generated", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsGenerated).To(Equal(&responses.FPDFText_IsGenerated{
+					Index:       0,
+					IsGenerated: false,
+				}))
+			})
+
+			It("returns correctly whether character at index 6 is generated", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: textPage,
+					Index:    6,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsGenerated).To(Equal(&responses.FPDFText_IsGenerated{
+					Index:       6,
+					IsGenerated: false,
+				}))
+			})
+
+			It("returns correctly whether character at index 13 is generated", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: textPage,
+					Index:    13,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsGenerated).To(Equal(&responses.FPDFText_IsGenerated{
+					Index:       13,
+					IsGenerated: true,
+				}))
+			})
+
+			It("returns correctly whether character at index 14 is generated", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: textPage,
+					Index:    14,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsGenerated).To(Equal(&responses.FPDFText_IsGenerated{
+					Index:       14,
+					IsGenerated: true,
+				}))
+			})
+
+			It("returns an error when giving an invalid character", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: textPage,
+					Index:    9999999,
+				})
+				Expect(err).To(MatchError("could not get whether text is generated"))
+				Expect(FPDFText_IsGenerated).To(BeNil())
+			})
+
+			It("returns an error when giving an invalid text page", func() {
+				FPDFText_IsGenerated, err := PdfiumInstance.FPDFText_IsGenerated(&requests.FPDFText_IsGenerated{
+					TextPage: "dffddf",
+					Index:    9999999,
+				})
+				Expect(err).To(MatchError("could not find textPage handle, perhaps the textPage was already closed or you tried to share textPages between instances"))
+				Expect(FPDFText_IsGenerated).To(BeNil())
+			})
+		})
+	})
 })

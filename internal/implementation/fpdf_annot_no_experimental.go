@@ -317,9 +317,21 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAtPoint(request *requests.F
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFAnnot_GetFormAdditionalActionJavaScript returns the JavaScript of an event of the annotation's additional actions.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (*responses.FPDFAnnot_GetFormAdditionalActionJavaScript, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFAnnot_GetFormFieldName returns the name of the given annotation, which is an interactive form annotation.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldName(request *requests.FPDFAnnot_GetFormFieldName) (*responses.FPDFAnnot_GetFormFieldName, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFAnnot_GetFormFieldAlternateName returns the alternate name of an annotation, which is an interactive form annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

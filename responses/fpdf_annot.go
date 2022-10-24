@@ -156,8 +156,16 @@ type FPDFAnnot_GetFormFieldAtPoint struct {
 	Annotation references.FPDF_ANNOTATION
 }
 
+type FPDFAnnot_GetFormAdditionalActionJavaScript struct {
+	FormAdditionalActionJavaScript string
+}
+
 type FPDFAnnot_GetFormFieldName struct {
 	FormFieldName string
+}
+
+type FPDFAnnot_GetFormFieldAlternateName struct {
+	FormFieldAlternateName string
 }
 
 type FPDFAnnot_GetFormFieldType struct {

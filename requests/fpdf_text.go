@@ -19,6 +19,11 @@ type FPDFText_GetUnicode struct {
 	Index    int
 }
 
+type FPDFText_IsGenerated struct {
+	TextPage references.FPDF_TEXTPAGE
+	Index    int
+}
+
 type FPDFText_GetFontSize struct {
 	TextPage references.FPDF_TEXTPAGE
 	Index    int

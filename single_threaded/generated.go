@@ -655,6 +655,20 @@ func (i *pdfiumInstance) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFo
 	return i.pdfium.FPDFAnnot_GetFontSize(request)
 }
 
+func (i *pdfiumInstance) FPDFAnnot_GetFormAdditionalActionJavaScript(request *requests.FPDFAnnot_GetFormAdditionalActionJavaScript) (resp *responses.FPDFAnnot_GetFormAdditionalActionJavaScript, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_GetFormAdditionalActionJavaScript", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAnnot_GetFormAdditionalActionJavaScript(request)
+}
+
 func (i *pdfiumInstance) FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount) (resp *responses.FPDFAnnot_GetFormControlCount, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -681,6 +695,20 @@ func (i *pdfiumInstance) FPDFAnnot_GetFormControlIndex(request *requests.FPDFAnn
 	}()
 
 	return i.pdfium.FPDFAnnot_GetFormControlIndex(request)
+}
+
+func (i *pdfiumInstance) FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (resp *responses.FPDFAnnot_GetFormFieldAlternateName, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_GetFormFieldAlternateName", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAnnot_GetFormFieldAlternateName(request)
 }
 
 func (i *pdfiumInstance) FPDFAnnot_GetFormFieldAtPoint(request *requests.FPDFAnnot_GetFormFieldAtPoint) (resp *responses.FPDFAnnot_GetFormFieldAtPoint, err error) {
@@ -4349,6 +4377,20 @@ func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnico
 	}()
 
 	return i.pdfium.FPDFText_GetUnicode(request)
+}
+
+func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (resp *responses.FPDFText_IsGenerated, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_IsGenerated", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFText_IsGenerated(request)
 }
 
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (resp *responses.FPDFText_LoadFont, err error) {
