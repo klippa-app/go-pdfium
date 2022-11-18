@@ -135,7 +135,12 @@ func Init(config Config) pdfium.Pool {
 			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Runtime, newWorker.Functions, newWorker.CompiledModule, newWorker.Module)
 
 			return newWorker, nil
-		}, nil, func(ctx goctx.Context, object *pool.PooledObject) bool {
+		}, func(ctx goctx.Context, object *pool.PooledObject) error {
+			worker := object.Object.(*worker)
+			err := worker.Module.Close(worker.Context)
+			worker = nil
+			return err
+		}, func(ctx goctx.Context, object *pool.PooledObject) bool {
 			worker := object.Object.(*worker)
 			// @todo: how do to alive check?
 			// @todo: do we need to do an alive check?
@@ -296,13 +301,10 @@ func (i *pdfiumInstance) Kill() (err error) {
 		}
 	}()
 
-	defer func() {
-		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
-		i.worker = nil
-		delete(i.pool.instanceRefs, i.instanceRef)
-		i.pool = nil
-		i.closed = true
-	}()
+	delete(i.pool.instanceRefs, i.instanceRef)
+	i.pool = nil
+	i.closed = true
 
-	return i.worker.Module.CloseWithExitCode(i.worker.Context, 137)
+	// Invalidate will close the module.
+	return i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
 }
