@@ -138,6 +138,15 @@ func Init(config Config) pdfium.Pool {
 		}, func(ctx goctx.Context, object *pool.PooledObject) error {
 			worker := object.Object.(*worker)
 			err := worker.Module.Close(worker.Context)
+			if err != nil {
+				return err
+			}
+
+			err = worker.Runtime.Close(worker.Context)
+			if err != nil {
+				return err
+			}
+
 			worker = nil
 			return err
 		}, func(ctx goctx.Context, object *pool.PooledObject) bool {
