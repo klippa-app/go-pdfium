@@ -86,6 +86,10 @@ func main() {
 			Source: "code_generation/templates/grpc.go.tmpl",
 			Target: "internal/commons/generated.go",
 		},
+		{
+			Source: "code_generation/templates/webassembly.go.tmpl",
+			Target: "webassembly/generated.go",
+		},
 	}
 	for i := range templates {
 		err := generateFromTemplate(templates[i], data)
@@ -109,6 +113,8 @@ func generateFromTemplate(codeTemplate Template, data GenerateData) error {
 	if err != nil {
 		return err
 	}
+
+	defer f.Close()
 
 	err = t.Execute(f, data)
 	if err != nil {

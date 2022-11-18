@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/internal/implementation"
+	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 	"sync"
 	"time"
 )
@@ -28,7 +28,7 @@ func Init(config Config) pdfium.Pool {
 	defer singleThreadedMutex.Unlock()
 
 	// Init the PDFium library.
-	implementation.InitLibrary(config.LibraryConfig)
+	implementation_cgo.InitLibrary(config.LibraryConfig)
 
 	poolRef := uuid.New()
 
@@ -60,7 +60,7 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 	}
 
 	newInstance := &pdfiumInstance{
-		pdfium: implementation.Pdfium.GetInstance(),
+		pdfium: implementation_cgo.Pdfium.GetInstance(),
 		lock:   &sync.Mutex{},
 		pool:   p,
 	}
@@ -96,7 +96,7 @@ func (p *pdfiumPool) Close() (err error) {
 
 	// Unload library if this was the last pool.
 	if len(poolRefs) == 0 {
-		implementation.DestroyLibrary()
+		implementation_cgo.DestroyLibrary()
 	}
 
 	singleThreadedMutex.Unlock()
@@ -105,7 +105,7 @@ func (p *pdfiumPool) Close() (err error) {
 }
 
 type pdfiumInstance struct {
-	pdfium      *implementation.PdfiumImplementation
+	pdfium      *implementation_cgo.PdfiumImplementation
 	instanceRef string
 	closed      bool
 	pool        *pdfiumPool
