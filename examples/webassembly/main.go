@@ -38,6 +38,16 @@ func main() {
 	}
 
 	log.Printf("The PDF %s has %d page(s)", filePath, pageCount)
+
+	err = instance.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = pool.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getPageCount(filePath string) (int, error) {

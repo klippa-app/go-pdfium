@@ -85,34 +85,34 @@ func Init(config Config) pdfium.Pool {
 				config.RandomSource = rand.Reader
 			}
 
-			newWorker := &worker{}
-
-			ctx := context.Background()
+			newWorker := &worker{
+				Context: context.Background(),
+			}
 
 			// @todo: can we reuse the runtime/compiled module for multiple instances?
 			// Create a new WebAssembly Runtime.
-			r := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfig())
+			r := wazero.NewRuntimeWithConfig(newWorker.Context, wazero.NewRuntimeConfig())
 
 			newWorker.Runtime = r
 
 			// Import WASI features.
-			if _, err := wasi_snapshot_preview1.Instantiate(ctx, r); err != nil {
+			if _, err := wasi_snapshot_preview1.Instantiate(newWorker.Context, r); err != nil {
 				return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
 			}
 
 			// Add missing emscripten and syscalls.
-			if _, err := imports.Instantiate(ctx, r); err != nil {
+			if _, err := imports.Instantiate(newWorker.Context, r); err != nil {
 				return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 			}
 
-			compiled, err := r.CompileModule(ctx, pdfiumWasm)
+			compiled, err := r.CompileModule(newWorker.Context, pdfiumWasm)
 			if err != nil {
 				return nil, fmt.Errorf("could not compile webassembly module: %w", err)
 			}
 
 			newWorker.CompiledModule = compiled
 
-			mod, err := r.InstantiateModule(ctx, compiled, wazero.NewModuleConfig().WithStartFunctions("_initialize").WithStdout(config.Stdout).WithStderr(config.Stderr).WithRandSource(config.RandomSource).WithFS(config.FS))
+			mod, err := r.InstantiateModule(newWorker.Context, compiled, wazero.NewModuleConfig().WithStartFunctions("_initialize").WithStdout(config.Stdout).WithStderr(config.Stderr).WithRandSource(config.RandomSource).WithFS(config.FS))
 			if err != nil {
 				return nil, fmt.Errorf("could not instantiate webassembly module: %w", err)
 			}
@@ -127,7 +127,7 @@ func Init(config Config) pdfium.Pool {
 				"free":   free,
 			}
 
-			_, err = mod.ExportedFunction("FPDF_InitLibrary").Call(ctx)
+			_, err = mod.ExportedFunction("FPDF_InitLibrary").Call(newWorker.Context)
 			if err != nil {
 				return nil, fmt.Errorf("could not call FPDF_InitLibrary: %w", err)
 			}
@@ -232,7 +232,6 @@ func (p *pdfiumPool) Close() (err error) {
 
 	// Close all instances
 	for i := range p.instanceRefs {
-		p.instanceRefs[i].worker.Module.Close(p.instanceRefs[i].worker.Context)
 		p.instanceRefs[i].worker = nil
 		p.instanceRefs[i].pool = nil
 		p.instanceRefs[i].closed = true
@@ -244,7 +243,7 @@ func (p *pdfiumPool) Close() (err error) {
 	delete(poolRefs, p.poolRef)
 	multiThreadedMutex.Unlock()
 
-	// Close the underlying pool.
+	// Close the underlying pool and destroy workers.
 	p.workerPool.Close(goctx.Background())
 
 	return nil
