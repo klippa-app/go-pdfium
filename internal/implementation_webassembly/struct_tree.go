@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (p *PdfiumImplementation) registerStructTree(structTree *int64, documentHandle *DocumentHandle) *StructTreeHandle {
+func (p *PdfiumImplementation) registerStructTree(structTree *uint64, documentHandle *DocumentHandle) *StructTreeHandle {
 	ref := uuid.New()
 	handle := &StructTreeHandle{
 		handle:      structTree,
@@ -20,7 +20,7 @@ func (p *PdfiumImplementation) registerStructTree(structTree *int64, documentHan
 	return handle
 }
 
-func (p *PdfiumImplementation) registerStructElement(structElement *int64, documentHandle *DocumentHandle) *StructElementHandle {
+func (p *PdfiumImplementation) registerStructElement(structElement *uint64, documentHandle *DocumentHandle) *StructElementHandle {
 	ref := uuid.New()
 	handle := &StructElementHandle{
 		handle:    structElement,

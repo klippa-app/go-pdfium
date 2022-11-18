@@ -1,28 +1,26 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"context"
 	"errors"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
 	"io"
 	"sync"
 	"unsafe"
 
+	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/google/uuid"
+	"github.com/tetratelabs/wazero"
+	"github.com/tetratelabs/wazero/api"
 )
 
 type fileReaderRef struct {
-	reader    io.ReadSeeker
-	stringRef unsafe.Pointer
-	//fileAccess *C.FPDF_FILEACCESS
-	// @todo: implement C.FPDF_FILEACCESS
-	fileAccess *int64
+	reader     io.ReadSeeker
+	stringRef  unsafe.Pointer
+	fileAccess *uint64
 }
 
 func GetInstance(ctx context.Context, runtime wazero.Runtime, functions map[string]api.Function, compiledModule wazero.CompiledModule, module api.Module) *PdfiumImplementation {
@@ -61,7 +59,7 @@ func GetInstance(ctx context.Context, runtime wazero.Runtime, functions map[stri
 		pageObjectMarkRefs:         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 		fontRefs:                   map[references.FPDF_FONT]*FontHandle{},
 		glyphPathRefs:              map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
-		fileReaders:                map[string]*fileReaderRef{},
+		fileReaders:                map[uint64]*fileReaderRef{},
 	}
 
 	return newInstance
@@ -107,7 +105,7 @@ type PdfiumImplementation struct {
 	pageObjectMarkRefs         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 	fontRefs                   map[references.FPDF_FONT]*FontHandle
 	glyphPathRefs              map[references.FPDF_GLYPHPATH]*GlyphPathHandle
-	fileReaders                map[string]*fileReaderRef
+	fileReaders                map[uint64]*fileReaderRef
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -125,15 +123,34 @@ func (p *PdfiumImplementation) Unlock() {
 	p.mutex.Unlock()
 }
 
+func (p *PdfiumImplementation) CString(input string) (pointer *uint64, free func(), err error) {
+	inputLength := uint64(len(input)) + 1
+
+	results, err := p.functions["malloc"].Call(p.context, inputLength)
+	if err != nil {
+		return nil, nil, err
+	}
+	pointer = &results[0]
+	free = func() {
+		p.functions["free"].Call(p.context, *pointer, inputLength)
+	}
+
+	return pointer, free, nil
+}
+
 func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()
 
-	//var cPassword *int64
+	var cPassword uint64
 	if request.Password != nil {
-		// @todo: implement password.
-		//cPassword = C.CString(*request.Password)
-		//defer C.free(unsafe.Pointer(cPassword))
+		cPasswordPointer, cPasswordPointerFree, err := p.CString(*request.Password)
+		if err != nil {
+			return nil, err
+		}
+
+		defer cPasswordPointerFree()
+		cPassword = *cPasswordPointer
 	}
 
 	nativeDoc := &DocumentHandle{
@@ -153,36 +170,57 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
 	}
 
-	var doc *int64
+	var doc *uint64
+	var dataPointer *uint64
 	if request.File != nil {
 		fileData := *request.File
 
+		results, err := p.functions["malloc"].Call(p.context, uint64(len(fileData)))
+		if err != nil {
+			return nil, err
+		}
+		dataPtr := results[0]
+
+		dataPointer = &dataPtr
+
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			// @todo: FPDF_LoadMemDocument64
-			/*
-				doc = C.FPDF_LoadMemDocument64(
-					unsafe.Pointer(&(fileData[0])),
-					C.size_t(len(fileData)),
-					cPassword)
-			*/
+			if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
+				return nil, err
+			}
+
+			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.context, dataPtr, uint64(len(fileData)), cPassword)
+			if err != nil {
+				return nil, err
+			}
+
+			doc = &res[0]
 		} else {
-			// @todo: FPDF_LoadMemDocument
-			/*
-				doc = C.FPDF_LoadMemDocument(
-					unsafe.Pointer(&(fileData[0])),
-					C.int(len(fileData)),
-					cPassword)*/
+			if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
+				return nil, err
+			}
+
+			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument").Call(p.context, dataPtr, uint64(len(fileData)), cPassword)
+			if err != nil {
+				return nil, err
+			}
+
+			doc = &res[0]
 		}
 	} else if request.FilePath != nil {
-		// @todo: FPDF_LoadDocument
-		/*
-			filePath := C.CString(*request.FilePath)
-			defer C.free(unsafe.Pointer(filePath))
-			doc = C.FPDF_LoadDocument(
-				filePath,
-				cPassword)
-		*/
+		filePathPointer, filePathPointerFree, err := p.CString(*request.FilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		defer filePathPointerFree()
+
+		res, err := p.module.ExportedFunction("FPDF_LoadDocument").Call(p.context, *filePathPointer, cPassword)
+		if err != nil {
+			return nil, err
+		}
+
+		doc = &res[0]
 	} else if request.FileReader != nil {
 		if request.FileReaderSize == 0 {
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
@@ -218,34 +256,36 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}
 
 	if doc == nil {
-		var pdfiumError error
+		errorCode, err := p.module.ExportedFunction("FPDF_GetLastError").Call(p.context)
+		if err != nil {
+			return nil, err
+		}
 
-		/* @todo: FPDF_GetLastError
-		errorCode := C.FPDF_GetLastError()
-		switch errorCode {
-		case C.FPDF_ERR_SUCCESS:
+		var pdfiumError error
+		switch FPDF_ERR(errorCode[0]) {
+		case FPDF_ERR_SUCCESS:
 			pdfiumError = pdfium_errors.ErrSuccess
-		case C.FPDF_ERR_UNKNOWN:
+		case FPDF_ERR_UNKNOWN:
 			pdfiumError = pdfium_errors.ErrUnknown
-		case C.FPDF_ERR_FILE:
+		case FPDF_ERR_FILE:
 			pdfiumError = pdfium_errors.ErrFile
-		case C.FPDF_ERR_FORMAT:
+		case FPDF_ERR_FORMAT:
 			pdfiumError = pdfium_errors.ErrFormat
-		case C.FPDF_ERR_PASSWORD:
+		case FPDF_ERR_PASSWORD:
 			pdfiumError = pdfium_errors.ErrPassword
-		case C.FPDF_ERR_SECURITY:
+		case FPDF_ERR_SECURITY:
 			pdfiumError = pdfium_errors.ErrSecurity
-		case C.FPDF_ERR_PAGE:
+		case FPDF_ERR_PAGE:
 			pdfiumError = pdfium_errors.ErrPage
 		default:
 			pdfiumError = pdfium_errors.ErrUnexpected
 		}
 
 		// Cleanup when file loading didn't work.
-		if nativeDoc.fileHandleRef != nil {
-			C.free(Pdfium.fileReaders[*nativeDoc.fileHandleRef].stringRef)
-			delete(Pdfium.fileReaders, *nativeDoc.fileHandleRef)
-		}*/
+		if nativeDoc.fileHandlePointer != nil {
+			p.functions["free"].Call(p.context, *p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
+			delete(p.fileReaders, *nativeDoc.fileHandlePointer)
+		}
 
 		return nil, pdfiumError
 	}
@@ -254,6 +294,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	nativeDoc.handle = doc
 	nativeDoc.data = request.File
 	nativeDoc.nativeRef = references.FPDF_DOCUMENT(documentRef.String())
+	nativeDoc.dataPointer = dataPointer
 	p.documentRefs[nativeDoc.nativeRef] = nativeDoc
 
 	return &responses.OpenDocument{
@@ -266,7 +307,7 @@ func (p *PdfiumImplementation) Close() error {
 	defer p.Unlock()
 
 	for i := range p.documentRefs {
-		err := p.documentRefs[i].Close()
+		err := p.documentRefs[i].Close(p)
 		if err != nil {
 			return err
 		}
@@ -384,14 +425,14 @@ func (p *PdfiumImplementation) Close() error {
 		delete(p.glyphPathRefs, i)
 	}
 
-	/*
-		for i := range p.fileReaders {
-			// Cleanup file handle.
-			Pdfium.fileReaders[i].fileAccess = nil
-			C.free(Pdfium.fileReaders[i].stringRef)
-			delete(Pdfium.fileReaders, i)
-			delete(p.fileReaders, i)
-		}*/
+	for i := range p.fileReaders {
+		p.functions["free"].Call(p.context, *p.fileReaders[i].fileAccess)
+
+		// Cleanup file handle.
+		p.fileReaders[i].fileAccess = nil
+
+		delete(p.fileReaders, i)
+	}
 
 	return nil
 }

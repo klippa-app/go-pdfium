@@ -97,24 +97,24 @@ func Init(config Config) pdfium.Pool {
 
 			// Import WASI features.
 			if _, err := wasi_snapshot_preview1.Instantiate(ctx, r); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
 			}
 
 			// Add missing emscripten and syscalls.
 			if _, err := imports.Instantiate(ctx, r); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 			}
 
 			compiled, err := r.CompileModule(ctx, pdfiumWasm)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not compile webassembly module: %w", err)
 			}
 
 			newWorker.CompiledModule = compiled
 
 			mod, err := r.InstantiateModule(ctx, compiled, wazero.NewModuleConfig().WithStartFunctions("_initialize").WithStdout(config.Stdout).WithStderr(config.Stderr).WithRandSource(config.RandomSource).WithFS(config.FS))
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not instantiate webassembly module: %w", err)
 			}
 
 			newWorker.Module = mod
@@ -129,7 +129,7 @@ func Init(config Config) pdfium.Pool {
 
 			_, err = mod.ExportedFunction("FPDF_InitLibrary").Call(ctx)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not call FPDF_InitLibrary: %w", err)
 			}
 
 			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Runtime, newWorker.Functions, newWorker.CompiledModule, newWorker.Module)

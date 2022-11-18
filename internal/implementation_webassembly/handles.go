@@ -1,6 +1,5 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"errors"
 	"unsafe"
@@ -9,11 +8,12 @@ import (
 )
 
 type DocumentHandle struct {
-	handle        *int64
-	currentPage   *PageHandle
-	data          *[]byte                  // Keep a reference to the data otherwise weird stuff happens
-	nativeRef     references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
-	fileHandleRef *string
+	handle            *uint64
+	currentPage       *PageHandle
+	data              *[]byte                  // Keep a reference to the data otherwise weird stuff happens
+	nativeRef         references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	dataPointer       *uint64
+	fileHandlePointer *uint64
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the document
@@ -59,18 +59,18 @@ func (d *DocumentHandle) getBookmarkHandle(bookmarkRef references.FPDF_BOOKMARK)
 }
 
 // Close closes the internal references in FPDF
-func (d *DocumentHandle) Close() error {
+func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 	if d.handle == nil {
 		return errors.New("no current document")
 	}
 
 	if d.currentPage != nil {
-		d.currentPage.Close()
+		d.currentPage.Close(pi)
 		d.currentPage = nil
 	}
 
 	for i := range d.pageRefs {
-		d.pageRefs[i].Close()
+		d.pageRefs[i].Close(pi)
 		delete(d.pageRefs, i)
 	}
 
@@ -127,8 +127,7 @@ func (d *DocumentHandle) Close() error {
 		delete(d.structElementRefs, i)
 	}
 
-	// @todo: close document.
-	//C.FPDF_CloseDocument(d.handle)
+	pi.module.ExportedFunction("FPDF_CloseDocument").Call(pi.context, *d.handle)
 	d.handle = nil
 
 	// Remove reference to data.
@@ -136,40 +135,45 @@ func (d *DocumentHandle) Close() error {
 		d.data = nil
 	}
 
+	// Free pointer to data.
+	if d.dataPointer != nil {
+		pi.functions["free"].Call(pi.context, *d.dataPointer)
+		d.dataPointer = nil
+	}
+
 	// Cleanup file handle.
-	if d.fileHandleRef != nil {
-		//Pdfium.fileReaders[*d.fileHandleRef].fileAccess = nil
-		//C.free(Pdfium.fileReaders[*d.fileHandleRef].stringRef)
-		//delete(Pdfium.fileReaders, *d.fileHandleRef)
+	if d.fileHandlePointer != nil {
+		pi.functions["free"].Call(pi.context, *pi.fileReaders[*d.fileHandlePointer].fileAccess)
+		pi.fileReaders[*d.fileHandlePointer].fileAccess = nil
+		delete(pi.fileReaders, *d.fileHandlePointer)
 	}
 
 	return nil
 }
 
 type PageHandle struct {
-	handle      *int64
+	handle      *uint64
 	index       int // -1 when unknown.
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 // Close closes the internal references in FPDF
-func (p *PageHandle) Close() {
+func (p *PageHandle) Close(pi *PdfiumImplementation) {
 	if p.handle != nil {
-		// @todo: close page.
-		//C.FPDF_ClosePage(p.handle)
+		pi.module.ExportedFunction("FPDF_ClosePage").Call(pi.context, *p.handle)
 		p.handle = nil
 	}
 }
 
 type BookmarkHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_BOOKMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type DestHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_DEST // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
@@ -181,51 +185,51 @@ type ActionHandle struct {
 }
 
 type LinkHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_LINK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PageLinkHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGELINK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type SchHandleHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_SCHHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type BitmapHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_BITMAP // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type TextPageHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_TEXTPAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PageRangeHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGERANGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PageObjectHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_PAGEOBJECT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type ClipPathHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_CLIPPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type FormHandleHandle struct {
-	handle           *int64
+	handle           *uint64
 	documentRef      references.FPDF_DOCUMENT
 	nativeRef        references.FPDF_FORMHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 	formInfo         unsafe.Pointer
@@ -234,67 +238,67 @@ type FormHandleHandle struct {
 }
 
 type AnnotationHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_ANNOTATION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type XObjectHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_XOBJECT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type SignatureHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_SIGNATURE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type AttachmentHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_ATTACHMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type JavaScriptActionHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_JAVASCRIPT_ACTION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type SearchHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_SCHHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PathSegmentHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_PATHSEGMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type StructTreeHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_STRUCTTREE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type StructElementHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_STRUCTELEMENT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type PageObjectMarkHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_PAGEOBJECTMARK // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type FontHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_FONT // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
 type GlyphPathHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_GLYPHPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
