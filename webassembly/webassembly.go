@@ -91,7 +91,7 @@ func Init(config Config) pdfium.Pool {
 
 			// @todo: can we reuse the runtime/compiled module for multiple instances?
 			// Create a new WebAssembly Runtime.
-			r := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfigCompiler())
+			r := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfig())
 
 			newWorker.Runtime = r
 
