@@ -5,6 +5,7 @@ import (
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"unsafe"
 )
 
 // FPDF_LoadDocument opens and load a PDF document from a file path.
@@ -301,8 +302,7 @@ func (p *PdfiumImplementation) FPDF_GetSecurityHandlerRevision(request *requests
 		return nil, err
 	}
 
-	// @todo: fix me, what if we get return -1? Rolls over to 4294967295 because of uint64.
-	securityHandlerRevision := res[0]
+	securityHandlerRevision := *(*int32)(unsafe.Pointer(&res[0]))
 
 	return &responses.FPDF_GetSecurityHandlerRevision{
 		SecurityHandlerRevision: int(securityHandlerRevision),

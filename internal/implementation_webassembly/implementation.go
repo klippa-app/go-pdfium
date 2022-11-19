@@ -149,7 +149,7 @@ func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	return &CString{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer, inputLength)
+			p.functions["free"].Call(p.context, pointer)
 		},
 	}, nil
 }
@@ -170,7 +170,7 @@ func (p *PdfiumImplementation) IntPointer() (*IntPointer, error) {
 	return &IntPointer{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer, 4)
+			p.functions["free"].Call(p.context, pointer)
 		},
 		Value: func() (int, error) {
 			b, _ := p.module.Memory().Read(p.context, uint32(pointer), uint32(4))
