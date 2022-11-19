@@ -1,9 +1,13 @@
 package implementation_webassembly
 
 import (
+	"bytes"
 	"context"
+	"encoding/binary"
 	"errors"
 	"io"
+	"path/filepath"
+	"strings"
 	"sync"
 	"unsafe"
 
@@ -123,34 +127,81 @@ func (p *PdfiumImplementation) Unlock() {
 	p.mutex.Unlock()
 }
 
-func (p *PdfiumImplementation) CString(input string) (pointer *uint64, free func(), err error) {
+type CString struct {
+	Pointer uint64
+	Free    func()
+}
+
+func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	inputLength := uint64(len(input)) + 1
 
 	results, err := p.functions["malloc"].Call(p.context, inputLength)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	pointer = &results[0]
-	free = func() {
-		p.functions["free"].Call(p.context, *pointer, inputLength)
+	pointer := results[0]
+
+	// Write string + null terminator.
+	if !p.module.Memory().Write(p.context, uint32(pointer), append([]byte(input), byte(0))) {
+		return nil, errors.New("could not write CString data")
 	}
 
-	return pointer, free, nil
+	return &CString{
+		Pointer: pointer,
+		Free: func() {
+			p.functions["free"].Call(p.context, pointer, inputLength)
+		},
+	}, nil
+}
+
+type IntPointer struct {
+	Pointer uint64
+	Free    func()
+	Value   func() (int, error)
+}
+
+func (p *PdfiumImplementation) IntPointer() (*IntPointer, error) {
+	results, err := p.functions["malloc"].Call(p.context, 4)
+	if err != nil {
+		return nil, err
+	}
+	pointer := results[0]
+
+	return &IntPointer{
+		Pointer: pointer,
+		Free: func() {
+			p.functions["free"].Call(p.context, pointer, 4)
+		},
+		Value: func() (int, error) {
+			b, _ := p.module.Memory().Read(p.context, uint32(pointer), uint32(4))
+			if err != nil {
+				return 0, err
+			}
+
+			var myInt int32
+			err := binary.Read(bytes.NewBuffer(b), binary.LittleEndian, &myInt)
+			if err != nil {
+				return 0, err
+			}
+
+			return int(myInt), nil
+		},
+	}, nil
 }
 
 func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()
 
-	var cPassword uint64
+	var cPasswordPointer uint64
 	if request.Password != nil {
-		cPasswordPointer, cPasswordPointerFree, err := p.CString(*request.Password)
+		cPassword, err := p.CString(*request.Password)
 		if err != nil {
 			return nil, err
 		}
 
-		defer cPasswordPointerFree()
-		cPassword = *cPasswordPointer
+		defer cPassword.Free()
+		cPasswordPointer = cPassword.Pointer
 	}
 
 	nativeDoc := &DocumentHandle{
@@ -183,24 +234,20 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		dataPointer = &dataPtr
 
+		if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
+			return nil, err
+		}
+
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
-				return nil, err
-			}
-
-			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.context, dataPtr, uint64(len(fileData)), cPassword)
+			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
 
 			doc = &res[0]
 		} else {
-			if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
-				return nil, err
-			}
-
-			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument").Call(p.context, dataPtr, uint64(len(fileData)), cPassword)
+			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument").Call(p.context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -208,14 +255,27 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			doc = &res[0]
 		}
 	} else if request.FilePath != nil {
-		filePathPointer, filePathPointerFree, err := p.CString(*request.FilePath)
+		filePath := *request.FilePath
+
+		// Non-root file, try to absolute it to current working directory.
+		// Relative paths are not supported within Webassembly.
+		if !strings.HasPrefix(filePath, "/") {
+			abs, err := filepath.Abs(filePath)
+			if err != nil {
+				return nil, err
+			}
+
+			filePath = abs
+		}
+
+		cFilePathPointer, err := p.CString(filePath)
 		if err != nil {
 			return nil, err
 		}
 
-		defer filePathPointerFree()
+		defer cFilePathPointer.Free()
 
-		res, err := p.module.ExportedFunction("FPDF_LoadDocument").Call(p.context, *filePathPointer, cPassword)
+		res, err := p.module.ExportedFunction("FPDF_LoadDocument").Call(p.context, cFilePathPointer.Pointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
