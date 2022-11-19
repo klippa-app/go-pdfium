@@ -584,7 +584,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetWidth(request *requests.FPDFBitmap_
 		return nil, err
 	}
 
-	width := C.FPDFBitmap_GetHeight(bitmapHandle.handle)
+	width := C.FPDFBitmap_GetWidth(bitmapHandle.handle)
 	return &responses.FPDFBitmap_GetWidth{
 		Width: int(width),
 	}, nil
