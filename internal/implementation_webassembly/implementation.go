@@ -240,14 +240,20 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 				return nil, err
 			}
 
-			doc = &res[0]
+			// Pointer 0 = document could not be opened.
+			if res[0] != 0 {
+				doc = &res[0]
+			}
 		} else {
 			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument").Call(p.context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
 
-			doc = &res[0]
+			// Pointer 0 = document could not be opened.
+			if res[0] != 0 {
+				doc = &res[0]
+			}
 		}
 	} else if request.FilePath != nil {
 		filePath := *request.FilePath
@@ -275,11 +281,16 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, err
 		}
 
-		doc = &res[0]
+		// Pointer 0 = document could not be opened.
+		if res[0] != 0 {
+			doc = &res[0]
+		}
 	} else if request.FileReader != nil {
 		if request.FileReaderSize == 0 {
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
+
+		return nil, pdfium_errors.ErrUnsupportedOnWebassembly
 
 		// @todo: FPDF_LoadCustomDocument
 		/*
