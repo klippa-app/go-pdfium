@@ -173,9 +173,9 @@ func (p *PdfiumImplementation) IntPointer() (*IntPointer, error) {
 			p.functions["free"].Call(p.context, pointer)
 		},
 		Value: func() (int, error) {
-			b, _ := p.module.Memory().Read(p.context, uint32(pointer), uint32(4))
-			if err != nil {
-				return 0, err
+			b, success := p.module.Memory().Read(p.context, uint32(pointer), uint32(4))
+			if !success {
+				return 0, errors.New("could not read int data from memory")
 			}
 
 			var myInt int32
@@ -235,7 +235,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		dataPointer = &dataPtr
 
 		if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
-			return nil, err
+			return nil, errors.New("could not write file data to memory")
 		}
 
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
