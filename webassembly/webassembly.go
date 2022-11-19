@@ -63,6 +63,27 @@ var multiThreadedMutex = &sync.Mutex{}
 // allow it. If the pool has been exhausted. It will wait until a worker becomes
 // available. So it's important that you close instances when you're done with them.
 func Init(config Config) (pdfium.Pool, error) {
+	// Set config defaults.
+	if config.WASM == nil {
+		config.WASM = pdfiumWasm
+	}
+
+	if config.FS == nil {
+		config.FS = os.DirFS("")
+	}
+
+	if config.Stderr == nil {
+		config.Stderr = os.Stderr
+	}
+
+	if config.Stdout == nil {
+		config.Stdout = os.Stdout
+	}
+
+	if config.RandomSource == nil {
+		config.RandomSource = rand.Reader
+	}
+
 	poolContext := context.Background()
 	runtime := wazero.NewRuntimeWithConfig(poolContext, wazero.NewRuntimeConfig())
 
@@ -78,7 +99,7 @@ func Init(config Config) (pdfium.Pool, error) {
 		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 	}
 
-	compiledModule, err := runtime.CompileModule(poolContext, pdfiumWasm)
+	compiledModule, err := runtime.CompileModule(poolContext, config.WASM)
 	if err != nil {
 		runtime.Close(poolContext)
 		return nil, fmt.Errorf("could not compile webassembly module: %w", err)
@@ -86,26 +107,6 @@ func Init(config Config) (pdfium.Pool, error) {
 
 	factory := pool.NewPooledObjectFactory(
 		func(goctx.Context) (interface{}, error) {
-			if config.WASM == nil {
-				config.WASM = pdfiumWasm
-			}
-
-			if config.FS == nil {
-				config.FS = os.DirFS("")
-			}
-
-			if config.Stderr == nil {
-				config.Stderr = os.Stderr
-			}
-
-			if config.Stdout == nil {
-				config.Stdout = os.Stdout
-			}
-
-			if config.RandomSource == nil {
-				config.RandomSource = rand.Reader
-			}
-
 			newWorker := &worker{
 				Context: poolContext,
 			}
