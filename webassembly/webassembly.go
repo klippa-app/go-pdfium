@@ -28,12 +28,10 @@ import (
 var pdfiumWasm []byte
 
 type worker struct {
-	Context        context.Context
-	Runtime        wazero.Runtime
-	Functions      map[string]api.Function
-	CompiledModule wazero.CompiledModule
-	Module         api.Module
-	Instance       *implementation_webassembly.PdfiumImplementation
+	Context   context.Context
+	Functions map[string]api.Function
+	Module    api.Module
+	Instance  *implementation_webassembly.PdfiumImplementation
 }
 
 type Config struct {
@@ -48,11 +46,13 @@ type Config struct {
 }
 
 type pdfiumPool struct {
-	workerPool   *pool.ObjectPool
-	instanceRefs map[string]*pdfiumInstance
-	poolRef      string
-	closed       bool
-	lock         *sync.Mutex
+	runtime        wazero.Runtime
+	compiledModule wazero.CompiledModule
+	workerPool     *pool.ObjectPool
+	instanceRefs   map[string]*pdfiumInstance
+	poolRef        string
+	closed         bool
+	lock           *sync.Mutex
 }
 
 var poolRefs = map[string]*pdfiumPool{}
@@ -62,7 +62,28 @@ var multiThreadedMutex = &sync.Mutex{}
 // It will launch a new worker for every requested instance as long as the limits
 // allow it. If the pool has been exhausted. It will wait until a worker becomes
 // available. So it's important that you close instances when you're done with them.
-func Init(config Config) pdfium.Pool {
+func Init(config Config) (pdfium.Pool, error) {
+	poolContext := context.Background()
+	runtime := wazero.NewRuntimeWithConfig(poolContext, wazero.NewRuntimeConfig())
+
+	// Import WASI features.
+	if _, err := wasi_snapshot_preview1.Instantiate(poolContext, runtime); err != nil {
+		runtime.Close(poolContext)
+		return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
+	}
+
+	// Add missing emscripten and syscalls.
+	if _, err := imports.Instantiate(poolContext, runtime); err != nil {
+		runtime.Close(poolContext)
+		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
+	}
+
+	compiledModule, err := runtime.CompileModule(poolContext, pdfiumWasm)
+	if err != nil {
+		runtime.Close(poolContext)
+		return nil, fmt.Errorf("could not compile webassembly module: %w", err)
+	}
+
 	factory := pool.NewPooledObjectFactory(
 		func(goctx.Context) (interface{}, error) {
 			if config.WASM == nil {
@@ -86,33 +107,17 @@ func Init(config Config) pdfium.Pool {
 			}
 
 			newWorker := &worker{
-				Context: context.Background(),
+				Context: poolContext,
 			}
 
-			// @todo: can we reuse the runtime/compiled module for multiple instances?
-			// Create a new WebAssembly Runtime.
-			r := wazero.NewRuntimeWithConfig(newWorker.Context, wazero.NewRuntimeConfig())
+			moduleConfig := wazero.NewModuleConfig().
+				WithStartFunctions("_initialize").
+				WithStdout(config.Stdout).
+				WithStderr(config.Stderr).
+				WithRandSource(config.RandomSource).
+				WithFS(config.FS)
 
-			newWorker.Runtime = r
-
-			// Import WASI features.
-			if _, err := wasi_snapshot_preview1.Instantiate(newWorker.Context, r); err != nil {
-				return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
-			}
-
-			// Add missing emscripten and syscalls.
-			if _, err := imports.Instantiate(newWorker.Context, r); err != nil {
-				return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
-			}
-
-			compiled, err := r.CompileModule(newWorker.Context, pdfiumWasm)
-			if err != nil {
-				return nil, fmt.Errorf("could not compile webassembly module: %w", err)
-			}
-
-			newWorker.CompiledModule = compiled
-
-			mod, err := r.InstantiateModule(newWorker.Context, compiled, wazero.NewModuleConfig().WithStartFunctions("_initialize").WithStdout(config.Stdout).WithStderr(config.Stderr).WithRandSource(config.RandomSource).WithFS(config.FS))
+			mod, err := runtime.InstantiateModule(newWorker.Context, compiledModule, moduleConfig)
 			if err != nil {
 				return nil, fmt.Errorf("could not instantiate webassembly module: %w", err)
 			}
@@ -132,17 +137,12 @@ func Init(config Config) pdfium.Pool {
 				return nil, fmt.Errorf("could not call FPDF_InitLibrary: %w", err)
 			}
 
-			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Runtime, newWorker.Functions, newWorker.CompiledModule, newWorker.Module)
+			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Functions, newWorker.Module)
 
 			return newWorker, nil
 		}, func(ctx goctx.Context, object *pool.PooledObject) error {
 			worker := object.Object.(*worker)
 			err := worker.Module.Close(worker.Context)
-			if err != nil {
-				return err
-			}
-
-			err = worker.Runtime.Close(worker.Context)
 			if err != nil {
 				return err
 			}
@@ -186,15 +186,17 @@ func Init(config Config) pdfium.Pool {
 
 	// Create a new PDFium pool.
 	newPool := &pdfiumPool{
-		poolRef:      poolRef.String(),
-		instanceRefs: map[string]*pdfiumInstance{},
-		lock:         &sync.Mutex{},
-		workerPool:   p,
+		runtime:        runtime,
+		compiledModule: compiledModule,
+		poolRef:        poolRef.String(),
+		instanceRefs:   map[string]*pdfiumInstance{},
+		lock:           &sync.Mutex{},
+		workerPool:     p,
 	}
 
 	poolRefs[newPool.poolRef] = newPool
 
-	return newPool
+	return newPool, nil
 }
 
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
@@ -254,6 +256,8 @@ func (p *pdfiumPool) Close() (err error) {
 
 	// Close the underlying pool and destroy workers.
 	p.workerPool.Close(goctx.Background())
+
+	p.runtime.Close(goctx.Background())
 
 	return nil
 }

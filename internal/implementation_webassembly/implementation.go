@@ -17,7 +17,6 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/google/uuid"
-	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 )
 
@@ -27,13 +26,11 @@ type fileReaderRef struct {
 	fileAccess *uint64
 }
 
-func GetInstance(ctx context.Context, runtime wazero.Runtime, functions map[string]api.Function, compiledModule wazero.CompiledModule, module api.Module) *PdfiumImplementation {
+func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		mutex:                      &sync.Mutex{},
 		context:                    ctx,
-		runtime:                    runtime,
 		functions:                  functions,
-		compiledModule:             compiledModule,
 		module:                     module,
 		documentRefs:               map[references.FPDF_DOCUMENT]*DocumentHandle{},
 		pageRefs:                   map[references.FPDF_PAGE]*PageHandle{},
@@ -71,12 +68,10 @@ func GetInstance(ctx context.Context, runtime wazero.Runtime, functions map[stri
 
 // Here is the real implementation of Pdfium
 type PdfiumImplementation struct {
-	mutex          *sync.Mutex
-	context        context.Context
-	runtime        wazero.Runtime
-	functions      map[string]api.Function
-	compiledModule wazero.CompiledModule
-	module         api.Module
+	mutex     *sync.Mutex
+	context   context.Context
+	functions map[string]api.Function
+	module    api.Module
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
