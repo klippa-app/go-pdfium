@@ -214,6 +214,8 @@ func (p *PdfiumImplementation) FPDF_GetFileVersion(request *requests.FPDF_GetFil
 		return nil, err
 	}
 
+	defer fileVersion.Free()
+
 	success, err := p.module.ExportedFunction("FPDF_GetFileVersion").Call(p.context, *documentHandle.handle, fileVersion.Pointer)
 	if err != nil {
 		return nil, err
@@ -327,4 +329,121 @@ func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageC
 	return &responses.FPDF_GetPageCount{
 		PageCount: int(res[0]),
 	}, nil
+}
+
+// FPDF_GetPageWidth returns the width of a page.
+func (p *PdfiumImplementation) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.module.ExportedFunction("FPDF_GetPageWidth").Call(p.context, *pageHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	width := *(*float64)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDF_GetPageWidth{
+		Page:  pageHandle.index,
+		Width: width,
+	}, nil
+}
+
+// FPDF_GetPageHeight returns the height of a page.
+func (p *PdfiumImplementation) FPDF_GetPageHeight(request *requests.FPDF_GetPageHeight) (*responses.FPDF_GetPageHeight, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.module.ExportedFunction("FPDF_GetPageHeight").Call(p.context, *pageHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	height := *(*float64)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDF_GetPageHeight{
+		Page:   pageHandle.index,
+		Height: height,
+	}, nil
+}
+
+// FPDF_GetPageSizeByIndex returns the size of a page by the page index.
+func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_GetPageSizeByIndex) (*responses.FPDF_GetPageSizeByIndex, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	widthPointer, err := p.DoublePointer()
+	if err != nil {
+		return nil, err
+	}
+	defer widthPointer.Free()
+
+	heightPointer, err := p.DoublePointer()
+	if err != nil {
+		return nil, err
+	}
+	defer heightPointer.Free()
+
+	res, err := p.module.ExportedFunction("FPDF_GetPageSizeByIndex").Call(p.context, *documentHandle.handle, uint64(request.Index), widthPointer.Pointer, heightPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	if int(res[0]) == 0 {
+		return nil, errors.New("could not load page size by index")
+	}
+
+	width, err := widthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	height, err := heightPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_GetPageSizeByIndex{
+		Page:   request.Index,
+		Width:  width,
+		Height: height,
+	}, nil
+}
+
+// FPDF_RenderPageBitmap renders contents of a page to a device independent bitmap.
+func (p *PdfiumImplementation) FPDF_RenderPageBitmap(request *requests.FPDF_RenderPageBitmap) (*responses.FPDF_RenderPageBitmap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.context, *bitmapHandle.handle, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.Flags))
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_RenderPageBitmap{}, nil
 }
