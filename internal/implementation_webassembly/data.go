@@ -191,10 +191,17 @@ type DoublePointer struct {
 	Value   func() (float64, error)
 }
 
-func (p *PdfiumImplementation) DoublePointer() (*DoublePointer, error) {
+func (p *PdfiumImplementation) DoublePointer(in *float64) (*DoublePointer, error) {
 	pointer, err := p.Malloc(p.CSizeDouble())
 	if err != nil {
 		return nil, err
+	}
+
+	if in != nil {
+		if !p.Module.Memory().WriteFloat64Le(p.Context, uint32(pointer), *in) {
+			p.Free(pointer)
+			return nil, errors.New("could not write float data to memory")
+		}
 	}
 
 	return &DoublePointer{

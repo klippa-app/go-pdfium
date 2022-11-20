@@ -391,13 +391,13 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 		return nil, err
 	}
 
-	widthPointer, err := p.DoublePointer()
+	widthPointer, err := p.DoublePointer(nil)
 	if err != nil {
 		return nil, err
 	}
 	defer widthPointer.Free()
 
-	heightPointer, err := p.DoublePointer()
+	heightPointer, err := p.DoublePointer(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -515,13 +515,13 @@ func (p *PdfiumImplementation) FPDF_DeviceToPage(request *requests.FPDF_DeviceTo
 		return nil, err
 	}
 
-	pageXPointer, err := p.DoublePointer()
+	pageXPointer, err := p.DoublePointer(nil)
 	if err != nil {
 		return nil, err
 	}
 	defer pageXPointer.Free()
 
-	pageYPointer, err := p.DoublePointer()
+	pageYPointer, err := p.DoublePointer(nil)
 	if err != nil {
 		return nil, err
 	}

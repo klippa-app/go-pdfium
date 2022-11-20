@@ -6,16 +6,6 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*responses.GetPageText, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTextStructured) (*responses.GetPageTextStructured, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
 func (p *PdfiumImplementation) GetMetaData(request *requests.GetMetaData) (*responses.GetMetaData, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
