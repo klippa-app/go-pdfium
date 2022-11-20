@@ -575,9 +575,7 @@ func (p *PdfiumImplementation) FPDF_PageToDevice(request *requests.FPDF_PageToDe
 	}
 	defer deviceYPointer.Free()
 
-	// @todo: Convert PageX to double
-	// Convert PageY to double
-	res, err := p.Module.ExportedFunction("FPDF_PageToDevice").Call(p.Context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.PageX), uint64(request.PageY), deviceXPointer.Pointer, deviceYPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_PageToDevice").Call(p.Context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)), deviceXPointer.Pointer, deviceYPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -976,7 +974,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIE
 		return nil, err
 	}
 
-	charData, err := charDataPointer.Value()
+	charData, err := charDataPointer.Value(false)
 	if err != nil {
 		return nil, err
 	}
@@ -1085,7 +1083,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 
 	dest := res[0]
 
-	charData, err := charDataPointer.Value()
+	charData, err := charDataPointer.Value(false)
 	if err != nil {
 		return nil, err
 	}
@@ -1146,7 +1144,7 @@ func (p *PdfiumImplementation) FPDF_GetTrailerEnds(request *requests.FPDF_GetTra
 		return nil, errors.New("could not read trailer ends")
 	}
 
-	cTrailerEndsPointer, err := p.UIntArrayPointer(uint64(trailerSize))
+	cTrailerEndsPointer, err := p.IntArrayPointer(uint64(trailerSize))
 	res, err = p.Module.ExportedFunction("FPDF_GetTrailerEnds").Call(p.Context, *documentHandle.handle, cTrailerEndsPointer.Pointer, uint64(trailerSize))
 	if err != nil {
 		return nil, err
@@ -1414,7 +1412,7 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketName(request *requests.FPDF_GetX
 		return nil, errors.New("could not get name of the XFA packet")
 	}
 
-	charData, err := charDataPointer.Value()
+	charData, err := charDataPointer.Value(false)
 	if err != nil {
 		return nil, err
 	}
@@ -1476,7 +1474,7 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_G
 		return nil, errors.New("could not get content of the XFA packet")
 	}
 
-	contentData, err := contentDataPointer.Value()
+	contentData, err := contentDataPointer.Value(true)
 	if err != nil {
 		return nil, err
 	}

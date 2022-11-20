@@ -123,7 +123,7 @@ func (p *PdfiumImplementation) UIntArrayPointer(size uint64) (*UIntArrayPointer,
 		Value: func() ([]uint, error) {
 			myInts := []uint{}
 
-			for i := 0; i < 5; i++ {
+			for i := 0; i < int(size); i++ {
 				b, success := p.Module.Memory().Read(p.Context, uint32(pointer+(uint64(i)*p.CSizeUInt())), uint32(p.CSizeUInt()))
 				if !success {
 					return nil, errors.New("could not read uint array data from memory")
@@ -134,6 +134,50 @@ func (p *PdfiumImplementation) UIntArrayPointer(size uint64) (*UIntArrayPointer,
 				if err != nil {
 					return nil, err
 				}
+
+				myInts = append(myInts, uint(myInt))
+			}
+
+			return myInts, nil
+		},
+	}, nil
+}
+
+type IntArrayPointer struct {
+	Pointer uint64
+	Size    uint64
+	Free    func()
+	Value   func() ([]int, error)
+}
+
+func (p *PdfiumImplementation) IntArrayPointer(size uint64) (*IntArrayPointer, error) {
+	pointer, err := p.Malloc(p.CSizeInt() * size)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IntArrayPointer{
+		Pointer: pointer,
+		Size:    size,
+		Free: func() {
+			p.Free(pointer)
+		},
+		Value: func() ([]int, error) {
+			myInts := []int{}
+
+			for i := 0; i < int(size); i++ {
+				b, success := p.Module.Memory().Read(p.Context, uint32(pointer+(uint64(i)*p.CSizeInt())), uint32(p.CSizeInt()))
+				if !success {
+					return nil, errors.New("could not read uint array data from memory")
+				}
+
+				var myInt int32
+				err := binary.Read(bytes.NewBuffer(b), binary.LittleEndian, &myInt)
+				if err != nil {
+					return nil, err
+				}
+
+				myInts = append(myInts, int(myInt))
 			}
 
 			return myInts, nil
@@ -172,7 +216,7 @@ func (p *PdfiumImplementation) DoublePointer() (*DoublePointer, error) {
 type ByteArrayPointer struct {
 	Pointer uint64
 	Free    func()
-	Value   func() ([]byte, error)
+	Value   func(copy bool) ([]byte, error)
 }
 
 func (p *PdfiumImplementation) ByteArrayPointer(size uint64) (*ByteArrayPointer, error) {
@@ -186,10 +230,16 @@ func (p *PdfiumImplementation) ByteArrayPointer(size uint64) (*ByteArrayPointer,
 		Free: func() {
 			p.Free(pointer)
 		},
-		Value: func() ([]byte, error) {
+		Value: func(copy bool) ([]byte, error) {
 			b, success := p.Module.Memory().Read(p.Context, uint32(pointer), uint32(size))
 			if !success {
 				return nil, errors.New("could not read byte array data from memory")
+			}
+
+			// Make a copy if we want to use the data outside the function call.
+			if copy {
+				contentDataCopy := append([]byte{}, b...)
+				return contentDataCopy, nil
 			}
 
 			return b, nil
@@ -330,27 +380,27 @@ func (p *PdfiumImplementation) CStructFS_MATRIX(in *structs.FPDF_FS_MATRIX) (uin
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.B) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)), in.B) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.C) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*2)), in.C) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.D) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*3)), in.D) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.E) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*4)), in.E) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.F) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*5)), in.F) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
@@ -358,32 +408,32 @@ func (p *PdfiumImplementation) CStructFS_MATRIX(in *structs.FPDF_FS_MATRIX) (uin
 
 	return pointer, func() (*structs.FPDF_FS_MATRIX, error) {
 		a, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		b, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		c, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*2)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		d, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*3)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		e, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*4)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		f, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*5)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
@@ -415,17 +465,17 @@ func (p *PdfiumImplementation) CStructFS_RECTF(in *structs.FPDF_FS_RECTF) (uint6
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.Top) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)), in.Top) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.Right) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*2)), in.Right) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.Bottom) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*3)), in.Bottom) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
@@ -433,22 +483,22 @@ func (p *PdfiumImplementation) CStructFS_RECTF(in *structs.FPDF_FS_RECTF) (uint6
 
 	return pointer, func() (*structs.FPDF_FS_RECTF, error) {
 		left, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		top, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		right, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*2)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		bottom, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*3)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
@@ -478,7 +528,7 @@ func (p *PdfiumImplementation) CStructFS_SIZEF(in *structs.FPDF_FS_SIZEF) (uint6
 			return 0, nil, errors.New("could not write float data to memory")
 		}
 
-		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer), in.Height) {
+		if !p.Module.Memory().WriteFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)), in.Height) {
 			p.Free(pointer)
 			return 0, nil, errors.New("could not write float data to memory")
 		}
@@ -486,12 +536,12 @@ func (p *PdfiumImplementation) CStructFS_SIZEF(in *structs.FPDF_FS_SIZEF) (uint6
 
 	return pointer, func() (*structs.FPDF_FS_SIZEF, error) {
 		width, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
 		height, ok := p.Module.Memory().ReadFloat32Le(p.Context, uint32(pointer+(p.CSizeFloat()*1)))
-		if ok {
+		if !ok {
 			return nil, errors.New("could not read float data from memory")
 		}
 
