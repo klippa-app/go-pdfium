@@ -1,13 +1,14 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"errors"
+	"log"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-	"unsafe"
 )
 
 // FPDF_LoadDocument opens and load a PDF document from a file path.
@@ -452,9 +453,39 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap(request *requests.FPDF_Rend
 
 // FPDF_RenderPageBitmapWithMatrix renders contents of a page to a device independent bitmap.
 func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithMatrix(request *requests.FPDF_RenderPageBitmapWithMatrix) (*responses.FPDF_RenderPageBitmapWithMatrix, error) {
-	//TODO implement me
-	// @todo: how to handle structs?
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmapHandle, err := p.getBitmapHandle(request.Bitmap)
+	if err != nil {
+		return nil, err
+	}
+
+	matrix, err := p.CStructFS_MATRIX(request.Matrix)
+	if err != nil {
+		return nil, err
+	}
+
+	defer p.Free(matrix)
+
+	clipping, err := p.CStructFS_RECTF(request.Clipping)
+	if err != nil {
+		return nil, err
+	}
+
+	defer p.Free(clipping)
+
+	_, err = p.Module.ExportedFunction("FPDF_RenderPageBitmapWithMatrix").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, matrix, clipping, uint64(request.Flags))
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_RenderPageBitmapWithMatrix{}, nil
 }
 
 // FPDF_DeviceToPage converts the screen coordinates of a point to page coordinates.
@@ -984,7 +1015,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDestByName(request *requests.FPDF_Ge
 
 	defer cstr.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_CountNamedDests").Call(p.Context, *documentHandle.handle, cstr.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_GetNamedDestByName").Call(p.Context, *documentHandle.handle, cstr.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1017,23 +1048,31 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 	defer bufLenPointer.Free()
 
 	// First get the name length.
-	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.Context, *documentHandle.handle, uint64(request.Index), 0, bufLenPointer.Pointer)
+	_, err = p.Module.ExportedFunction("FPDF_GetNamedDest").Call(p.Context, *documentHandle.handle, uint64(request.Index), 0, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
 
-	bufLen := res[0]
+	bufLen, err := bufLenPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Index == 25 && bufLen > 0 {
+		log.Fatalf("Skootskoot: %d", bufLen)
+	}
+
 	if int64(bufLen) <= 0 {
 		return nil, errors.New("could not get name of named dest")
 	}
 
-	charDataPointer, err := p.ByteArrayPointer(bufLen)
+	charDataPointer, err := p.ByteArrayPointer(uint64(bufLen))
 	if err != nil {
 		return nil, err
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDF_GetNamedDest").Call(p.Context, *documentHandle.handle, uint64(request.Index), charDataPointer.Pointer, bufLenPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_GetNamedDest").Call(p.Context, *documentHandle.handle, uint64(request.Index), charDataPointer.Pointer, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

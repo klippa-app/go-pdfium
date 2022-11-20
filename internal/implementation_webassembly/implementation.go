@@ -64,6 +64,27 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 	return newInstance
 }
 
+type FunctionWrapper struct {
+	function api.Function
+	mutex    *sync.Mutex
+}
+
+// Definition implements the same method as documented on api.FunctionDefinition.
+func (f *FunctionWrapper) Definition() api.FunctionDefinition {
+	// We need to lock these because they are not thread safe.
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+	return f.function.Definition()
+}
+
+// Call implements the same method as documented on api.Function.
+func (f *FunctionWrapper) Call(ctx context.Context, params ...uint64) (ret []uint64, err error) {
+	// We need to lock these because they are not thread safe.
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+	return f.function.Call(ctx, params...)
+}
+
 // Here is the real implementation of Pdfium
 type PdfiumImplementation struct {
 	mutex *sync.Mutex
@@ -158,11 +179,10 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	if request.File != nil {
 		fileData := *request.File
 
-		results, err := p.Functions["malloc"].Call(p.Context, uint64(len(fileData)))
+		dataPtr, err := p.Malloc(uint64(len(fileData)))
 		if err != nil {
 			return nil, err
 		}
-		dataPtr := results[0]
 
 		dataPointer = &dataPtr
 
@@ -227,8 +247,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
-		return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-
 		// @todo: FPDF_LoadCustomDocument
 		/*
 			// Create a PDFium file access struct.
@@ -254,6 +272,47 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			doc = C.FPDF_LoadCustomDocument(
 				&readerStruct,
 				cPassword)*/
+
+		fileData, err := io.ReadAll(request.FileReader)
+		if err != nil {
+			return nil, err
+		}
+
+		// This is implemented without FileAccess right now so that we can
+		// continue the implementation and have "working" tests that use this.
+		dataPtr, err := p.Malloc(uint64(len(fileData)))
+		if err != nil {
+			return nil, err
+		}
+
+		dataPointer = &dataPtr
+
+		if !p.Module.Memory().Write(p.Context, uint32(dataPtr), fileData) {
+			return nil, errors.New("could not write file data to memory")
+		}
+
+		// If larger than INT_MAX, use FPDF_LoadMemDocument64
+		if len(fileData) > 2147483647 {
+			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			if err != nil {
+				return nil, err
+			}
+
+			// Pointer 0 = document could not be opened.
+			if res[0] != 0 {
+				doc = &res[0]
+			}
+		} else {
+			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			if err != nil {
+				return nil, err
+			}
+
+			// Pointer 0 = document could not be opened.
+			if res[0] != 0 {
+				doc = &res[0]
+			}
+		}
 	} else {
 		return nil, errors.New("No file given")
 	}
@@ -286,7 +345,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandlePointer != nil {
-			p.Functions["free"].Call(p.Context, *p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
+			p.Free(*p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
 			delete(p.fileReaders, *nativeDoc.fileHandlePointer)
 		}
 
@@ -429,7 +488,7 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.fileReaders {
-		p.Functions["free"].Call(p.Context, *p.fileReaders[i].fileAccess)
+		p.Free(*p.fileReaders[i].fileAccess)
 
 		// Cleanup file handle.
 		p.fileReaders[i].fileAccess = nil

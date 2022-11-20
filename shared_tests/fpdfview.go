@@ -729,17 +729,17 @@ var _ = Describe("fpdfview", func() {
 						webassemblyImplementation := PdfiumInstance.GetImplementation().(*implementation_webassembly.PdfiumImplementation)
 
 						// Request memory
-						results, err := webassemblyImplementation.Functions["malloc"].Call(webassemblyImplementation.Context, uint64(fileSize))
+						memoryPointer, err := webassemblyImplementation.Malloc(uint64(fileSize))
 						if err != nil {
 							Expect(err).To(BeNil())
 							return
 						}
-						pointer = results[0]
 
 						// Create a view of the underlying memory.
-						memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(webassemblyImplementation.Context, uint32(results[0]), uint32(fileSize))
+						memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(webassemblyImplementation.Context, uint32(memoryPointer), uint32(fileSize))
 						Expect(ok).To(BeTrue())
 						buffer = memoryBuffer
+						pointer = memoryPointer
 					}
 
 					FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
@@ -770,7 +770,7 @@ var _ = Describe("fpdfview", func() {
 						webassemblyImplementation := PdfiumInstance.GetImplementation().(*implementation_webassembly.PdfiumImplementation)
 
 						// Free memory
-						_, err := webassemblyImplementation.Functions["free"].Call(webassemblyImplementation.Context, pointer.(uint64))
+						err := webassemblyImplementation.Free(pointer.(uint64))
 						if err != nil {
 							Expect(err).To(BeNil())
 						}

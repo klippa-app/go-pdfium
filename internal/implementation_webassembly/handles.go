@@ -137,13 +137,13 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 
 	// Free pointer to data.
 	if d.dataPointer != nil {
-		pi.Functions["free"].Call(pi.Context, *d.dataPointer)
+		pi.Free(*d.dataPointer)
 		d.dataPointer = nil
 	}
 
 	// Cleanup file handle.
 	if d.fileHandlePointer != nil {
-		pi.Functions["free"].Call(pi.Context, *pi.fileReaders[*d.fileHandlePointer].fileAccess)
+		pi.Free(*pi.fileReaders[*d.fileHandlePointer].fileAccess)
 		pi.fileReaders[*d.fileHandlePointer].fileAccess = nil
 		delete(pi.fileReaders, *d.fileHandlePointer)
 	}
