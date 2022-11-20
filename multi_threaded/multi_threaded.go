@@ -295,3 +295,7 @@ func (i *pdfiumInstance) Kill() (err error) {
 	i.worker.pluginClient.Kill()
 	return
 }
+
+func (i *pdfiumInstance) GetImplementation() interface{} {
+	return i.worker.plugin
+}

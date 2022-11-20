@@ -27,9 +27,9 @@ type fileReaderRef struct {
 func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		mutex:                      &sync.Mutex{},
-		context:                    ctx,
-		functions:                  functions,
-		module:                     module,
+		Context:                    ctx,
+		Functions:                  functions,
+		Module:                     module,
 		documentRefs:               map[references.FPDF_DOCUMENT]*DocumentHandle{},
 		pageRefs:                   map[references.FPDF_PAGE]*PageHandle{},
 		bookmarkRefs:               map[references.FPDF_BOOKMARK]*BookmarkHandle{},
@@ -66,14 +66,15 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 
 // Here is the real implementation of Pdfium
 type PdfiumImplementation struct {
-	mutex     *sync.Mutex
-	context   context.Context
-	functions map[string]api.Function
-	module    api.Module
+	mutex *sync.Mutex
+
+	// Wazero items
+	Context   context.Context
+	Functions map[string]api.Function
+	Module    api.Module
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
-
 	documentRefs               map[references.FPDF_DOCUMENT]*DocumentHandle
 	pageRefs                   map[references.FPDF_PAGE]*PageHandle
 	bookmarkRefs               map[references.FPDF_BOOKMARK]*BookmarkHandle
@@ -157,7 +158,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	if request.File != nil {
 		fileData := *request.File
 
-		results, err := p.functions["malloc"].Call(p.context, uint64(len(fileData)))
+		results, err := p.Functions["malloc"].Call(p.Context, uint64(len(fileData)))
 		if err != nil {
 			return nil, err
 		}
@@ -165,13 +166,13 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		dataPointer = &dataPtr
 
-		if !p.module.Memory().Write(p.context, uint32(dataPtr), fileData) {
+		if !p.Module.Memory().Write(p.Context, uint32(dataPtr), fileData) {
 			return nil, errors.New("could not write file data to memory")
 		}
 
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -181,7 +182,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 				doc = &res[0]
 			}
 		} else {
-			res, err := p.module.ExportedFunction("FPDF_LoadMemDocument").Call(p.context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -212,7 +213,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		defer cFilePathPointer.Free()
 
-		res, err := p.module.ExportedFunction("FPDF_LoadDocument").Call(p.context, cFilePathPointer.Pointer, cPasswordPointer)
+		res, err := p.Module.ExportedFunction("FPDF_LoadDocument").Call(p.Context, cFilePathPointer.Pointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
@@ -258,7 +259,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}
 
 	if doc == nil {
-		errorCode, err := p.module.ExportedFunction("FPDF_GetLastError").Call(p.context)
+		errorCode, err := p.Module.ExportedFunction("FPDF_GetLastError").Call(p.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -285,7 +286,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandlePointer != nil {
-			p.functions["free"].Call(p.context, *p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
+			p.Functions["free"].Call(p.Context, *p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
 			delete(p.fileReaders, *nativeDoc.fileHandlePointer)
 		}
 
@@ -428,7 +429,7 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.fileReaders {
-		p.functions["free"].Call(p.context, *p.fileReaders[i].fileAccess)
+		p.Functions["free"].Call(p.Context, *p.fileReaders[i].fileAccess)
 
 		// Cleanup file handle.
 		p.fileReaders[i].fileAccess = nil

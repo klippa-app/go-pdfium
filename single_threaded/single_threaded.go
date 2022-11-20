@@ -150,3 +150,7 @@ func (i *pdfiumInstance) Close() (err error) {
 func (i *pdfiumInstance) Kill() (err error) {
 	return i.Close()
 }
+
+func (i *pdfiumInstance) GetImplementation() interface{} {
+	return i.pdfium
+}

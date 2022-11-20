@@ -43,7 +43,7 @@ func (p *PdfiumImplementation) loadPage(page requests.Page) (*PageHandle, error)
 		documentHandle.currentPage = nil
 	}
 
-	pageObject, err := p.module.ExportedFunction("FPDF_LoadPage").Call(p.context, *documentHandle.handle, uint64(page.ByIndex.Index))
+	pageObject, err := p.Module.ExportedFunction("FPDF_LoadPage").Call(p.Context, *documentHandle.handle, uint64(page.ByIndex.Index))
 	if err != nil {
 		return nil, err
 	}

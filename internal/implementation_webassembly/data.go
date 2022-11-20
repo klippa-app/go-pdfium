@@ -15,21 +15,21 @@ type CString struct {
 func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	inputLength := uint64(len(input)) + 1
 
-	results, err := p.functions["malloc"].Call(p.context, inputLength)
+	results, err := p.Functions["malloc"].Call(p.Context, inputLength)
 	if err != nil {
 		return nil, err
 	}
 	pointer := results[0]
 
 	// Write string + null terminator.
-	if !p.module.Memory().Write(p.context, uint32(pointer), append([]byte(input), byte(0))) {
+	if !p.Module.Memory().Write(p.Context, uint32(pointer), append([]byte(input), byte(0))) {
 		return nil, errors.New("could not write CString data")
 	}
 
 	return &CString{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer)
+			p.Functions["free"].Call(p.Context, pointer)
 		},
 	}, nil
 }
@@ -41,7 +41,7 @@ type IntPointer struct {
 }
 
 func (p *PdfiumImplementation) IntPointer() (*IntPointer, error) {
-	results, err := p.functions["malloc"].Call(p.context, 4)
+	results, err := p.Functions["malloc"].Call(p.Context, 4)
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +50,10 @@ func (p *PdfiumImplementation) IntPointer() (*IntPointer, error) {
 	return &IntPointer{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer)
+			p.Functions["free"].Call(p.Context, pointer)
 		},
 		Value: func() (int, error) {
-			b, success := p.module.Memory().Read(p.context, uint32(pointer), uint32(4))
+			b, success := p.Module.Memory().Read(p.Context, uint32(pointer), uint32(4))
 			if !success {
 				return 0, errors.New("could not read int data from memory")
 			}
@@ -76,7 +76,7 @@ type DoublePointer struct {
 }
 
 func (p *PdfiumImplementation) DoublePointer() (*DoublePointer, error) {
-	results, err := p.functions["malloc"].Call(p.context, 8)
+	results, err := p.Functions["malloc"].Call(p.Context, 8)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +85,10 @@ func (p *PdfiumImplementation) DoublePointer() (*DoublePointer, error) {
 	return &DoublePointer{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer)
+			p.Functions["free"].Call(p.Context, pointer)
 		},
 		Value: func() (float64, error) {
-			val, success := p.module.Memory().ReadFloat64Le(p.context, uint32(pointer))
+			val, success := p.Module.Memory().ReadFloat64Le(p.Context, uint32(pointer))
 			if !success {
 				return 0, errors.New("could not read double data from memory")
 			}
@@ -105,7 +105,7 @@ type ByteArrayPointer struct {
 }
 
 func (p *PdfiumImplementation) ByteArrayPointer(size uint64) (*ByteArrayPointer, error) {
-	results, err := p.functions["malloc"].Call(p.context, size)
+	results, err := p.Functions["malloc"].Call(p.Context, size)
 	if err != nil {
 		return nil, err
 	}
@@ -114,10 +114,10 @@ func (p *PdfiumImplementation) ByteArrayPointer(size uint64) (*ByteArrayPointer,
 	return &ByteArrayPointer{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer)
+			p.Functions["free"].Call(p.Context, pointer)
 		},
 		Value: func() ([]byte, error) {
-			b, success := p.module.Memory().Read(p.context, uint32(pointer), uint32(size))
+			b, success := p.Module.Memory().Read(p.Context, uint32(pointer), uint32(size))
 			if !success {
 				return nil, errors.New("could not read byte array data from memory")
 			}
@@ -134,7 +134,7 @@ type LongPointer struct {
 }
 
 func (p *PdfiumImplementation) LongPointer() (*LongPointer, error) {
-	results, err := p.functions["malloc"].Call(p.context, 8)
+	results, err := p.Functions["malloc"].Call(p.Context, 8)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +143,10 @@ func (p *PdfiumImplementation) LongPointer() (*LongPointer, error) {
 	return &LongPointer{
 		Pointer: pointer,
 		Free: func() {
-			p.functions["free"].Call(p.context, pointer)
+			p.Functions["free"].Call(p.Context, pointer)
 		},
 		Value: func() (int64, error) {
-			b, success := p.module.Memory().Read(p.context, uint32(pointer), uint32(8))
+			b, success := p.Module.Memory().Read(p.Context, uint32(pointer), uint32(8))
 			if !success {
 				return 0, errors.New("could not read long data from memory")
 			}

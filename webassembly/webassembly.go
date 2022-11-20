@@ -321,3 +321,7 @@ func (i *pdfiumInstance) Kill() (err error) {
 	// Invalidate will close the module.
 	return i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
 }
+
+func (i *pdfiumInstance) GetImplementation() interface{} {
+	return i.worker.Instance
+}

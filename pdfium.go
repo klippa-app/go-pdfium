@@ -54,6 +54,9 @@ type Pdfium interface {
 	// Use this when you detected that your process has hung.
 	Kill() error
 
+	// GetImplementation returns the specific runtime implementation.
+	GetImplementation() interface{}
+
 	// End instance functions.
 
 	// Start text: text helpers

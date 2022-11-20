@@ -124,7 +124,7 @@ func (p *PdfiumImplementation) FPDF_GetLastError(request *requests.FPDF_GetLastE
 	p.Lock()
 	defer p.Unlock()
 
-	errorCode, err := p.module.ExportedFunction("FPDF_GetLastError").Call(p.context)
+	errorCode, err := p.Module.ExportedFunction("FPDF_GetLastError").Call(p.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (p *PdfiumImplementation) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetS
 		enable = uint64(1)
 	}
 
-	_, err := p.module.ExportedFunction("FPDF_SetSandBoxPolicy").Call(p.context, uint64(request.Policy), enable)
+	_, err := p.Module.ExportedFunction("FPDF_SetSandBoxPolicy").Call(p.Context, uint64(request.Policy), enable)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (p *PdfiumImplementation) FPDF_LoadPage(request *requests.FPDF_LoadPage) (*
 		return nil, err
 	}
 
-	pageObject, err := p.module.ExportedFunction("FPDF_LoadPage").Call(p.context, *documentHandle.handle, uint64(request.Index))
+	pageObject, err := p.Module.ExportedFunction("FPDF_LoadPage").Call(p.Context, *documentHandle.handle, uint64(request.Index))
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func (p *PdfiumImplementation) FPDF_GetFileVersion(request *requests.FPDF_GetFil
 
 	defer fileVersion.Free()
 
-	success, err := p.module.ExportedFunction("FPDF_GetFileVersion").Call(p.context, *documentHandle.handle, fileVersion.Pointer)
+	success, err := p.Module.ExportedFunction("FPDF_GetFileVersion").Call(p.Context, *documentHandle.handle, fileVersion.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (p *PdfiumImplementation) FPDF_GetDocPermissions(request *requests.FPDF_Get
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_GetDocPermissions").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetDocPermissions").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func (p *PdfiumImplementation) FPDF_GetSecurityHandlerRevision(request *requests
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_GetSecurityHandlerRevision").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetSecurityHandlerRevision").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func (p *PdfiumImplementation) FPDF_GetPageCount(request *requests.FPDF_GetPageC
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_GetPageCount").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetPageCount").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +343,7 @@ func (p *PdfiumImplementation) FPDF_GetPageWidth(request *requests.FPDF_GetPageW
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_GetPageWidth").Call(p.context, *pageHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetPageWidth").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func (p *PdfiumImplementation) FPDF_GetPageHeight(request *requests.FPDF_GetPage
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_GetPageHeight").Call(p.context, *pageHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetPageHeight").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -401,7 +401,7 @@ func (p *PdfiumImplementation) FPDF_GetPageSizeByIndex(request *requests.FPDF_Ge
 	}
 	defer heightPointer.Free()
 
-	res, err := p.module.ExportedFunction("FPDF_GetPageSizeByIndex").Call(p.context, *documentHandle.handle, uint64(request.Index), widthPointer.Pointer, heightPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_GetPageSizeByIndex").Call(p.Context, *documentHandle.handle, uint64(request.Index), widthPointer.Pointer, heightPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -442,7 +442,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap(request *requests.FPDF_Rend
 		return nil, err
 	}
 
-	_, err = p.module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.context, *bitmapHandle.handle, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.Flags))
+	_, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.Flags))
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +495,7 @@ func (p *PdfiumImplementation) FPDF_DeviceToPage(request *requests.FPDF_DeviceTo
 	}
 	defer pageYPointer.Free()
 
-	res, err := p.module.ExportedFunction("FPDF_DeviceToPage").Call(p.context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.DeviceX), uint64(request.DeviceY), pageXPointer.Pointer, pageYPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_DeviceToPage").Call(p.Context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.DeviceX), uint64(request.DeviceY), pageXPointer.Pointer, pageYPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -543,7 +543,7 @@ func (p *PdfiumImplementation) FPDF_PageToDevice(request *requests.FPDF_PageToDe
 	}
 	defer deviceYPointer.Free()
 
-	res, err := p.module.ExportedFunction("FPDF_PageToDevice").Call(p.context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.PageX), uint64(request.PageY), deviceXPointer.Pointer, deviceYPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_PageToDevice").Call(p.Context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.PageX), uint64(request.PageY), deviceXPointer.Pointer, deviceYPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -573,7 +573,7 @@ func (p *PdfiumImplementation) FPDFBitmap_Create(request *requests.FPDFBitmap_Cr
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.module.ExportedFunction("FPDFBitmap_Create").Call(p.context, uint64(request.Width), uint64(request.Height), uint64(request.Alpha))
+	res, err := p.Module.ExportedFunction("FPDFBitmap_Create").Call(p.Context, uint64(request.Width), uint64(request.Height), uint64(request.Alpha))
 	if err != nil {
 		return nil, err
 	}
@@ -600,15 +600,15 @@ func (p *PdfiumImplementation) FPDFBitmap_Create(request *requests.FPDFBitmap_Cr
 //
 // Not supported on multi-threaded usage.
 func (p *PdfiumImplementation) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error) {
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-
 	p.Lock()
 	defer p.Unlock()
 
-	// @todo: figure out how we are going to do this.
-	// @todo: we can't use a pointer to the byte array since this would be
-	// @todo: the address in Go land, but we need the address in WASM land.
-	res, err := p.module.ExportedFunction("FPDFBitmap_CreateEx").Call(p.context, uint64(request.Width), uint64(request.Height), uint64(request.Format), 0, uint64(request.Stride))
+	pointer, ok := request.Pointer.(uint64)
+	if !ok {
+		return nil, errors.New("request.Pointer is not of type uint64")
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFBitmap_CreateEx").Call(p.Context, uint64(request.Width), uint64(request.Height), uint64(request.Format), pointer, uint64(request.Stride))
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +631,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetFormat(request *requests.FPDFBitmap
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDFBitmap_GetFormat").Call(p.context, *bitmapHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBitmap_GetFormat").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -661,7 +661,7 @@ func (p *PdfiumImplementation) FPDFBitmap_FillRect(request *requests.FPDFBitmap_
 		return nil, err
 	}
 
-	_, err = p.module.ExportedFunction("FPDFBitmap_FillRect").Call(p.context, *bitmapHandle.handle, uint64(request.Left), uint64(request.Top), uint64(request.Width), uint64(request.Height), uint64(request.Color))
+	_, err = p.Module.ExportedFunction("FPDFBitmap_FillRect").Call(p.Context, *bitmapHandle.handle, uint64(request.Left), uint64(request.Top), uint64(request.Width), uint64(request.Height), uint64(request.Color))
 	if err != nil {
 		return nil, err
 	}
@@ -688,14 +688,14 @@ func (p *PdfiumImplementation) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap
 	}
 
 	// We need to calculate the buffer size, this is stride (bytes per bitmap line) * height.
-	res, err := p.module.ExportedFunction("FPDFBitmap_GetStride").Call(p.context, *bitmapHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBitmap_GetStride").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	stride := *(*int32)(unsafe.Pointer(&res[0]))
 
-	res, err = p.module.ExportedFunction("FPDFBitmap_GetHeight").Call(p.context, *bitmapHandle.handle)
+	res, err = p.Module.ExportedFunction("FPDFBitmap_GetHeight").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -705,13 +705,13 @@ func (p *PdfiumImplementation) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap
 	size := int(stride * height)
 
 	// The pointer to the first byte of the bitmap buffer.
-	res, err = p.module.ExportedFunction("FPDFBitmap_GetBuffer").Call(p.context, *bitmapHandle.handle)
+	res, err = p.Module.ExportedFunction("FPDFBitmap_GetBuffer").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create a view of the underlying memory, not a copy.
-	data, success := p.module.Memory().Read(p.context, uint32(res[0]), uint32(size))
+	data, success := p.Module.Memory().Read(p.Context, uint32(res[0]), uint32(size))
 	if !success {
 		return nil, errors.New("could not get bitmap buffer")
 	}
@@ -731,7 +731,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetWidth(request *requests.FPDFBitmap_
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDFBitmap_GetWidth").Call(p.context, *bitmapHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBitmap_GetWidth").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -753,7 +753,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetHeight(request *requests.FPDFBitmap
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDFBitmap_GetHeight").Call(p.context, *bitmapHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBitmap_GetHeight").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -775,7 +775,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetStride(request *requests.FPDFBitmap
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDFBitmap_GetStride").Call(p.context, *bitmapHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBitmap_GetStride").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -799,7 +799,7 @@ func (p *PdfiumImplementation) FPDFBitmap_Destroy(request *requests.FPDFBitmap_D
 		return nil, err
 	}
 
-	_, err = p.module.ExportedFunction("FPDFBitmap_Destroy").Call(p.context, *bitmapHandle.handle)
+	_, err = p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, *bitmapHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -819,7 +819,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetPrintScaling(request *requests.
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetPrintScaling").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetPrintScaling").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -841,7 +841,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetNumCopies(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetNumCopies").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetNumCopies").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -862,7 +862,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetPrintPageRange(request *request
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetPrintPageRange").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetPrintPageRange").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -884,7 +884,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetDuplex(request *requests.FPDF_V
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetDuplex").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetDuplex").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -913,7 +913,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIE
 	defer cstr.Free()
 
 	// First get the metadata length.
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.context, *documentHandle.handle, cstr.Pointer, 0, 0)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.Context, *documentHandle.handle, cstr.Pointer, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -930,7 +930,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIE
 
 	defer charDataPointer.Free()
 
-	_, err = p.module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.context, *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, nameSize)
+	_, err = p.Module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.Context, *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, nameSize)
 	if err != nil {
 		return nil, err
 	}
@@ -955,7 +955,7 @@ func (p *PdfiumImplementation) FPDF_CountNamedDests(request *requests.FPDF_Count
 		return nil, err
 	}
 
-	res, err := p.module.ExportedFunction("FPDF_CountNamedDests").Call(p.context, *documentHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_CountNamedDests").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -984,7 +984,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDestByName(request *requests.FPDF_Ge
 
 	defer cstr.Free()
 
-	res, err := p.module.ExportedFunction("FPDF_CountNamedDests").Call(p.context, *documentHandle.handle, cstr.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_CountNamedDests").Call(p.Context, *documentHandle.handle, cstr.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1017,7 +1017,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 	defer bufLenPointer.Free()
 
 	// First get the name length.
-	res, err := p.module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.context, *documentHandle.handle, uint64(request.Index), 0, bufLenPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetName").Call(p.Context, *documentHandle.handle, uint64(request.Index), 0, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1033,7 +1033,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.module.ExportedFunction("FPDF_GetNamedDest").Call(p.context, *documentHandle.handle, uint64(request.Index), charDataPointer.Pointer, bufLenPointer.Pointer)
+	res, err = p.Module.ExportedFunction("FPDF_GetNamedDest").Call(p.Context, *documentHandle.handle, uint64(request.Index), charDataPointer.Pointer, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

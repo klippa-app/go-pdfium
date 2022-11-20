@@ -489,7 +489,19 @@ func (p *PdfiumImplementation) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_
 	p.Lock()
 	defer p.Unlock()
 
-	bitmap := C.FPDFBitmap_CreateEx(C.int(request.Width), C.int(request.Height), C.int(request.Format), unsafe.Pointer(&request.Buffer[0]), C.int(request.Stride))
+	var pointer unsafe.Pointer
+	if request.Buffer != nil {
+		pointer = unsafe.Pointer(&request.Buffer[0])
+	} else if request.Pointer != nil {
+		v, ok := request.Pointer.(unsafe.Pointer)
+		if !ok {
+			return nil, errors.New("request.Pointer is not of type unsafe.Pointer")
+		}
+
+		pointer = v
+	}
+
+	bitmap := C.FPDFBitmap_CreateEx(C.int(request.Width), C.int(request.Height), C.int(request.Format), pointer, C.int(request.Stride))
 	bitmapHandle := p.registerBitmap(bitmap)
 
 	return &responses.FPDFBitmap_CreateEx{

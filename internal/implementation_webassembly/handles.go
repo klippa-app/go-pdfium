@@ -127,7 +127,7 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 		delete(d.structElementRefs, i)
 	}
 
-	pi.module.ExportedFunction("FPDF_CloseDocument").Call(pi.context, *d.handle)
+	pi.Module.ExportedFunction("FPDF_CloseDocument").Call(pi.Context, *d.handle)
 	d.handle = nil
 
 	// Remove reference to data.
@@ -137,13 +137,13 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 
 	// Free pointer to data.
 	if d.dataPointer != nil {
-		pi.functions["free"].Call(pi.context, *d.dataPointer)
+		pi.Functions["free"].Call(pi.Context, *d.dataPointer)
 		d.dataPointer = nil
 	}
 
 	// Cleanup file handle.
 	if d.fileHandlePointer != nil {
-		pi.functions["free"].Call(pi.context, *pi.fileReaders[*d.fileHandlePointer].fileAccess)
+		pi.Functions["free"].Call(pi.Context, *pi.fileReaders[*d.fileHandlePointer].fileAccess)
 		pi.fileReaders[*d.fileHandlePointer].fileAccess = nil
 		delete(pi.fileReaders, *d.fileHandlePointer)
 	}
@@ -161,7 +161,7 @@ type PageHandle struct {
 // Close closes the internal references in FPDF
 func (p *PageHandle) Close(pi *PdfiumImplementation) {
 	if p.handle != nil {
-		pi.module.ExportedFunction("FPDF_ClosePage").Call(pi.context, *p.handle)
+		pi.Module.ExportedFunction("FPDF_ClosePage").Call(pi.Context, *p.handle)
 		p.handle = nil
 	}
 }
