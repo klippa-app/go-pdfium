@@ -163,21 +163,25 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			if err != nil {
 				return nil, err
 			}
+			defer leftPointer.Free()
 
 			topPointer, err := p.DoublePointer(nil)
 			if err != nil {
 				return nil, err
 			}
+			defer topPointer.Free()
 
 			rightPointer, err := p.DoublePointer(nil)
 			if err != nil {
 				return nil, err
 			}
+			defer rightPointer.Free()
 
 			bottomPointer, err := p.DoublePointer(nil)
 			if err != nil {
 				return nil, err
 			}
+			defer bottomPointer.Free()
 
 			_, err = p.Module.ExportedFunction("FPDFText_GetCharBox").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
 			if err != nil {
@@ -275,25 +279,31 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			return nil, err
 		}
 
+		defer charDataPointer.Free()
+
 		leftPointer, err := p.DoublePointer(nil)
 		if err != nil {
 			return nil, err
 		}
+		defer leftPointer.Free()
 
 		topPointer, err := p.DoublePointer(nil)
 		if err != nil {
 			return nil, err
 		}
+		defer topPointer.Free()
 
 		rightPointer, err := p.DoublePointer(nil)
 		if err != nil {
 			return nil, err
 		}
+		defer rightPointer.Free()
 
 		bottomPointer, err := p.DoublePointer(nil)
 		if err != nil {
 			return nil, err
 		}
+		defer bottomPointer.Free()
 
 		for i := 0; i < int(rectsCount); i++ {
 			_, err = p.Module.ExportedFunction("FPDFText_GetRect").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
@@ -441,6 +451,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	if err != nil {
 		return nil, err
 	}
+	defer fontFlagsPointer.Free()
 
 	// First get the length of the font name.
 	res, err = p.Module.ExportedFunction("FPDFText_GetFontInfo").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), 0, 0, fontFlagsPointer.Pointer)
@@ -455,6 +466,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 		if err != nil {
 			return nil, err
 		}
+		defer rawFontNamePointer.Free()
 
 		// Get the actual font name.
 		// For some reason, the font name is UTF-8.
