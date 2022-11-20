@@ -1,7 +1,9 @@
 package implementation_webassembly
 
+import "C"
 import (
 	"errors"
+	"github.com/klippa-app/go-pdfium/structs"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -465,14 +467,14 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithMatrix(request *requests
 		return nil, err
 	}
 
-	matrix, err := p.CStructFS_MATRIX(request.Matrix)
+	matrix, _, err := p.CStructFS_MATRIX(&request.Matrix)
 	if err != nil {
 		return nil, err
 	}
 
 	defer p.Free(matrix)
 
-	clipping, err := p.CStructFS_RECTF(request.Clipping)
+	clipping, _, err := p.CStructFS_RECTF(&request.Clipping)
 	if err != nil {
 		return nil, err
 	}
@@ -573,12 +575,15 @@ func (p *PdfiumImplementation) FPDF_PageToDevice(request *requests.FPDF_PageToDe
 	}
 	defer deviceYPointer.Free()
 
+	// @todo: Convert PageX to double
+	// Convert PageY to double
 	res, err := p.Module.ExportedFunction("FPDF_PageToDevice").Call(p.Context, *pageHandle.handle, uint64(request.StartX), uint64(request.StartY), uint64(request.SizeX), uint64(request.SizeY), uint64(request.Rotate), uint64(request.PageX), uint64(request.PageY), deviceXPointer.Pointer, deviceYPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
 
-	if int(res[0]) == 0 {
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
 		return nil, errors.New("could not calculate from page to device")
 	}
 
@@ -591,6 +596,8 @@ func (p *PdfiumImplementation) FPDF_PageToDevice(request *requests.FPDF_PageToDe
 	if err != nil {
 		return nil, err
 	}
+
+	//log.Fatal(deviceY)
 
 	return &responses.FPDF_PageToDevice{
 		DeviceX: int(deviceX),
@@ -632,6 +639,10 @@ func (p *PdfiumImplementation) FPDFBitmap_Create(request *requests.FPDFBitmap_Cr
 func (p *PdfiumImplementation) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_CreateEx) (*responses.FPDFBitmap_CreateEx, error) {
 	p.Lock()
 	defer p.Unlock()
+
+	if request.Buffer != nil {
+		return nil, errors.New("request.Buffer is not supported on the Webassembly runtime")
+	}
 
 	pointer, ok := request.Pointer.(uint64)
 	if !ok {
@@ -1089,4 +1100,409 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 		Dest: destHandle.nativeRef,
 		Name: transformedText,
 	}, nil
+}
+
+// FPDF_DocumentHasValidCrossReferenceTable returns whether the document's cross reference table is valid or not.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_DocumentHasValidCrossReferenceTable(request *requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_DocumentHasValidCrossReferenceTable").Call(p.Context, *documentHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	isValid := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDF_DocumentHasValidCrossReferenceTable{
+		DocumentHasValidCrossReferenceTable: int(isValid) == 1,
+	}, nil
+}
+
+// FPDF_GetTrailerEnds returns the byte offsets of trailer ends.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetTrailerEnds(request *requests.FPDF_GetTrailerEnds) (*responses.FPDF_GetTrailerEnds, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetTrailerEnds").Call(p.Context, *documentHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	trailerSize := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(trailerSize) == 0 {
+		return nil, errors.New("could not read trailer ends")
+	}
+
+	cTrailerEndsPointer, err := p.UIntArrayPointer(uint64(trailerSize))
+	res, err = p.Module.ExportedFunction("FPDF_GetTrailerEnds").Call(p.Context, *documentHandle.handle, cTrailerEndsPointer.Pointer, uint64(trailerSize))
+	if err != nil {
+		return nil, err
+	}
+
+	readTrailers := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(readTrailers) == 0 {
+		return nil, errors.New("could not read trailer ends")
+	}
+
+	cTrailerEndsValues, err := cTrailerEndsPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	trailerEnds := make([]int, trailerSize)
+	for i := range cTrailerEndsValues {
+		trailerEnds[i] = int(cTrailerEndsValues[i])
+	}
+
+	return &responses.FPDF_GetTrailerEnds{
+		TrailerEnds: trailerEnds,
+	}, nil
+}
+
+// FPDF_GetPageWidthF returns the page width in float32.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetPageWidthF").Call(p.Context, *pageHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	pageWidth := *(*float32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDF_GetPageWidthF{
+		PageWidth: pageWidth,
+	}, nil
+}
+
+// FPDF_GetPageHeightF returns the page height in float32.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetPageHeightF(request *requests.FPDF_GetPageHeightF) (*responses.FPDF_GetPageHeightF, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetPageHeightF").Call(p.Context, *pageHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHeight := *(*float32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDF_GetPageHeightF{
+		PageHeight: pageHeight,
+	}, nil
+}
+
+// FPDF_GetPageBoundingBox returns the bounding box of the page. This is the intersection between
+// its media box and its crop box.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetPageBoundingBox(request *requests.FPDF_GetPageBoundingBox) (*responses.FPDF_GetPageBoundingBox, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	rectPointer, rectValue, err := p.CStructFS_RECTF(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(rectPointer)
+
+	res, err := p.Module.ExportedFunction("FPDF_GetPageBoundingBox").Call(p.Context, *pageHandle.handle, rectPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page bounding box")
+	}
+
+	rect, err := rectValue()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_GetPageBoundingBox{
+		Rect: structs.FPDF_FS_RECTF{
+			Left:   rect.Left,
+			Top:    rect.Top,
+			Right:  rect.Right,
+			Bottom: rect.Bottom,
+		},
+	}, nil
+}
+
+// FPDF_GetPageSizeByIndexF returns the size of the page at the given index.
+// Prefer FPDF_GetPageSizeByIndexF(). This will be deprecated in the future.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetPageSizeByIndexF(request *requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	sizePointer, sizeValue, err := p.CStructFS_SIZEF(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer p.Free(sizePointer)
+
+	res, err := p.Module.ExportedFunction("FPDF_GetPageSizeByIndexF").Call(p.Context, *documentHandle.handle, uint64(request.Index), sizePointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page size by index")
+	}
+
+	size, err := sizeValue()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_GetPageSizeByIndexF{
+		Size: structs.FPDF_FS_SIZEF{
+			Width:  size.Width,
+			Height: size.Height,
+		},
+	}, nil
+}
+
+// FPDF_VIEWERREF_GetPrintPageRangeCount returns the number of elements in a FPDF_PAGERANGE.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_VIEWERREF_GetPrintPageRangeCount(request *requests.FPDF_VIEWERREF_GetPrintPageRangeCount) (*responses.FPDF_VIEWERREF_GetPrintPageRangeCount, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageRangeHandle, err := p.getPageRangeHandle(request.PageRange)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetPrintPageRangeCount").Call(p.Context, *pageRangeHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*uint64)(unsafe.Pointer(&res[0]))
+	return &responses.FPDF_VIEWERREF_GetPrintPageRangeCount{
+		Count: count,
+	}, nil
+}
+
+// FPDF_VIEWERREF_GetPrintPageRangeElement returns an element from a FPDF_PAGERANGE.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_VIEWERREF_GetPrintPageRangeElement(request *requests.FPDF_VIEWERREF_GetPrintPageRangeElement) (*responses.FPDF_VIEWERREF_GetPrintPageRangeElement, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageRangeHandle, err := p.getPageRangeHandle(request.PageRange)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_VIEWERREF_GetPrintPageRangeElement").Call(p.Context, *pageRangeHandle.handle, uint64(request.Index))
+	if err != nil {
+		return nil, err
+	}
+
+	value := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(value) == -1 {
+		return nil, errors.New("could not load page range element")
+	}
+
+	return &responses.FPDF_VIEWERREF_GetPrintPageRangeElement{
+		Value: int(value),
+	}, nil
+}
+
+// FPDF_GetXFAPacketCount returns the number of valid packets in the XFA entry.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetXFAPacketCount(request *requests.FPDF_GetXFAPacketCount) (*responses.FPDF_GetXFAPacketCount, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetXFAPacketCount").Call(p.Context, *documentHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(count) == -1 {
+		return nil, errors.New("error getting XFA packet count")
+	}
+
+	return &responses.FPDF_GetXFAPacketCount{
+		Count: int(count),
+	}, nil
+}
+
+// FPDF_GetXFAPacketName returns the name of a packet in the XFA array.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetXFAPacketName(request *requests.FPDF_GetXFAPacketName) (*responses.FPDF_GetXFAPacketName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetXFAPacketName").Call(p.Context, *documentHandle.handle, uint64(request.Index), 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the name length.
+	nameSize := res[0]
+	if uint64(nameSize) == 0 {
+		return nil, errors.New("could not get name of the XFA packet")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(nameSize)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	res, err = p.Module.ExportedFunction("FPDF_GetXFAPacketName").Call(p.Context, *documentHandle.handle, uint64(request.Index), charDataPointer.Pointer, nameSize)
+	if err != nil {
+		return nil, err
+	}
+
+	if uint64(res[0]) == 0 {
+		return nil, errors.New("could not get name of the XFA packet")
+	}
+
+	charData, err := charDataPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_GetXFAPacketName{
+		Index: request.Index,
+		Name:  string(charData[:len(charData)-1]),
+	}, nil
+}
+
+// FPDF_GetXFAPacketContent returns the content of a packet in the XFA array.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	outBufLenPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+
+	defer outBufLenPointer.Free()
+
+	// First get the name length.
+	res, err := p.Module.ExportedFunction("FPDF_GetXFAPacketContent").Call(p.Context, *documentHandle.handle, uint64(request.Index), 0, 0, outBufLenPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+
+	outBufLen, err := outBufLenPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	if int(success) == 0 || uint64(outBufLen) == 0 {
+		return nil, errors.New("could not get content of the XFA packet")
+	}
+
+	contentDataPointer, err := p.ByteArrayPointer(outBufLen)
+	if err != nil {
+		return nil, err
+	}
+	defer contentDataPointer.Free()
+
+	res, err = p.Module.ExportedFunction("FPDF_GetXFAPacketContent").Call(p.Context, *documentHandle.handle, uint64(request.Index), contentDataPointer.Pointer, outBufLen, outBufLenPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success = *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get content of the XFA packet")
+	}
+
+	contentData, err := contentDataPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	// Callers must check both the return value and the input |buflen| is no
+	// less than the returned |out_buflen| before using the data in |buffer|.
+	if uint64(len(contentData)) < uint64(outBufLen) {
+		return nil, errors.New("could not get content of the XFA packet")
+	}
+
+	return &responses.FPDF_GetXFAPacketContent{
+		Index:   request.Index,
+		Content: contentData,
+	}, nil
+}
+
+// FPDF_SetPrintMode sets printing mode when printing on Windows.
+// Experimental API.
+// Windows only!
+func (p *PdfiumImplementation) FPDF_SetPrintMode(request *requests.FPDF_SetPrintMode) (*responses.FPDF_SetPrintMode, error) {
+	return nil, pdfium_errors.ErrWindowsUnsupported
+}
+
+// FPDF_RenderPage renders contents of a page to a device (screen, bitmap, or printer).
+// This feature does not work on multi-threaded usage as you will need to give a device handle.
+// Windows only!
+func (p *PdfiumImplementation) FPDF_RenderPage(request *requests.FPDF_RenderPage) (*responses.FPDF_RenderPage, error) {
+	return nil, pdfium_errors.ErrWindowsUnsupported
 }

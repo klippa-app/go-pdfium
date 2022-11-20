@@ -25,6 +25,11 @@ var _ = Describe("fpdf_formfill", func() {
 			Skip("Form filling is not supported on multi-threaded usage")
 		}
 		Locker.Lock()
+
+		if TestType == "webassembly" {
+			// @todo: remove me when implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	AfterEach(func() {
@@ -32,6 +37,11 @@ var _ = Describe("fpdf_formfill", func() {
 			Skip("Form filling is not supported on multi-threaded usage")
 		}
 		Locker.Unlock()
+
+		if TestType == "webassembly" {
+			// @todo: remove me when implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	Context("no document", func() {

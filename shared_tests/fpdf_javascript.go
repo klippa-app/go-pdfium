@@ -17,10 +17,20 @@ import (
 var _ = Describe("fpdf_javascript", func() {
 	BeforeEach(func() {
 		Locker.Lock()
+
+		if TestType == "webassembly" {
+			// @todo: remove me when implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	AfterEach(func() {
 		Locker.Unlock()
+
+		if TestType == "webassembly" {
+			// @todo: remove me when implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	Context("no document is given", func() {
