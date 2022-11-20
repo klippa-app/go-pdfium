@@ -969,7 +969,7 @@ var _ = Describe("fpdfview", func() {
 				var pointer interface{}
 				width := 1000
 				height := 1500
-				stride := 4
+				stride := width * 4
 
 				BeforeEach(func() {
 					if TestType == "multi" {
@@ -981,7 +981,7 @@ var _ = Describe("fpdfview", func() {
 					}
 
 					// Size = 1000 pixels in width * 4 bytes per pixel * 1000 pixels in height
-					fileSize := (width * stride) * height
+					fileSize := stride * height
 
 					if TestType == "single" {
 						buffer = make([]byte, fileSize)

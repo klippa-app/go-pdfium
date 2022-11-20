@@ -1,9 +1,4 @@
-package implementation_cgo
-
-// #cgo pkg-config: pdfium
-// #include "fpdfview.h"
-// #include "fpdf_edit.h"
-import "C"
+package implementation_webassembly
 
 import (
 	"bytes"
@@ -32,8 +27,19 @@ func (p *PdfiumImplementation) getPageSize(page requests.Page) (int, float64, fl
 		return 0, 0, 0, err
 	}
 
-	imgWidth := C.FPDF_GetPageWidth(pageHandle.handle)
-	imgHeight := C.FPDF_GetPageHeight(pageHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDF_GetPageWidth").Call(p.Context, *pageHandle.handle)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	imgWidth := *(*float64)(unsafe.Pointer(&res[0]))
+
+	res, err = p.Module.ExportedFunction("FPDF_GetPageHeight").Call(p.Context, *pageHandle.handle)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	imgHeight := *(*float64)(unsafe.Pointer(&res[0]))
 
 	return pageHandle.index, float64(imgWidth), float64(imgHeight), nil
 }
@@ -313,11 +319,24 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		}
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
+	// We use a "fake" image here, we will replace the Pix later.
+	rect := image.Rect(0, 0, totalWidth, totalHeight)
+	img := &image.RGBA{
+		Pix:    nil,
+		Stride: 4 * rect.Dx(),
+		Rect:   rect,
+	}
 
-	// Create a device independent bitmap to the external buffer by passing a
-	// pointer to the first pixel, PDFium will do the rest.
-	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+	size := img.Stride * totalHeight
+
+	// Sadly we can't use FPDFBitmap_CreateEx here because the caller would
+	// have no way to close the underlying memory in Webassembly.
+	res, err := p.Module.ExportedFunction("FPDFBitmap_Create").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(1))
+	if err != nil {
+		return nil, err
+	}
+
+	bitmap := res[0]
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
@@ -339,9 +358,29 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		currentOffset += pages[i].Height + padding
 	}
 
+	// The pointer to the first byte of the bitmap buffer.
+	res, err = p.Module.ExportedFunction("FPDFBitmap_GetBuffer").Call(p.Context, bitmap)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a view of the underlying memory, not a copy.
+	data, success := p.Module.Memory().Read(p.Context, uint32(res[0]), uint32(size))
+	if !success {
+		return nil, errors.New("could not get bitmap buffer")
+	}
+
+	// We need to copy the data here since we will call FPDFBitmap_Destroy
+	// so original buffer becomes unavailable.
+	dataCopy := append([]byte{}, data...)
+
 	// Release bitmap resources and buffers.
-	// This does not clear the Go image pixel buffer.
-	C.FPDFBitmap_Destroy(bitmap)
+	_, err = p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, bitmap)
+	if err != nil {
+		return nil, err
+	}
+
+	img.Pix = dataCopy
 
 	return &responses.RenderPages{
 		Image:  img,
@@ -352,13 +391,18 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, bool, error) {
+func (p *PdfiumImplementation) renderPage(bitmap uint64, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, bool, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, false, err
 	}
 
-	alpha := C.FPDFPage_HasTransparency(pageHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFPage_HasTransparency").Call(p.Context, *pageHandle.handle)
+	if err != nil {
+		return 0, false, err
+	}
+
+	alpha := *(*int32)(unsafe.Pointer(&res[0]))
 
 	// White
 	fillColor := 0xFFFFFFFF
@@ -372,11 +416,18 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 	}
 
 	// Fill the page rect with the specified color.
-	C.FPDFBitmap_FillRect(bitmap, 0, C.int(offset), C.int(width), C.int(height), C.ulong(fillColor))
+	_, err = p.Module.ExportedFunction("FPDFBitmap_FillRect").Call(p.Context, bitmap, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(fillColor))
+	if err != nil {
+		return 0, false, err
+	}
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+	flags = flags | enums.FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER
+	_, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.Context, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
+	if err != nil {
+		return 0, false, err
+	}
 
 	return pageHandle.index, hasTransparency, nil
 }

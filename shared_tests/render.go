@@ -23,20 +23,10 @@ import (
 var _ = Describe("Render", func() {
 	BeforeEach(func() {
 		Locker.Lock()
-
-		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
-			Skip("This test is skipped on Webassembly")
-		}
 	})
 
 	AfterEach(func() {
 		Locker.Unlock()
-
-		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
-			Skip("This test is skipped on Webassembly")
-		}
 	})
 
 	Context("no document", func() {
@@ -2270,11 +2260,17 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
 	Expect(string(existingFileHash)).To(Equal(currentHash))
 
+	// @todo: figure out why webassembly renders have a different hash.
 	if strings.Contains(testName, "_single_") {
 		// Compare the single variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
 		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
+
+		// Compare the single variant to the webassembly variant.
+		existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_webassembly_", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingWebassemblyFileHash)).To(Equal(currentHash))
 
 		// Compare the single variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
@@ -2286,6 +2282,11 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
+		// Compare the multi variant to the webassembly variant.
+		existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_webassembly_", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingWebassemblyFileHash)).To(Equal(currentHash))
+
 		// Compare the multi variant to the internal variant.
 		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
 		Expect(err).To(BeNil())
@@ -2296,10 +2297,30 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 		Expect(err).To(BeNil())
 		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
 
+		// Compare the internal variant to the webassembly variant.
+		existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_webassembly_", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingWebassemblyFileHash)).To(Equal(currentHash))
+
 		// Compare the internal variant to the multi variant.
 		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
 		Expect(err).To(BeNil())
 		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
+	} else if strings.Contains(testName, "_webassembly_") {
+		// Compare the webassembly variant to the single variant.
+		existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "_single_", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingSingleFileHash)).To(Equal(currentHash))
+
+		// Compare the webassembly variant to the multi variant.
+		existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "_multi_", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingMultiFileHash)).To(Equal(currentHash))
+
+		// Compare the webassembly variant to the internal variant.
+		existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "internal", 1) + ".hash")
+		Expect(err).To(BeNil())
+		Expect(string(existingInternalFileHash)).To(Equal(currentHash))
 	}
 }
 
