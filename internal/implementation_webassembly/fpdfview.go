@@ -2,7 +2,6 @@ package implementation_webassembly
 
 import (
 	"errors"
-	"log"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -1056,10 +1055,6 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 	bufLen, err := bufLenPointer.Value()
 	if err != nil {
 		return nil, err
-	}
-
-	if request.Index == 25 && bufLen > 0 {
-		log.Fatalf("Skootskoot: %d", bufLen)
 	}
 
 	if int64(bufLen) <= 0 {
