@@ -4,7 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io/ioutil"
+
 	"github.com/klippa-app/go-pdfium/structs"
+
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 type CString struct {
@@ -26,6 +31,65 @@ func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	}
 
 	return &CString{
+		Pointer: pointer,
+		Free: func() {
+			p.Free(pointer)
+		},
+	}, nil
+}
+
+func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
+	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
+	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
+
+	decoded, err := ioutil.ReadAll(unicodeReader)
+	if err != nil {
+		return "", err
+	}
+
+	// Remove NULL terminator.
+	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
+
+	return string(decoded), nil
+}
+
+func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
+	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
+
+	output := &bytes.Buffer{}
+	unicodeWriter := transform.NewWriter(output, utf16bom)
+	unicodeWriter.Write([]byte(text))
+	unicodeWriter.Close()
+
+	return output.Bytes(), nil
+}
+
+type CFPDF_WIDESTRING struct {
+	Pointer uint64
+	Free    func()
+}
+
+func (p *PdfiumImplementation) CFPDF_WIDESTRING(input string) (*CFPDF_WIDESTRING, error) {
+	transformedText, err := p.transformUTF8ToUTF16LE(input)
+	if err != nil {
+		return nil, err
+	}
+
+	inputLength := uint64(len(transformedText)) + 1
+
+	pointer, err := p.Malloc(inputLength)
+	if err != nil {
+		return nil, err
+	}
+
+	// Write string + null terminator.
+	if !p.Module.Memory().Write(p.Context, uint32(pointer), append([]byte(input), byte(0))) {
+		return nil, errors.New("could not write FPDF_WIDESTRING data")
+	}
+
+	return &CFPDF_WIDESTRING{
 		Pointer: pointer,
 		Free: func() {
 			p.Free(pointer)
@@ -226,10 +290,17 @@ type ByteArrayPointer struct {
 	Value   func(copy bool) ([]byte, error)
 }
 
-func (p *PdfiumImplementation) ByteArrayPointer(size uint64) (*ByteArrayPointer, error) {
+func (p *PdfiumImplementation) ByteArrayPointer(size uint64, in []byte) (*ByteArrayPointer, error) {
 	pointer, err := p.Malloc(size)
 	if err != nil {
 		return nil, err
+	}
+
+	if in != nil {
+		if !p.Module.Memory().Write(p.Context, uint32(pointer), in) {
+			p.Free(pointer)
+			return nil, errors.New("could not write byte data to memory")
+		}
 	}
 
 	return &ByteArrayPointer{

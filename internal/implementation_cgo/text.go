@@ -121,7 +121,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			top := C.double(0)
 			right := C.double(0)
 			bottom := C.double(0)
-			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &top, &right, &bottom)
+			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &right, &bottom, &top)
 			charData := make([]byte, 4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
 			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
 

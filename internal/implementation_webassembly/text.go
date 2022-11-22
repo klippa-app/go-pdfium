@@ -3,7 +3,6 @@ package implementation_webassembly
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"math"
 	"unsafe"
 
@@ -12,8 +11,6 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/google/uuid"
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 )
 
 func (p *PdfiumImplementation) registerTextPage(attachment *uint64, documentHandle *DocumentHandle) *TextPageHandle {
@@ -68,7 +65,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	charsInPage := *(*int32)(unsafe.Pointer(&res[0]))
 
-	charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage + 1) * 2)) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
+	charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage+1)*2), nil) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
 	if err != nil {
 		return nil, err
 	}
@@ -183,12 +180,12 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			}
 			defer bottomPointer.Free()
 
-			_, err = p.Module.ExportedFunction("FPDFText_GetCharBox").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
+			_, err = p.Module.ExportedFunction("FPDFText_GetCharBox").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
 			if err != nil {
 				return nil, err
 			}
 
-			charDataPointer, err := p.ByteArrayPointer(4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
+			charDataPointer, err := p.ByteArrayPointer(4, nil) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
 			if err != nil {
 				return nil, err
 			}
@@ -274,7 +271,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		// Create a buffer that has room for all chars in this page, since
 		// we don't know the amount of chars in the section.
 		// We need to clear this every time, because we don't know how much bytes every char is.
-		charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage + 1) * 2)) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
+		charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage+1)*2), nil) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
 		if err != nil {
 			return nil, err
 		}
@@ -396,34 +393,6 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	return resp, nil
 }
 
-func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
-	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
-	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
-
-	decoded, err := ioutil.ReadAll(unicodeReader)
-	if err != nil {
-		return "", err
-	}
-
-	// Remove NULL terminator.
-	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
-
-	return string(decoded), nil
-}
-
-func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
-	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
-
-	output := &bytes.Buffer{}
-	unicodeWriter := transform.NewWriter(output, utf16bom)
-	unicodeWriter.Write([]byte(text))
-	unicodeWriter.Close()
-
-	return output.Bytes(), nil
-}
-
 func convertPointPositions(pointPositions responses.CharPosition, ratio float64) *responses.CharPosition {
 	return &responses.CharPosition{
 		Left:   math.Round(pointPositions.Left * ratio),
@@ -462,7 +431,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	fontNameLength := *(*int32)(unsafe.Pointer(&res[0]))
 	fontName := ""
 	if fontNameLength > 0 {
-		rawFontNamePointer, err := p.ByteArrayPointer(uint64(fontNameLength))
+		rawFontNamePointer, err := p.ByteArrayPointer(uint64(fontNameLength), nil)
 		if err != nil {
 			return nil, err
 		}

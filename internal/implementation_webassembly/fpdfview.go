@@ -1,15 +1,14 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/structs"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
 )
 
 // FPDF_LoadDocument opens and load a PDF document from a file path.
@@ -963,7 +962,7 @@ func (p *PdfiumImplementation) FPDF_VIEWERREF_GetName(request *requests.FPDF_VIE
 		return nil, errors.New("could not get name")
 	}
 
-	charDataPointer, err := p.ByteArrayPointer(nameSize)
+	charDataPointer, err := p.ByteArrayPointer(nameSize, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1071,7 +1070,7 @@ func (p *PdfiumImplementation) FPDF_GetNamedDest(request *requests.FPDF_GetNamed
 		return nil, errors.New("could not get name of named dest")
 	}
 
-	charDataPointer, err := p.ByteArrayPointer(uint64(bufLen))
+	charDataPointer, err := p.ByteArrayPointer(uint64(bufLen), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1398,7 +1397,7 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketName(request *requests.FPDF_GetX
 		return nil, errors.New("could not get name of the XFA packet")
 	}
 
-	charDataPointer, err := p.ByteArrayPointer(nameSize)
+	charDataPointer, err := p.ByteArrayPointer(nameSize, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1459,7 +1458,7 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_G
 		return nil, errors.New("could not get content of the XFA packet")
 	}
 
-	contentDataPointer, err := p.ByteArrayPointer(outBufLen)
+	contentDataPointer, err := p.ByteArrayPointer(outBufLen, nil)
 	if err != nil {
 		return nil, err
 	}
