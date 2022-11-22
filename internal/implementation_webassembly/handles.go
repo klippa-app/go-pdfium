@@ -179,7 +179,7 @@ type DestHandle struct {
 }
 
 type ActionHandle struct {
-	handle      *int64
+	handle      *uint64
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_ACTION // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
