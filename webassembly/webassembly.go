@@ -14,12 +14,12 @@ import (
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
-	"github.com/klippa-app/go-pdfium/webassembly/imports"
 
 	"github.com/google/uuid"
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
+	"github.com/tetratelabs/wazero/imports/emscripten"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
@@ -93,8 +93,8 @@ func Init(config Config) (pdfium.Pool, error) {
 		return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
 	}
 
-	// Add missing emscripten and syscalls.
-	if _, err := imports.Instantiate(poolContext, runtime); err != nil {
+	// Add basic Emscripten specific methods.
+	if _, err := emscripten.Instantiate(poolContext, runtime); err != nil {
 		runtime.Close(poolContext)
 		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 	}
@@ -111,12 +111,14 @@ func Init(config Config) (pdfium.Pool, error) {
 				Context: poolContext,
 			}
 
+			moduleName := uuid.New()
 			moduleConfig := wazero.NewModuleConfig().
 				WithStartFunctions("_initialize").
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
 				WithRandSource(config.RandomSource).
-				WithFS(config.FS)
+				WithFS(config.FS).
+				WithName(moduleName.String())
 
 			mod, err := runtime.InstantiateModule(newWorker.Context, compiledModule, moduleConfig)
 			if err != nil {
