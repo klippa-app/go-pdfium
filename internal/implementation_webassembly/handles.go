@@ -8,12 +8,12 @@ import (
 )
 
 type DocumentHandle struct {
-	handle            *uint64
-	currentPage       *PageHandle
-	data              *[]byte                  // Keep a reference to the data otherwise weird stuff happens
-	nativeRef         references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
-	dataPointer       *uint64
-	fileHandlePointer *uint64
+	handle        *uint64
+	currentPage   *PageHandle
+	data          *[]byte                  // Keep a reference to the data otherwise weird stuff happens
+	nativeRef     references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
+	dataPointer   *uint64
+	fileHandleRef *uint32
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the document
@@ -142,10 +142,11 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 	}
 
 	// Cleanup file handle.
-	if d.fileHandlePointer != nil {
-		pi.Free(*pi.fileReaders[*d.fileHandlePointer].fileAccess)
-		pi.fileReaders[*d.fileHandlePointer].fileAccess = nil
-		delete(pi.fileReaders, *d.fileHandlePointer)
+	if d.fileHandleRef != nil {
+		pi.Free(*pi.fileReaders[*d.fileHandleRef].FileAccess)
+		pi.fileReaders[*d.fileHandleRef].FileAccess = nil
+		delete(pi.fileReaders, *d.fileHandleRef)
+		delete(FileReaders, *d.fileHandleRef)
 	}
 
 	return nil

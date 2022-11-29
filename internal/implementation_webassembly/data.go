@@ -12,6 +12,9 @@ import (
 	"golang.org/x/text/transform"
 )
 
+var FileReaders = map[uint32]*FileReaderRef{}
+var OpenFilesCounter = uint32(0)
+
 type CString struct {
 	Pointer uint64
 	Free    func()
@@ -417,6 +420,11 @@ func (p *PdfiumImplementation) CSizeUInt() uint64 {
 }
 
 func (p *PdfiumImplementation) CSizeInt() uint64 {
+	// @todo: implement on pdfium/emscripten side?
+	return 4
+}
+
+func (p *PdfiumImplementation) CSizePointer() uint64 {
 	// @todo: implement on pdfium/emscripten side?
 	return 4
 }

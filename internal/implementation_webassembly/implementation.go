@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"unsafe"
 
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
@@ -18,10 +17,9 @@ import (
 	"github.com/tetratelabs/wazero/api"
 )
 
-type fileReaderRef struct {
-	reader     io.ReadSeeker
-	stringRef  unsafe.Pointer
-	fileAccess *uint64
+type FileReaderRef struct {
+	Reader     io.ReadSeeker
+	FileAccess *uint64
 }
 
 func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {
@@ -58,7 +56,7 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 		pageObjectMarkRefs:         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 		fontRefs:                   map[references.FPDF_FONT]*FontHandle{},
 		glyphPathRefs:              map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
-		fileReaders:                map[uint64]*fileReaderRef{},
+		fileReaders:                map[uint32]*FileReaderRef{},
 	}
 
 	return newInstance
@@ -124,7 +122,7 @@ type PdfiumImplementation struct {
 	pageObjectMarkRefs         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 	fontRefs                   map[references.FPDF_FONT]*FontHandle
 	glyphPathRefs              map[references.FPDF_GLYPHPATH]*GlyphPathHandle
-	fileReaders                map[uint64]*fileReaderRef
+	fileReaders                map[uint32]*FileReaderRef
 
 	// We need to keep track of our own instance.
 	instanceRef int
@@ -247,71 +245,41 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
-		// @todo: FPDF_LoadCustomDocument
-		/*
-			// Create a PDFium file access struct.
-			readerStruct := C.FPDF_FILEACCESS{}
-			readerStruct.m_FileLen = C.ulong(request.FileReaderSize)
+		fileReaderIndex := OpenFilesCounter
+		OpenFilesCounter++
 
-			readerRef := uuid.New()
-			readerRefString := readerRef.String()
-			cReaderRef := C.CString(readerRefString)
-
-			// Set the Go callback through cgo.
-			C.FPDF_FILEACCESS_SET_GET_BLOCK(&readerStruct, cReaderRef)
-
-			fileReaderRef := &fileReaderRef{
-				stringRef:  unsafe.Pointer(cReaderRef),
-				reader:     request.FileReader,
-				fileAccess: &readerStruct,
-			}
-
-			Pdfium.fileReaders[readerRef.String()] = fileReaderRef
-			nativeDoc.fileHandleRef = &readerRefString
-
-			doc = C.FPDF_LoadCustomDocument(
-				&readerStruct,
-				cPassword)*/
-
-		fileData, err := io.ReadAll(request.FileReader)
+		paramPointer, err := p.Malloc(4)
 		if err != nil {
 			return nil, err
 		}
 
-		// This is implemented without FileAccess right now so that we can
-		// continue the implementation and have "working" tests that use this.
-		dataPtr, err := p.Malloc(uint64(len(fileData)))
+		p.Module.Memory().WriteUint32Le(p.Context, uint32(paramPointer), fileReaderIndex)
+
+		res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(request.FileReaderSize), paramPointer)
 		if err != nil {
 			return nil, err
 		}
 
-		dataPointer = &dataPtr
+		fileAccessPointer := res[0]
 
-		if !p.Module.Memory().Write(p.Context, uint32(dataPtr), fileData) {
-			return nil, errors.New("could not write file data to memory")
+		fileReaderRef := &FileReaderRef{
+			Reader:     request.FileReader,
+			FileAccess: &fileAccessPointer,
 		}
 
-		// If larger than INT_MAX, use FPDF_LoadMemDocument64
-		if len(fileData) > 2147483647 {
-			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
-			if err != nil {
-				return nil, err
-			}
+		FileReaders[fileReaderIndex] = fileReaderRef
+		p.fileReaders[fileReaderIndex] = fileReaderRef
 
-			// Pointer 0 = document could not be opened.
-			if res[0] != 0 {
-				doc = &res[0]
-			}
-		} else {
-			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
-			if err != nil {
-				return nil, err
-			}
+		nativeDoc.fileHandleRef = &fileReaderIndex
 
-			// Pointer 0 = document could not be opened.
-			if res[0] != 0 {
-				doc = &res[0]
-			}
+		res, err = p.Module.ExportedFunction("FPDF_LoadCustomDocument").Call(p.Context, fileAccessPointer, cPasswordPointer)
+		if err != nil {
+			return nil, err
+		}
+
+		// Pointer 0 = document could not be opened.
+		if res[0] != 0 {
+			doc = &res[0]
 		}
 	} else {
 		return nil, errors.New("No file given")
@@ -344,9 +312,9 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		}
 
 		// Cleanup when file loading didn't work.
-		if nativeDoc.fileHandlePointer != nil {
-			p.Free(*p.fileReaders[*nativeDoc.fileHandlePointer].fileAccess)
-			delete(p.fileReaders, *nativeDoc.fileHandlePointer)
+		if nativeDoc.fileHandleRef != nil {
+			p.Free(*p.fileReaders[*nativeDoc.fileHandleRef].FileAccess)
+			delete(p.fileReaders, *nativeDoc.fileHandleRef)
 		}
 
 		return nil, pdfiumError
@@ -488,12 +456,13 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.fileReaders {
-		p.Free(*p.fileReaders[i].fileAccess)
+		p.Free(*p.fileReaders[i].FileAccess)
 
 		// Cleanup file handle.
-		p.fileReaders[i].fileAccess = nil
+		p.fileReaders[i].FileAccess = nil
 
 		delete(p.fileReaders, i)
+		delete(FileReaders, i)
 	}
 
 	return nil

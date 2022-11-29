@@ -14,12 +14,14 @@ import (
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
+	"github.com/klippa-app/go-pdfium/webassembly/imports"
 
 	"github.com/google/uuid"
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/emscripten"
+	"github.com/tetratelabs/wazero/experimental"
+	"github.com/tetratelabs/wazero/experimental/logging"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
@@ -84,7 +86,8 @@ func Init(config Config) (pdfium.Pool, error) {
 		config.RandomSource = rand.Reader
 	}
 
-	poolContext := context.Background()
+	poolContext := context.WithValue(context.Background(), experimental.FunctionListenerFactoryKey{}, logging.NewLoggingListenerFactory(os.Stdout))
+	poolContext = context.Background()
 	runtime := wazero.NewRuntimeWithConfig(poolContext, wazero.NewRuntimeConfig())
 
 	// Import WASI features.
@@ -94,7 +97,7 @@ func Init(config Config) (pdfium.Pool, error) {
 	}
 
 	// Add basic Emscripten specific methods.
-	if _, err := emscripten.Instantiate(poolContext, runtime); err != nil {
+	if _, err := imports.Instantiate(poolContext, runtime); err != nil {
 		runtime.Close(poolContext)
 		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 	}
