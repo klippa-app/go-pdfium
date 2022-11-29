@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io"
 	"io/ioutil"
 
 	"github.com/klippa-app/go-pdfium/structs"
@@ -12,8 +13,21 @@ import (
 	"golang.org/x/text/transform"
 )
 
+type FileReaderRef struct {
+	Reader     io.ReadSeeker
+	FileAccess *uint64
+}
+
 var FileReaders = map[uint32]*FileReaderRef{}
-var OpenFilesCounter = uint32(0)
+var FileReadersCounter = uint32(0)
+
+type FileWriterRef struct {
+	Writer    io.Writer
+	FileWrite *uint64
+}
+
+var FileWriters = map[uint32]*FileWriterRef{}
+var FileWritersCounter = uint32(0)
 
 type CString struct {
 	Pointer uint64

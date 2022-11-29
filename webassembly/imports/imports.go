@@ -40,4 +40,5 @@ type functionExporter struct{}
 // ExportFunctions implements FunctionExporter.ExportFunctions
 func (e *functionExporter) ExportFunctions(b wazero.HostModuleBuilder) {
 	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FILEACCESS_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FILEACCESS_CB")
+	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FILEWRITE_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FILEWRITE_CB")
 }

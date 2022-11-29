@@ -46,6 +46,39 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 	}
 
 	ok = mem.Write(ctx, pBufPointer, readBuffer)
+	if !ok {
+		stack[0] = uint64(0)
+		return
+	}
+
+	stack[0] = uint64(n)
+	return
+}
+
+type FPDF_FILEWRITE_CB struct {
+}
+
+func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	fileWritePointer := uint32(stack[0])
+	pDataPointer := uint32(stack[1])
+	size := uint32(stack[2])
+
+	mem := mod.Memory()
+
+	// Check if we have the file referenced in param.
+	openWriter, ok := implementation_webassembly.FileWriters[fileWritePointer]
+	if !ok {
+		stack[0] = uint64(0)
+		return
+	}
+
+	pBuf, ok := mem.Read(ctx, pDataPointer, size)
+	if !ok {
+		stack[0] = uint64(0)
+		return
+	}
+
+	n, err := openWriter.Writer.Write(pBuf)
 	if err != nil {
 		stack[0] = uint64(0)
 		return

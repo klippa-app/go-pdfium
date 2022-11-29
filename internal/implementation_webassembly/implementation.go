@@ -3,7 +3,6 @@ package implementation_webassembly
 import (
 	"context"
 	"errors"
-	"io"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -16,11 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/tetratelabs/wazero/api"
 )
-
-type FileReaderRef struct {
-	Reader     io.ReadSeeker
-	FileAccess *uint64
-}
 
 func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
@@ -245,8 +239,8 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
-		fileReaderIndex := OpenFilesCounter
-		OpenFilesCounter++
+		fileReaderIndex := FileReadersCounter
+		FileReadersCounter++
 
 		paramPointer, err := p.Malloc(4)
 		if err != nil {
