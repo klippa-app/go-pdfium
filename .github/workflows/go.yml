@@ -69,26 +69,18 @@ jobs:
         with:
           platform: x64
       - name: Test all packages (Windows)
-        shell: bash
         if: matrix.os == 'windows-latest'
         run: |
-          echo $PKG_CONFIG_PATH
-          echo $PATH
-          export PKG_CONFIG_PATH="/d/opt/pkgconfig"
-          export PATH="$PATH:/d/opt/pdfium/bin"
-          echo $PKG_CONFIG_PATH
-          echo $PATH
+          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
+          $env:Path += ";D:\opt\pdfium\bin"
           go test -timeout 30m `go list ./... | grep -v webassembly` -v
       - name: Test all packages (Windows) - Experimental
-        shell: bash
         if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
-          echo $PKG_CONFIG_PATH
-          echo $PATH
-          export PKG_CONFIG_PATH="/d/opt/pkgconfig"
-          export PATH="$PATH:/d/opt/pdfium/bin"
-          export IS_EXPERIMENTAL="1"
-          go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -v
+          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
+          $env:Path += ";D:\opt\pdfium\bin"
+          $env:IS_EXPERIMENTAL = '1'
+          go test -timeout 30m "$(go list ./... | grep -v webassembly)" -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
