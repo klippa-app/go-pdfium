@@ -72,13 +72,19 @@ jobs:
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
+          echo $PKG_CONFIG_PATH
+          echo $PATH
           export PKG_CONFIG_PATH="/d/opt/pkgconfig"
           export PATH="$PATH:/d/opt/pdfium/bin"
+          echo $PKG_CONFIG_PATH
+          echo $PATH
           go test -timeout 30m `go list ./... | grep -v webassembly` -v
       - name: Test all packages (Windows) - Experimental
         shell: bash
         if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
+          echo $PKG_CONFIG_PATH
+          echo $PATH
           export PKG_CONFIG_PATH="/d/opt/pkgconfig"
           export PATH="$PATH:/d/opt/pdfium/bin"
           export IS_EXPERIMENTAL="1"
