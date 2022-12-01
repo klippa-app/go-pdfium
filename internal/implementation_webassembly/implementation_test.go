@@ -16,14 +16,19 @@ var _ = BeforeSuite(func() {
 	err := os.Setenv("TZ", "UTC")
 	Expect(err).To(BeNil())
 
-	pool := webassembly.Init(webassembly.Config{})
+	pool, err := webassembly.Init(webassembly.Config{
+		MinIdle:  1,
+		MaxIdle:  1,
+		MaxTotal: 1,
+	})
+	Expect(err).To(BeNil())
 	shared_tests.PdfiumPool = pool
 
 	instance, err := pool.GetInstance(time.Second * 30)
 	Expect(err).To(BeNil())
 	shared_tests.PdfiumInstance = instance
 	shared_tests.TestDataPath = "../../shared_tests"
-	shared_tests.TestType = "internal"
+	shared_tests.TestType = "webassembly"
 })
 
 var _ = AfterSuite(func() {

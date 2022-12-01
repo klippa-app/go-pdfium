@@ -983,7 +983,7 @@ var _ = Describe("fpdfview", func() {
 					// Size = 1000 pixels in width * 4 bytes per pixel * 1000 pixels in height
 					fileSize := stride * height
 
-					if TestType == "single" {
+					if TestType == "single" || TestType == "internal" {
 						buffer = make([]byte, fileSize)
 						pointer = unsafe.Pointer(&buffer[0])
 					} else if TestType == "webassembly" {
