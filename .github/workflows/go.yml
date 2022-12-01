@@ -68,5 +68,6 @@ jobs:
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go list ./...
-          go list ./... | grep -v webassembly
+          $env:Packages = `go list "./..." | grep -v webassembly`
+          echo "$Packages"
+          go test -timeout 30m "$Packages" -v
