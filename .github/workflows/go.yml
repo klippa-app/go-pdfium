@@ -15,9 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest ]
-        go: [ 1.16 ]
-        pdfium: [ 5378 ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        go: [ 1.16, 1.17, 1.18, 1.19 ]
+        pdfium: [ 4849, 4874, 4929, 5038, 5079, 5254, 5378 ]
     env:
       PDFIUM_EXPERIMENTAL_VERSION: 5378
       PDFIUM_EXPERIMENTAL_GO_VERSION: 1.19
@@ -64,10 +64,59 @@ jobs:
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
-        if: matrix.os == 'windows-latest'
         shell: bash
+        if: matrix.os == 'windows-latest'
         run: |
           export PKG_CONFIG_PATH="D:\opt\pkgconfig"
           export Path="$Path;D:\opt\pdfium\bin"
-          go list ./... | grep -v webassembly
           go test -timeout 30m `go list ./... | grep -v webassembly` -v
+      - name: Test all packages (Windows) - Experimental
+        shell: bash
+        if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        run: |
+          export PKG_CONFIG_PATH="D:\opt\pkgconfig"
+          export Path="$Path;D:\opt\pdfium\bin"
+          export IS_EXPERIMENTAL="1"
+          go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -v
+      - name: Test implementation for coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        run: |
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
+          export IS_EXPERIMENTAL="1"
+          go test -timeout 30m ./internal/implementation_cgo -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
+      - name: Archive code coverage results
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: ./coverage.out
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage.out
+  test-webassembly:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        go: [ 1.17, 1.18, 1.19 ]
+    env:
+      PDFIUM_EXPERIMENTAL_GO_VERSION: 1.19
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Test all packages
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          go test -timeout 30m `go list ./... | grep --color=never webassembly` -v
+      - name: Test all packages - Experimental
+        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        run: |
+          export IS_EXPERIMENTAL="1"
+          go test -timeout 30m `go list ./... | grep --color=never webassembly` -tags pdfium_experimental -v
