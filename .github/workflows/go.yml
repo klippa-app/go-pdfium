@@ -67,7 +67,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: bash
         run: |
-          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
-          $env:Path += ";D:\opt\pdfium\bin"
+          export PKG_CONFIG_PATH = "D:\opt\pkgconfig"
+          export Path += "$Path;D:\opt\pdfium\bin"
           go list ./... | grep -v webassembly
           go test -timeout 30m `go list ./... | grep -v webassembly` -v
