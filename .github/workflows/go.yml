@@ -63,12 +63,21 @@ jobs:
           export GODEBUG=cgocheck=2
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+      - name: Set up MinGW (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
       - name: Test all packages (Windows)
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
+          echo $PATH
+          echo $PKG_CONFIG_PATH
           export PKG_CONFIG_PATH="D:\opt\pkgconfig"
           export Path="$Path;D:\opt\pdfium\bin"
+          echo $PATH
+          echo $Path
           go test -timeout 30m `go list ./... | grep -v webassembly` -v
       - name: Test all packages (Windows) - Experimental
         shell: bash
