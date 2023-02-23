@@ -14,7 +14,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
 	github.com/stretchr/testify v1.8.0
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.3.8
 	google.golang.org/genproto v0.0.0-20210816143620-e15ff196659d // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
