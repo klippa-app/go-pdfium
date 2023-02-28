@@ -16,11 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        go: [ 1.16, 1.17, 1.18 ]
+        go: [ 1.16, 1.17, 1.18, 1.19, 1.20 ]
         pdfium: [ 4849, 4874, 4929, 5038, 5079, 5254, 5378 ]
     env:
       PDFIUM_EXPERIMENTAL_VERSION: 5378
-      PDFIUM_EXPERIMENTAL_GO_VERSION: 1.18
+      PDFIUM_EXPERIMENTAL_GO_VERSION: 1.20
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
