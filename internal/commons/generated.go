@@ -37,6 +37,7 @@ type Pdfium interface {
 	FORM_OnRButtonDown(*requests.FORM_OnRButtonDown) (*responses.FORM_OnRButtonDown, error)
 	FORM_OnRButtonUp(*requests.FORM_OnRButtonUp) (*responses.FORM_OnRButtonUp, error)
 	FORM_Redo(*requests.FORM_Redo) (*responses.FORM_Redo, error)
+	FORM_ReplaceAndKeepSelection(*requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error)
 	FORM_ReplaceSelection(*requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error)
 	FORM_SelectAllText(*requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error)
 	FORM_SetFocusedAnnot(*requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error)
@@ -324,6 +325,7 @@ type Pdfium interface {
 	FPDFText_GetTextIndexFromCharIndex(*requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
 	FPDFText_GetTextRenderMode(*requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
 	FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
+	FPDFText_HasUnicodeMapError(*requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error)
 	FPDFText_IsGenerated(*requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 	FPDFText_LoadFont(*requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
 	FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
@@ -691,6 +693,16 @@ func (g *PdfiumRPC) FORM_OnRButtonUp(request *requests.FORM_OnRButtonUp) (*respo
 func (g *PdfiumRPC) FORM_Redo(request *requests.FORM_Redo) (*responses.FORM_Redo, error) {
 	resp := &responses.FORM_Redo{}
 	err := g.client.Call("Plugin.FORM_Redo", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error) {
+	resp := &responses.FORM_ReplaceAndKeepSelection{}
+	err := g.client.Call("Plugin.FORM_ReplaceAndKeepSelection", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3568,6 +3580,16 @@ func (g *PdfiumRPC) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {
+	resp := &responses.FPDFText_HasUnicodeMapError{}
+	err := g.client.Call("Plugin.FPDFText_HasUnicodeMapError", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {
 	resp := &responses.FPDFText_IsGenerated{}
 	err := g.client.Call("Plugin.FPDFText_IsGenerated", request, resp)
@@ -5218,6 +5240,24 @@ func (s *PdfiumRPCServer) FORM_Redo(request *requests.FORM_Redo, resp *responses
 	}()
 
 	implResp, err := s.Impl.FORM_Redo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection, resp *responses.FORM_ReplaceAndKeepSelection) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ReplaceAndKeepSelection", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_ReplaceAndKeepSelection(request)
 	if err != nil {
 		return err
 	}
@@ -10384,6 +10424,24 @@ func (s *PdfiumRPCServer) FPDFText_GetUnicode(request *requests.FPDFText_GetUnic
 	}()
 
 	implResp, err := s.Impl.FPDFText_GetUnicode(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError, resp *responses.FPDFText_HasUnicodeMapError) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_HasUnicodeMapError", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFText_HasUnicodeMapError(request)
 	if err != nil {
 		return err
 	}

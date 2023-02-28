@@ -24,6 +24,11 @@ type FPDFText_IsGenerated struct {
 	Index    int
 }
 
+type FPDFText_HasUnicodeMapError struct {
+	TextPage references.FPDF_TEXTPAGE
+	Index    int
+}
+
 type FPDFText_GetFontSize struct {
 	TextPage references.FPDF_TEXTPAGE
 	Index    int

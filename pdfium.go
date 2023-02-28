@@ -1184,6 +1184,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 
+	// FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
+	// Experimental API.
+	FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error)
+
 	// FPDFText_GetFontSize returns the font size of a particular character.
 	FPDFText_GetFontSize(request *requests.FPDFText_GetFontSize) (*responses.FPDFText_GetFontSize, error)
 
@@ -2001,6 +2005,15 @@ type Pdfium interface {
 	// Call this function to obtain selected text within a form text
 	// field or form combobox text field.
 	FORM_GetSelectedText(request *requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error)
+
+	// FORM_ReplaceAndKeepSelection
+	// Call this function to replace the selected text in a form text field or
+	// user-editable form combobox text field with another text string (which
+	// can be empty or non-empty). If there is no selected text, this function
+	// will append the replacement text after the current caret position. After
+	// the insertion, the inserted text will be selected.
+	// Experimental API
+	FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error)
 
 	// FORM_ReplaceSelection
 	// Call this function to replace the selected text in a form

@@ -83,3 +83,14 @@ func (p *PdfiumImplementation) FORM_SetIndexSelected(request *requests.FORM_SetI
 func (p *PdfiumImplementation) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FORM_ReplaceAndKeepSelection
+// Call this function to replace the selected text in a form text field or
+// user-editable form combobox text field with another text string (which
+// can be empty or non-empty). If there is no selected text, this function
+// will append the replacement text after the current caret position. After
+// the insertion, the inserted text will be selected.
+// Experimental API
+func (p *PdfiumImplementation) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

@@ -270,3 +270,25 @@ func (p *PdfiumImplementation) FPDFText_IsGenerated(request *requests.FPDFText_I
 		IsGenerated: int(isGenerated) == 1,
 	}, nil
 }
+
+// FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	textPageHandle, err := p.getTextPageHandle(request.TextPage)
+	if err != nil {
+		return nil, err
+	}
+
+	hasUnicodeMapError := C.FPDFText_IsGenerated(textPageHandle.handle, C.int(request.Index))
+	if int(hasUnicodeMapError) == -1 {
+		return nil, errors.New("could not get whether text has a unicode map error")
+	}
+
+	return &responses.FPDFText_HasUnicodeMapError{
+		Index:              request.Index,
+		HasUnicodeMapError: int(hasUnicodeMapError) == 1,
+	}, nil
+}

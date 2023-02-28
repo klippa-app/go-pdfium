@@ -55,6 +55,8 @@ type FORM_GetSelectedText struct {
 	SelectedText string
 }
 
+type FORM_ReplaceAndKeepSelection struct{}
+
 type FORM_ReplaceSelection struct{}
 
 type FORM_SelectAllText struct{}
