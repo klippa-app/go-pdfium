@@ -910,7 +910,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetFillColor(request *requests.FPDFPa
 		return nil, err
 	}
 
-	success := C.FPDFPageObj_SetStrokeColor(pageObjectHandle.handle, C.uint(request.FillColor.R), C.uint(request.FillColor.G), C.uint(request.FillColor.B), C.uint(request.FillColor.A))
+	success := C.FPDFPageObj_SetFillColor(pageObjectHandle.handle, C.uint(request.FillColor.R), C.uint(request.FillColor.G), C.uint(request.FillColor.B), C.uint(request.FillColor.A))
 	if int(success) == 0 {
 		return nil, errors.New("could not set page object fill color")
 	}

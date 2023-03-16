@@ -125,7 +125,7 @@ func (p *PdfiumImplementation) CFPDF_WIDESTRING(input string) (*CFPDF_WIDESTRING
 		return nil, err
 	}
 
-	inputLength := uint64(len(transformedText)) + 1
+	inputLength := uint64(len(transformedText)) + 2
 
 	pointer, err := p.Malloc(inputLength)
 	if err != nil {
@@ -133,7 +133,7 @@ func (p *PdfiumImplementation) CFPDF_WIDESTRING(input string) (*CFPDF_WIDESTRING
 	}
 
 	// Write string + null terminator.
-	if !p.Module.Memory().Write(uint32(pointer), append([]byte(input), byte(0))) {
+	if !p.Module.Memory().Write(uint32(pointer), append(transformedText, byte(0), byte(0))) {
 		return nil, errors.New("could not write FPDF_WIDESTRING data")
 	}
 
@@ -312,7 +312,7 @@ func (p *PdfiumImplementation) DoublePointer(in *float64) (*DoublePointer, error
 	if in != nil {
 		if !p.Module.Memory().WriteFloat64Le(uint32(pointer), *in) {
 			p.Free(pointer)
-			return nil, errors.New("could not write float data to memory")
+			return nil, errors.New("could not write double data to memory")
 		}
 	}
 
@@ -325,6 +325,41 @@ func (p *PdfiumImplementation) DoublePointer(in *float64) (*DoublePointer, error
 			val, success := p.Module.Memory().ReadFloat64Le(uint32(pointer))
 			if !success {
 				return 0, errors.New("could not read double data from memory")
+			}
+
+			return val, nil
+		},
+	}, nil
+}
+
+type FloatPointer struct {
+	Pointer uint64
+	Free    func()
+	Value   func() (float32, error)
+}
+
+func (p *PdfiumImplementation) FloatPointer(in *float32) (*FloatPointer, error) {
+	pointer, err := p.Malloc(p.CSizeFloat())
+	if err != nil {
+		return nil, err
+	}
+
+	if in != nil {
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer), *in) {
+			p.Free(pointer)
+			return nil, errors.New("could not write float data to memory")
+		}
+	}
+
+	return &FloatPointer{
+		Pointer: pointer,
+		Free: func() {
+			p.Free(pointer)
+		},
+		Value: func() (float32, error) {
+			val, success := p.Module.Memory().ReadFloat32Le(uint32(pointer))
+			if !success {
+				return 0, errors.New("could not read float data from memory")
 			}
 
 			return val, nil

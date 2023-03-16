@@ -1,7 +1,9 @@
 package implementation_webassembly
 
+import "C"
 import (
 	"errors"
+	"github.com/klippa-app/go-pdfium/structs"
 	"io"
 	"os"
 	"unsafe"
@@ -779,5 +781,1141 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageMetadata(request *requests.F
 
 	return &responses.FPDFImageObj_GetImageMetadata{
 		ImageMetadata: *metadata,
+	}, nil
+}
+
+// FPDFPageObj_CreateNewPath creates a new path object at an initial position.
+func (p *PdfiumImplementation) FPDFPageObj_CreateNewPath(request *requests.FPDFPageObj_CreateNewPath) (*responses.FPDFPageObj_CreateNewPath, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewPath").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	if err != nil {
+		return nil, err
+	}
+
+	pageObject := res[0]
+	pageObjectHandle := p.registerPageObject(&pageObject)
+
+	return &responses.FPDFPageObj_CreateNewPath{
+		PageObject: pageObjectHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPageObj_CreateNewRect creates a closed path consisting of a rectangle.
+func (p *PdfiumImplementation) FPDFPageObj_CreateNewRect(request *requests.FPDFPageObj_CreateNewRect) (*responses.FPDFPageObj_CreateNewRect, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewRect").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)), *(*uint64)(unsafe.Pointer(&request.W)), *(*uint64)(unsafe.Pointer(&request.H)))
+	if err != nil {
+		return nil, err
+	}
+
+	pageObject := res[0]
+	pageObjectHandle := p.registerPageObject(&pageObject)
+	return &responses.FPDFPageObj_CreateNewRect{
+		PageObject: pageObjectHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPageObj_GetBounds returns the bounding box of the given page object.
+func (p *PdfiumImplementation) FPDFPageObj_GetBounds(request *requests.FPDFPageObj_GetBounds) (*responses.FPDFPageObj_GetBounds, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	leftPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer leftPointer.Free()
+
+	bottomPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer bottomPointer.Free()
+
+	rightPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer rightPointer.Free()
+
+	topPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer topPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetBounds").Call(p.Context, *pageObjectHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object bounds")
+	}
+
+	left, err := leftPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	bottom, err := bottomPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	right, err := rightPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	top, err := topPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetBounds{
+		Left:   float32(left),
+		Bottom: float32(bottom),
+		Right:  float32(right),
+		Top:    float32(top),
+	}, nil
+}
+
+// FPDFPageObj_SetBlendMode sets the blend mode of the page object.
+func (p *PdfiumImplementation) FPDFPageObj_SetBlendMode(request *requests.FPDFPageObj_SetBlendMode) (*responses.FPDFPageObj_SetBlendMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	blendMode, err := p.CString(string(request.BlendMode))
+	if err != nil {
+		return nil, err
+	}
+
+	defer blendMode.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFPageObj_SetBlendMode").Call(p.Context, *pageObjectHandle.handle, blendMode.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_SetBlendMode{}, nil
+}
+
+// FPDFPageObj_SetStrokeColor sets the stroke RGBA of a page object.
+func (p *PdfiumImplementation) FPDFPageObj_SetStrokeColor(request *requests.FPDFPageObj_SetStrokeColor) (*responses.FPDFPageObj_SetStrokeColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetStrokeColor").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.StrokeColor.R)), *(*uint64)(unsafe.Pointer(&request.StrokeColor.G)), *(*uint64)(unsafe.Pointer(&request.StrokeColor.B)), *(*uint64)(unsafe.Pointer(&request.StrokeColor.A)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object stroke color")
+	}
+
+	return &responses.FPDFPageObj_SetStrokeColor{}, nil
+}
+
+// FPDFPageObj_GetStrokeColor returns the stroke RGBA of a page object
+func (p *PdfiumImplementation) FPDFPageObj_GetStrokeColor(request *requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	rPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer rPointer.Free()
+
+	gPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer gPointer.Free()
+
+	bPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer bPointer.Free()
+
+	aPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer aPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetStrokeColor").Call(p.Context, *pageObjectHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer, aPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object stroke color")
+	}
+
+	r, err := rPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := gPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := bPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	a, err := aPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetStrokeColor{
+		StrokeColor: structs.FPDF_COLOR{
+			R: uint(r),
+			G: uint(g),
+			B: uint(b),
+			A: uint(a),
+		},
+	}, nil
+}
+
+// FPDFPageObj_SetStrokeWidth sets the stroke width of a page object
+func (p *PdfiumImplementation) FPDFPageObj_SetStrokeWidth(request *requests.FPDFPageObj_SetStrokeWidth) (*responses.FPDFPageObj_SetStrokeWidth, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetStrokeWidth").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.StrokeWidth)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object stroke color")
+	}
+
+	return &responses.FPDFPageObj_SetStrokeWidth{}, nil
+}
+
+// FPDFPageObj_GetStrokeWidth returns the stroke width of a page object.
+func (p *PdfiumImplementation) FPDFPageObj_GetStrokeWidth(request *requests.FPDFPageObj_GetStrokeWidth) (*responses.FPDFPageObj_GetStrokeWidth, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	strokeWidthPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer strokeWidthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetStrokeWidth").Call(p.Context, *pageObjectHandle.handle, strokeWidthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object stroke width")
+	}
+
+	strokeWidth, err := strokeWidthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetStrokeWidth{
+		StrokeWidth: float32(strokeWidth),
+	}, nil
+}
+
+// FPDFPageObj_GetLineJoin returns the line join of the page object.
+func (p *PdfiumImplementation) FPDFPageObj_GetLineJoin(request *requests.FPDFPageObj_GetLineJoin) (*responses.FPDFPageObj_GetLineJoin, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetLineJoin").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	lineJoin := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(lineJoin) == -1 {
+		return nil, errors.New("could not get page object line join")
+	}
+
+	return &responses.FPDFPageObj_GetLineJoin{
+		LineJoin: enums.FPDF_LINEJOIN(lineJoin),
+	}, nil
+}
+
+// FPDFPageObj_SetLineJoin sets the line join of the page object.
+func (p *PdfiumImplementation) FPDFPageObj_SetLineJoin(request *requests.FPDFPageObj_SetLineJoin) (*responses.FPDFPageObj_SetLineJoin, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetLineJoin").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.LineJoin)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object line join")
+	}
+
+	return &responses.FPDFPageObj_SetLineJoin{}, nil
+}
+
+// FPDFPageObj_GetLineCap returns the line cap of the page object.
+func (p *PdfiumImplementation) FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetLineCap").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	lineCap := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(lineCap) == -1 {
+		return nil, errors.New("could not get page object line cap")
+	}
+
+	return &responses.FPDFPageObj_GetLineCap{
+		LineCap: enums.FPDF_LINECAP(lineCap),
+	}, nil
+}
+
+// FPDFPageObj_SetLineCap sets the line cap of the page object.
+func (p *PdfiumImplementation) FPDFPageObj_SetLineCap(request *requests.FPDFPageObj_SetLineCap) (*responses.FPDFPageObj_SetLineCap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetLineJoin").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.LineCap)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object line cap")
+	}
+
+	return &responses.FPDFPageObj_SetLineCap{}, nil
+}
+
+// FPDFPageObj_SetFillColor sets the fill RGBA of a page object
+func (p *PdfiumImplementation) FPDFPageObj_SetFillColor(request *requests.FPDFPageObj_SetFillColor) (*responses.FPDFPageObj_SetFillColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetFillColor").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.FillColor.R)), *(*uint64)(unsafe.Pointer(&request.FillColor.G)), *(*uint64)(unsafe.Pointer(&request.FillColor.B)), *(*uint64)(unsafe.Pointer(&request.FillColor.A)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object fill color")
+	}
+
+	return &responses.FPDFPageObj_SetFillColor{}, nil
+}
+
+// FPDFPageObj_GetFillColor returns the fill RGBA of a page object
+func (p *PdfiumImplementation) FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_GetFillColor) (*responses.FPDFPageObj_GetFillColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	rPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer rPointer.Free()
+
+	gPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer gPointer.Free()
+
+	bPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer bPointer.Free()
+
+	aPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer aPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetFillColor").Call(p.Context, *pageObjectHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer, aPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object fill color")
+	}
+
+	r, err := rPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := gPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := bPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	a, err := aPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetFillColor{
+		FillColor: structs.FPDF_COLOR{
+			R: uint(r),
+			G: uint(g),
+			B: uint(b),
+			A: uint(a),
+		},
+	}, nil
+}
+
+// FPDFPath_CountSegments returns the number of segments inside the given path.
+// A segment is a command, created by e.g. FPDFPath_MoveTo(),
+// FPDFPath_LineTo() or FPDFPath_BezierTo().
+func (p *PdfiumImplementation) FPDFPath_CountSegments(request *requests.FPDFPath_CountSegments) (*responses.FPDFPath_CountSegments, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_CountSegments").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(count) == -1 {
+		return nil, errors.New("could not get path segment count")
+	}
+
+	return &responses.FPDFPath_CountSegments{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFPath_GetPathSegment returns the segment in the given path at the given index.
+func (p *PdfiumImplementation) FPDFPath_GetPathSegment(request *requests.FPDFPath_GetPathSegment) (*responses.FPDFPath_GetPathSegment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_GetPathSegment").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	pathSegment := res[0]
+	if pathSegment == 0 {
+		return nil, errors.New("could not get path segment")
+	}
+
+	pathSegmentHandle := p.registerPathSegment(&pathSegment)
+
+	return &responses.FPDFPath_GetPathSegment{
+		PathSegment: pathSegmentHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPathSegment_GetPoint returns the coordinates of the given segment.
+func (p *PdfiumImplementation) FPDFPathSegment_GetPoint(request *requests.FPDFPathSegment_GetPoint) (*responses.FPDFPathSegment_GetPoint, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	xPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer xPointer.Free()
+
+	yPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer yPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPathSegment_GetPoint").Call(p.Context, *pathSegmentHandle.handle, xPointer.Pointer, yPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get path segment point")
+	}
+
+	x, err := xPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	y, err := yPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPathSegment_GetPoint{
+		X: float32(x),
+		Y: float32(y),
+	}, nil
+}
+
+// FPDFPathSegment_GetType returns the type of the given segment.
+func (p *PdfiumImplementation) FPDFPathSegment_GetType(request *requests.FPDFPathSegment_GetType) (*responses.FPDFPathSegment_GetType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPathSegment_GetType").Call(p.Context, *pathSegmentHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	segmentType := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPathSegment_GetType{
+		Type: enums.FPDF_SEGMENT(segmentType),
+	}, nil
+}
+
+// FPDFPathSegment_GetClose returns whether the segment closes the current subpath of a given path.
+func (p *PdfiumImplementation) FPDFPathSegment_GetClose(request *requests.FPDFPathSegment_GetClose) (*responses.FPDFPathSegment_GetClose, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pathSegmentHandle, err := p.getPathSegmentHandle(request.PathSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPathSegment_GetClose").Call(p.Context, *pathSegmentHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	getClose := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPathSegment_GetClose{
+		IsClose: int(getClose) == 1,
+	}, nil
+}
+
+// FPDFPath_MoveTo moves a path's current point.
+// Note that no line will be created between the previous current point and the
+// new one.
+func (p *PdfiumImplementation) FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo) (*responses.FPDFPath_MoveTo, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_MoveTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not move path")
+	}
+
+	return &responses.FPDFPath_MoveTo{}, nil
+}
+
+// FPDFPath_LineTo adds a line between the current point and a new point in the path.
+func (p *PdfiumImplementation) FPDFPath_LineTo(request *requests.FPDFPath_LineTo) (*responses.FPDFPath_LineTo, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_LineTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not add line")
+	}
+
+	return &responses.FPDFPath_LineTo{}, nil
+}
+
+// FPDFPath_BezierTo adds a cubic Bezier curve to the given path, starting at the current point.
+func (p *PdfiumImplementation) FPDFPath_BezierTo(request *requests.FPDFPath_BezierTo) (*responses.FPDFPath_BezierTo, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_BezierTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X1)), *(*uint64)(unsafe.Pointer(&request.Y1)), *(*uint64)(unsafe.Pointer(&request.X2)), *(*uint64)(unsafe.Pointer(&request.Y2)), *(*uint64)(unsafe.Pointer(&request.X3)), *(*uint64)(unsafe.Pointer(&request.Y3)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not add bezier")
+	}
+
+	return &responses.FPDFPath_BezierTo{}, nil
+}
+
+// FPDFPath_Close closes the current subpath of a given path.
+func (p *PdfiumImplementation) FPDFPath_Close(request *requests.FPDFPath_Close) (*responses.FPDFPath_Close, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_Close").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not close path")
+	}
+
+	return &responses.FPDFPath_Close{}, nil
+}
+
+// FPDFPath_SetDrawMode sets the drawing mode of a path.
+func (p *PdfiumImplementation) FPDFPath_SetDrawMode(request *requests.FPDFPath_SetDrawMode) (*responses.FPDFPath_SetDrawMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	stroke := 0
+	if request.Stroke {
+		stroke = 1
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPath_SetDrawMode").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.FillMode)), *(*uint64)(unsafe.Pointer(&stroke)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not set draw mode")
+	}
+
+	return &responses.FPDFPath_SetDrawMode{}, nil
+}
+
+// FPDFPath_GetDrawMode returns the drawing mode of a path.
+func (p *PdfiumImplementation) FPDFPath_GetDrawMode(request *requests.FPDFPath_GetDrawMode) (*responses.FPDFPath_GetDrawMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	fillModePointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer fillModePointer.Free()
+
+	strokePointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer strokePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPath_GetDrawMode").Call(p.Context, *pageObjectHandle.handle, fillModePointer.Pointer, strokePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get draw mode")
+	}
+
+	fillMode, err := fillModePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	stroke, err := strokePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPath_GetDrawMode{
+		FillMode: enums.FPDF_FILLMODE(fillMode),
+		Stroke:   int(stroke) == 1,
+	}, nil
+}
+
+// FPDFPageObj_NewTextObj creates a new text object using one of the standard PDF fonts.
+func (p *PdfiumImplementation) FPDFPageObj_NewTextObj(request *requests.FPDFPageObj_NewTextObj) (*responses.FPDFPageObj_NewTextObj, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	font, err := p.CString(request.Font)
+	defer font.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_NewTextObj").Call(p.Context, *documentHandle.handle, font.Pointer, *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	if err != nil {
+		return nil, err
+	}
+
+	textObject := res[0]
+	textObjectHandle := p.registerPageObject(&textObject)
+
+	return &responses.FPDFPageObj_NewTextObj{
+		PageObject: textObjectHandle.nativeRef,
+	}, nil
+}
+
+// FPDFText_SetText sets the text for a text object. If it had text, it will be replaced.
+func (p *PdfiumImplementation) FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedTextPointer, err := p.CFPDF_WIDESTRING(request.Text)
+	if err != nil {
+		return nil, err
+	}
+
+	defer transformedTextPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFText_SetText").Call(p.Context, *pageObjectHandle.handle, transformedTextPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not set text")
+	}
+
+	return &responses.FPDFText_SetText{}, nil
+}
+
+// FPDFText_SetCharcodes sets the text using charcodes for a text object. If it had text, it will be
+// replaced.
+func (p *PdfiumImplementation) FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	length := uint64(len(request.CharCodes))
+	charCodes, err := p.UIntArrayPointer(length)
+	if err != nil {
+		return nil, err
+	}
+
+	defer charCodes.Free()
+	for i := range request.CharCodes {
+		success := p.Module.Memory().WriteUint32Le(uint32(charCodes.Pointer+(p.CSizeUInt()*uint64(i))), request.CharCodes[i])
+		if !success {
+			return nil, errors.New("could not write uint array data to memory")
+		}
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFText_SetCharcodes").Call(p.Context, *pageObjectHandle.handle, charCodes.Pointer, *(*uint64)(unsafe.Pointer(&length)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not set charcodes")
+	}
+
+	return &responses.FPDFText_SetCharcodes{}, nil
+}
+
+// FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
+// into the document.
+// The loaded font can be closed using FPDFFont_Close.
+func (p *PdfiumImplementation) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	cid := 0
+	if request.CID {
+		cid = 1
+	}
+
+	dataLength := uint32(len(request.Data))
+	fontData, err := p.ByteArrayPointer(uint64(len(request.Data)), request.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fontData.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFText_LoadFont").Call(p.Context, *documentHandle.handle, fontData.Pointer, *(*uint64)(unsafe.Pointer(&dataLength)), *(*uint64)(unsafe.Pointer(&request.FontType)), *(*uint64)(unsafe.Pointer(&cid)))
+	if err != nil {
+		return nil, err
+	}
+
+	font := res[0]
+	fontHandle := p.registerFont(&font)
+
+	return &responses.FPDFText_LoadFont{
+		Font: fontHandle.nativeRef,
+	}, nil
+}
+
+// FPDFTextObj_GetFontSize returns the font size of a text object.
+func (p *PdfiumImplementation) FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	fontSizePointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fontSizePointer.Free()
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetFontSize").Call(p.Context, *pageObjectHandle.handle, fontSizePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get font size")
+	}
+
+	fontSize, err := fontSizePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFTextObj_GetFontSize{
+		FontSize: float32(fontSize),
+	}, nil
+}
+
+// FPDFFont_Close closes a loaded PDF font
+func (p *PdfiumImplementation) FPDFFont_Close(request *requests.FPDFFont_Close) (*responses.FPDFFont_Close, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.Module.ExportedFunction("FPDFFont_Close").Call(p.Context, *fontHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	delete(p.fontRefs, fontHandle.nativeRef)
+
+	return &responses.FPDFFont_Close{}, nil
+}
+
+// FPDFPageObj_CreateTextObj creates a new text object using a loaded font.
+func (p *PdfiumImplementation) FPDFPageObj_CreateTextObj(request *requests.FPDFPageObj_CreateTextObj) (*responses.FPDFPageObj_CreateTextObj, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateTextObj").Call(p.Context, *documentHandle.handle, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	if err != nil {
+		return nil, err
+	}
+
+	textObject := res[0]
+	textObjectHandle := p.registerPageObject(&textObject)
+
+	return &responses.FPDFPageObj_CreateTextObj{
+		PageObject: textObjectHandle.nativeRef,
+	}, nil
+}
+
+// FPDFTextObj_GetTextRenderMode returns the text rendering mode of a text object.
+func (p *PdfiumImplementation) FPDFTextObj_GetTextRenderMode(request *requests.FPDFTextObj_GetTextRenderMode) (*responses.FPDFTextObj_GetTextRenderMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetTextRenderMode").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	textRenderMode := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFTextObj_GetTextRenderMode{
+		TextRenderMode: enums.FPDF_TEXT_RENDERMODE(textRenderMode),
+	}, nil
+}
+
+// FPDFTextObj_GetText returns the text of a text object.
+func (p *PdfiumImplementation) FPDFTextObj_GetText(request *requests.FPDFTextObj_GetText) (*responses.FPDFTextObj_GetText, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	textPageHandle, err := p.getTextPageHandle(request.TextPage)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetText").Call(p.Context, *pageObjectHandle.handle, *textPageHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	textSize := *(*int32)(unsafe.Pointer(&res[0]))
+	if textSize == 0 {
+		return nil, errors.New("could not get text")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(uint64(textSize), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	res, err = p.Module.ExportedFunction("FPDFTextObj_GetText").Call(p.Context, *pageObjectHandle.handle, *textPageHandle.handle, charDataPointer.Pointer, *(*uint64)(unsafe.Pointer(&textSize)))
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedName, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFTextObj_GetText{
+		Text: transformedName,
+	}, nil
+}
+
+// FPDFFormObj_CountObjects returns the number of page objects inside the given form object.
+func (p *PdfiumImplementation) FPDFFormObj_CountObjects(request *requests.FPDFFormObj_CountObjects) (*responses.FPDFFormObj_CountObjects, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFormObj_CountObjects").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFFormObj_CountObjects{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFFormObj_GetObject returns the page object in the given form object at the given index.
+func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormObj_GetObject) (*responses.FPDFFormObj_GetObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFormObj_GetObject").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	formObject := res[0]
+	if formObject == 0 {
+		return nil, errors.New("could not get form object")
+	}
+
+	formObjectHandle := p.registerPageObject(&formObject)
+
+	return &responses.FPDFFormObj_GetObject{
+		PageObject: formObjectHandle.nativeRef,
 	}, nil
 }

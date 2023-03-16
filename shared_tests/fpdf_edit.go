@@ -80,30 +80,18 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("returns an error when calling FPDFPageObj_NewTextObj", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_NewTextObj, err := PdfiumInstance.FPDFPageObj_NewTextObj(&requests.FPDFPageObj_NewTextObj{})
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFPageObj_NewTextObj).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFText_LoadFont", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFText_LoadFont, err := PdfiumInstance.FPDFText_LoadFont(&requests.FPDFText_LoadFont{})
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFText_LoadFont).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_CreateTextObj", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_CreateTextObj, err := PdfiumInstance.FPDFPageObj_CreateTextObj(&requests.FPDFPageObj_CreateTextObj{})
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFPageObj_CreateTextObj).To(BeNil())
@@ -208,270 +196,162 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("returns an error when calling FPDFPageObj_GetBounds", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetBounds, err := PdfiumInstance.FPDFPageObj_GetBounds(&requests.FPDFPageObj_GetBounds{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetBounds).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetBlendMode", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetBlendMode, err := PdfiumInstance.FPDFPageObj_SetBlendMode(&requests.FPDFPageObj_SetBlendMode{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetBlendMode).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetStrokeColor", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetStrokeColor, err := PdfiumInstance.FPDFPageObj_SetStrokeColor(&requests.FPDFPageObj_SetStrokeColor{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetStrokeColor).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_GetStrokeColor", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetStrokeColor, err := PdfiumInstance.FPDFPageObj_GetStrokeColor(&requests.FPDFPageObj_GetStrokeColor{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetStrokeColor).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetStrokeWidth", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetStrokeWidth, err := PdfiumInstance.FPDFPageObj_SetStrokeWidth(&requests.FPDFPageObj_SetStrokeWidth{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetStrokeWidth).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_GetStrokeWidth", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetStrokeWidth, err := PdfiumInstance.FPDFPageObj_GetStrokeWidth(&requests.FPDFPageObj_GetStrokeWidth{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetStrokeWidth).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_GetLineJoin", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetLineJoin, err := PdfiumInstance.FPDFPageObj_GetLineJoin(&requests.FPDFPageObj_GetLineJoin{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetLineJoin).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetLineJoin", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetLineJoin, err := PdfiumInstance.FPDFPageObj_SetLineJoin(&requests.FPDFPageObj_SetLineJoin{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetLineJoin).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_GetLineCap", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetLineCap, err := PdfiumInstance.FPDFPageObj_GetLineCap(&requests.FPDFPageObj_GetLineCap{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetLineCap).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetLineCap", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetLineCap, err := PdfiumInstance.FPDFPageObj_SetLineCap(&requests.FPDFPageObj_SetLineCap{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetLineCap).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_SetFillColor", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_SetFillColor, err := PdfiumInstance.FPDFPageObj_SetFillColor(&requests.FPDFPageObj_SetFillColor{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_SetFillColor).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObj_GetFillColor", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_GetFillColor, err := PdfiumInstance.FPDFPageObj_GetFillColor(&requests.FPDFPageObj_GetFillColor{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetFillColor).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_CountSegments", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_CountSegments).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_GetPathSegment", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_GetPathSegment).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_MoveTo", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_MoveTo, err := PdfiumInstance.FPDFPath_MoveTo(&requests.FPDFPath_MoveTo{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_MoveTo).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_LineTo", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_LineTo, err := PdfiumInstance.FPDFPath_LineTo(&requests.FPDFPath_LineTo{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_LineTo).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_BezierTo", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_BezierTo, err := PdfiumInstance.FPDFPath_BezierTo(&requests.FPDFPath_BezierTo{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_BezierTo).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_Close", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_Close, err := PdfiumInstance.FPDFPath_Close(&requests.FPDFPath_Close{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_Close).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_SetDrawMode", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_SetDrawMode, err := PdfiumInstance.FPDFPath_SetDrawMode(&requests.FPDFPath_SetDrawMode{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_SetDrawMode).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPath_GetDrawMode", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPath_GetDrawMode, err := PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPath_GetDrawMode).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFText_SetText", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFText_SetText, err := PdfiumInstance.FPDFText_SetText(&requests.FPDFText_SetText{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFText_SetText).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFText_SetCharcodes", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFText_SetCharcodes, err := PdfiumInstance.FPDFText_SetCharcodes(&requests.FPDFText_SetCharcodes{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFText_SetCharcodes).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFTextObj_GetFontSize", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFTextObj_GetFontSize, err := PdfiumInstance.FPDFTextObj_GetFontSize(&requests.FPDFTextObj_GetFontSize{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFTextObj_GetFontSize).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFTextObj_GetTextRenderMode", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFTextObj_GetTextRenderMode, err := PdfiumInstance.FPDFTextObj_GetTextRenderMode(&requests.FPDFTextObj_GetTextRenderMode{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFTextObj_GetTextRenderMode).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFTextObj_GetText", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFTextObj_GetText).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFFormObj_CountObjects", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFFormObj_CountObjects).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFFormObj_GetObject", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFFormObj_GetObject).To(BeNil())
@@ -506,30 +386,18 @@ var _ = Describe("fpdf_edit", func() {
 	Context("no path segment object", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFPathSegment_GetPoint", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPathSegment_GetPoint, err := PdfiumInstance.FPDFPathSegment_GetPoint(&requests.FPDFPathSegment_GetPoint{})
 				Expect(err).To(MatchError("pathSegment not given"))
 				Expect(FPDFPathSegment_GetPoint).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPathSegment_GetType", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPathSegment_GetType, err := PdfiumInstance.FPDFPathSegment_GetType(&requests.FPDFPathSegment_GetType{})
 				Expect(err).To(MatchError("pathSegment not given"))
 				Expect(FPDFPathSegment_GetType).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPathSegment_GetClose", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPathSegment_GetClose, err := PdfiumInstance.FPDFPathSegment_GetClose(&requests.FPDFPathSegment_GetClose{})
 				Expect(err).To(MatchError("pathSegment not given"))
 				Expect(FPDFPathSegment_GetClose).To(BeNil())
@@ -540,10 +408,6 @@ var _ = Describe("fpdf_edit", func() {
 	Context("no font object", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFFont_Close", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFFont_Close, err := PdfiumInstance.FPDFFont_Close(&requests.FPDFFont_Close{})
 				Expect(err).To(MatchError("font not given"))
 				Expect(FPDFFont_Close).To(BeNil())
@@ -639,10 +503,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows us to insert an object to a page", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_NewTextObj, err := PdfiumInstance.FPDFPageObj_NewTextObj(&requests.FPDFPageObj_NewTextObj{
 					Document: doc,
 					Font:     "Arial",
@@ -678,11 +538,6 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
 					Count: 4,
 				}))
-
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 
 				FPDFPageObj_NewTextObj, err := PdfiumInstance.FPDFPageObj_NewTextObj(&requests.FPDFPageObj_NewTextObj{
 					Document: doc,
@@ -762,10 +617,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows us to create an object and destroy it", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPageObj_NewTextObj, err := PdfiumInstance.FPDFPageObj_NewTextObj(&requests.FPDFPageObj_NewTextObj{
 					Document: doc,
 					Font:     "Arial",
@@ -1110,11 +961,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting a bitmap to an image object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFBitmap_Create, err := PdfiumInstance.FPDFBitmap_Create(&requests.FPDFBitmap_Create{
 						Width:  50,
 						Height: 50,
@@ -1138,11 +984,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting a bitmap to an image object and then getting it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFBitmap_Create, err := PdfiumInstance.FPDFBitmap_Create(&requests.FPDFBitmap_Create{
 						Width:  50,
 						Height: 50,
@@ -1197,11 +1038,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows a path object to be created", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
-
 				FPDFPageObj_CreateNewPath, err := PdfiumInstance.FPDFPageObj_CreateNewPath(&requests.FPDFPageObj_CreateNewPath{
 					X: 100,
 					Y: 100,
@@ -1212,11 +1048,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows a rect object to be created", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
-
 				FPDFPageObj_CreateNewRect, err := PdfiumInstance.FPDFPageObj_CreateNewRect(&requests.FPDFPageObj_CreateNewRect{
 					X: 100,
 					Y: 100,
@@ -1229,11 +1060,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows a font to be loaded, a text object to be created with it and to be closed", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
-
 				fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
 				Expect(err).To(BeNil())
 
@@ -1403,11 +1229,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the bounds of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetBounds, err := PdfiumInstance.FPDFPageObj_GetBounds(&requests.FPDFPageObj_GetBounds{
 						PageObject: imageObject,
 					})
@@ -1421,11 +1242,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the blend mode of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetBlendMode, err := PdfiumInstance.FPDFPageObj_SetBlendMode(&requests.FPDFPageObj_SetBlendMode{
 						PageObject: imageObject,
 						BlendMode:  enums.PDF_BLEND_MODE_DARKEN,
@@ -1435,11 +1251,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the stroke color of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetStrokeColor, err := PdfiumInstance.FPDFPageObj_SetStrokeColor(&requests.FPDFPageObj_SetStrokeColor{
 						PageObject: imageObject,
 						StrokeColor: structs.FPDF_COLOR{
@@ -1454,11 +1265,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when the object has no stroke color", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetStrokeColor, err := PdfiumInstance.FPDFPageObj_GetStrokeColor(&requests.FPDFPageObj_GetStrokeColor{
 						PageObject: imageObject,
 					})
@@ -1467,11 +1273,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the stroke color of a page object and then retrieving it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetStrokeColor, err := PdfiumInstance.FPDFPageObj_SetStrokeColor(&requests.FPDFPageObj_SetStrokeColor{
 						PageObject: imageObject,
 						StrokeColor: structs.FPDF_COLOR{
@@ -1499,11 +1300,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the stroke width of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetStrokeWidth, err := PdfiumInstance.FPDFPageObj_SetStrokeWidth(&requests.FPDFPageObj_SetStrokeWidth{
 						PageObject:  imageObject,
 						StrokeWidth: 3,
@@ -1513,11 +1309,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the stroke width of a page object and then retrieving it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetStrokeWidth, err := PdfiumInstance.FPDFPageObj_GetStrokeWidth(&requests.FPDFPageObj_GetStrokeWidth{
 						PageObject: imageObject,
 					})
@@ -1543,11 +1334,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the line join of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetLineJoin, err := PdfiumInstance.FPDFPageObj_GetLineJoin(&requests.FPDFPageObj_GetLineJoin{
 						PageObject: imageObject,
 					})
@@ -1558,11 +1344,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the line join of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetLineJoin, err := PdfiumInstance.FPDFPageObj_SetLineJoin(&requests.FPDFPageObj_SetLineJoin{
 						PageObject: imageObject,
 						LineJoin:   enums.FPDF_LINEJOIN_BEVEL,
@@ -1572,11 +1353,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the line join of a page object and then retrieving it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetLineJoin, err := PdfiumInstance.FPDFPageObj_SetLineJoin(&requests.FPDFPageObj_SetLineJoin{
 						PageObject: imageObject,
 						LineJoin:   enums.FPDF_LINEJOIN_BEVEL,
@@ -1594,11 +1370,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the line cap of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetLineCap, err := PdfiumInstance.FPDFPageObj_GetLineCap(&requests.FPDFPageObj_GetLineCap{
 						PageObject: imageObject,
 					})
@@ -1609,11 +1380,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the line cap of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetLineCap, err := PdfiumInstance.FPDFPageObj_SetLineCap(&requests.FPDFPageObj_SetLineCap{
 						PageObject: imageObject,
 						LineCap:    enums.FPDF_LINECAP_PROJECTING_SQUAR,
@@ -1623,11 +1389,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the line cap of a page object and then retrieving it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetLineCap, err := PdfiumInstance.FPDFPageObj_SetLineCap(&requests.FPDFPageObj_SetLineCap{
 						PageObject: imageObject,
 						LineCap:    enums.FPDF_LINECAP_PROJECTING_SQUAR,
@@ -1645,11 +1406,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the fill color of a page object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetFillColor, err := PdfiumInstance.FPDFPageObj_SetFillColor(&requests.FPDFPageObj_SetFillColor{
 						PageObject: imageObject,
 						FillColor: structs.FPDF_COLOR{
@@ -1664,11 +1420,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when the object has no fill color", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_GetFillColor, err := PdfiumInstance.FPDFPageObj_GetFillColor(&requests.FPDFPageObj_GetFillColor{
 						PageObject: imageObject,
 					})
@@ -1677,11 +1428,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the fill color of a page object and then retrieving it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPageObj_SetFillColor, err := PdfiumInstance.FPDFPageObj_SetFillColor(&requests.FPDFPageObj_SetFillColor{
 						PageObject: imageObject,
 						FillColor: structs.FPDF_COLOR{
@@ -1700,20 +1446,15 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_GetFillColor).To(Equal(&responses.FPDFPageObj_GetFillColor{
 						FillColor: structs.FPDF_COLOR{
-							R: 0,
-							G: 0,
-							B: 0,
+							R: 255,
+							G: 255,
+							B: 255,
 							A: 255,
 						},
 					}))
 				})
 
 				It("returns an error when trying to get the path segments on an image", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{
 						PageObject: imageObject,
 					})
@@ -1777,11 +1518,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the count of segments of a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{
 						PageObject: pageObject,
 					})
@@ -1792,11 +1528,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to load an invalid path segment", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
 						PageObject: pageObject,
 						Index:      35,
@@ -1806,11 +1537,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting a path segments", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
 						PageObject: pageObject,
 						Index:      0,
@@ -1824,11 +1550,6 @@ var _ = Describe("fpdf_edit", func() {
 					var pathSegment references.FPDF_PATHSEGMENT
 
 					BeforeEach(func() {
-						if TestType == "webassembly" {
-							// @todo: remove me when implemented.
-							Skip("This test is skipped on Webassembly")
-						}
-
 						FPDFPath_GetPathSegment, err := PdfiumInstance.FPDFPath_GetPathSegment(&requests.FPDFPath_GetPathSegment{
 							PageObject: pageObject,
 							Index:      0,
@@ -1840,11 +1561,6 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows getting the point of a path segment", func() {
-						if TestType == "webassembly" {
-							// @todo: remove me when implemented.
-							Skip("This test is skipped on Webassembly")
-						}
-
 						FPDFPathSegment_GetPoint, err := PdfiumInstance.FPDFPathSegment_GetPoint(&requests.FPDFPathSegment_GetPoint{
 							PathSegment: pathSegment,
 						})
@@ -1856,11 +1572,6 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows getting the type of a path segment", func() {
-						if TestType == "webassembly" {
-							// @todo: remove me when implemented.
-							Skip("This test is skipped on Webassembly")
-						}
-
 						FPDFPathSegment_GetType, err := PdfiumInstance.FPDFPathSegment_GetType(&requests.FPDFPathSegment_GetType{
 							PathSegment: pathSegment,
 						})
@@ -1871,11 +1582,6 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows getting the close of a path segment", func() {
-						if TestType == "webassembly" {
-							// @todo: remove me when implemented.
-							Skip("This test is skipped on Webassembly")
-						}
-
 						FPDFPathSegment_GetClose, err := PdfiumInstance.FPDFPathSegment_GetClose(&requests.FPDFPathSegment_GetClose{
 							PathSegment: pathSegment,
 						})
@@ -1887,11 +1593,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows moving the path to a point", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_MoveTo, err := PdfiumInstance.FPDFPath_MoveTo(&requests.FPDFPath_MoveTo{
 						PageObject: pageObject,
 						X:          100,
@@ -1902,11 +1603,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows adding a line to a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_LineTo, err := PdfiumInstance.FPDFPath_LineTo(&requests.FPDFPath_LineTo{
 						PageObject: pageObject,
 						X:          100,
@@ -1917,11 +1613,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows adding a bezier to a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_BezierTo, err := PdfiumInstance.FPDFPath_BezierTo(&requests.FPDFPath_BezierTo{
 						PageObject: pageObject,
 						X1:         100,
@@ -1936,11 +1627,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows closing a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_Close, err := PdfiumInstance.FPDFPath_Close(&requests.FPDFPath_Close{
 						PageObject: pageObject,
 					})
@@ -1949,11 +1635,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the draw mode of a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_SetDrawMode, err := PdfiumInstance.FPDFPath_SetDrawMode(&requests.FPDFPath_SetDrawMode{
 						PageObject: pageObject,
 						FillMode:   enums.FPDF_FILLMODE_ALTERNATE,
@@ -1964,11 +1645,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the draw mode of a path", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_GetDrawMode, err := PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{
 						PageObject: pageObject,
 					})
@@ -1980,11 +1656,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting the draw mode of a path and then getting it again", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPath_GetDrawMode, err := PdfiumInstance.FPDFPath_GetDrawMode(&requests.FPDFPath_GetDrawMode{
 						PageObject: pageObject,
 					})
@@ -2068,25 +1739,42 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows us changing the text using a string", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFText_SetText, err := PdfiumInstance.FPDFText_SetText(&requests.FPDFText_SetText{
 						PageObject: pageObject,
 						Text:       "Changed for SetText test",
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFText_SetText).To(Equal(&responses.FPDFText_SetText{}))
+
+					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_LoadPage).To(Not(BeNil()))
+					Expect(FPDFText_LoadPage.TextPage).To(Not(BeEmpty()))
+
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+						TextPage:   FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetText).To(Equal(&responses.FPDFTextObj_GetText{
+						Text: "Changed for SetText test",
+					}))
+
+					FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_ClosePage).To(Equal(&responses.FPDFText_ClosePage{}))
 				})
 
 				It("allows us changing the text using charcodes", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFText_SetCharcodes, err := PdfiumInstance.FPDFText_SetCharcodes(&requests.FPDFText_SetCharcodes{
 						PageObject: pageObject,
 						CharCodes: []uint32{
@@ -2096,13 +1784,37 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFText_SetCharcodes).To(Equal(&responses.FPDFText_SetCharcodes{}))
+
+					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_LoadPage).To(Not(BeNil()))
+					Expect(FPDFText_LoadPage.TextPage).To(Not(BeEmpty()))
+
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+						TextPage:   FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetText).To(Equal(&responses.FPDFTextObj_GetText{
+						Text: string([]rune{9, 6, 7, 3, 5, 2, 1,
+							9, 6, 7, 4, 8, 2}),
+					}))
+
+					FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_ClosePage).To(Equal(&responses.FPDFText_ClosePage{}))
 				})
 
 				It("allows getting the font size", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFTextObj_GetFontSize, err := PdfiumInstance.FPDFTextObj_GetFontSize(&requests.FPDFTextObj_GetFontSize{
 						PageObject: pageObject,
 					})
@@ -2113,11 +1825,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the text render mode", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFTextObj_GetTextRenderMode, err := PdfiumInstance.FPDFTextObj_GetTextRenderMode(&requests.FPDFTextObj_GetTextRenderMode{
 						PageObject: pageObject,
 					})
@@ -2128,11 +1835,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when getting the text without a tex page", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
 						PageObject: pageObject,
 					})
@@ -2141,10 +1843,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the text", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -2228,10 +1926,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows to get the form object count", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
 						PageObject: pageObject,
 					})
@@ -2242,10 +1936,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when getting an invalid form object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
 						PageObject: pageObject,
 						Index:      23,
@@ -2255,10 +1945,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows to get a form object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
 						PageObject: pageObject,
 						Index:      0,
