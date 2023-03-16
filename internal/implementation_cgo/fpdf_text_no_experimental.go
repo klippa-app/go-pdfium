@@ -71,3 +71,9 @@ func (p *PdfiumImplementation) FPDFLink_GetTextRange(request *requests.FPDFLink_
 func (p *PdfiumImplementation) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

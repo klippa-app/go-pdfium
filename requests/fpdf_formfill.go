@@ -141,6 +141,12 @@ type FORM_GetSelectedText struct {
 	Page       Page
 }
 
+type FORM_ReplaceAndKeepSelection struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Page       Page
+	Text       string
+}
+
 type FORM_ReplaceSelection struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page

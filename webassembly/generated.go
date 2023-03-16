@@ -361,6 +361,20 @@ func (i *pdfiumInstance) FORM_Redo(request *requests.FORM_Redo) (resp *responses
 	return i.worker.Instance.FORM_Redo(request)
 }
 
+func (i *pdfiumInstance) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (resp *responses.FORM_ReplaceAndKeepSelection, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_ReplaceAndKeepSelection", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FORM_ReplaceAndKeepSelection(request)
+}
+
 func (i *pdfiumInstance) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (resp *responses.FORM_ReplaceSelection, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4377,6 +4391,20 @@ func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnico
 	}()
 
 	return i.worker.Instance.FPDFText_GetUnicode(request)
+}
+
+func (i *pdfiumInstance) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (resp *responses.FPDFText_HasUnicodeMapError, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_HasUnicodeMapError", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFText_HasUnicodeMapError(request)
 }
 
 func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (resp *responses.FPDFText_IsGenerated, err error) {

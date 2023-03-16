@@ -211,6 +211,14 @@ func (i *pdfiumInstance) FORM_Redo(request *requests.FORM_Redo) (*responses.FORM
 	return i.worker.plugin.FORM_Redo(request)
 }
 
+func (i *pdfiumInstance) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_ReplaceAndKeepSelection(request)
+}
+
 func (i *pdfiumInstance) FORM_ReplaceSelection(request *requests.FORM_ReplaceSelection) (*responses.FORM_ReplaceSelection, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2473,6 +2481,14 @@ func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnico
 	}
 
 	return i.worker.plugin.FPDFText_GetUnicode(request)
+}
+
+func (i *pdfiumInstance) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_HasUnicodeMapError(request)
 }
 
 func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error) {

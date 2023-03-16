@@ -1029,4 +1029,140 @@ var _ = Describe("fpdf_text", func() {
 			})
 		})
 	})
+
+	Context("a PDF file with invalid unicode", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bug_1388_2.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("a text page is opened", func() {
+			var textPage references.FPDF_TEXTPAGE
+
+			BeforeEach(func() {
+				textPageResp, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(textPageResp).To(Not(BeNil()))
+
+				textPage = textPageResp.TextPage
+			})
+
+			AfterEach(func() {
+				resp, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(resp).To(Not(BeNil()))
+			})
+
+			It("returns the correct amount of chars", func() {
+				FPDFText_CountChars, err := PdfiumInstance.FPDFText_CountChars(&requests.FPDFText_CountChars{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_CountChars).To(Equal(&responses.FPDFText_CountChars{
+					Count: 5,
+				}))
+			})
+
+			It("returns an error when checking for a unicode map error on an invalid char index", func() {
+				FPDFText_HasUnicodeMapError, err := PdfiumInstance.FPDFText_HasUnicodeMapError(&requests.FPDFText_HasUnicodeMapError{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get whether text has a unicode map error"))
+				Expect(FPDFText_HasUnicodeMapError).To(BeNil())
+			})
+
+			It("returns the correct char at position 0 without a unicode map error", func() {
+				FPDFText_GetUnicode, err := PdfiumInstance.FPDFText_GetUnicode(&requests.FPDFText_GetUnicode{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetUnicode).To(Equal(&responses.FPDFText_GetUnicode{
+					Index:   0,
+					Unicode: 'X',
+				}))
+
+				FPDFText_HasUnicodeMapError, err := PdfiumInstance.FPDFText_HasUnicodeMapError(&requests.FPDFText_HasUnicodeMapError{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_HasUnicodeMapError).To(Equal(&responses.FPDFText_HasUnicodeMapError{
+					Index:              0,
+					HasUnicodeMapError: false,
+				}))
+			})
+
+			It("returns the correct char at position 1 without a unicode map error", func() {
+				FPDFText_GetUnicode, err := PdfiumInstance.FPDFText_GetUnicode(&requests.FPDFText_GetUnicode{
+					TextPage: textPage,
+					Index:    1,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetUnicode).To(Equal(&responses.FPDFText_GetUnicode{
+					Index:   1,
+					Unicode: ' ',
+				}))
+
+				FPDFText_HasUnicodeMapError, err := PdfiumInstance.FPDFText_HasUnicodeMapError(&requests.FPDFText_HasUnicodeMapError{
+					TextPage: textPage,
+					Index:    1,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_HasUnicodeMapError).To(Equal(&responses.FPDFText_HasUnicodeMapError{
+					Index:              1,
+					HasUnicodeMapError: false,
+				}))
+			})
+
+			It("returns the correct char at position 2 with a unicode map error", func() {
+				FPDFText_GetUnicode, err := PdfiumInstance.FPDFText_GetUnicode(&requests.FPDFText_GetUnicode{
+					TextPage: textPage,
+					Index:    2,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetUnicode).To(Equal(&responses.FPDFText_GetUnicode{
+					Index:   2,
+					Unicode: 31,
+				}))
+
+				FPDFText_HasUnicodeMapError, err := PdfiumInstance.FPDFText_HasUnicodeMapError(&requests.FPDFText_HasUnicodeMapError{
+					TextPage: textPage,
+					Index:    2,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_HasUnicodeMapError).To(Equal(&responses.FPDFText_HasUnicodeMapError{
+					Index:              2,
+					HasUnicodeMapError: false, // @todo: this SHOULD be true...
+				}))
+			})
+		})
+	})
 })

@@ -252,3 +252,34 @@ func (p *PdfiumImplementation) FORM_IsIndexSelected(request *requests.FORM_IsInd
 		IsIndexSelected: int(isIndexSelected) == 1,
 	}, nil
 }
+
+// FORM_ReplaceAndKeepSelection
+// Call this function to replace the selected text in a form text field or
+// user-editable form combobox text field with another text string (which
+// can be empty or non-empty). If there is no selected text, this function
+// will append the replacement text after the current caret position. After
+// the insertion, the inserted text will be selected.
+// Experimental API
+func (p *PdfiumImplementation) FORM_ReplaceAndKeepSelection(request *requests.FORM_ReplaceAndKeepSelection) (*responses.FORM_ReplaceAndKeepSelection, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF8ToUTF16LE(request.Text)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FORM_ReplaceAndKeepSelection(formHandleHandle.handle, pageHandle.handle, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedText[0])))
+
+	return &responses.FORM_ReplaceAndKeepSelection{}, nil
+}
