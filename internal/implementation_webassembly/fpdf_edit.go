@@ -1,9 +1,7 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/structs"
 	"io"
 	"os"
 	"unsafe"
@@ -11,6 +9,7 @@ import (
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"github.com/klippa-app/go-pdfium/structs"
 )
 
 // FPDF_CreateNewDocument returns a new document.
