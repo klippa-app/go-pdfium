@@ -21,6 +21,35 @@ type FileReaderRef struct {
 var FileReaders = map[uint32]*FileReaderRef{}
 var FileReadersCounter = uint32(0)
 
+func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.ReadSeeker) (*uint64, *uint32, error) {
+	fileReaderIndex := FileReadersCounter
+	FileReadersCounter++
+
+	paramPointer, err := p.Malloc(4)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
+
+	res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(fileSize), paramPointer)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fileAccessPointer := res[0]
+
+	fileReaderRef := &FileReaderRef{
+		Reader:     reader,
+		FileAccess: &fileAccessPointer,
+	}
+
+	FileReaders[fileReaderIndex] = fileReaderRef
+	p.fileReaders[fileReaderIndex] = fileReaderRef
+
+	return &fileAccessPointer, &fileReaderIndex, nil
+}
+
 type FileWriterRef struct {
 	Writer    io.Writer
 	FileWrite *uint64

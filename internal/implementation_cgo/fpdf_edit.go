@@ -445,7 +445,7 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFileInline(request *requests
 	Pdfium.fileReaders[readerRef.String()] = fileReaderRef
 	p.fileReaders[readerRef.String()] = fileReaderRef
 
-	result := C.FPDFImageObj_LoadJpegFile(&pageHandle, C.int(request.Count), pageObjectHandle.handle, &readerStruct)
+	result := C.FPDFImageObj_LoadJpegFileInline(&pageHandle, C.int(request.Count), pageObjectHandle.handle, &readerStruct)
 	if int(result) == 0 {
 		return nil, errors.New("could not load jpeg file")
 	}

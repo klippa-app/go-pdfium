@@ -239,34 +239,14 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
 		}
 
-		fileReaderIndex := FileReadersCounter
-		FileReadersCounter++
-
-		paramPointer, err := p.Malloc(4)
+		fileAccessPointer, fileReaderIndex, err := p.CreateFileAccessReader(request.FileReaderSize, request.FileReader)
 		if err != nil {
 			return nil, err
 		}
 
-		p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
+		nativeDoc.fileHandleRef = fileReaderIndex
 
-		res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(request.FileReaderSize), paramPointer)
-		if err != nil {
-			return nil, err
-		}
-
-		fileAccessPointer := res[0]
-
-		fileReaderRef := &FileReaderRef{
-			Reader:     request.FileReader,
-			FileAccess: &fileAccessPointer,
-		}
-
-		FileReaders[fileReaderIndex] = fileReaderRef
-		p.fileReaders[fileReaderIndex] = fileReaderRef
-
-		nativeDoc.fileHandleRef = &fileReaderIndex
-
-		res, err = p.Module.ExportedFunction("FPDF_LoadCustomDocument").Call(p.Context, fileAccessPointer, cPasswordPointer)
+		res, err := p.Module.ExportedFunction("FPDF_LoadCustomDocument").Call(p.Context, *fileAccessPointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
