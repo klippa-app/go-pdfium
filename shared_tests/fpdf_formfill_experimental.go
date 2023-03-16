@@ -574,6 +574,17 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				Expect(err).To(BeNil())
 				Expect(FORM_OnLButtonUp).To(Equal(&responses.FORM_OnLButtonUp{}))
 
+				FORM_ReplaceAndKeepSelection, err := PdfiumInstance.FORM_ReplaceAndKeepSelection(&requests.FORM_ReplaceAndKeepSelection{
+					Page: requests.Page{
+						ByReference: &FPDF_LoadPage.Page,
+					},
+					FormHandle: formHandle,
+					Text:       "Jeroen",
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_ReplaceAndKeepSelection).To(Equal(&responses.FORM_ReplaceAndKeepSelection{}))
+				renderFormImage(FPDF_LoadPage.Page)
+
 				FORM_ReplaceSelection, err := PdfiumInstance.FORM_ReplaceSelection(&requests.FORM_ReplaceSelection{
 					Page: requests.Page{
 						ByReference: &FPDF_LoadPage.Page,
