@@ -736,7 +736,7 @@ var _ = Describe("fpdfview", func() {
 						}
 
 						// Create a view of the underlying memory.
-						memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(webassemblyImplementation.Context, uint32(memoryPointer), uint32(fileSize))
+						memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(uint32(memoryPointer), uint32(fileSize))
 						Expect(ok).To(BeTrue())
 						buffer = memoryBuffer
 						pointer = memoryPointer

@@ -19,7 +19,7 @@ func Instantiate(ctx context.Context, r wazero.Runtime) (api.Closer, error) {
 	builder := r.NewHostModuleBuilder("env")
 	emscripten.NewFunctionExporter().ExportFunctions(builder)
 	NewFunctionExporter().ExportFunctions(builder)
-	return builder.Instantiate(ctx, r)
+	return builder.Instantiate(ctx)
 }
 
 // FunctionExporter configures the functions in the "env" module used by

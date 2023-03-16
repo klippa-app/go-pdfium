@@ -178,7 +178,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		dataPointer = &dataPtr
 
-		if !p.Module.Memory().Write(p.Context, uint32(dataPtr), fileData) {
+		if !p.Module.Memory().Write(uint32(dataPtr), fileData) {
 			return nil, errors.New("could not write file data to memory")
 		}
 
@@ -247,7 +247,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			return nil, err
 		}
 
-		p.Module.Memory().WriteUint32Le(p.Context, uint32(paramPointer), fileReaderIndex)
+		p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
 
 		res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(request.FileReaderSize), paramPointer)
 		if err != nil {

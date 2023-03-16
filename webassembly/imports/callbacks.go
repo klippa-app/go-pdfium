@@ -17,7 +17,7 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 
 	mem := mod.Memory()
 
-	param, ok := mem.ReadUint32Le(ctx, paramPointer)
+	param, ok := mem.ReadUint32Le(paramPointer)
 	if !ok {
 		stack[0] = uint64(0)
 		return
@@ -45,7 +45,7 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 		return
 	}
 
-	ok = mem.Write(ctx, pBufPointer, readBuffer)
+	ok = mem.Write(pBufPointer, readBuffer)
 	if !ok {
 		stack[0] = uint64(0)
 		return
@@ -72,7 +72,7 @@ func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []ui
 		return
 	}
 
-	pBuf, ok := mem.Read(ctx, pDataPointer, size)
+	pBuf, ok := mem.Read(pDataPointer, size)
 	if !ok {
 		stack[0] = uint64(0)
 		return

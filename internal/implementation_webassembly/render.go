@@ -365,7 +365,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	}
 
 	// Create a view of the underlying memory, not a copy.
-	data, success := p.Module.Memory().Read(p.Context, uint32(res[0]), uint32(size))
+	data, success := p.Module.Memory().Read(uint32(res[0]), uint32(size))
 	if !success {
 		return nil, errors.New("could not get bitmap buffer")
 	}

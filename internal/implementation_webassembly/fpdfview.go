@@ -750,7 +750,7 @@ func (p *PdfiumImplementation) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap
 
 	// Create a view of the underlying memory, not a copy.
 	// This memory should be available until FPDFBitmap_Destroy is called.
-	data, success := p.Module.Memory().Read(p.Context, uint32(res[0]), uint32(size))
+	data, success := p.Module.Memory().Read(uint32(res[0]), uint32(size))
 	if !success {
 		return nil, errors.New("could not get bitmap buffer")
 	}
