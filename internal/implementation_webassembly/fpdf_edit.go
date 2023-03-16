@@ -1918,3 +1918,1606 @@ func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormO
 		PageObject: formObjectHandle.nativeRef,
 	}, nil
 }
+
+// FPDFPage_RemoveObject removes an object from a page.
+// Ownership is transferred to the caller. Call FPDFPageObj_Destroy() to free
+// it.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_RemoveObject) (*responses.FPDFPage_RemoveObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPage_RemoveObject").Call(p.Context, *pageHandle.handle, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not remove object")
+	}
+
+	return &responses.FPDFPage_RemoveObject{}, nil
+}
+
+// FPDFPageObj_GetMatrix returns the transform matrix of a page object.
+// The matrix is composed as:
+//
+//	|a c e|
+//	|b d f|
+//
+// and can be used to scale, rotate, shear and translate the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrixPointer, matrixValue, err := p.CStructFS_MATRIX(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(matrixPointer)
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetMatrix").Call(p.Context, *pageObjectHandle.handle, matrixPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get page object matrix")
+	}
+
+	matrix, err := matrixValue()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetMatrix{
+		Matrix: structs.FPDF_FS_MATRIX{
+			A: float32(matrix.A),
+			B: float32(matrix.B),
+			C: float32(matrix.C),
+			D: float32(matrix.D),
+			E: float32(matrix.E),
+			F: float32(matrix.F),
+		},
+	}, nil
+}
+
+// FPDFPageObj_SetMatrix sets the transform matrix on a page object.
+// The matrix is composed as:
+//
+//	|a c e|
+//	|b d f|
+//
+// and can be used to scale, rotate, shear and translate the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageObj_SetMatrix) (*responses.FPDFPageObj_SetMatrix, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrixPointer, _, err := p.CStructFS_MATRIX(&request.Transform)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(matrixPointer)
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetMatrix").Call(p.Context, *pageObjectHandle.handle, matrixPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set page object matrix")
+	}
+
+	return &responses.FPDFPageObj_SetMatrix{}, nil
+}
+
+// FPDFPageObj_CountMarks returns the count of content marks in a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_CountMarks(request *requests.FPDFPageObj_CountMarks) (*responses.FPDFPageObj_CountMarks, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CountMarks").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObj_CountMarks{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFPageObj_GetMark returns the content mark of a page object at the given index.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMark(request *requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetMark").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	mark := res[0]
+	if mark == 0 {
+		return nil, errors.New("could not get mark")
+	}
+
+	markHandle := p.registerPageObjectMark(&mark)
+
+	return &responses.FPDFPageObj_GetMark{
+		Mark: markHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPageObj_AddMark adds a new content mark to the given page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	name, err := p.CString(request.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	defer name.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_AddMark").Call(p.Context, *pageObjectHandle.handle, name.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	mark := res[0]
+	if mark == 0 {
+		return nil, errors.New("could not add mark")
+	}
+
+	markHandle := p.registerPageObjectMark(&mark)
+
+	return &responses.FPDFPageObj_AddMark{
+		Mark: markHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPageObj_RemoveMark removes the given content mark from the given page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_RemoveMark").Call(p.Context, *pageObjectHandle.handle, *pageObjectMarkHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not remove mark")
+	}
+
+	return &responses.FPDFPageObj_RemoveMark{}, nil
+}
+
+// FPDFPageObjMark_GetName returns the name of a content mark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetName(request *requests.FPDFPageObjMark_GetName) (*responses.FPDFPageObjMark_GetName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	nameLengthPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer nameLengthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetName").Call(p.Context, *pageObjectMarkHandle.handle, 0, 0, nameLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get name")
+	}
+
+	nameLengthValue, err := nameLengthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	nameLength := uint64(nameLengthValue)
+	if nameLength == 0 {
+		return nil, errors.New("could not get name")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(nameLength, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFPageObjMark_GetName").Call(p.Context, *pageObjectMarkHandle.handle, charDataPointer.Pointer, nameLength, nameLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetName{
+		Name: transformedText,
+	}, nil
+}
+
+// FPDFPageObjMark_CountParams returns the number of key/value pair parameters in the given mark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_CountParams(request *requests.FPDFPageObjMark_CountParams) (*responses.FPDFPageObjMark_CountParams, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_CountParams").Call(p.Context, *pageObjectMarkHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObjMark_CountParams{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFPageObjMark_GetParamKey returns the key of a property in a content mark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamKey(request *requests.FPDFPageObjMark_GetParamKey) (*responses.FPDFPageObjMark_GetParamKey, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyLengthPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer keyLengthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetParamKey").Call(p.Context, *pageObjectMarkHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), 0, 0, keyLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get key")
+	}
+
+	keyLengthValue, err := keyLengthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	keyLength := uint64(keyLengthValue)
+	if keyLength == 0 {
+		return nil, errors.New("could not get key")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(keyLength, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFPageObjMark_GetParamKey").Call(p.Context, *pageObjectMarkHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, keyLength, keyLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamKey{
+		Key: transformedText,
+	}, nil
+}
+
+// FPDFPageObjMark_GetParamValueType returns the type of the value of a property in a content mark by key.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamValueType(request *requests.FPDFPageObjMark_GetParamValueType) (*responses.FPDFPageObjMark_GetParamValueType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetParamValueType").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	valueType := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObjMark_GetParamValueType{
+		ValueType: enums.FPDF_OBJECT_TYPE(valueType),
+	}, nil
+}
+
+// FPDFPageObjMark_GetParamIntValue returns the value of a number property in a content mark by key as int.
+// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+// for this property.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	intValuePointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer intValuePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetParamIntValue").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer, intValuePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	intValue, err := intValuePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamIntValue{
+		Value: int(intValue),
+	}, nil
+}
+
+// FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	valueLengthPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer valueLengthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetParamStringValue").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer, 0, 0, valueLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	valueLengthValue, err := valueLengthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	valueLength := uint64(valueLengthValue)
+	if valueLength == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(valueLength, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFPageObjMark_GetParamStringValue").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer, charDataPointer.Pointer, valueLength, valueLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamStringValue{
+		Value: transformedText,
+	}, nil
+}
+
+// FPDFPageObjMark_GetParamBlobValue returns the value of a blob property in a content mark by key.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *requests.FPDFPageObjMark_GetParamBlobValue) (*responses.FPDFPageObjMark_GetParamBlobValue, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	valueLengthPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer valueLengthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_GetParamBlobValue").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer, 0, 0, valueLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	valueLengthValue, err := valueLengthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	valueLength := uint64(valueLengthValue)
+	if valueLength == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	paramDataPointer, err := p.ByteArrayPointer(valueLength, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer paramDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFPageObjMark_GetParamBlobValue").Call(p.Context, *pageObjectMarkHandle.handle, keyPointer.Pointer, paramDataPointer.Pointer, valueLength, valueLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	paramData, err := paramDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObjMark_GetParamBlobValue{
+		Value: paramData,
+	}, nil
+}
+
+// FPDFPageObjMark_SetIntParam sets the value of an int property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_SetIntParam").Call(p.Context, *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.Value)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_SetIntParam{}, nil
+}
+
+// FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetStringParam(request *requests.FPDFPageObjMark_SetStringParam) (*responses.FPDFPageObjMark_SetStringParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	valuePointer, err := p.CString(request.Value)
+	if err != nil {
+		return nil, err
+	}
+	defer valuePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_SetStringParam").Call(p.Context, *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_SetStringParam{}, nil
+}
+
+// FPDFPageObjMark_SetBlobParam sets the value of a blob property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPageObjMark_SetBlobParam) (*responses.FPDFPageObjMark_SetBlobParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Value == nil || len(request.Value) == 0 {
+		return nil, errors.New("blob value cant be empty")
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	dataLength := uint64(len(request.Value))
+	valuePointer, err := p.ByteArrayPointer(dataLength, request.Value)
+	if err != nil {
+		return nil, err
+	}
+	defer valuePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_SetBlobParam").Call(p.Context, *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, valuePointer.Pointer, dataLength)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_SetBlobParam{}, nil
+}
+
+// FPDFPageObjMark_RemoveParam removes a property from a content mark by key.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_RemoveParam(request *requests.FPDFPageObjMark_RemoveParam) (*responses.FPDFPageObjMark_RemoveParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPointer, err := p.CString(request.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer keyPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_RemoveParam").Call(p.Context, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_RemoveParam{}, nil
+}
+
+// FPDFImageObj_GetRenderedBitmap returns a bitmap rasterization of the given image object that takes the image mask and
+// image matrix into account. To render correctly, the caller must provide the
+// document associated with the image object. If there is a page associated
+// with the image object the caller should provide that as well.
+// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+// must be called on the returned bitmap when it is no longer needed.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetRenderedBitmap(request *requests.FPDFImageObj_GetRenderedBitmap) (*responses.FPDFImageObj_GetRenderedBitmap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFImageObj_GetRenderedBitmap").Call(p.Context, *documentHandle.handle, *pageHandle.handle, *imageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	bitmap := res[0]
+	if bitmap == 0 {
+		return nil, errors.New("could not get bitmap")
+	}
+
+	bitmapHandle := p.registerBitmap(&bitmap)
+
+	return &responses.FPDFImageObj_GetRenderedBitmap{
+		Bitmap: bitmapHandle.nativeRef,
+	}, nil
+}
+
+// FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
+// Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
+// object. When the object is rotated by a non-multiple of 90 degrees, this API
+// returns a tighter bound that cannot be represented with just the 4 sides of
+// a rectangle.
+//
+// Currently only works the following page object types: FPDF_PAGEOBJ_TEXT and
+// FPDF_PAGEOBJ_IMAGE.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	quadPointsPointer, quadPointsValue, err := p.CStructFS_QUADPOINTSF(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(quadPointsPointer)
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetRotatedBounds").Call(p.Context, *pageObjectHandle.handle, quadPointsPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get rotated bounds for page object")
+	}
+
+	quadPoints, err := quadPointsValue()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetRotatedBounds{
+		QuadPoints: *quadPoints,
+	}, nil
+}
+
+// FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	dashPhasePointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer dashPhasePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetDashPhase").Call(p.Context, *pageObjectHandle.handle, dashPhasePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get dash phase")
+	}
+
+	dashPhase, err := dashPhasePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetDashPhase{
+		DashPhase: float32(dashPhase),
+	}, nil
+}
+
+// FPDFPageObj_SetDashPhase sets the line dash phase of the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_SetDashPhase(request *requests.FPDFPageObj_SetDashPhase) (*responses.FPDFPageObj_SetDashPhase, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetDashPhase").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.DashPhase)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set dash phase")
+	}
+
+	return &responses.FPDFPageObj_SetDashPhase{}, nil
+}
+
+// FPDFPageObj_GetDashCount returns the line dash array size of the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetDashCount(request *requests.FPDFPageObj_GetDashCount) (*responses.FPDFPageObj_GetDashCount, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetDashCount").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	dashCount := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObj_GetDashCount{
+		DashCount: int(dashCount),
+	}, nil
+}
+
+// FPDFPageObj_GetDashArray returns the line dash array of the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetDashArray(request *requests.FPDFPageObj_GetDashArray) (*responses.FPDFPageObj_GetDashArray, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the Dash Count.
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetDashCount").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	dashCount := *(*int32)(unsafe.Pointer(&res[0]))
+	dashCountSize := uint64(dashCount)
+
+	convertedData := make([]float32, 0)
+	if int(dashCount) > 0 {
+		// Create an array that's big enough.
+		valueDataPointer, err := p.FloatArrayPointer(dashCountSize)
+		if err != nil {
+			return nil, err
+		}
+		defer valueDataPointer.Free()
+
+		_, err = p.Module.ExportedFunction("FPDFPageObj_GetDashArray").Call(p.Context, *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize)
+		if err != nil {
+			return nil, err
+		}
+
+		valueData, err := valueDataPointer.Value()
+		if err != nil {
+			return nil, err
+		}
+
+		convertedData = valueData
+	}
+
+	return &responses.FPDFPageObj_GetDashArray{
+		DashArray: convertedData,
+	}, nil
+}
+
+// FPDFPageObj_SetDashArray sets the line dash array of the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPageObj_SetDashArray) (*responses.FPDFPageObj_SetDashArray, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	dashCountSize := uint64(uint64(len(request.DashArray)))
+
+	// Create an array that's big enough.
+	valueDataPointer, err := p.FloatArrayPointer(dashCountSize)
+	if err != nil {
+		return nil, err
+	}
+	defer valueDataPointer.Free()
+
+	// Put the values in the array.
+	for i := range request.DashArray {
+		p.Module.Memory().WriteFloat32Le(uint32(valueDataPointer.Pointer+(p.CSizeFloat()*uint64(i))), request.DashArray[i])
+	}
+
+	_, err = p.Module.ExportedFunction("FPDFPageObj_SetDashArray").Call(p.Context, *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize, *(*uint64)(unsafe.Pointer(&request.DashPhase)))
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_SetDashArray{}, nil
+}
+
+// FPDFText_LoadStandardFont loads one of the standard 14 fonts per PDF spec 1.7 page 416. The preferred
+// way of using font style is using a dash to separate the name from the style,
+// for example 'Helvetica-BoldItalic'.
+// The loaded font can be closed using FPDFFont_Close.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	fontNamePointer, err := p.CString(request.Font)
+	if err != nil {
+		return nil, err
+	}
+	defer fontNamePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFText_LoadStandardFont").Call(p.Context, *documentHandle.handle, fontNamePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	font := res[0]
+	if font == 0 {
+		return nil, errors.New("could not load standard font")
+	}
+
+	fontHandle := p.registerFont(&font)
+
+	return &responses.FPDFText_LoadStandardFont{
+		Font: fontHandle.nativeRef,
+	}, nil
+}
+
+// FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFTextObj_SetTextRenderMode").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.TextRenderMode)))
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not set text render mode")
+	}
+
+	return &responses.FPDFTextObj_SetTextRenderMode{}, nil
+}
+
+// FPDFTextObj_GetRenderedBitmap returns a bitmap rasterization of the given text object.
+// To render correctly, the caller must provide the document associated with the text object.
+// If there is a page associated with text object, the caller should provide that as well.
+// The returned bitmap will be owned by the caller, and FPDFBitmap_Destroy()
+// must be called on the returned bitmap when it is no longer needed.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_GetRenderedBitmap(request *requests.FPDFTextObj_GetRenderedBitmap) (*responses.FPDFTextObj_GetRenderedBitmap, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	var pageHandle uint64
+	if request.Page != "" {
+		pageHandleReference, err := p.getPageHandle(request.Page)
+		if err != nil {
+			return nil, err
+		}
+
+		pageHandle = *pageHandleReference.handle
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetRenderedBitmap").Call(p.Context, *documentHandle.handle, pageHandle, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Scale)))
+	if err != nil {
+		return nil, err
+	}
+
+	bitmap := res[0]
+	if bitmap == 0 {
+		return nil, errors.New("could not render text object as bitmap")
+	}
+
+	bitmapHandle := p.registerBitmap(&bitmap)
+
+	return &responses.FPDFTextObj_GetRenderedBitmap{
+		Bitmap: bitmapHandle.nativeRef,
+	}, nil
+}
+
+// FPDFTextObj_GetFont returns the font of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj_GetFont) (*responses.FPDFTextObj_GetFont, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetFont").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	font := res[0]
+	if font == 0 {
+		return nil, errors.New("could not load standard font")
+	}
+
+	fontHandle := p.registerFont(&font)
+
+	return &responses.FPDFTextObj_GetFont{
+		Font: fontHandle.nativeRef,
+	}, nil
+}
+
+// FPDFFont_GetFontName returns the font name of a font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	res, err := p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	nameSize := *(*int32)(unsafe.Pointer(&res[0]))
+	if nameSize == 0 {
+		return nil, errors.New("could not get font name")
+	}
+
+	charDataSize := uint64(nameSize)
+	charDataPointer, err := p.ByteArrayPointer(charDataSize, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetFontName{
+		FontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	}, nil
+}
+
+// FPDFFont_GetFontData returns the decoded data from the given font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFontData(request *requests.FPDFFont_GetFontData) (*responses.FPDFFont_GetFontData, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	outBufLenPointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer outBufLenPointer.Free()
+
+	// First get the font data length.
+	res, err := p.Module.ExportedFunction("FPDFFont_GetFontData").Call(p.Context, *fontHandle.handle, 0, 0, outBufLenPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) != 1 {
+		return nil, errors.New("could not get font data")
+	}
+
+	outBufLenValue, err := outBufLenPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	outBufLen := uint64(outBufLenValue)
+	if int(outBufLen) == 0 {
+		return nil, errors.New("could not get font data")
+	}
+
+	fontDataPointer, err := p.ByteArrayPointer(outBufLen, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer fontDataPointer.Free()
+
+	res, err = p.Module.ExportedFunction("FPDFFont_GetFontData").Call(p.Context, *fontHandle.handle, fontDataPointer.Pointer, outBufLen, outBufLenPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success = *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) != 1 {
+		return nil, errors.New("could not get font data")
+	}
+
+	fontData, err := fontDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetFontData{
+		FontData: fontData,
+	}, nil
+}
+
+// FPDFFont_GetIsEmbedded returns whether the given font is embedded or not.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetIsEmbedded(request *requests.FPDFFont_GetIsEmbedded) (*responses.FPDFFont_GetIsEmbedded, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetIsEmbedded").Call(p.Context, *fontHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	isEmbedded := *(*int32)(unsafe.Pointer(&res[0]))
+	return &responses.FPDFFont_GetIsEmbedded{
+		IsEmbedded: int(isEmbedded) == 1,
+	}, nil
+}
+
+// FPDFFont_GetFlags returns the descriptor flags of a font.
+// Returns the bit flags specifying various characteristics of the font as
+// defined in ISO 32000-1:2008, table 123.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) (*responses.FPDFFont_GetFlags, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetFlags").Call(p.Context, *fontHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	flags := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(flags) == -1 {
+		return nil, errors.New("could not get font flags")
+	}
+
+	fontFlags := &responses.FPDFFont_GetFlags{
+		Flags: uint32(flags),
+	}
+
+	FixedPitch := uint32(1 << 1)
+	Serif := uint32(1 << 2)
+	Symbolic := uint32(1 << 3)
+	Script := uint32(1 << 4)
+	Nonsymbolic := uint32(1 << 6)
+	Italic := uint32(1 << 7)
+	AllCap := uint32(1 << 17)
+	SmallCap := uint32(1 << 18)
+	ForceBold := uint32(1 << 19)
+
+	hasFlag := func(flag uint32) bool {
+		if fontFlags.Flags&flag > 0 {
+			return true
+		}
+
+		return false
+	}
+
+	fontFlags.FixedPitch = hasFlag(FixedPitch)
+	fontFlags.Serif = hasFlag(Serif)
+	fontFlags.Symbolic = hasFlag(Symbolic)
+	fontFlags.Script = hasFlag(Script)
+	fontFlags.Nonsymbolic = hasFlag(Nonsymbolic)
+	fontFlags.Italic = hasFlag(Italic)
+	fontFlags.AllCap = hasFlag(AllCap)
+	fontFlags.SmallCap = hasFlag(SmallCap)
+	fontFlags.ForceBold = hasFlag(ForceBold)
+
+	return fontFlags, nil
+}
+
+// FPDFFont_GetWeight returns the font weight of a font.
+// Typical values are 400 (normal) and 700 (bold).
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetWeight(request *requests.FPDFFont_GetWeight) (*responses.FPDFFont_GetWeight, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetWeight").Call(p.Context, *fontHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	fontWeight := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(fontWeight) == -1 {
+		return nil, errors.New("could not get font weight")
+	}
+
+	return &responses.FPDFFont_GetWeight{
+		Weight: int(fontWeight),
+	}, nil
+}
+
+// FPDFFont_GetItalicAngle returns the italic angle of a font.
+// The italic angle of a font is defined as degrees counterclockwise
+// from vertical. For a font that slopes to the right, this will be negative.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetItalicAngle(request *requests.FPDFFont_GetItalicAngle) (*responses.FPDFFont_GetItalicAngle, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	anglePointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetItalicAngle").Call(p.Context, *fontHandle.handle, anglePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get italic angle")
+	}
+
+	angle, err := anglePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetItalicAngle{
+		ItalicAngle: int(angle),
+	}, nil
+}
+
+// FPDFFont_GetAscent returns ascent distance of a font.
+// Ascent is the maximum distance in points above the baseline reached by the
+// glyphs of the font. One point is 1/72 inch (around 0.3528 mm).
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetAscent(request *requests.FPDFFont_GetAscent) (*responses.FPDFFont_GetAscent, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	ascentPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetAscent").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)), ascentPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get ascent")
+	}
+
+	ascent, err := ascentPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetAscent{
+		Ascent: float32(ascent),
+	}, nil
+}
+
+// FPDFFont_GetDescent returns the descent distance of a font.
+// Descent is the maximum distance in points below the baseline reached by the
+// glyphs of the font. One point is 1/72 inch (around 0.3528 mm).
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetDescent(request *requests.FPDFFont_GetDescent) (*responses.FPDFFont_GetDescent, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	descentPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetDescent").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)), descentPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get descent")
+	}
+
+	descent, err := descentPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetDescent{
+		Descent: float32(descent),
+	}, nil
+}
+
+// FPDFFont_GetGlyphWidth returns the width of a glyph in a font.
+// Glyph width is the distance from the end of the prior glyph to the next
+// glyph. This will be the vertical distance for vertical writing.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetGlyphWidth(request *requests.FPDFFont_GetGlyphWidth) (*responses.FPDFFont_GetGlyphWidth, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	glyphWidthPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphWidth").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.Glyph)), *(*uint64)(unsafe.Pointer(&request.FontSize)), glyphWidthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	result := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(result) == 0 {
+		return nil, errors.New("could not get glyph width")
+	}
+
+	glyphWidth, err := glyphWidthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetGlyphWidth{
+		GlyphWidth: float32(glyphWidth),
+	}, nil
+}
+
+// FPDFFont_GetGlyphPath returns the glyphpath describing how to draw a font glyph.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetGlyphPath(request *requests.FPDFFont_GetGlyphPath) (*responses.FPDFFont_GetGlyphPath, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphPath").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.Glyph)), *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	if err != nil {
+		return nil, err
+	}
+
+	glyphPath := res[0]
+	if glyphPath == 0 {
+		return nil, errors.New("could not get glyph path")
+	}
+
+	glyphPathHandle := p.registerGlyphPath(&glyphPath)
+
+	return &responses.FPDFFont_GetGlyphPath{
+		GlyphPath: glyphPathHandle.nativeRef,
+	}, nil
+}
+
+// FPDFGlyphPath_CountGlyphSegments returns the number of segments inside the given glyphpath.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFGlyphPath_CountGlyphSegments(request *requests.FPDFGlyphPath_CountGlyphSegments) (*responses.FPDFGlyphPath_CountGlyphSegments, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	glyphPathHandle, err := p.getGlyphPathHandle(request.GlyphPath)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFGlyphPath_CountGlyphSegments").Call(p.Context, *glyphPathHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(count) == -1 {
+		return nil, errors.New("could not get glyph path segment count")
+	}
+
+	return &responses.FPDFGlyphPath_CountGlyphSegments{
+		Count: int(count),
+	}, nil
+}
+
+// FPDFGlyphPath_GetGlyphPathSegment returns the segment in glyphpath at the given index.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *requests.FPDFGlyphPath_GetGlyphPathSegment) (*responses.FPDFGlyphPath_GetGlyphPathSegment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	glyphPathHandle, err := p.getGlyphPathHandle(request.GlyphPath)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFGlyphPath_GetGlyphPathSegment").Call(p.Context, *glyphPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	segment := res[0]
+	if segment == 0 {
+		return nil, errors.New("could not get glyph path segment")
+	}
+
+	segmentHandle := p.registerPathSegment(&segment)
+
+	return &responses.FPDFGlyphPath_GetGlyphPathSegment{
+		GlyphPathSegment: segmentHandle.nativeRef,
+	}, nil
+}

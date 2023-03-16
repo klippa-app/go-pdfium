@@ -297,6 +297,42 @@ func (p *PdfiumImplementation) IntArrayPointer(size uint64) (*IntArrayPointer, e
 	}, nil
 }
 
+type FloatArrayPointer struct {
+	Pointer uint64
+	Size    uint64
+	Free    func()
+	Value   func() ([]float32, error)
+}
+
+func (p *PdfiumImplementation) FloatArrayPointer(size uint64) (*FloatArrayPointer, error) {
+	pointer, err := p.Malloc(p.CSizeFloat() * size)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FloatArrayPointer{
+		Pointer: pointer,
+		Size:    size,
+		Free: func() {
+			p.Free(pointer)
+		},
+		Value: func() ([]float32, error) {
+			myFloats := []float32{}
+
+			for i := 0; i < int(size); i++ {
+				myFloat, success := p.Module.Memory().ReadFloat32Le(uint32(pointer + (uint64(i) * p.CSizeFloat())))
+				if !success {
+					return nil, errors.New("could not read uint array data from memory")
+				}
+
+				myFloats = append(myFloats, myFloat)
+			}
+
+			return myFloats, nil
+		},
+	}, nil
+}
+
 type DoublePointer struct {
 	Pointer uint64
 	Free    func()
@@ -829,6 +865,113 @@ func (p *PdfiumImplementation) CStructFPDF_IMAGEOBJ_METADATA(in *structs.FPDF_IM
 			BitsPerPixel:    uint(bitsPerPixel),
 			Colorspace:      enums.FPDF_COLORSPACE(int(*(*int32)(unsafe.Pointer(&colorSpace)))),
 			MarkedContentID: int(*(*int32)(unsafe.Pointer(&markedContentID))),
+		}, nil
+	}, nil
+}
+
+func (p *PdfiumImplementation) CSizeStructFS_QUADPOINTSF() uint64 {
+	// FS_MATRIX is 6 * float (x1, y1, x2, y2, x3, y3, x4, y4).
+	return p.CSizeFloat() * 8
+}
+
+func (p *PdfiumImplementation) CStructFS_QUADPOINTSF(in *structs.FPDF_FS_QUADPOINTSF) (uint64, func() (*structs.FPDF_FS_QUADPOINTSF, error), error) {
+	pointer, err := p.Malloc(p.CSizeStructFS_QUADPOINTSF())
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if in != nil {
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer), in.X1) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*1)), in.Y1) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*2)), in.X2) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*3)), in.Y2) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*4)), in.X3) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*5)), in.Y3) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*6)), in.X4) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFloat()*7)), in.Y4) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write float data to memory")
+		}
+	}
+
+	return pointer, func() (*structs.FPDF_FS_QUADPOINTSF, error) {
+		x1, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		y1, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 1)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		x2, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 2)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		y2, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 3)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		x3, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 4)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		y3, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 5)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		x4, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 6)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		y4, ok := p.Module.Memory().ReadFloat32Le(uint32(pointer + (p.CSizeFloat() * 7)))
+		if !ok {
+			return nil, errors.New("could not read float data from memory")
+		}
+
+		return &structs.FPDF_FS_QUADPOINTSF{
+			X1: x1,
+			Y1: y1,
+			X2: x2,
+			Y2: y2,
+			X3: x3,
+			Y3: y3,
+			X4: x4,
+			Y4: y4,
 		}, nil
 	}, nil
 }
