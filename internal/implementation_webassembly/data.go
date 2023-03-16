@@ -6,7 +6,9 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/structs"
 
 	"golang.org/x/text/encoding/unicode"
@@ -677,6 +679,121 @@ func (p *PdfiumImplementation) CStructFS_SIZEF(in *structs.FPDF_FS_SIZEF) (uint6
 		return &structs.FPDF_FS_SIZEF{
 			Width:  width,
 			Height: height,
+		}, nil
+	}, nil
+}
+
+func (p *PdfiumImplementation) CSizeStructFPDF_IMAGEOBJ_METADATA() uint64 {
+	// FPDF_IMAGEOBJ_METADATA is 2 * uint (width, height) + 2 * float (horizontal_dpi, vertical_dpi) + uint (bits_per_pixel) + 2 * int (colorspace, marked_content_id).
+	return (p.CSizeUInt() * 2) + (p.CSizeFloat() * 2) + p.CSizeUInt() + (p.CSizeInt() * 2)
+}
+
+func (p *PdfiumImplementation) CStructFPDF_IMAGEOBJ_METADATA(in *structs.FPDF_IMAGEOBJ_METADATA) (uint64, func() (*structs.FPDF_IMAGEOBJ_METADATA, error), error) {
+	pointer, err := p.Malloc(p.CSizeStructFPDF_IMAGEOBJ_METADATA())
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if in != nil {
+		offset := pointer
+		if !p.Module.Memory().WriteUint32Le(uint32(offset), uint32(in.Width)) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write width data to memory")
+		}
+		offset += p.CSizeUInt()
+
+		if !p.Module.Memory().WriteUint32Le(uint32(offset), uint32(in.Height)) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write height data to memory")
+		}
+		offset += p.CSizeUInt()
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(offset), in.HorizontalDPI) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write horizontal DPI data to memory")
+		}
+		offset += p.CSizeFloat()
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(offset), in.VerticalDPI) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write vertical DPI data to memory")
+		}
+		offset += p.CSizeFloat()
+
+		if !p.Module.Memory().WriteUint32Le(uint32(offset), uint32(in.BitsPerPixel)) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write bits per pixel data to memory")
+		}
+		offset += p.CSizeUInt()
+
+		if !p.Module.Memory().WriteUint32Le(uint32(offset), *(*uint32)(unsafe.Pointer(&in.Colorspace))) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write colorspace data to memory")
+		}
+		offset += p.CSizeInt()
+
+		if !p.Module.Memory().WriteUint32Le(uint32(offset), *(*uint32)(unsafe.Pointer(&in.MarkedContentID))) {
+			p.Free(pointer)
+			return 0, nil, errors.New("could not write marked content ID data to memory")
+		}
+	}
+
+	return pointer, func() (*structs.FPDF_IMAGEOBJ_METADATA, error) {
+		offset := pointer
+		width, ok := p.Module.Memory().ReadUint32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read width data from memory")
+		}
+		offset += p.CSizeUInt()
+
+		height, ok := p.Module.Memory().ReadUint32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read height data from memory")
+		}
+
+		offset += p.CSizeUInt()
+
+		horizontalDPI, ok := p.Module.Memory().ReadFloat32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read horizontal DPI data from memory")
+		}
+
+		offset += p.CSizeFloat()
+
+		verticalDPI, ok := p.Module.Memory().ReadFloat32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read vertical DPI data from memory")
+		}
+
+		offset += p.CSizeFloat()
+
+		bitsPerPixel, ok := p.Module.Memory().ReadUint32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read bits per pixel data from memory")
+		}
+
+		offset += p.CSizeUInt()
+
+		colorSpace, ok := p.Module.Memory().ReadUint32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read colorspace data from memory")
+		}
+
+		offset += p.CSizeInt()
+
+		markedContentID, ok := p.Module.Memory().ReadUint32Le(uint32(offset))
+		if !ok {
+			return nil, errors.New("could not read marked content ID data from memory")
+		}
+
+		return &structs.FPDF_IMAGEOBJ_METADATA{
+			Width:           uint(width),
+			Height:          uint(height),
+			HorizontalDPI:   horizontalDPI,
+			VerticalDPI:     verticalDPI,
+			BitsPerPixel:    uint(bitsPerPixel),
+			Colorspace:      enums.FPDF_COLORSPACE(int(*(*int32)(unsafe.Pointer(&colorSpace)))),
+			MarkedContentID: int(*(*int32)(unsafe.Pointer(&markedContentID))),
 		}, nil
 	}, nil
 }

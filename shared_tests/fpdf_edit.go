@@ -114,30 +114,18 @@ var _ = Describe("fpdf_edit", func() {
 	Context("no page", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFPage_InsertObject", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_InsertObject, err := PdfiumInstance.FPDFPage_InsertObject(&requests.FPDFPage_InsertObject{})
 				Expect(err).To(MatchError("either page reference or index should be given"))
 				Expect(FPDFPage_InsertObject).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPage_CountObjects", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_CountObjects, err := PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{})
 				Expect(err).To(MatchError("either page reference or index should be given"))
 				Expect(FPDFPage_CountObjects).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPage_GetObject", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{})
 				Expect(err).To(MatchError("either page reference or index should be given"))
 				Expect(FPDFPage_GetObject).To(BeNil())
@@ -184,60 +172,36 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("returns an error when calling FPDFImageObj_SetMatrix", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_SetMatrix, err := PdfiumInstance.FPDFImageObj_SetMatrix(&requests.FPDFImageObj_SetMatrix{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_SetMatrix).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetImageDataDecoded", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetImageDataDecoded, err := PdfiumInstance.FPDFImageObj_GetImageDataDecoded(&requests.FPDFImageObj_GetImageDataDecoded{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImageDataDecoded).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetImageDataRaw", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetImageDataRaw, err := PdfiumInstance.FPDFImageObj_GetImageDataRaw(&requests.FPDFImageObj_GetImageDataRaw{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImageDataRaw).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetImageFilterCount", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetImageFilterCount, err := PdfiumInstance.FPDFImageObj_GetImageFilterCount(&requests.FPDFImageObj_GetImageFilterCount{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImageFilterCount).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetImageFilter", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetImageFilter, err := PdfiumInstance.FPDFImageObj_GetImageFilter(&requests.FPDFImageObj_GetImageFilter{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImageFilter).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetImageMetadata", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetImageMetadata, err := PdfiumInstance.FPDFImageObj_GetImageMetadata(&requests.FPDFImageObj_GetImageMetadata{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImageMetadata).To(BeNil())
@@ -514,20 +478,12 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("returns an error when calling FPDFImageObj_SetBitmap", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_SetBitmap, err := PdfiumInstance.FPDFImageObj_SetBitmap(&requests.FPDFImageObj_SetBitmap{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_SetBitmap).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFImageObj_GetBitmap", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFImageObj_GetBitmap, err := PdfiumInstance.FPDFImageObj_GetBitmap(&requests.FPDFImageObj_GetBitmap{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetBitmap).To(BeNil())
@@ -670,10 +626,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("gives an error when inserting an invalid object", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_InsertObject, err := PdfiumInstance.FPDFPage_InsertObject(&requests.FPDFPage_InsertObject{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
@@ -714,10 +666,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows us to insert an object to a page and the object count changes", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_CountObjects, err := PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
@@ -730,6 +678,11 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
 					Count: 4,
 				}))
+
+				if TestType == "webassembly" {
+					// @todo: remove me when implemented.
+					Skip("This test is skipped on Webassembly")
+				}
 
 				FPDFPageObj_NewTextObj, err := PdfiumInstance.FPDFPageObj_NewTextObj(&requests.FPDFPageObj_NewTextObj{
 					Document: doc,
@@ -767,10 +720,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("returns an error when request an invalid page object", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
@@ -785,10 +734,6 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows us to retrieve a page object", func() {
-				if TestType == "webassembly" {
-					// @todo: remove me when implemented.
-					Skip("This test is skipped on Webassembly")
-				}
 				FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 					Page: requests.Page{
 						ByIndex: &requests.PageByIndex{
@@ -842,10 +787,6 @@ var _ = Describe("fpdf_edit", func() {
 				var pageObject references.FPDF_PAGEOBJECT
 
 				BeforeEach(func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
 					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -1125,11 +1066,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows setting a matrix on an image object", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_SetMatrix, err := PdfiumInstance.FPDFImageObj_SetMatrix(&requests.FPDFImageObj_SetMatrix{
 						ImageObject: imageObject,
 						Transform: structs.FPDF_FS_MATRIX{
@@ -1146,11 +1082,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to set a bitmap to an invalid page", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_SetBitmap, err := PdfiumInstance.FPDFImageObj_SetBitmap(&requests.FPDFImageObj_SetBitmap{
 						ImageObject: imageObject,
 						Page: &requests.Page{
@@ -1165,11 +1096,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to set a bitmap from an invalid bitmap handle", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_SetBitmap, err := PdfiumInstance.FPDFImageObj_SetBitmap(&requests.FPDFImageObj_SetBitmap{
 						ImageObject: imageObject,
 						Page: &requests.Page{
@@ -1246,11 +1172,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to get a bitmap from an image object that doesnt have one", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetBitmap, err := PdfiumInstance.FPDFImageObj_GetBitmap(&requests.FPDFImageObj_GetBitmap{
 						ImageObject: imageObject,
 					})
@@ -1259,11 +1180,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to get the decoded image data", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageDataDecoded, err := PdfiumInstance.FPDFImageObj_GetImageDataDecoded(&requests.FPDFImageObj_GetImageDataDecoded{
 						ImageObject: imageObject,
 					})
@@ -1272,11 +1188,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when trying to get the raw image data", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageDataRaw, err := PdfiumInstance.FPDFImageObj_GetImageDataRaw(&requests.FPDFImageObj_GetImageDataRaw{
 						ImageObject: imageObject,
 					})
@@ -1381,11 +1292,6 @@ var _ = Describe("fpdf_edit", func() {
 				var imageObject references.FPDF_PAGEOBJECT
 
 				BeforeEach(func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -1411,11 +1317,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns the correct decoded image data", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageDataDecoded, err := PdfiumInstance.FPDFImageObj_GetImageDataDecoded(&requests.FPDFImageObj_GetImageDataDecoded{
 						ImageObject: imageObject,
 					})
@@ -1425,11 +1326,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns the correct raw image data", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageDataRaw, err := PdfiumInstance.FPDFImageObj_GetImageDataRaw(&requests.FPDFImageObj_GetImageDataRaw{
 						ImageObject: imageObject,
 					})
@@ -1439,11 +1335,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns the correct image filter count", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageFilterCount, err := PdfiumInstance.FPDFImageObj_GetImageFilterCount(&requests.FPDFImageObj_GetImageFilterCount{
 						ImageObject: imageObject,
 					})
@@ -1454,11 +1345,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when requesting an invalid image filter", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageFilter, err := PdfiumInstance.FPDFImageObj_GetImageFilter(&requests.FPDFImageObj_GetImageFilter{
 						ImageObject: imageObject,
 						Index:       2,
@@ -1468,11 +1354,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns the correct image filter", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageFilter, err := PdfiumInstance.FPDFImageObj_GetImageFilter(&requests.FPDFImageObj_GetImageFilter{
 						ImageObject: imageObject,
 						Index:       0,
@@ -1484,11 +1365,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when teyring to get the image metadata with an invalid page", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageMetadata, err := PdfiumInstance.FPDFImageObj_GetImageMetadata(&requests.FPDFImageObj_GetImageMetadata{
 						ImageObject: imageObject,
 						Page: requests.Page{
@@ -1503,11 +1379,6 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns the correct image metadata", func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFImageObj_GetImageMetadata, err := PdfiumInstance.FPDFImageObj_GetImageMetadata(&requests.FPDFImageObj_GetImageMetadata{
 						ImageObject: imageObject,
 						Page: requests.Page{
@@ -1881,11 +1752,6 @@ var _ = Describe("fpdf_edit", func() {
 				var pageObject references.FPDF_PAGEOBJECT
 
 				BeforeEach(func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -2177,11 +2043,6 @@ var _ = Describe("fpdf_edit", func() {
 				var pageObject references.FPDF_PAGEOBJECT
 
 				BeforeEach(func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -2280,6 +2141,10 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows getting the text", func() {
+					if TestType == "webassembly" {
+						// @todo: remove me when implemented.
+						Skip("This test is skipped on Webassembly")
+					}
 					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -2339,11 +2204,6 @@ var _ = Describe("fpdf_edit", func() {
 				var pageObject references.FPDF_PAGEOBJECT
 
 				BeforeEach(func() {
-					if TestType == "webassembly" {
-						// @todo: remove me when implemented.
-						Skip("This test is skipped on Webassembly")
-					}
-
 					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
 						Page: requests.Page{
 							ByIndex: &requests.PageByIndex{
@@ -2368,6 +2228,10 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows to get the form object count", func() {
+					if TestType == "webassembly" {
+						// @todo: remove me when implemented.
+						Skip("This test is skipped on Webassembly")
+					}
 					FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
 						PageObject: pageObject,
 					})
@@ -2378,6 +2242,10 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("returns an error when getting an invalid form object", func() {
+					if TestType == "webassembly" {
+						// @todo: remove me when implemented.
+						Skip("This test is skipped on Webassembly")
+					}
 					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
 						PageObject: pageObject,
 						Index:      23,
@@ -2387,6 +2255,10 @@ var _ = Describe("fpdf_edit", func() {
 				})
 
 				It("allows to get a form object", func() {
+					if TestType == "webassembly" {
+						// @todo: remove me when implemented.
+						Skip("This test is skipped on Webassembly")
+					}
 					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
 						PageObject: pageObject,
 						Index:      0,
