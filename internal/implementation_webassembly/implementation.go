@@ -402,6 +402,12 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.dataAvailRefs {
+		delete(FileAvailables, uint32(*p.dataAvailRefs[i].fileAvail))
+		p.Free(*p.dataAvailRefs[i].fileAvail)
+		if *p.dataAvailRefs[i].hints != 0 {
+			delete(FileHints, uint32(*p.dataAvailRefs[i].hints))
+			p.Free(*p.dataAvailRefs[i].hints)
+		}
 		delete(p.dataAvailRefs, i)
 	}
 

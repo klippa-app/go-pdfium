@@ -87,3 +87,42 @@ func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []ui
 	stack[0] = uint64(n)
 	return
 }
+
+type FX_FILEAVAIL_IS_DATA_AVAILABLE_CB struct {
+}
+
+func (cb FX_FILEAVAIL_IS_DATA_AVAILABLE_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	me := uint32(stack[0])
+	offset := uint32(stack[1])
+	size := uint32(stack[2])
+
+	fileAvail, ok := implementation_webassembly.FileAvailables[me]
+	if !ok {
+		stack[0] = uint64(0)
+		return
+	}
+
+	if fileAvail.DataAvailableCallback(uint64(offset), uint64(size)) {
+		stack[0] = uint64(1)
+		return
+	}
+
+	stack[0] = uint64(0)
+	return
+}
+
+type FX_DOWNLOADHINTS_ADD_SEGMENT_CB struct {
+}
+
+func (cb FX_DOWNLOADHINTS_ADD_SEGMENT_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	me := uint32(stack[0])
+	offset := uint32(stack[1])
+	size := uint32(stack[2])
+
+	fileHint, ok := implementation_webassembly.FileHints[me]
+	if !ok {
+		return
+	}
+
+	fileHint.AddSegmentCallback(uint64(offset), uint64(size))
+}
