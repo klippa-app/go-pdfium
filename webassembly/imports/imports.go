@@ -43,4 +43,7 @@ func (e *functionExporter) ExportFunctions(b wazero.HostModuleBuilder) {
 	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FILEWRITE_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FILEWRITE_CB")
 	b.NewFunctionBuilder().WithGoModuleFunction(FX_FILEAVAIL_IS_DATA_AVAILABLE_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FX_FILEAVAIL_IS_DATA_AVAILABLE_CB")
 	b.NewFunctionBuilder().WithGoModuleFunction(FX_DOWNLOADHINTS_ADD_SEGMENT_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FX_DOWNLOADHINTS_ADD_SEGMENT_CB")
+	b.NewFunctionBuilder().WithGoModuleFunction(UNSUPPORT_INFO_HANDLER_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("UNSUPPORT_INFO_HANDLER_CB")
+	b.NewFunctionBuilder().WithGoModuleFunction(FSDK_SetTimeFunction_CB{}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64}).Export("FSDK_SetTimeFunction_CB")
+	b.NewFunctionBuilder().WithGoModuleFunction(FSDK_SetLocaltimeFunction_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FSDK_SetLocaltimeFunction_CB")
 }

@@ -2,8 +2,10 @@ package imports
 
 import (
 	"context"
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/tetratelabs/wazero/api"
+	"log"
 )
 
 type FPDF_FILEACCESS_CB struct {
@@ -125,4 +127,69 @@ func (cb FX_DOWNLOADHINTS_ADD_SEGMENT_CB) Call(ctx context.Context, mod api.Modu
 	}
 
 	fileHint.AddSegmentCallback(uint64(offset), uint64(size))
+}
+
+type UNSUPPORT_INFO_HANDLER_CB struct {
+}
+
+func (cb UNSUPPORT_INFO_HANDLER_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	ntype := uint32(stack[1])
+
+	if implementation_webassembly.CurrentUnsupportedObjectHandler != nil {
+		implementation_webassembly.CurrentUnsupportedObjectHandler(enums.FPDF_UNSP(ntype))
+	}
+}
+
+type FSDK_SetTimeFunction_CB struct {
+}
+
+func (cb FSDK_SetTimeFunction_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	currentTime := uint64(0)
+	if implementation_webassembly.CurrentTimeHandler != nil {
+		currentTime = api.EncodeI64(implementation_webassembly.CurrentTimeHandler())
+	}
+
+	stack[0] = currentTime
+	return
+}
+
+type FSDK_SetLocaltimeFunction_CB struct {
+}
+
+// re-use memory to prevent allocating more than necessary.
+var lastLocalTimePointer *uint64
+
+func (cb FSDK_SetLocaltimeFunction_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	timestamp := uint32(stack[0])
+
+	currentLocalTime := uint64(0)
+	if implementation_webassembly.CurrentLocalTimeHandler != nil {
+		localTime := implementation_webassembly.CurrentLocalTimeHandler(int64(timestamp))
+
+		if lastLocalTimePointer == nil {
+			// 9 int fields in localtime.
+			results, err := mod.ExportedFunction("malloc").Call(ctx, 4*9)
+			if err != nil {
+				log.Printf("Could not allocate memory")
+				stack[0] = currentLocalTime
+				return
+			}
+			lastLocalTimePointer = &results[0]
+		}
+
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer), api.EncodeI32(int32(localTime.TmSec)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+4), api.EncodeI32(int32(localTime.TmMin)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+8), api.EncodeI32(int32(localTime.TmHour)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+12), api.EncodeI32(int32(localTime.TmMday)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+16), api.EncodeI32(int32(localTime.TmMon)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+20), api.EncodeI32(int32(localTime.TmYear)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+24), api.EncodeI32(int32(localTime.TmWday)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+28), api.EncodeI32(int32(localTime.TmYday)))
+		mod.Memory().WriteUint64Le(uint32(*lastLocalTimePointer+32), api.EncodeI32(int32(localTime.TmIsdst)))
+
+		currentLocalTime = *lastLocalTimePointer
+	}
+
+	stack[0] = currentLocalTime
+	return
 }

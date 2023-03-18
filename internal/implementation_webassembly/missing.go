@@ -36,26 +36,6 @@ func (p *PdfiumImplementation) FPDFPage_Flatten(request *requests.FPDFPage_Flatt
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
 }
 
-func (p *PdfiumImplementation) FPDFDoc_GetPageMode(request *requests.FPDFDoc_GetPageMode) (*responses.FPDFDoc_GetPageMode, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FSDK_SetUnSpObjProcessHandler(request *requests.FSDK_SetUnSpObjProcessHandler) (*responses.FSDK_SetUnSpObjProcessHandler, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FSDK_SetTimeFunction(request *requests.FSDK_SetTimeFunction) (*responses.FSDK_SetTimeFunction, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FSDK_SetLocaltimeFunction(request *requests.FSDK_SetLocaltimeFunction) (*responses.FSDK_SetLocaltimeFunction, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
 func (p *PdfiumImplementation) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
