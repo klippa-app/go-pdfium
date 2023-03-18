@@ -1,20 +1,18 @@
 package implementation_webassembly
 
 import (
-	"unsafe"
-
 	"github.com/google/uuid"
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerFormHandle(formHandle *uint64, formInfo unsafe.Pointer) *FormHandleHandle {
+func (p *PdfiumImplementation) registerFormHandle(formHandle *uint64, formInfo *uint64) *FormHandleHandle {
 	ref := uuid.New()
 	handle := &FormHandleHandle{
 		handle:           formHandle,
 		nativeRef:        references.FPDF_FORMHANDLE(ref.String()),
 		formInfo:         formInfo,
-		pagePointers:     map[unsafe.Pointer]references.FPDF_PAGE{},
-		documentPointers: map[unsafe.Pointer]references.FPDF_DOCUMENT{},
+		pagePointers:     map[uint64]references.FPDF_PAGE{},
+		documentPointers: map[uint64]references.FPDF_DOCUMENT{},
 	}
 
 	p.formHandleRefs[handle.nativeRef] = handle

@@ -2,8 +2,6 @@ package implementation_webassembly
 
 import (
 	"errors"
-	"unsafe"
-
 	"github.com/klippa-app/go-pdfium/references"
 )
 
@@ -233,9 +231,9 @@ type FormHandleHandle struct {
 	handle           *uint64
 	documentRef      references.FPDF_DOCUMENT
 	nativeRef        references.FPDF_FORMHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
-	formInfo         unsafe.Pointer
-	pagePointers     map[unsafe.Pointer]references.FPDF_PAGE
-	documentPointers map[unsafe.Pointer]references.FPDF_DOCUMENT
+	formInfo         *uint64
+	pagePointers     map[uint64]references.FPDF_PAGE
+	documentPointers map[uint64]references.FPDF_DOCUMENT
 }
 
 type AnnotationHandle struct {
