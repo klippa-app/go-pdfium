@@ -56,31 +56,6 @@ func (p *PdfiumImplementation) FSDK_SetLocaltimeFunction(request *requests.FSDK_
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
 }
 
-func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
 func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly

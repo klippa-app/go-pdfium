@@ -1,6 +1,7 @@
 package implementation_webassembly
 
 import (
+	"bytes"
 	"errors"
 	"unsafe"
 
@@ -871,5 +872,193 @@ func (p *PdfiumImplementation) FPDFLink_GetQuadPoints(request *requests.FPDFLink
 			X4: float32(quadPoints.X4),
 			Y4: float32(quadPoints.Y4),
 		},
+	}, nil
+}
+
+// FPDFDest_GetView returns the view (fit type) for a given dest.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFDest_GetView(request *requests.FPDFDest_GetView) (*responses.FPDFDest_GetView, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	destHandle, err := p.getDestHandle(request.Dest)
+	if err != nil {
+		return nil, err
+	}
+
+	numParamsPointer, err := p.ULongPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer numParamsPointer.Free()
+
+	paramsPointer, err := p.FloatArrayPointer(4)
+	if err != nil {
+		return nil, err
+	}
+	defer paramsPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFDest_GetView").Call(p.Context, *destHandle.handle, numParamsPointer.Pointer, paramsPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	destView := *(*int32)(unsafe.Pointer(&res[0]))
+
+	numParams, err := numParamsPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	params, err := paramsPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	resParams := make([]float32, int(numParams), int(numParams))
+	if int(numParams) > 0 {
+		for i := range resParams {
+			resParams[i] = float32(params[i])
+		}
+	}
+
+	return &responses.FPDFDest_GetView{
+		DestView: enums.FPDF_PDFDEST_VIEW(destView),
+		Params:   resParams,
+	}, nil
+}
+
+// FPDFLink_GetAnnot returns a FPDF_ANNOTATION object for a link.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetAnnot) (*responses.FPDFLink_GetAnnot, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	linkHandle, err := p.getLinkHandle(request.Link)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFLink_GetAnnot").Call(p.Context, *pageHandle.handle, *linkHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotation := res[0]
+	if annotation == 0 {
+		return &responses.FPDFLink_GetAnnot{}, nil
+	}
+
+	annotationHandle := p.registerAnnotation(&annotation)
+
+	return &responses.FPDFLink_GetAnnot{
+		Annotation: &annotationHandle.nativeRef,
+	}, nil
+}
+
+// FPDF_GetPageAAction returns an additional-action from page.
+// If this function returns a valid handle, it is valid as long as the page is
+// valid.
+// Experimental API
+func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPageAAction) (*responses.FPDF_GetPageAAction, error) {
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_GetPageAAction").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
+	if err != nil {
+		return nil, err
+	}
+
+	action := res[0]
+	if action == 0 {
+		return &responses.FPDF_GetPageAAction{}, nil
+	}
+
+	actionHandle := p.registerAction(&action)
+
+	return &responses.FPDF_GetPageAAction{
+		AAType: &request.AAType,
+		Action: &actionHandle.nativeRef,
+	}, nil
+}
+
+// FPDF_GetFileIdentifier Get the file identifier defined in the trailer of a document.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.FileIdType != enums.FPDF_FILEIDTYPE_PERMANENT && request.FileIdType != enums.FPDF_FILEIDTYPE_CHANGING {
+		return nil, errors.New("invalid file id type given")
+	}
+
+	// First get the identifier length.
+	res, err := p.Module.ExportedFunction("FPDF_GetFileIdentifier").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	identifierSize := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if identifierSize == 0 {
+		return &responses.FPDF_GetFileIdentifier{
+			FileIdType: request.FileIdType,
+			Identifier: nil,
+		}, nil
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(identifierSize, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	res, err = p.Module.ExportedFunction("FPDF_GetFileIdentifier").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), charDataPointer.Pointer, identifierSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	// Remove NULL terminator.
+	charData = bytes.TrimSuffix(charData, []byte("\x00"))
+
+	return &responses.FPDF_GetFileIdentifier{
+		FileIdType: request.FileIdType,
+		Identifier: charData,
+	}, nil
+}
+
+// FPDFBookmark_GetCount returns the number of children of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFLink_CountQuadPoints").Call(p.Context, *bookmarkHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFBookmark_GetCount{
+		Count: int(count),
 	}, nil
 }
