@@ -20,20 +20,10 @@ import (
 var _ = Describe("fpdf_annot", func() {
 	BeforeEach(func() {
 		Locker.Lock()
-
-		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
-			Skip("This test is skipped on Webassembly")
-		}
 	})
 
 	AfterEach(func() {
 		Locker.Unlock()
-
-		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
-			Skip("This test is skipped on Webassembly")
-		}
 	})
 
 	Context("no page is given", func() {
@@ -838,7 +828,7 @@ var _ = Describe("fpdf_annot", func() {
 				Expect(FPDFPage_GetAnnot.Annotation).To(Not(BeNil()))
 
 				FPDFAnnot_GetObjectCount, err := PdfiumInstance.FPDFAnnot_GetObjectCount(&requests.FPDFAnnot_GetObjectCount{
-					Annotation: FPDFPage_GetAnnot.Annotation,
+					Annotation: FPDFPage_CreateAnnot.Annotation,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDFAnnot_GetObjectCount).To(Equal(&responses.FPDFAnnot_GetObjectCount{
@@ -846,7 +836,7 @@ var _ = Describe("fpdf_annot", func() {
 				}))
 
 				FPDFAnnot_GetObject, err := PdfiumInstance.FPDFAnnot_GetObject(&requests.FPDFAnnot_GetObject{
-					Annotation: FPDFPage_GetAnnot.Annotation,
+					Annotation: FPDFPage_CreateAnnot.Annotation,
 					Index:      0,
 				})
 				Expect(err).To(BeNil())
@@ -887,21 +877,21 @@ var _ = Describe("fpdf_annot", func() {
 				Expect(FPDFImageObj_SetBitmap).To(Equal(&responses.FPDFImageObj_SetBitmap{}))
 
 				FPDFAnnot_UpdateObject, err := PdfiumInstance.FPDFAnnot_UpdateObject(&requests.FPDFAnnot_UpdateObject{
-					Annotation: FPDFPage_GetAnnot.Annotation,
+					Annotation: FPDFPage_CreateAnnot.Annotation,
 					PageObject: FPDFAnnot_GetObject.PageObject,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDFAnnot_UpdateObject).To(Equal(&responses.FPDFAnnot_UpdateObject{}))
 
 				FPDFAnnot_RemoveObject, err := PdfiumInstance.FPDFAnnot_RemoveObject(&requests.FPDFAnnot_RemoveObject{
-					Annotation: FPDFPage_GetAnnot.Annotation,
+					Annotation: FPDFPage_CreateAnnot.Annotation,
 					Index:      0,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDFAnnot_RemoveObject).To(Equal(&responses.FPDFAnnot_RemoveObject{}))
 
 				FPDFAnnot_RemoveObject, err = PdfiumInstance.FPDFAnnot_RemoveObject(&requests.FPDFAnnot_RemoveObject{
-					Annotation: FPDFPage_GetAnnot.Annotation,
+					Annotation: FPDFPage_CreateAnnot.Annotation,
 					Index:      0,
 				})
 				Expect(err).To(MatchError("could not remove object"))
@@ -1644,6 +1634,11 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
+			if TestType == "webassembly" {
+				// @todo: remove me when implemented.
+				Skip("This test is skipped on Webassembly")
+			}
+
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
@@ -1685,6 +1680,11 @@ var _ = Describe("fpdf_annot", func() {
 		AfterEach(func() {
 			if TestType == "multi" {
 				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			if TestType == "webassembly" {
+				// @todo: remove me when implemented.
+				Skip("This test is skipped on Webassembly")
 			}
 
 			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
@@ -1751,6 +1751,11 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
+			if TestType == "webassembly" {
+				// @todo: remove me when implemented.
+				Skip("This test is skipped on Webassembly")
+			}
+
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annot_javascript.pdf")
 			Expect(err).To(BeNil())
 
@@ -1792,6 +1797,11 @@ var _ = Describe("fpdf_annot", func() {
 		AfterEach(func() {
 			if TestType == "multi" {
 				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
+			if TestType == "webassembly" {
+				// @todo: remove me when implemented.
+				Skip("This test is skipped on Webassembly")
 			}
 
 			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{

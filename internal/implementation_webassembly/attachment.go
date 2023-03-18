@@ -66,15 +66,19 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 			return nil, err
 		}
 
-		nameSize := *(*int32)(unsafe.Pointer(&res[0]))
+		nameSize := uint64(*(*int32)(unsafe.Pointer(&res[0])))
 		if nameSize == 0 {
 			return nil, errors.New("Could not get name")
 		}
 
-		charDataPointer, err := p.ByteArrayPointer(uint64(nameSize), nil)
+		charDataPointer, err := p.ByteArrayPointer(nameSize, nil)
+		if err != nil {
+			return nil, err
+		}
+
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDFJavaScriptAction_GetName").Call(p.Context, attachment, charDataPointer.Pointer, uint64(nameSize))
+		_, err = p.Module.ExportedFunction("FPDFAttachment_GetName").Call(p.Context, attachment, charDataPointer.Pointer, nameSize)
 		if err != nil {
 			return nil, err
 		}

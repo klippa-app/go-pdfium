@@ -333,6 +333,119 @@ func (p *PdfiumImplementation) FloatArrayPointer(size uint64) (*FloatArrayPointe
 	}, nil
 }
 
+func (p *PdfiumImplementation) CSizeFS_POINTF() uint64 {
+	// @todo: implement on pdfium/emscripten side?
+	// x + y
+	return 2 * p.CSizeFloat()
+}
+
+type FS_POINTFArrayPointer struct {
+	Pointer uint64
+	Size    uint64
+	Free    func()
+	Value   func() ([]structs.FPDF_FS_POINTF, error)
+}
+
+func (p *PdfiumImplementation) FS_POINTFArrayPointer(size uint64, in []structs.FPDF_FS_POINTF) (*FS_POINTFArrayPointer, error) {
+	pointer, err := p.Malloc(p.CSizeFS_POINTF() * size)
+	if err != nil {
+		return nil, err
+	}
+
+	if in != nil {
+		inSize := len(in)
+		for i := 0; i < int(inSize); i++ {
+			if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFS_POINTF()*uint64(i))), in[i].X) {
+				p.Free(pointer)
+				return nil, errors.New("could not write float data to memory")
+			}
+
+			if !p.Module.Memory().WriteFloat32Le(uint32(pointer+(p.CSizeFS_POINTF()*uint64(i))+p.CSizeFloat()), in[i].Y) {
+				p.Free(pointer)
+				return nil, errors.New("could not write float data to memory")
+			}
+		}
+	}
+
+	return &FS_POINTFArrayPointer{
+		Pointer: pointer,
+		Size:    size,
+		Free: func() {
+			p.Free(pointer)
+		},
+		Value: func() ([]structs.FPDF_FS_POINTF, error) {
+			myPoints := []structs.FPDF_FS_POINTF{}
+
+			for i := 0; i < int(size); i++ {
+				x, success := p.Module.Memory().ReadFloat32Le(uint32(pointer + (uint64(i) * p.CSizeFS_POINTF())))
+				if !success {
+					return nil, errors.New("could not read uint array data from memory")
+				}
+
+				y, success := p.Module.Memory().ReadFloat32Le(uint32(pointer + (uint64(i) * p.CSizeFS_POINTF()) + p.CSizeFloat()))
+				if !success {
+					return nil, errors.New("could not read uint array data from memory")
+				}
+
+				myPoints = append(myPoints, structs.FPDF_FS_POINTF{
+					X: x,
+					Y: y,
+				})
+			}
+
+			return myPoints, nil
+		},
+	}, nil
+}
+
+type FS_POINTFPointer struct {
+	Pointer uint64
+	Free    func()
+	Value   func() (*structs.FPDF_FS_POINTF, error)
+}
+
+func (p *PdfiumImplementation) FS_POINTFPointer(in *structs.FPDF_FS_POINTF) (*FS_POINTFPointer, error) {
+	pointer, err := p.Malloc(p.CSizeFS_POINTF())
+	if err != nil {
+		return nil, err
+	}
+
+	if in != nil {
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer), in.X) {
+			p.Free(pointer)
+			return nil, errors.New("could not write float data to memory")
+		}
+
+		if !p.Module.Memory().WriteFloat32Le(uint32(pointer+p.CSizeFloat()), in.Y) {
+			p.Free(pointer)
+			return nil, errors.New("could not write float data to memory")
+		}
+	}
+
+	return &FS_POINTFPointer{
+		Pointer: pointer,
+		Free: func() {
+			p.Free(pointer)
+		},
+		Value: func() (*structs.FPDF_FS_POINTF, error) {
+			x, success := p.Module.Memory().ReadFloat32Le(uint32(pointer))
+			if !success {
+				return nil, errors.New("could not read float data from memory")
+			}
+
+			y, success := p.Module.Memory().ReadFloat32Le(uint32(pointer + p.CSizeFloat()))
+			if !success {
+				return nil, errors.New("could not read float data from memory")
+			}
+
+			return &structs.FPDF_FS_POINTF{
+				X: x,
+				Y: y,
+			}, nil
+		},
+	}, nil
+}
+
 type DoublePointer struct {
 	Pointer uint64
 	Free    func()
