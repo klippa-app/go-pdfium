@@ -6,46 +6,6 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-func (p *PdfiumImplementation) FPDF_GetSignatureCount(request *requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_GetSignatureObject(request *requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetContents(request *requests.FPDFSignatureObj_GetContents) (*responses.FPDFSignatureObj_GetContents, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetByteRange(request *requests.FPDFSignatureObj_GetByteRange) (*responses.FPDFSignatureObj_GetByteRange, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetSubFilter(request *requests.FPDFSignatureObj_GetSubFilter) (*responses.FPDFSignatureObj_GetSubFilter, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetReason(request *requests.FPDFSignatureObj_GetReason) (*responses.FPDFSignatureObj_GetReason, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetTime(request *requests.FPDFSignatureObj_GetTime) (*responses.FPDFSignatureObj_GetTime, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFSignatureObj_GetDocMDPPermission(request *requests.FPDFSignatureObj_GetDocMDPPermission) (*responses.FPDFSignatureObj_GetDocMDPPermission, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
 func (p *PdfiumImplementation) FPDFPage_GetDecodedThumbnailData(request *requests.FPDFPage_GetDecodedThumbnailData) (*responses.FPDFPage_GetDecodedThumbnailData, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
