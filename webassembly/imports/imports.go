@@ -61,4 +61,5 @@ func (e *functionExporter) ExportFunctions(b wazero.HostModuleBuilder) {
 	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB")
 	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_DoURIAction_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_DoURIAction_CB")
 	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_DoGoToAction_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_DoGoToAction_CB")
+	b.NewFunctionBuilder().WithGoModuleFunction(IFSDK_PAUSE_NeedToPauseNow_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("IFSDK_PAUSE_NeedToPauseNow_CB")
 }

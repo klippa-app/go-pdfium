@@ -61,31 +61,6 @@ func (p *PdfiumImplementation) FPDFPage_GetThumbnailAsBitmap(request *requests.F
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
 }
 
-func (p *PdfiumImplementation) FPDFDoc_GetJavaScriptActionCount(request *requests.FPDFDoc_GetJavaScriptActionCount) (*responses.FPDFDoc_GetJavaScriptActionCount, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFDoc_GetJavaScriptAction(request *requests.FPDFDoc_GetJavaScriptAction) (*responses.FPDFDoc_GetJavaScriptAction, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFDoc_CloseJavaScriptAction(request *requests.FPDFDoc_CloseJavaScriptAction) (*responses.FPDFDoc_CloseJavaScriptAction, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFJavaScriptAction_GetName(request *requests.FPDFJavaScriptAction_GetName) (*responses.FPDFJavaScriptAction_GetName, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDFJavaScriptAction_GetScript(request *requests.FPDFJavaScriptAction_GetScript) (*responses.FPDFJavaScriptAction_GetScript, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
 func (p *PdfiumImplementation) FPDFText_GetCharIndexFromTextIndex(request *requests.FPDFText_GetCharIndexFromTextIndex) (*responses.FPDFText_GetCharIndexFromTextIndex, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
@@ -187,26 +162,6 @@ func (p *PdfiumImplementation) FPDF_DestroyClipPath(request *requests.FPDF_Destr
 }
 
 func (p *PdfiumImplementation) FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithColorScheme_Start(request *requests.FPDF_RenderPageBitmapWithColorScheme_Start) (*responses.FPDF_RenderPageBitmapWithColorScheme_Start, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_RenderPage_Continue) (*responses.FPDF_RenderPage_Continue, error) {
-	//TODO implement me
-	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
-}
-
-func (p *PdfiumImplementation) FPDF_RenderPage_Close(request *requests.FPDF_RenderPage_Close) (*responses.FPDF_RenderPage_Close, error) {
 	//TODO implement me
 	return nil, pdfium_errors.ErrUnsupportedOnWebassembly
 }

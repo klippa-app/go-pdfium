@@ -1,9 +1,11 @@
 package imports
 
+import "C"
 import (
 	"context"
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/tetratelabs/wazero/api"
 	"log"
 )
@@ -483,4 +485,42 @@ func (cb FPDF_FORMFILLINFO_FFI_DoGoToAction_CB) Call(ctx context.Context, mod ap
 	}
 
 	formFillInfoHandle.FFI_DoGoToAction(nPageIndex, zoomMode, fPosArray, sizeofArray)
+}
+
+type IFSDK_PAUSE_NeedToPauseNow_CB struct {
+}
+
+func (cb IFSDK_PAUSE_NeedToPauseNow_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	me := uint32(stack[0])
+
+	stringRefPointer, _ := mod.Memory().ReadUint32Le(me + 8)
+
+	stringRef := []byte{}
+	for {
+		data, success := mod.Memory().Read(stringRefPointer, 1)
+		if !success {
+			return
+		}
+
+		if data[0] == 0x00 {
+			break
+		}
+
+		stringRef = append(stringRef, data[0])
+		stringRefPointer++
+	}
+
+	// Check if we still have the reference.
+	if _, ok := implementation_webassembly.PauseHandles[references.FPDF_PAGE(string(stringRef))]; !ok {
+		stack[0] = api.EncodeI32(int32(1))
+		return
+	}
+
+	shouldPause := implementation_webassembly.PauseHandles[references.FPDF_PAGE(string(stringRef))].Callback()
+	if shouldPause {
+		stack[0] = api.EncodeI32(int32(1))
+		return
+	}
+
+	stack[0] = api.EncodeI32(int32(0))
 }
