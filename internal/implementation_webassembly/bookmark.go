@@ -123,7 +123,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 			return nil, err
 		}
 
-		res, err = p.Module.ExportedFunction("FPDFBookmark_GetAction").Call(p.Context, *documentHandle.handle)
+		res, err = p.Module.ExportedFunction("FPDFBookmark_GetAction").Call(p.Context, *bookmarkHandle.handle)
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +138,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 			respBookmark.ActionInfo = actionInfo
 		}
 
-		res, err = p.Module.ExportedFunction("FPDFBookmark_GetAction").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
+		res, err = p.Module.ExportedFunction("FPDFBookmark_GetDest").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
 		if err != nil {
 			return nil, err
 		}

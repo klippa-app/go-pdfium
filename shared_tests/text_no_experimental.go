@@ -17,7 +17,7 @@ var _ = Describe("text", func() {
 		Locker.Lock()
 
 		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
+			// Webassembly has all the experimental things implemented.
 			Skip("This test is skipped on Webassembly")
 		}
 	})
@@ -26,7 +26,7 @@ var _ = Describe("text", func() {
 		Locker.Unlock()
 
 		if TestType == "webassembly" {
-			// @todo: remove me when implemented.
+			// Webassembly has all the experimental things implemented.
 			Skip("This test is skipped on Webassembly")
 		}
 	})
