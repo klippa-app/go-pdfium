@@ -26,7 +26,7 @@ func (f *FormFillInfo) Release() {
 	}
 }
 
-func (f *FormFillInfo) FFI_Invalidate_CB(page uint32, left, top, right, bottom float64) {
+func (f *FormFillInfo) FFI_Invalidate_CB(page uint32, left, top, right, bottom uint64) {
 	var pageRef references.FPDF_PAGE
 	if pointerPageRef, ok := f.FormHandleHandle.pagePointers[uint64(page)]; ok {
 		pageRef = pointerPageRef
@@ -35,10 +35,10 @@ func (f *FormFillInfo) FFI_Invalidate_CB(page uint32, left, top, right, bottom f
 		pageRef = pageHandle.nativeRef
 	}
 
-	f.FormFillInfo.FFI_Invalidate(pageRef, left, top, right, bottom)
+	f.FormFillInfo.FFI_Invalidate(pageRef, api.DecodeF64(left), api.DecodeF64(top), api.DecodeF64(right), api.DecodeF64(bottom))
 }
 
-func (f *FormFillInfo) FFI_OutputSelectedRect(page uint32, left, top, right, bottom float64) {
+func (f *FormFillInfo) FFI_OutputSelectedRect(page uint32, left, top, right, bottom uint64) {
 	var pageRef references.FPDF_PAGE
 	if pointerPageRef, ok := f.FormHandleHandle.pagePointers[uint64(page)]; ok {
 		pageRef = pointerPageRef
@@ -47,7 +47,7 @@ func (f *FormFillInfo) FFI_OutputSelectedRect(page uint32, left, top, right, bot
 		pageRef = pageHandle.nativeRef
 	}
 
-	f.FormFillInfo.FFI_OutputSelectedRect(pageRef, left, top, right, bottom)
+	f.FormFillInfo.FFI_OutputSelectedRect(pageRef, api.DecodeF64(left), api.DecodeF64(top), api.DecodeF64(right), api.DecodeF64(bottom))
 }
 
 func (f *FormFillInfo) FFI_SetCursor(cursor uint32) {
@@ -128,36 +128,69 @@ func (f *FormFillInfo) FFI_GetRotation(page uint64) int {
 	return int(rotation)
 }
 
-func (f *FormFillInfo) FFI_ExecuteNamedAction(namedAction uint64) {
-	// @todo: extract string.
-	f.FormFillInfo.FFI_ExecuteNamedAction("")
+func (f *FormFillInfo) FFI_ExecuteNamedAction(namedActionPointer uint64) {
+	namedActionData := []byte{}
+	for {
+		data, success := f.Instance.Module.Memory().Read(uint32(namedActionPointer), 1)
+		if !success {
+			return
+		}
+
+		if data[0] == 0x00 {
+			break
+		}
+
+		namedActionData = append(namedActionData, data[0])
+		namedActionPointer++
+	}
+
+	f.FormFillInfo.FFI_ExecuteNamedAction(string(namedActionData))
 }
 
-func (f *FormFillInfo) FFI_SetTextFieldFocus(value uint64, valueLen uint64, isFocus uint64) {
-	// @todo: extract string.
-	f.FormFillInfo.FFI_SetTextFieldFocus("", isFocus == 1)
-}
-
-func (f *FormFillInfo) FFI_DoURIAction(bsURI uint64) {
-	// @todo: extract string.
-	f.FormFillInfo.FFI_DoURIAction("")
-}
-
-func (f *FormFillInfo) FFI_DoGoToAction(nPageIndex uint64, zoomMode uint64, fPosArray uint64, sizeofArray uint64) {
-	// @todo: extract string.
-	if f.FormFillInfo.FFI_DoGoToAction == nil {
+func (f *FormFillInfo) FFI_SetTextFieldFocus(value uint32, valueLen uint32, isFocus uint32) {
+	size := valueLen * 2
+	data, success := f.Instance.Module.Memory().Read(value, size)
+	if !success {
 		return
 	}
 
-	// @todo: extract data
-	/*
-		target := (*[1<<25 - 1]float32)(unsafe.Pointer(fPosArray))[:sizeofArray:sizeofArray]
-		pos := make([]float32, int(sizeofArray))
-		for i := range pos {
-			pos[i] = float32(target[i])
-		}*/
+	decodedValue, err := f.Instance.transformUTF16LEToUTF8(data)
+	if err != nil {
+		return
+	}
 
+	f.FormFillInfo.FFI_SetTextFieldFocus(decodedValue, isFocus == 1)
+}
+
+func (f *FormFillInfo) FFI_DoURIAction(bsURI uint32) {
+	bsURIData := []byte{}
+	for {
+		data, success := f.Instance.Module.Memory().Read(bsURI, 1)
+		if !success {
+			return
+		}
+
+		if data[0] == 0x00 {
+			break
+		}
+
+		bsURIData = append(bsURIData, data[0])
+		bsURI++
+	}
+
+	f.FormFillInfo.FFI_DoURIAction(string(bsURIData))
+}
+
+func (f *FormFillInfo) FFI_DoGoToAction(nPageIndex, zoomMode, fPosArray, sizeofArray uint32) {
 	pos := make([]float32, int(sizeofArray))
+	for i := range pos {
+		targetValue, success := f.Instance.Module.Memory().ReadFloat32Le(fPosArray + (uint32(i) * uint32(f.Instance.CSizeFloat())))
+		if !success {
+			return
+		}
+		pos[i] = float32(targetValue)
+	}
+
 	f.FormFillInfo.FFI_DoGoToAction(int(nPageIndex), enums.FPDF_ZOOM_MODE(zoomMode), pos)
 }
 
@@ -1246,7 +1279,7 @@ func (p *PdfiumImplementation) FORM_SelectAllText(request *requests.FORM_SelectA
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_GetFocusedText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.Module.ExportedFunction("FORM_SelectAllText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}

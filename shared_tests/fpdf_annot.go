@@ -1634,11 +1634,6 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
-			if TestType == "webassembly" {
-				// @todo: remove me when implemented.
-				Skip("This test is skipped on Webassembly")
-			}
-
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
@@ -1680,11 +1675,6 @@ var _ = Describe("fpdf_annot", func() {
 		AfterEach(func() {
 			if TestType == "multi" {
 				Skip("Form filling is not supported on multi-threaded usage")
-			}
-
-			if TestType == "webassembly" {
-				// @todo: remove me when implemented.
-				Skip("This test is skipped on Webassembly")
 			}
 
 			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
@@ -1751,11 +1741,6 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
-			if TestType == "webassembly" {
-				// @todo: remove me when implemented.
-				Skip("This test is skipped on Webassembly")
-			}
-
 			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annot_javascript.pdf")
 			Expect(err).To(BeNil())
 
@@ -1797,11 +1782,6 @@ var _ = Describe("fpdf_annot", func() {
 		AfterEach(func() {
 			if TestType == "multi" {
 				Skip("Form filling is not supported on multi-threaded usage")
-			}
-
-			if TestType == "webassembly" {
-				// @todo: remove me when implemented.
-				Skip("This test is skipped on Webassembly")
 			}
 
 			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{

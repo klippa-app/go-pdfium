@@ -217,10 +217,10 @@ type FPDF_FORMFILLINFO_FFI_Invalidate_CB struct {
 func (cb FPDF_FORMFILLINFO_FFI_Invalidate_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
 	me := uint32(stack[0])
 	page := uint32(stack[1])
-	left := float64(stack[2])
-	top := float64(stack[3])
-	right := float64(stack[4])
-	bottom := float64(stack[5])
+	left := uint64(stack[2])
+	top := uint64(stack[3])
+	right := uint64(stack[4])
+	bottom := uint64(stack[5])
 
 	// Check if we still have the callback.
 	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
@@ -237,10 +237,10 @@ type FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB struct {
 func (cb FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB) Call(ctx context.Context, mod api.Module, stack []uint64) {
 	me := uint32(stack[0])
 	page := uint32(stack[1])
-	left := float64(stack[2])
-	top := float64(stack[3])
-	right := float64(stack[4])
-	bottom := float64(stack[5])
+	left := uint64(stack[2])
+	top := uint64(stack[3])
+	right := uint64(stack[4])
+	bottom := uint64(stack[5])
 
 	// Check if we still have the callback.
 	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
@@ -439,7 +439,7 @@ func (cb FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB) Call(ctx context.Context, m
 		return
 	}
 
-	formFillInfoHandle.FFI_SetTextFieldFocus(uint64(value), uint64(valueLen), uint64(isFocus))
+	formFillInfoHandle.FFI_SetTextFieldFocus(value, valueLen, isFocus)
 }
 
 type FPDF_FORMFILLINFO_FFI_DoURIAction_CB struct {
@@ -455,7 +455,11 @@ func (cb FPDF_FORMFILLINFO_FFI_DoURIAction_CB) Call(ctx context.Context, mod api
 		return
 	}
 
-	formFillInfoHandle.FFI_DoURIAction(uint64(bsURI))
+	if formFillInfoHandle.FormFillInfo.FFI_DoURIAction == nil {
+		return
+	}
+
+	formFillInfoHandle.FFI_DoURIAction(bsURI)
 }
 
 type FPDF_FORMFILLINFO_FFI_DoGoToAction_CB struct {
@@ -474,5 +478,9 @@ func (cb FPDF_FORMFILLINFO_FFI_DoGoToAction_CB) Call(ctx context.Context, mod ap
 		return
 	}
 
-	formFillInfoHandle.FFI_DoGoToAction(uint64(nPageIndex), uint64(zoomMode), uint64(fPosArray), uint64(sizeofArray))
+	if formFillInfoHandle.FormFillInfo.FFI_DoGoToAction == nil {
+		return
+	}
+
+	formFillInfoHandle.FFI_DoGoToAction(nPageIndex, zoomMode, fPosArray, sizeofArray)
 }
