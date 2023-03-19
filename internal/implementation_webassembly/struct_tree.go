@@ -38,11 +38,11 @@ func (p *PdfiumImplementation) registerStructElement(structElement *uint64, docu
 }
 
 type StructElementAttributeHandle struct {
-	handle    *int64
+	handle    *uint64
 	nativeRef references.FPDF_STRUCTELEMENT_ATTR // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }
 
-func (p *PdfiumImplementation) registerStructElementAttribute(structElementAttribute *int64) *StructElementAttributeHandle {
+func (p *PdfiumImplementation) registerStructElementAttribute(structElementAttribute *uint64) *StructElementAttributeHandle {
 	ref := uuid.New()
 	handle := &StructElementAttributeHandle{
 		handle:    structElementAttribute,
