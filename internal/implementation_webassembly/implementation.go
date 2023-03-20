@@ -3,7 +3,6 @@ package implementation_webassembly
 import (
 	"context"
 	"errors"
-	"log"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -218,8 +217,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 			filePath = abs
 		}
-
-		log.Println(filePath)
 
 		cFilePathPointer, err := p.CString(filePath)
 		if err != nil {

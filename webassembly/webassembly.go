@@ -120,7 +120,7 @@ func Init(config Config) (pdfium.Pool, error) {
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
 				WithRandSource(config.RandomSource).
-				WithFS(config.FS).
+				WithFSConfig(wazero.NewFSConfig().WithDirMount("/", "/")).
 				WithName(moduleName.String())
 
 			mod, err := runtime.InstantiateModule(newWorker.Context, compiledModule, moduleConfig)
