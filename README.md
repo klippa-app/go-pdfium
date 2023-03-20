@@ -18,7 +18,7 @@
   within go), while keeping the same interface
 * This library will handle all complicated cgo/WebAssembly gymnastics for you, no direct cgo/WebAssembly usage/knowledge
   required
-* Implementation of all PDFium public API methods (including [experimental](#experimental)), with some exceptions
+* Implementation of all PDFium public API methods (including methods that are marked experimental), with some exceptions
 * PDFium has methods to do the following:
     * PDFium instance configuration (sandbox policy, fonts)
     * Document loading (from bytes, path or io.ReadSeeker)
