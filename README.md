@@ -68,37 +68,44 @@
 This project uses the PDFium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents. Therefor this project could also be called a binding.
 
-## Implementations
-
 ### Single/Multi-threading
 
 Since PDFium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
 make it multithreaded by calling it from Go's subroutines.
 
-This library allows you to call PDFium in a single or multi-threaded way.
+This library has 3 different implementations that you can use to call PDFium:
 
-We have implemented multi-threading this using [HashiCorp's Go Plugin System](https://github.com/hashicorp/go-plugin),
-which allows us launch separate PDFium worker processes, and then route the requests through the different workers. This
-also makes it a bit more safe to use PDFium, as it's less likely to segfaults or corrupt your main Go application. The
-Plugin system provides the communication between the processes using gRPC, however, when implementing this library, you
-won't really see anything of that. From the outside it will look like normal Go code. The inter-process communication
-does come with a cost as it has to serialize/deserialize input/output as it moves between the main process and the
-PDFium workers.
+- single_threaded: call PDFium from the same process with CGO
+- multi_threaded: call PDFium using multiple workers with CGO, implemented using go-plugin
+- webassmebly: call PDFium using WebAssembly with [Wazero runtime](https://wazero.io/), you can start multiple runtimes
+  to get multi-threaded behaviour
 
-Single-threading works by directly calling the PDFium library from the same process. Single-threaded might be preferred
-if the caller is managing the workers themselves and does not want the overhead of another process. Be aware that since
-PDFium is C++, we can't handle segfaults caused by PDFium, which may cause your process to be killed. So using this
-library in the multi-threaded way, with only 1 worker, can still have some benefits, since it can automatically recover
-from things like segfaults.
-
-Both the single-threaded and multi-threaded implementation are thread/subroutine safe, this has been guaranteed by
-locking the instance that's doing your work while it's doing PDFium operations. New operations will wait until the lock
-becomes available again.
+All implementations are thread/subroutine safe, this has been guaranteed by locking the instance that's doing your work
+while it's doing PDFium operations. New operations will wait until the lock becomes available again.
 
 **Be aware that PDFium could use quite some memory depending on the size of the PDF and the requests that you do, so be
 aware of the amount of workers that you configure.**
 
-#### Prerequisites
+## Implementations
+
+### CGO Single/Multi-threading
+
+Single-threading in CGO works by directly calling the PDFium library from the same process. Single-threaded might be
+preferred if the caller is managing the workers themselves and does not want the overhead of another process. Be aware
+that since PDFium is C++, we can't handle segfaults caused by PDFium, which may cause your process to be killed. So
+using this library in the multi-threaded way, with only 1 worker, can still have some benefits, since it can
+automatically recover from things like segfaults.
+
+For CGO we have implemented multi-threading
+using [HashiCorp's Go Plugin System](https://github.com/hashicorp/go-plugin),
+which allows us to launch separate PDFium worker processes, and then route the requests through the different workers.
+This also makes it a bit more safe to use PDFium, as it's less likely to segfaults or corrupt your main Go application.
+The Plugin system provides the communication between the processes using gRPC, however, when implementing this library,
+you won't really see anything of that. From the outside it will look like normal Go code. The inter-process
+communication does come with a cost as it has to serialize/deserialize input/output as it moves between the main process
+and the PDFium workers.
+
+#### Prerequisites (CGO)
 
 To use this Go library, you will need the actual PDFium library to run it and have it available through pkgconfig.
 
@@ -139,13 +146,13 @@ this can globally be done on ubuntu by editing `~/.profile`
 and adding the line in this file. reloading for bash can be done by relogging or running `source ~/.profile` can be used
 to test the change for a terminal
 
-#### Getting started
+#### Getting started (CGO)
 
 To get started, make sure that you create a separate package in your application that will start the worker.
 
 The examples below can also be found in the examples folder.
 
-##### Single-threaded
+##### Single-threaded through CGO
 
 For single threaded implementations we just have to initialize the library.
 
@@ -177,7 +184,7 @@ func init() {
 }
 ```
 
-##### Multi-threaded
+##### Multi-threaded through CGO
 
 ###### Worker package
 
@@ -373,7 +380,7 @@ func renderPage(filePath string, page int, output string) error {
 }
 ```
 
-#### Experimental
+#### Experimental (CGO)
 
 Some newer API's by PDFium are marked as experimental. We do have support for these functions, but because they are
 prone to change
@@ -408,7 +415,8 @@ for running WebAssembly within Go. The comes with quite some advantages:
 - Since PDFium is compiled to WebAssembly and runs inside the Wazero runtime, it basically runs in a sandbox:
     - No chance of crashing the Go process like with cgo
     - No access to other local resources in case of attacks on PDFium (disk, network, memory)
-    - Full control over file access (you decide which folders Wazero exposes to PDFium, by default it exposes the whole disk)
+    - Full control over file access (you decide which folders Wazero exposes to PDFium, by default it exposes the whole
+      disk)
 
 Of course there are also some disadvantages:
 
@@ -422,13 +430,14 @@ Of course there are also some disadvantages:
 **Be aware that PDFium could use quite some memory depending on the size of the PDF and the requests that you do, so be
 aware of the amount of workers that you configure.**
 
-#### Getting started
+#### Getting started (WebAssembly)
 
 To get started, make sure that you create a separate package in your application that will start the worker.
 
 The examples below can also be found in the examples folder.
 
-To start go-pdfium workers, you will have to init the go-pdfium worker pool somewhere, this also allows you to dynamically start
+To start go-pdfium workers, you will have to init the go-pdfium worker pool somewhere, this also allows you to
+dynamically start
 workers when needed. The best location to add this is in the `init()` of a package that is going to call the PDFium
 library. Example:
 
@@ -451,11 +460,11 @@ var instance pdfium.Pdfium
 func init() {
 	// Init the PDFium library and return the instance to open documents.
 	// You can tweak these configs to your need. Be aware that workers can use quite some memory.
-    pool, err = webassembly.Init(webassembly.Config{
-        MinIdle:  1, // Makes sure that at least x workers are always available
-        MaxIdle:  1, // Makes sure that at most x workers are ever available
-        MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
-    })
+	pool, err = webassembly.Init(webassembly.Config{
+		MinIdle:  1, // Makes sure that at least x workers are always available
+		MaxIdle:  1, // Makes sure that at most x workers are ever available
+		MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+	})
 
 	var err error
 	instance, err = pool.GetInstance(time.Second * 30)
@@ -597,7 +606,7 @@ func renderPage(filePath string, page int, output string) error {
 }
 ```
 
-#### Experimental
+#### Experimental (WebAssembly)
 
 Some newer API's by PDFium are marked as experimental. The WebAssembly build has support for all of them.
 
@@ -612,7 +621,8 @@ will just load in
 the complete file and pass the bytes through the gRPC interface.
 
 Document/image saving allows you to save using a `io.Writer`. Please be aware this only works when using the
-single-threaded or WebAssembly usage. It's not possible to encode the `io.Writer` with gRPC. Or share it between processes for that
+single-threaded or WebAssembly usage. It's not possible to encode the `io.Writer` with gRPC. Or share it between
+processes for that
 matter.
 
 ## About Klippa
