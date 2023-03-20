@@ -77,8 +77,15 @@ To solve this, this library has 3 different implementations that you can use to 
 
 - single_threaded: call PDFium from the same process with CGO
 - multi_threaded: call PDFium using multiple workers with CGO, implemented using go-plugin
-- webassmebly: call PDFium using WebAssembly with [Wazero runtime](https://wazero.io/), you can start multiple runtimes
+- webassembly: call PDFium using WebAssembly with [Wazero runtime](https://wazero.io/), you can start multiple runtimes
   to get multi-threaded behaviour
+
+Both `single_threaded` and `multi_threaded` requires PDFium to be installed on your machine for your platform during
+compilation and runtime, it also requires CGO to work on the platform you're compiling to.
+
+`webassembly` does not need any external dependencies and also does not require CGO to work. However, Wazero currently
+only has compiler support for amd64 and arm64, meaning it will be using the interpreter on other architectures which
+will be much, much slower.
 
 All implementations use exactly the same interface, so there won't be any code changes for you to switch between them.
 
