@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"sync"
 	"time"
@@ -41,7 +40,7 @@ type Config struct {
 	MaxIdle      int
 	MaxTotal     int
 	WASM         []byte
-	FS           fs.FS
+	FSConfig     wazero.FSConfig
 	Stdout       io.Writer
 	Stderr       io.Writer
 	RandomSource io.Reader
@@ -70,8 +69,9 @@ func Init(config Config) (pdfium.Pool, error) {
 		config.WASM = pdfiumWasm
 	}
 
-	if config.FS == nil {
-		config.FS = os.DirFS("")
+	// Mount the full root by default.
+	if config.FSConfig == nil {
+		config.FSConfig = wazero.NewFSConfig().WithDirMount("/", "/")
 	}
 
 	if config.Stderr == nil {
@@ -120,7 +120,7 @@ func Init(config Config) (pdfium.Pool, error) {
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
 				WithRandSource(config.RandomSource).
-				WithFSConfig(wazero.NewFSConfig().WithDirMount("/", "/")).
+				WithFSConfig(config.FSConfig).
 				WithName(moduleName.String())
 
 			mod, err := runtime.InstantiateModule(newWorker.Context, compiledModule, moduleConfig)
