@@ -391,6 +391,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(1170))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -415,6 +416,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3508))
+							renderedPage.Cleanup()
 						})
 					})
 				})
@@ -458,6 +460,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_2000x0")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2829))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -483,6 +486,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_0x2000")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -511,6 +515,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_2000x2000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
+								renderedPage.Cleanup()
 							})
 						})
 						Context("and the width being larger than the height", func() {
@@ -536,6 +541,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_4000x2000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2000))
+								renderedPage.Cleanup()
 							})
 						})
 
@@ -562,6 +568,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_2000x4000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2829))
+								renderedPage.Cleanup()
 							})
 						})
 					})
@@ -659,6 +666,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_100")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2340))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -712,6 +720,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_300")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(7016))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -765,6 +774,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_200_300")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5847))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -819,6 +829,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_300_padding_50")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(7066))
+							renderedPage.Cleanup()
 						})
 					})
 				})
@@ -913,6 +924,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x0")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5658))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -966,6 +978,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_0x2000")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -1023,6 +1036,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x2000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
+								renderedPage.Cleanup()
 							})
 						})
 						Context("and the width being larger than the height", func() {
@@ -1078,6 +1092,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_4000x2000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4000))
+								renderedPage.Cleanup()
 							})
 						})
 
@@ -1134,6 +1149,7 @@ var _ = Describe("Render", func() {
 								}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x4000")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(5658))
+								renderedPage.Cleanup()
 							})
 						})
 					})
@@ -1189,6 +1205,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x0_1500x0")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2000))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4951))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -1243,6 +1260,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_0x2000_0x1500")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3500))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -1299,6 +1317,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x2000_1500x1500")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(3500))
+							renderedPage.Cleanup()
 						})
 					})
 
@@ -1356,6 +1375,7 @@ var _ = Describe("Render", func() {
 							}, TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_pixels_2000x2000_2000x2000_padding_50")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(4050))
+							renderedPage.Cleanup()
 						})
 					})
 				})
@@ -1982,6 +2002,7 @@ var _ = Describe("Render", func() {
 					Width:             1653,
 					Height:            2339,
 				}, TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel")
+				renderedPage.Cleanup()
 			})
 		})
 	})
@@ -2161,6 +2182,7 @@ var _ = Describe("Render", func() {
 					}, TestDataPath+"/testdata/render_"+TestType+"_testpdf_multiple_pdf_combined")
 					Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(1415))
 					Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(6100))
+					renderedPage.Cleanup()
 				})
 			})
 		})

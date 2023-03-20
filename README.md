@@ -595,6 +595,11 @@ func renderPage(filePath string, page int, output string) error {
 		return err
 	}
 
+	// The Render* methods return a cleanup function that has to be called when
+	// using webassembly to make sure resources are cleaned up. Do this after
+	// you are done with the returned image object.
+	defer pageRender.Cleanup()
+
 	// Write the output to a file.
 	f, err := os.Create(output)
 	if err != nil {

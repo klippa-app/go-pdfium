@@ -111,7 +111,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 	}
 
 	// Render a single page.
-	result, err := p.renderPages([]renderPage{
+	result, cleanupFunc, err := p.renderPages([]renderPage{
 		{
 			Page:              request.Page,
 			Width:             widthInPixels,
@@ -125,6 +125,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 	}
 
 	return &responses.RenderPageInDPI{
+		CleanupFunc: cleanupFunc,
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
@@ -164,13 +165,14 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 		}
 	}
 
-	result, err := p.renderPages(pages, request.Padding)
+	result, cleanupFunc, err := p.renderPages(pages, request.Padding)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.RenderPagesInDPI{
-		Result: *result,
+		CleanupFunc: cleanupFunc,
+		Result:      *result,
 	}, nil
 }
 
@@ -227,7 +229,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 	}
 
 	// Render a single page.
-	result, err := p.renderPages([]renderPage{
+	result, cleanupFunc, err := p.renderPages([]renderPage{
 		{
 			Page:              request.Page,
 			Width:             width,
@@ -241,6 +243,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 	}
 
 	return &responses.RenderPageInPixels{
+		CleanupFunc: cleanupFunc,
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
@@ -282,13 +285,14 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 		}
 	}
 
-	result, err := p.renderPages(pages, request.Padding)
+	result, cleanupFunc, err := p.renderPages(pages, request.Padding)
 	if err != nil {
 		return nil, err
 	}
 
 	return &responses.RenderPagesInPixels{
-		Result: *result,
+		CleanupFunc: cleanupFunc,
+		Result:      *result,
 	}, nil
 }
 
@@ -301,7 +305,7 @@ type renderPage struct {
 }
 
 // renderPages renders a list of pages, the result is an image.
-func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*responses.RenderPages, error) {
+func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*responses.RenderPages, func(), error) {
 	totalWidth := 0
 	totalHeight := 0
 
@@ -329,14 +333,17 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 
 	size := img.Stride * totalHeight
 
-	// Sadly we can't use FPDFBitmap_CreateEx here because the caller would
-	// have no way to close the underlying memory in Webassembly.
 	res, err := p.Module.ExportedFunction("FPDFBitmap_Create").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(1))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	bitmap := res[0]
+
+	releaseFunc := func() {
+		// Release bitmap resources and buffers.
+		p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, bitmap)
+	}
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
@@ -351,7 +358,8 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		}
 		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
 		if err != nil {
-			return nil, err
+			releaseFunc()
+			return nil, nil, err
 		}
 		pagesInfo[i].Page = index
 		pagesInfo[i].HasTransparency = hasTransparency
@@ -361,33 +369,25 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	// The pointer to the first byte of the bitmap buffer.
 	res, err = p.Module.ExportedFunction("FPDFBitmap_GetBuffer").Call(p.Context, bitmap)
 	if err != nil {
-		return nil, err
+		releaseFunc()
+		return nil, nil, err
 	}
 
 	// Create a view of the underlying memory, not a copy.
 	data, success := p.Module.Memory().Read(uint32(res[0]), uint32(size))
 	if !success {
-		return nil, errors.New("could not get bitmap buffer")
+		releaseFunc()
+		return nil, nil, errors.New("could not get bitmap buffer")
 	}
 
-	// We need to copy the data here since we will call FPDFBitmap_Destroy
-	// so original buffer becomes unavailable.
-	dataCopy := append([]byte{}, data...)
-
-	// Release bitmap resources and buffers.
-	_, err = p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, bitmap)
-	if err != nil {
-		return nil, err
-	}
-
-	img.Pix = dataCopy
+	img.Pix = data
 
 	return &responses.RenderPages{
 		Image:  img,
 		Pages:  pagesInfo,
 		Width:  totalWidth,
 		Height: totalHeight,
-	}, nil
+	}, releaseFunc, nil
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
@@ -443,6 +443,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.Image
 		hasTransparency = resp.Result.HasTransparency
@@ -467,6 +468,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.Image
 
@@ -486,6 +488,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.Image
 		hasTransparency = resp.Result.HasTransparency
@@ -510,6 +513,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.Image
 
