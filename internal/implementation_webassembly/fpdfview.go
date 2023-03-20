@@ -714,8 +714,7 @@ func (p *PdfiumImplementation) FPDFBitmap_FillRect(request *requests.FPDFBitmap_
 // then manipulate any color and/or alpha values for any pixels in the
 // bitmap.
 //
-// The data is in BGRA format. Where the A maybe unused if alpha was
-// not specified.
+// Use FPDFBitmap_GetFormat() to find out the format of the data.
 func (p *PdfiumImplementation) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap_GetBuffer) (*responses.FPDFBitmap_GetBuffer, error) {
 	p.Lock()
 	defer p.Unlock()
