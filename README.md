@@ -68,6 +68,8 @@
 This project uses the PDFium C++ library by Google (https://pdfium.googlesource.com/pdfium/) to process the PDF
 documents. Therefor this project could also be called a binding.
 
+Please be aware that PDFium comes with the `Apache License 2.0` license.
+
 ### Single/Multi-threading
 
 Since PDFium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
@@ -436,6 +438,8 @@ Of course there are also some disadvantages:
   close the instance, this could be solved by not re-using instances
 - Some platform specific quirks that have been implemented in PDFium (for example for Windows and MacOS) won't work
   because the WebAssembly build is compiled as Linux
+
+Please be aware that Wazero comes with the `Apache License 2.0` license.
 
 #### Getting started (WebAssembly)
 
