@@ -409,7 +409,8 @@ for running WebAssembly within Go. The comes with quite some advantages:
   go-pdfium and PDFium on all of those platforms
 - Because it's running in Go, we can just start up multiple Wazero runtimes to support processing multiple PDF files at
   once
-- Because it's running in Go, you can directly access the memory in Wazero, for example to render as image
+- Because it's running in Go, you can directly access the memory in Wazero, for example to render a PDFium bitmap
+  directly to a Go Image
 - Because it's running in Go, method calls and responses don't have to travel over gRPC like with go-plugin, saving
   quite some time in encoding/decoding, which makes it about 2x as fast as the go-pugin multithreading approach
 - Since PDFium is compiled to WebAssembly and runs inside the Wazero runtime, it basically runs in a sandbox:
