@@ -73,12 +73,14 @@ documents. Therefor this project could also be called a binding.
 Since PDFium is [not a multithreaded C++ library](https://groups.google.com/g/pdfium/c/HeZSsM_KEUk), we can not directly
 make it multithreaded by calling it from Go's subroutines.
 
-This library has 3 different implementations that you can use to call PDFium:
+To solve this, this library has 3 different implementations that you can use to call PDFium:
 
 - single_threaded: call PDFium from the same process with CGO
 - multi_threaded: call PDFium using multiple workers with CGO, implemented using go-plugin
 - webassmebly: call PDFium using WebAssembly with [Wazero runtime](https://wazero.io/), you can start multiple runtimes
   to get multi-threaded behaviour
+
+All implementations use exactly the same interface, so there won't be any code changes for you to switch between them.
 
 All implementations are thread/subroutine safe, this has been guaranteed by locking the instance that's doing your work
 while it's doing PDFium operations. New operations will wait until the lock becomes available again.
@@ -88,7 +90,7 @@ aware of the amount of workers that you configure.**
 
 ## Implementations
 
-### CGO Single/Multi-threading
+### Single/Multi-threading through CGO
 
 Single-threading in CGO works by directly calling the PDFium library from the same process. Single-threaded might be
 preferred if the caller is managing the workers themselves and does not want the overhead of another process. Be aware
@@ -428,12 +430,7 @@ Of course there are also some disadvantages:
 - Some platform specific quirks that have been implemented in PDFium (for example for Windows and MacOS) won't work
   because the WebAssembly build is compiled as Linux
 
-**Be aware that PDFium could use quite some memory depending on the size of the PDF and the requests that you do, so be
-aware of the amount of workers that you configure.**
-
 #### Getting started (WebAssembly)
-
-To get started, make sure that you create a separate package in your application that will start the worker.
 
 The examples below can also be found in the examples folder.
 
@@ -611,8 +608,9 @@ func renderPage(filePath string, page int, output string) error {
 
 Some newer API's by PDFium are marked as experimental. The WebAssembly build has support for all of them.
 
-We actively monitor PDFium API additions/changes/deletions and apply them in the code-base. When API methods become
-non-experimental, we will make them available in the default configuration.
+We actively monitor PDFium API additions/changes/deletions and apply them in the code-base.
+
+The WebAssembly build will always be the latest PDFium version that we added support for.
 
 ## `io.ReadSeeker` and `io.Writer`
 
