@@ -44,6 +44,7 @@ type Config struct {
 	Stdout       io.Writer
 	Stderr       io.Writer
 	RandomSource io.Reader
+	ReuseWorkers bool // WebAssembly runtime by default doesn't use workers because creating new instances is cheap.
 }
 
 type pdfiumPool struct {
@@ -54,6 +55,7 @@ type pdfiumPool struct {
 	poolRef        string
 	closed         bool
 	lock           *sync.Mutex
+	reuseWorkers   bool
 }
 
 var poolRefs = map[string]*pdfiumPool{}
@@ -198,6 +200,7 @@ func Init(config Config) (pdfium.Pool, error) {
 		instanceRefs:   map[string]*pdfiumInstance{},
 		lock:           &sync.Mutex{},
 		workerPool:     p,
+		reuseWorkers:   config.ReuseWorkers,
 	}
 
 	poolRefs[newPool.poolRef] = newPool
@@ -293,9 +296,16 @@ func (i *pdfiumInstance) Close() (err error) {
 	}()
 
 	defer func() {
-		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
+		if i.pool.reuseWorkers {
+			i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
+		} else {
+			i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+		}
+
 		i.worker = nil
+		i.pool.lock.Lock()
 		delete(i.pool.instanceRefs, i.instanceRef)
+		i.pool.lock.Unlock()
 		i.pool = nil
 		i.closed = true
 		i.lock.Unlock()
@@ -319,7 +329,10 @@ func (i *pdfiumInstance) Kill() (err error) {
 		}
 	}()
 
+	i.pool.lock.Lock()
 	delete(i.pool.instanceRefs, i.instanceRef)
+	i.pool.lock.Unlock()
+
 	i.pool = nil
 	i.closed = true
 

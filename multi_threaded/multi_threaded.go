@@ -260,7 +260,9 @@ func (i *pdfiumInstance) Close() (err error) {
 	defer func() {
 		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
 		i.worker = nil
+		i.pool.lock.Lock()
 		delete(i.pool.instanceRefs, i.instanceRef)
+		i.pool.lock.Unlock()
 		i.pool = nil
 		i.closed = true
 		i.lock.Unlock()
@@ -287,7 +289,9 @@ func (i *pdfiumInstance) Kill() (err error) {
 	defer func() {
 		i.pool.workerPool.ReturnObject(goctx.Background(), i.worker)
 		i.worker = nil
+		i.pool.lock.Lock()
 		delete(i.pool.instanceRefs, i.instanceRef)
+		i.pool.lock.Unlock()
 		i.pool = nil
 		i.closed = true
 	}()
