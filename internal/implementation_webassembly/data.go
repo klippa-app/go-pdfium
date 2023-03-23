@@ -16,8 +16,9 @@ import (
 )
 
 type FileReaderRef struct {
-	Reader     io.ReadSeeker
-	FileAccess *uint64
+	Reader       io.ReadSeeker
+	FileAccess   *uint64
+	ParamPointer *uint64
 }
 
 var FileReaders = map[uint32]*FileReaderRef{}
@@ -42,8 +43,9 @@ func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.
 	fileAccessPointer := res[0]
 
 	fileReaderRef := &FileReaderRef{
-		Reader:     reader,
-		FileAccess: &fileAccessPointer,
+		Reader:       reader,
+		FileAccess:   &fileAccessPointer,
+		ParamPointer: &paramPointer,
 	}
 
 	FileReaders[fileReaderIndex] = fileReaderRef

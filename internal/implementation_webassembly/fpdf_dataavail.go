@@ -88,6 +88,8 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 	}
 
 	p.Free(*p.fileReaders[*dataAvailHandler.reader].FileAccess)
+	p.Free(*dataAvailHandler.fileAvail)
+	p.Free(*dataAvailHandler.handle)
 	delete(p.fileReaders, *dataAvailHandler.reader)
 	delete(FileReaders, *dataAvailHandler.reader)
 	delete(p.dataAvailRefs, dataAvailHandler.nativeRef)

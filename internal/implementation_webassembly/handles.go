@@ -142,6 +142,7 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 	// Cleanup file handle.
 	if d.fileHandleRef != nil {
 		pi.Free(*pi.fileReaders[*d.fileHandleRef].FileAccess)
+		pi.Free(*pi.fileReaders[*d.fileHandleRef].ParamPointer)
 		pi.fileReaders[*d.fileHandleRef].FileAccess = nil
 		delete(pi.fileReaders, *d.fileHandleRef)
 		delete(FileReaders, *d.fileHandleRef)

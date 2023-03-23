@@ -288,7 +288,12 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandleRef != nil {
 			p.Free(*p.fileReaders[*nativeDoc.fileHandleRef].FileAccess)
+			p.Free(*p.fileReaders[*nativeDoc.fileHandleRef].ParamPointer)
 			delete(p.fileReaders, *nativeDoc.fileHandleRef)
+		}
+
+		if dataPointer != nil {
+			p.Free(*dataPointer)
 		}
 
 		return nil, pdfiumError
@@ -404,6 +409,7 @@ func (p *PdfiumImplementation) Close() error {
 	for i := range p.dataAvailRefs {
 		delete(FileAvailables, uint32(*p.dataAvailRefs[i].fileAvail))
 		p.Free(*p.dataAvailRefs[i].fileAvail)
+		p.Free(*p.dataAvailRefs[i].handle)
 		if *p.dataAvailRefs[i].hints != 0 {
 			delete(FileHints, uint32(*p.dataAvailRefs[i].hints))
 			p.Free(*p.dataAvailRefs[i].hints)
@@ -437,6 +443,7 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.fileReaders {
 		p.Free(*p.fileReaders[i].FileAccess)
+		p.Free(*p.fileReaders[i].ParamPointer)
 
 		// Cleanup file handle.
 		p.fileReaders[i].FileAccess = nil
