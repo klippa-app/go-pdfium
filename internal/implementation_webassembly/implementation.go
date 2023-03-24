@@ -221,7 +221,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		volume := filepath.VolumeName(filePath)
 		if volume != "" {
-			return nil, fmt.Errorf("you tried to use Windows volume %s, using Windows volumes is not possible in WebAssembly, you will need to mount your volume in the FSConfig and use unix style paths", volume)
+			return nil, fmt.Errorf("you tried to use Windows volume %s, using Windows volumes is not possible in WebAssembly, you will need to mount your volume in the FSConfig and use POSIX style paths, ee the project README for more information on file handling", volume)
 		}
 
 		cFilePathPointer, err := p.CString(filePath)
