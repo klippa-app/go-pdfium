@@ -2,9 +2,9 @@ package worker
 
 import (
 	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/internal/implementation"
+	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 )
 
 func StartWorker(config *pdfium.LibraryConfig) {
-	implementation.StartPlugin(config)
+	implementation_cgo.StartPlugin(config)
 }

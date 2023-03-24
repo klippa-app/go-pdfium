@@ -31,19 +31,55 @@ type RenderPages struct {
 }
 
 type RenderPageInPixels struct {
-	Result RenderPage
+	Result      RenderPage
+	CleanupFunc func() // In WebAssembly you MUST call Cleanup() when you are done with the image object to release resources.
+}
+
+// Cleanup should be called when using the WebAssembly runtime and when you're
+// done with the Image object to release resources.
+func (r *RenderPageInPixels) Cleanup() {
+	if r.CleanupFunc != nil {
+		r.CleanupFunc()
+	}
 }
 
 type RenderPagesInPixels struct {
-	Result RenderPages
+	Result      RenderPages
+	CleanupFunc func() // In WebAssembly you MUST call Cleanup() when you are done with the image object to release resources.
+}
+
+// Cleanup should be called when using the WebAssembly runtime and when you're
+// done with the Image object to release resources.
+func (r *RenderPagesInPixels) Cleanup() {
+	if r.CleanupFunc != nil {
+		r.CleanupFunc()
+	}
 }
 
 type RenderPageInDPI struct {
-	Result RenderPage
+	Result      RenderPage
+	CleanupFunc func() // In WebAssembly you MUST call Cleanup() when you are done with the image object to release resources.
+}
+
+// Cleanup should be called when using the WebAssembly runtime and when you're
+// done with the Image object to release resources.
+func (r *RenderPageInDPI) Cleanup() {
+	if r.CleanupFunc != nil {
+		r.CleanupFunc()
+	}
 }
 
 type RenderPagesInDPI struct {
-	Result RenderPages
+	Result      RenderPages
+	CleanupFunc func() // In WebAssembly you MUST call Cleanup() when you are done with the image object to release resources.
+}
+
+// Cleanup should be called when using the WebAssembly runtime and when you're
+// done with the Image object to release resources.
+func (r *RenderPagesInDPI) Cleanup() {
+	if r.CleanupFunc != nil {
+		r.CleanupFunc()
+	}
 }
 
 type RenderToFile struct {

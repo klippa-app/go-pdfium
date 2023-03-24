@@ -769,6 +769,7 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from bytes into a page", func() {
+
 						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
@@ -1445,9 +1446,9 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_GetFillColor).To(Equal(&responses.FPDFPageObj_GetFillColor{
 						FillColor: structs.FPDF_COLOR{
-							R: 0,
-							G: 0,
-							B: 0,
+							R: 255,
+							G: 255,
+							B: 255,
 							A: 255,
 						},
 					}))
@@ -1744,6 +1745,33 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFText_SetText).To(Equal(&responses.FPDFText_SetText{}))
+
+					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_LoadPage).To(Not(BeNil()))
+					Expect(FPDFText_LoadPage.TextPage).To(Not(BeEmpty()))
+
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+						TextPage:   FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetText).To(Equal(&responses.FPDFTextObj_GetText{
+						Text: "Changed for SetText test",
+					}))
+
+					FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_ClosePage).To(Equal(&responses.FPDFText_ClosePage{}))
 				})
 
 				It("allows us changing the text using charcodes", func() {
@@ -1756,6 +1784,34 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFText_SetCharcodes).To(Equal(&responses.FPDFText_SetCharcodes{}))
+
+					FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_LoadPage).To(Not(BeNil()))
+					Expect(FPDFText_LoadPage.TextPage).To(Not(BeEmpty()))
+
+					FPDFTextObj_GetText, err := PdfiumInstance.FPDFTextObj_GetText(&requests.FPDFTextObj_GetText{
+						PageObject: pageObject,
+						TextPage:   FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetText).To(Equal(&responses.FPDFTextObj_GetText{
+						Text: string([]rune{9, 6, 7, 3, 5, 2, 1,
+							9, 6, 7, 4, 8, 2}),
+					}))
+
+					FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: FPDFText_LoadPage.TextPage,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_ClosePage).To(Equal(&responses.FPDFText_ClosePage{}))
 				})
 
 				It("allows getting the font size", func() {

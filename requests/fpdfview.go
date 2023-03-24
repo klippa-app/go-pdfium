@@ -156,11 +156,12 @@ type FPDFBitmap_Create struct {
 }
 
 type FPDFBitmap_CreateEx struct {
-	Width  int // The number of pixels in width for the bitmap. Must be greater than 0.
-	Height int // The number of pixels in height for the bitmap. Must be greater than 0.
-	Format enums.FPDF_BITMAP_FORMAT
-	Buffer []byte
-	Stride int // Number of bytes for each scan line. The value must be 0 or greater. When the value is 0, FPDFBitmap_CreateEx() will automatically calculate the appropriate value using Width and Format. When using an external buffer, it is recommended for the caller to pass in the value. When not using an external buffer, it is recommended for the caller to pass in 0.
+	Width   int // The number of pixels in width for the bitmap. Must be greater than 0.
+	Height  int // The number of pixels in height for the bitmap. Must be greater than 0.
+	Format  enums.FPDF_BITMAP_FORMAT
+	Buffer  []byte      // DEPRECATED: use Pointer, unsupported on Webassembly runtime.
+	Pointer interface{} // In the CGO runtime this must be an unsafe.Pointer to the first byte of a byte array, use unsafe.Pointer(&byteArray[0]) to get it. In the Webassembly runtime this must be uint64 with a pointer inside the Webassembly memory space created by malloc.
+	Stride  int         // Number of bytes for each scan line. The value must be 0 or greater. When the value is 0, FPDFBitmap_CreateEx() will automatically calculate the appropriate value using Width and Format. When using an external buffer, it is recommended for the caller to pass in the value. When not using an external buffer, it is recommended for the caller to pass in 0.
 
 }
 
