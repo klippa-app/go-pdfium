@@ -1,6 +1,5 @@
 package shared_tests
 
-import "C"
 import (
 	"bytes"
 	"fmt"

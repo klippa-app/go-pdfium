@@ -1,13 +1,14 @@
 package imports
 
-import "C"
 import (
 	"context"
+	"log"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/klippa-app/go-pdfium/references"
+	
 	"github.com/tetratelabs/wazero/api"
-	"log"
 )
 
 type FPDF_FILEACCESS_CB struct {
