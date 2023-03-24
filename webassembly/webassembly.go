@@ -134,14 +134,13 @@ func Init(config Config) (pdfium.Pool, error) {
 				Context: poolContext,
 			}
 
-			moduleName := uuid.New()
 			moduleConfig := wazero.NewModuleConfig().
 				WithStartFunctions("_initialize").
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
 				WithRandSource(config.RandomSource).
 				WithFSConfig(config.FSConfig).
-				WithName(moduleName.String())
+				WithName("")
 
 			mod, err := runtime.InstantiateModule(newWorker.Context, compiledModule, moduleConfig)
 			if err != nil {
