@@ -441,6 +441,21 @@ Of course there are also some disadvantages:
 
 Please be aware that Wazero comes with the `Apache License 2.0` license.
 
+#### Path handling (WebAssembly)
+
+Because you can tell Wazero which folders have to be mounted in WebAssembly, you have full control over the filesystem.
+
+By default, go-pdfium will mount the full root disk in Wazero on non-Windows environments.
+On Windows environments, go-pdfium will get the volume of the current working directory and mount that as the root.
+
+You can change this behaviour by overwriting FSConfig in the pool setup.
+
+All paths given to go-pdfium in WebAssembly mode have to be in POSIX style and have to be absolute, so for
+example: `/home/user/Downloads/file.pdf`. If you have mounted `/home/user/`on the root, then the path you would have to
+give is `/Downloads/file.pdf`, this is the same on Windows, so no backward slashes or volume names in paths.
+
+You can set your own mounts by overwriting FSConfig in the pool setup.
+
 #### Getting started (WebAssembly)
 
 The examples below can also be found in the examples folder.

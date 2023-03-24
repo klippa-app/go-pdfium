@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -73,7 +75,23 @@ func Init(config Config) (pdfium.Pool, error) {
 
 	// Mount the full root by default.
 	if config.FSConfig == nil {
-		config.FSConfig = wazero.NewFSConfig().WithDirMount("/", "/")
+		config.FSConfig = wazero.NewFSConfig()
+
+		// On Windows we mount the volume of the current working directory as
+		// root. On Linux we mount / as root.
+		if runtime.GOOS == "windows" {
+			cwdDir, err := os.Getwd()
+			if err != nil {
+				return nil, err
+			}
+
+			volumeName := filepath.VolumeName(cwdDir)
+			if volumeName != "" {
+				config.FSConfig = config.FSConfig.WithDirMount(fmt.Sprintf("%s\\", volumeName), "/")
+			}
+		} else {
+			config.FSConfig = config.FSConfig.WithDirMount("/", "/")
+		}
 	}
 
 	if config.Stderr == nil {

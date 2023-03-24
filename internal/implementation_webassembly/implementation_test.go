@@ -2,6 +2,9 @@ package implementation_webassembly_test
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/shared_tests"
@@ -28,6 +31,19 @@ var _ = BeforeSuite(func() {
 	Expect(err).To(BeNil())
 	shared_tests.PdfiumInstance = instance
 	shared_tests.TestDataPath = "../../shared_tests"
+
+	if runtime.GOOS == "windows" {
+		absPath, err := filepath.Abs(shared_tests.TestDataPath)
+		Expect(err).To(BeNil())
+
+		volumeName := filepath.VolumeName(absPath)
+		if volumeName != "" {
+			absPath = strings.TrimPrefix(absPath, volumeName)
+		}
+
+		shared_tests.TestDataPath = strings.ReplaceAll(absPath, "\\", "/")
+	}
+
 	shared_tests.TestType = "webassembly"
 })
 

@@ -3,6 +3,7 @@ package implementation_webassembly
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -216,6 +217,11 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			}
 
 			filePath = abs
+		}
+
+		volume := filepath.VolumeName(filePath)
+		if volume != "" {
+			return nil, fmt.Errorf("you tried to use Windows volume %s, using Windows volumes is not possible in WebAssembly, you will need to mount your volume in the FSConfig and use unix style paths", volume)
 		}
 
 		cFilePathPointer, err := p.CString(filePath)
