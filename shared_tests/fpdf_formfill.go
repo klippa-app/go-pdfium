@@ -1,13 +1,14 @@
 package shared_tests
 
-import "C"
 import (
 	"bytes"
 	"fmt"
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"image"
 	"image/jpeg"
 	"io/ioutil"
 	"time"
+	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -436,14 +437,42 @@ var _ = Describe("fpdf_formfill", func() {
 			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
 			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
 
+			width := 300
+			height := 300
+			stride := width * 4
+
+			fileSize := stride * height
+			var buffer []byte
+			var pointer interface{}
+
+			if TestType == "single" || TestType == "internal" {
+				buffer = make([]byte, fileSize)
+				pointer = unsafe.Pointer(&buffer[0])
+			} else if TestType == "webassembly" {
+				webassemblyImplementation := PdfiumInstance.GetImplementation().(*implementation_webassembly.PdfiumImplementation)
+
+				// Request memory
+				memoryPointer, err := webassemblyImplementation.Malloc(uint64(fileSize))
+				if err != nil {
+					Expect(err).To(BeNil())
+					return
+				}
+
+				// Create a view of the underlying memory.
+				memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(uint32(memoryPointer), uint32(fileSize))
+				Expect(ok).To(BeTrue())
+				buffer = memoryBuffer
+				pointer = memoryPointer
+			}
+
 			renderCount = 0
 			img = image.NewRGBA(image.Rect(0, 0, 300, 300))
 			FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
-				Width:  300,
-				Height: 300,
-				Format: enums.FPDF_BITMAP_FORMAT_BGRA,
-				Buffer: img.Pix,
-				Stride: img.Stride,
+				Width:   300,
+				Height:  300,
+				Format:  enums.FPDF_BITMAP_FORMAT_BGRA,
+				Pointer: pointer,
+				Stride:  img.Stride,
 			})
 			Expect(err).To(BeNil())
 			Expect(FPDFBitmap_CreateEx).To(Not(BeNil()))

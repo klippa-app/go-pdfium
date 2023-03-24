@@ -111,10 +111,10 @@ type FPDFText_GetRect struct {
 
 type FPDFText_GetBoundedText struct {
 	TextPage references.FPDF_TEXTPAGE
-	Left     float32 // Left boundary.
-	Top      float32 // Top boundary.
-	Right    float32 // Right boundary.
-	Bottom   float32 // Bottom boundary.
+	Left     float64 // Left boundary.
+	Top      float64 // Top boundary.
+	Right    float64 // Right boundary.
+	Bottom   float64 // Bottom boundary.
 }
 
 type FPDFText_FindStartFlag uint64

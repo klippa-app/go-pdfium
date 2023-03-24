@@ -4,8 +4,10 @@
 package shared_tests
 
 import (
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"io/ioutil"
 	"os"
+	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -857,12 +859,16 @@ var _ = Describe("fpdfview", func() {
 				})
 			})
 
-			When("an external bitmap has been created", func() {
+			When("an external bitmap has been created with a buffer reference", func() {
 				var bitmap references.FPDF_BITMAP
 				var buffer []byte
 				BeforeEach(func() {
 					if TestType == "multi" {
 						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
+					if TestType == "webassembly" {
+						Skip("External bitmap by buffer reference is not supported on webassembly usage")
 					}
 
 					buffer = make([]byte, (1000*4)*1000) // 1000 pixels in width * 4 bytes per pixel * 1000 pixels in height
@@ -882,6 +888,10 @@ var _ = Describe("fpdfview", func() {
 				AfterEach(func() {
 					if TestType == "multi" {
 						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
+					if TestType == "webassembly" {
+						Skip("External bitmap by buffer reference is not supported on webassembly usage")
 					}
 
 					FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
@@ -944,6 +954,136 @@ var _ = Describe("fpdfview", func() {
 						Top:    0,
 						Width:  1000,
 						Height: 1000,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_FillRect).To(Equal(&responses.FPDFBitmap_FillRect{}))
+
+					By("the first byte of the buffer is white")
+					Expect(buffer[0]).To(Equal(uint8(255)))
+				})
+			})
+
+			When("an external bitmap has been created with a pointer reference", func() {
+				var bitmap references.FPDF_BITMAP
+				var buffer []byte
+				var pointer interface{}
+				width := 1000
+				height := 1500
+				stride := width * 4
+
+				BeforeEach(func() {
+					if TestType == "multi" {
+						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
+					if TestType == "webassembly" {
+						Skip("External bitmap by buffer reference is not supported on webassembly usage")
+					}
+
+					// Size = 1000 pixels in width * 4 bytes per pixel * 1000 pixels in height
+					fileSize := stride * height
+
+					if TestType == "single" || TestType == "internal" {
+						buffer = make([]byte, fileSize)
+						pointer = unsafe.Pointer(&buffer[0])
+					} else if TestType == "webassembly" {
+						webassemblyImplementation := PdfiumInstance.GetImplementation().(*implementation_webassembly.PdfiumImplementation)
+
+						// Request memory
+						memoryPointer, err := webassemblyImplementation.Malloc(uint64(fileSize))
+						if err != nil {
+							Expect(err).To(BeNil())
+							return
+						}
+
+						// Create a view of the underlying memory.
+						memoryBuffer, ok := webassemblyImplementation.Module.Memory().Read(uint32(memoryPointer), uint32(fileSize))
+						Expect(ok).To(BeTrue())
+						buffer = memoryBuffer
+						pointer = memoryPointer
+					}
+
+					FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
+						Width:   width,
+						Height:  height,
+						Format:  enums.FPDF_BITMAP_FORMAT_BGRA,
+						Pointer: pointer,
+						Stride:  stride,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_CreateEx).To(Not(BeNil()))
+					bitmap = FPDFBitmap_CreateEx.Bitmap
+				})
+
+				AfterEach(func() {
+					if TestType == "multi" {
+						Skip("External bitmap is not supported on multi-threaded usage")
+					}
+
+					if TestType == "webassembly" {
+						Skip("External bitmap by buffer reference is not supported on webassembly usage")
+					}
+
+					FPDFBitmap_Destroy, err := PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{
+						Bitmap: bitmap,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
+					buffer = nil
+				})
+
+				It("returns the correct bitmap format", func() {
+					FPDFBitmap_GetFormat, err := PdfiumInstance.FPDFBitmap_GetFormat(&requests.FPDFBitmap_GetFormat{
+						Bitmap: bitmap,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_GetFormat).To(Equal(&responses.FPDFBitmap_GetFormat{
+						Format: enums.FPDF_BITMAP_FORMAT_BGRA,
+					}))
+				})
+
+				It("returns the correct bitmap width", func() {
+					FPDFBitmap_GetWidth, err := PdfiumInstance.FPDFBitmap_GetWidth(&requests.FPDFBitmap_GetWidth{
+						Bitmap: bitmap,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_GetWidth).To(Equal(&responses.FPDFBitmap_GetWidth{
+						Width: width,
+					}))
+				})
+
+				It("returns the correct bitmap height", func() {
+					FPDFBitmap_GetHeight, err := PdfiumInstance.FPDFBitmap_GetHeight(&requests.FPDFBitmap_GetHeight{
+						Bitmap: bitmap,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_GetHeight).To(Equal(&responses.FPDFBitmap_GetHeight{
+						Height: height,
+					}))
+				})
+
+				It("returns the correct bitmap stride", func() {
+					FPDFBitmap_GetStride, err := PdfiumInstance.FPDFBitmap_GetStride(&requests.FPDFBitmap_GetStride{
+						Bitmap: bitmap,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFBitmap_GetStride).To(Equal(&responses.FPDFBitmap_GetStride{
+						Stride: stride,
+					}))
+				})
+
+				It("allows the bitmap to be filled by white", func() {
+					By("the first byte of the buffer is transparent")
+					Expect(buffer[0]).To(Equal(uint8(0)))
+
+					By("when the bitmap is filled")
+					FPDFBitmap_FillRect, err := PdfiumInstance.FPDFBitmap_FillRect(&requests.FPDFBitmap_FillRect{
+						Bitmap: bitmap,
+						Color:  0xFFFFFFFF,
+						Left:   0,
+						Top:    0,
+						Width:  width,
+						Height: height,
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFBitmap_FillRect).To(Equal(&responses.FPDFBitmap_FillRect{}))

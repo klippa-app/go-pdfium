@@ -2,6 +2,7 @@ package shared_tests
 
 import (
 	"bytes"
+	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
 	"os"
 
@@ -130,7 +131,7 @@ var _ = Describe("fpdf_save", func() {
 			})
 
 			Context("and saved with another PDF version", func() {
-				It("it returns the correct byte array", func() {
+				It("it returns the correct byte array and the result has the correct version", func() {
 					FPDF_SaveWithVersion, err := PdfiumInstance.FPDF_SaveWithVersion(&requests.FPDF_SaveWithVersion{
 						Document:    doc,
 						FileVersion: 13,
@@ -139,6 +140,39 @@ var _ = Describe("fpdf_save", func() {
 					Expect(FPDF_SaveWithVersion).To(Not(BeNil()))
 					Expect(FPDF_SaveWithVersion.FileBytes).To(Not(BeNil()))
 					Expect(FPDF_SaveWithVersion.FileBytes).To(PointTo(HaveLen(11375)))
+
+					savedDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+						Data: FPDF_SaveWithVersion.FileBytes,
+					})
+					Expect(err).To(BeNil())
+
+					fileVersion, err := PdfiumInstance.FPDF_GetFileVersion(&requests.FPDF_GetFileVersion{
+						Document: savedDoc.Document,
+					})
+					Expect(err).To(BeNil())
+					Expect(fileVersion).To(Equal(&responses.FPDF_GetFileVersion{
+						FileVersion: 13,
+					}))
+
+					FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+						Document: savedDoc.Document,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_CloseDocument).To(Not(BeNil()))
+				})
+			})
+
+			Context("and saved with incremental flag", func() {
+				It("it returns the correct byte array", func() {
+					FPDF_SaveWithVersion, err := PdfiumInstance.FPDF_SaveWithVersion(&requests.FPDF_SaveWithVersion{
+						Document:    doc,
+						FileVersion: 13,
+						Flags:       requests.SaveFlagIncremental,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_SaveWithVersion).To(Not(BeNil()))
+					Expect(FPDF_SaveWithVersion.FileBytes).To(Not(BeNil()))
+					Expect(FPDF_SaveWithVersion.FileBytes).To(PointTo(HaveLen(11780)))
 				})
 			})
 		})

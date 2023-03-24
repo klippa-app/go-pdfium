@@ -3,7 +3,6 @@
 
 package shared_tests
 
-import "C"
 import (
 	"io/ioutil"
 

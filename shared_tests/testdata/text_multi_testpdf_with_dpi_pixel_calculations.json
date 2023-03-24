@@ -6,15 +6,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 71.9451904296875,
-        "Top": 76.55418395996094,
-        "Right": 789.1592407226562,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 76.55418395996094,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 300,
-        "Top": 319,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 319,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -23,15 +23,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 77.89618682861328,
-        "Top": 78.88618469238281,
-        "Right": 789.1592407226562,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 78.88618469238281,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 325,
-        "Top": 329,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 329,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -40,15 +40,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 80.88818359375,
-        "Top": 81.87818908691406,
-        "Right": 789.1592407226562,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 81.87818908691406,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 337,
-        "Top": 341,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 341,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -57,15 +57,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 83.45118713378906,
-        "Top": 89.02819061279297,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 89.02819061279297,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 348,
-        "Top": 371,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 371,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -74,15 +74,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 91.12918853759766,
-        "Top": 92.26219177246094,
-        "Right": 789.1592407226562,
-        "Bottom": 794.8462524414062
+        "Top": 794.8462524414062,
+        "Right": 92.26219177246094,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 380,
-        "Top": 384,
-        "Right": 3288,
-        "Bottom": 3312
+        "Top": 3312,
+        "Right": 384,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -91,14 +91,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 93.83518981933594,
-        "Top": 97.32218933105469,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 97.32218933105469,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 391,
-        "Top": 406,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 406,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -108,15 +108,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 97.78418731689453,
-        "Top": 103.92218780517578,
-        "Right": 789.0162353515625,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 103.92218780517578,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 407,
-        "Top": 433,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 433,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -125,15 +125,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 105.8141860961914,
-        "Top": 110.85218811035156,
-        "Right": 789.1592407226562,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 110.85218811035156,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 441,
-        "Top": 462,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 462,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -142,15 +142,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 112.10618591308594,
-        "Top": 115.85719299316406,
-        "Right": 789.1592407226562,
-        "Bottom": 796.8812255859375
+        "Top": 796.8812255859375,
+        "Right": 115.85719299316406,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 467,
-        "Top": 483,
-        "Right": 3288,
-        "Bottom": 3320
+        "Top": 3320,
+        "Right": 483,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -159,15 +159,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 116.836181640625,
-        "Top": 117.82618713378906,
-        "Right": 789.1592407226562,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 117.82618713378906,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 487,
-        "Top": 491,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 491,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -176,15 +176,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 119.0911865234375,
-        "Top": 122.8421859741211,
-        "Right": 789.1592407226562,
-        "Bottom": 796.8812255859375
+        "Top": 796.8812255859375,
+        "Right": 122.8421859741211,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 496,
-        "Top": 512,
-        "Right": 3288,
-        "Bottom": 3320
+        "Top": 3320,
+        "Right": 512,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -193,15 +193,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 123.83218383789062,
-        "Top": 124.82218933105469,
-        "Right": 789.1592407226562,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 124.82218933105469,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 516,
-        "Top": 520,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 520,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -210,15 +210,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 126.39518737792969,
-        "Top": 131.97219848632812,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 131.97219848632812,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 527,
-        "Top": 550,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 550,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -227,15 +227,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 133.39117431640625,
-        "Top": 138.7701873779297,
-        "Right": 789.0162353515625,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 138.7701873779297,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 556,
-        "Top": 578,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 578,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -244,14 +244,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 139.76019287109375,
-        "Top": 143.2471923828125,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 143.2471923828125,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 582,
-        "Top": 597,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 597,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -261,15 +261,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 143.8411865234375,
-        "Top": 150.5841827392578,
-        "Right": 789.1592407226562,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 150.5841827392578,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 599,
-        "Top": 627,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 627,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -278,15 +278,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 151.36517333984375,
-        "Top": 156.88717651367188,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 156.88717651367188,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 631,
-        "Top": 654,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 654,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -295,15 +295,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 158.36117553710938,
-        "Top": 163.12417602539062,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 163.12417602539062,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 660,
-        "Top": 680,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 680,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -312,15 +312,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 164.68618774414062,
-        "Top": 169.72418212890625,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 169.72418212890625,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 686,
-        "Top": 707,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 707,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -329,15 +329,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 171.71517944335938,
-        "Top": 180.49317932128906,
-        "Right": 789.1592407226562,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 180.49317932128906,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 715,
-        "Top": 752,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 752,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -346,15 +346,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 182.3411865234375,
-        "Top": 187.91818237304688,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 187.91818237304688,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 760,
-        "Top": 783,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 783,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -363,15 +363,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 189.73318481445312,
-        "Top": 194.77117919921875,
-        "Right": 789.1592407226562,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 194.77117919921875,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 791,
-        "Top": 812,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 812,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -380,15 +380,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 196.0251922607422,
-        "Top": 199.77618408203125,
-        "Right": 789.1592407226562,
-        "Bottom": 796.8812255859375
+        "Top": 796.8812255859375,
+        "Right": 199.77618408203125,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 817,
-        "Top": 832,
-        "Right": 3288,
-        "Bottom": 3320
+        "Top": 3320,
+        "Right": 832,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -397,14 +397,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 199.72119140625,
-        "Top": 203.20819091796875,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 203.20819091796875,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 832,
-        "Top": 847,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 847,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -414,15 +414,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 203.5161895751953,
-        "Top": 208.60919189453125,
-        "Right": 789.1592407226562,
-        "Bottom": 797.3212280273438
+        "Top": 797.3212280273438,
+        "Right": 208.60919189453125,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 848,
-        "Top": 869,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 869,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -431,14 +431,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 203.3491973876953,
-        "Top": 203.3491973876953,
-        "Right": 789.1592407226562,
+        "Top": 789.1592407226562,
+        "Right": 203.3491973876953,
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 847,
-        "Top": 847,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 847,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -448,15 +448,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 464.4881896972656,
-        "Top": 469.669189453125,
-        "Right": 789.1592407226562,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 469.669189453125,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 1935,
-        "Top": 1957,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 1957,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -465,15 +465,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 470.065185546875,
-        "Top": 475.1471862792969,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 475.1471862792969,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 1959,
-        "Top": 1980,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 1980,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -482,15 +482,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 477.0061950683594,
-        "Top": 482.38519287109375,
-        "Right": 786.8822631835938,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 482.38519287109375,
+        "Bottom": 786.8822631835938
       },
       "PixelPosition": {
         "Left": 1988,
-        "Top": 2010,
-        "Right": 3279,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 2010,
+        "Bottom": 3279
       },
       "FontInformation": null
     },
@@ -499,15 +499,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 483.9801940917969,
-        "Top": 489.55718994140625,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 489.55718994140625,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 2017,
-        "Top": 2040,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 2040,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -516,14 +516,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 490.3931884765625,
-        "Top": 493.88018798828125,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 493.88018798828125,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2043,
-        "Top": 2058,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 2058,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -533,15 +533,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 494.5951843261719,
-        "Top": 499.36920166015625,
-        "Right": 789.1592407226562,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 499.36920166015625,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2061,
-        "Top": 2081,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 2081,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -550,14 +550,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 500.3811950683594,
-        "Top": 503.8681945800781,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 503.8681945800781,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2085,
-        "Top": 2099,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 2099,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -567,15 +567,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 503.9781799316406,
-        "Top": 509.50018310546875,
-        "Right": 789.0162353515625,
-        "Bottom": 795.3192138671875
+        "Top": 795.3192138671875,
+        "Right": 509.50018310546875,
+        "Bottom": 789.0162353515625
       },
       "PixelPosition": {
         "Left": 2100,
-        "Top": 2123,
-        "Right": 3288,
-        "Bottom": 3314
+        "Top": 3314,
+        "Right": 2123,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -584,15 +584,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 510.6111755371094,
-        "Top": 514.439208984375,
-        "Right": 789.1592407226562,
-        "Bottom": 797.5192260742188
+        "Top": 797.5192260742188,
+        "Right": 514.439208984375,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2128,
-        "Top": 2143,
-        "Right": 3288,
-        "Bottom": 3323
+        "Top": 3323,
+        "Right": 2143,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -601,14 +601,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 514.3621826171875,
-        "Top": 517.8491821289062,
-        "Right": 789.1592407226562,
-        "Bottom": 789.1702270507812
+        "Top": 789.1702270507812,
+        "Right": 517.8491821289062,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2143,
-        "Top": 2158,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 2158,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -618,15 +618,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 518.564208984375,
-        "Top": 523.3381958007812,
-        "Right": 789.1592407226562,
-        "Bottom": 797.17822265625
+        "Top": 797.17822265625,
+        "Right": 523.3381958007812,
+        "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2161,
-        "Top": 2181,
-        "Right": 3288,
-        "Bottom": 3322
+        "Top": 3322,
+        "Right": 2181,
+        "Bottom": 3288
       },
       "FontInformation": null
     },
@@ -635,14 +635,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 517.9901733398438,
-        "Top": 517.9901733398438,
-        "Right": 789.1592407226562,
+        "Top": 789.1592407226562,
+        "Right": 517.9901733398438,
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2158,
-        "Top": 2158,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 2158,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -652,14 +652,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 517.9901733398438,
-        "Top": 517.9901733398438,
-        "Right": 789.1592407226562,
+        "Top": 789.1592407226562,
+        "Right": 517.9901733398438,
         "Bottom": 789.1592407226562
       },
       "PixelPosition": {
         "Left": 2158,
-        "Top": 2158,
-        "Right": 3288,
+        "Top": 3288,
+        "Right": 2158,
         "Bottom": 3288
       },
       "FontInformation": null
@@ -669,15 +669,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 71.07418823242188,
-        "Top": 76.07818603515625,
-        "Right": 762.8438110351562,
-        "Bottom": 769.40478515625
+        "Top": 769.40478515625,
+        "Right": 76.07818603515625,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 296,
-        "Top": 317,
-        "Right": 3179,
-        "Bottom": 3206
+        "Top": 3206,
+        "Right": 317,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -686,15 +686,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 76.72618865966797,
-        "Top": 80.48818969726562,
-        "Right": 762.8438110351562,
-        "Bottom": 769.683837890625
+        "Top": 769.683837890625,
+        "Right": 80.48818969726562,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 320,
-        "Top": 335,
-        "Right": 3179,
-        "Bottom": 3207
+        "Top": 3207,
+        "Right": 335,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -703,15 +703,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 81.64918518066406,
-        "Top": 85.6631851196289,
-        "Right": 762.8438110351562,
-        "Bottom": 769.683837890625
+        "Top": 769.683837890625,
+        "Right": 85.6631851196289,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 340,
-        "Top": 357,
-        "Right": 3179,
-        "Bottom": 3207
+        "Top": 3207,
+        "Right": 357,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -720,15 +720,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 86.80618286132812,
-        "Top": 90.39718627929688,
-        "Right": 762.726806640625,
-        "Bottom": 767.8837890625
+        "Top": 767.8837890625,
+        "Right": 90.39718627929688,
+        "Bottom": 762.726806640625
       },
       "PixelPosition": {
         "Left": 362,
-        "Top": 377,
-        "Right": 3178,
-        "Bottom": 3200
+        "Top": 3200,
+        "Right": 377,
+        "Bottom": 3178
       },
       "FontInformation": null
     },
@@ -737,14 +737,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 90.86518859863281,
-        "Top": 96.28318786621094,
-        "Right": 762.8438110351562,
-        "Bottom": 762.852783203125
+        "Top": 762.852783203125,
+        "Right": 96.28318786621094,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 379,
-        "Top": 401,
-        "Right": 3179,
+        "Top": 3179,
+        "Right": 401,
         "Bottom": 3179
       },
       "FontInformation": null
@@ -754,15 +754,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 96.65219116210938,
-        "Top": 100.66619110107422,
-        "Right": 762.8438110351562,
-        "Bottom": 769.683837890625
+        "Top": 769.683837890625,
+        "Right": 100.66619110107422,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 403,
-        "Top": 419,
-        "Right": 3179,
-        "Bottom": 3207
+        "Top": 3207,
+        "Right": 419,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -771,15 +771,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 101.80018615722656,
-        "Top": 105.39118957519531,
-        "Right": 762.726806640625,
-        "Bottom": 767.8837890625
+        "Top": 767.8837890625,
+        "Right": 105.39118957519531,
+        "Bottom": 762.726806640625
       },
       "PixelPosition": {
         "Left": 424,
-        "Top": 439,
-        "Right": 3178,
-        "Bottom": 3200
+        "Top": 3200,
+        "Right": 439,
+        "Bottom": 3178
       },
       "FontInformation": null
     },
@@ -788,14 +788,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 105.86819458007812,
-        "Top": 111.28619384765625,
-        "Right": 762.8438110351562,
-        "Bottom": 762.852783203125
+        "Top": 762.852783203125,
+        "Right": 111.28619384765625,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 441,
-        "Top": 464,
-        "Right": 3179,
+        "Top": 3179,
+        "Right": 464,
         "Bottom": 3179
       },
       "FontInformation": null
@@ -805,15 +805,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 111.44818878173828,
-        "Top": 115.51618957519531,
-        "Right": 762.726806640625,
-        "Bottom": 767.8837890625
+        "Top": 767.8837890625,
+        "Right": 115.51618957519531,
+        "Bottom": 762.726806640625
       },
       "PixelPosition": {
         "Left": 464,
-        "Top": 481,
-        "Right": 3178,
-        "Bottom": 3200
+        "Top": 3200,
+        "Right": 481,
+        "Bottom": 3178
       },
       "FontInformation": null
     },
@@ -822,14 +822,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 115.8671875,
-        "Top": 121.28519439697266,
-        "Right": 762.8438110351562,
-        "Bottom": 762.852783203125
+        "Top": 762.852783203125,
+        "Right": 121.28519439697266,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 483,
-        "Top": 505,
-        "Right": 3179,
+        "Top": 3179,
+        "Right": 505,
         "Bottom": 3179
       },
       "FontInformation": null
@@ -839,15 +839,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 121.43818664550781,
-        "Top": 125.398193359375,
-        "Right": 762.8438110351562,
-        "Bottom": 769.1618041992188
+        "Top": 769.1618041992188,
+        "Right": 125.398193359375,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 506,
-        "Top": 522,
-        "Right": 3179,
-        "Bottom": 3205
+        "Top": 3205,
+        "Right": 522,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -856,15 +856,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 126.40618896484375,
-        "Top": 130.75318908691406,
-        "Right": 762.726806640625,
-        "Bottom": 767.8837890625
+        "Top": 767.8837890625,
+        "Right": 130.75318908691406,
+        "Bottom": 762.726806640625
       },
       "PixelPosition": {
         "Left": 527,
-        "Top": 545,
-        "Right": 3178,
-        "Bottom": 3200
+        "Top": 3200,
+        "Right": 545,
+        "Bottom": 3178
       },
       "FontInformation": null
     },
@@ -873,15 +873,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 131.7971954345703,
-        "Top": 135.38818359375,
-        "Right": 762.726806640625,
-        "Bottom": 767.8837890625
+        "Top": 767.8837890625,
+        "Right": 135.38818359375,
+        "Bottom": 762.726806640625
       },
       "PixelPosition": {
         "Left": 549,
-        "Top": 564,
-        "Right": 3178,
-        "Bottom": 3200
+        "Top": 3200,
+        "Right": 564,
+        "Bottom": 3178
       },
       "FontInformation": null
     },
@@ -890,15 +890,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 136.44119262695312,
-        "Top": 140.40118408203125,
-        "Right": 762.8438110351562,
-        "Bottom": 769.1618041992188
+        "Top": 769.1618041992188,
+        "Right": 140.40118408203125,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 569,
-        "Top": 585,
-        "Right": 3179,
-        "Bottom": 3205
+        "Top": 3205,
+        "Right": 585,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -907,14 +907,14 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 140.86019897460938,
-        "Top": 146.2781982421875,
-        "Right": 762.8438110351562,
-        "Bottom": 762.852783203125
+        "Top": 762.852783203125,
+        "Right": 146.2781982421875,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 587,
-        "Top": 609,
-        "Right": 3179,
+        "Top": 3179,
+        "Right": 609,
         "Bottom": 3179
       },
       "FontInformation": null
@@ -924,15 +924,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 146.7281951904297,
-        "Top": 150.877197265625,
-        "Right": 762.8438110351562,
-        "Bottom": 769.40478515625
+        "Top": 769.40478515625,
+        "Right": 150.877197265625,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 611,
-        "Top": 629,
-        "Right": 3179,
-        "Bottom": 3206
+        "Top": 3206,
+        "Right": 629,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -941,15 +941,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 151.4622039794922,
-        "Top": 155.71920776367188,
-        "Right": 762.8438110351562,
-        "Bottom": 769.40478515625
+        "Top": 769.40478515625,
+        "Right": 155.71920776367188,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 631,
-        "Top": 649,
-        "Right": 3179,
-        "Bottom": 3206
+        "Top": 3206,
+        "Right": 649,
+        "Bottom": 3179
       },
       "FontInformation": null
     },
@@ -958,15 +958,15 @@
       "Angle": 0,
       "PointPosition": {
         "Left": 156.8892059326172,
-        "Top": 160.75021362304688,
-        "Right": 762.8438110351562,
-        "Bottom": 769.40478515625
+        "Top": 769.40478515625,
+        "Right": 160.75021362304688,
+        "Bottom": 762.8438110351562
       },
       "PixelPosition": {
         "Left": 654,
-        "Top": 670,
-        "Right": 3179,
-        "Bottom": 3206
+        "Top": 3206,
+        "Right": 670,
+        "Bottom": 3179
       },
       "FontInformation": null
     }

@@ -15,10 +15,20 @@ import (
 var _ = Describe("text", func() {
 	BeforeEach(func() {
 		Locker.Lock()
+
+		if TestType == "webassembly" {
+			// Webassembly has all the experimental things implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	AfterEach(func() {
 		Locker.Unlock()
+
+		if TestType == "webassembly" {
+			// Webassembly has all the experimental things implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	Context("a normal PDF file", func() {
