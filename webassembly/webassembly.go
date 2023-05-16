@@ -116,16 +116,16 @@ func Init(config Config) (pdfium.Pool, error) {
 		return nil, fmt.Errorf("could not instantiate webassembly wasi_snapshot_preview1 module: %w", err)
 	}
 
-	// Add basic Emscripten specific methods.
-	if _, err := imports.Instantiate(poolContext, runtime); err != nil {
-		runtime.Close(poolContext)
-		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
-	}
-
 	compiledModule, err := runtime.CompileModule(poolContext, config.WASM)
 	if err != nil {
 		runtime.Close(poolContext)
 		return nil, fmt.Errorf("could not compile webassembly module: %w", err)
+	}
+
+	// Add basic Emscripten specific methods.
+	if _, err := imports.Instantiate(poolContext, runtime, compiledModule); err != nil {
+		runtime.Close(poolContext)
+		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 	}
 
 	factory := pool.NewPooledObjectFactory(

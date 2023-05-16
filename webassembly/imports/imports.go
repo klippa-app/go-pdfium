@@ -15,9 +15,13 @@ import (
 //   - Closing the wazero.Runtime has the same effect as closing the result.
 //   - To add more functions to the "env" module, use FunctionExporter.
 //   - To instantiate into another wazero.Namespace, use FunctionExporter.
-func Instantiate(ctx context.Context, r wazero.Runtime) (api.Closer, error) {
+func Instantiate(ctx context.Context, r wazero.Runtime, mod wazero.CompiledModule) (api.Closer, error) {
 	builder := r.NewHostModuleBuilder("env")
-	emscripten.NewFunctionExporter().ExportFunctions(builder)
+	exporter, err := emscripten.NewFunctionExporterForModule(mod)
+	if err != nil {
+		return nil, err
+	}
+	exporter.ExportFunctions(builder)
 	NewFunctionExporter().ExportFunctions(builder)
 	return builder.Instantiate(ctx)
 }
