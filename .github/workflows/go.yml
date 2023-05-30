@@ -113,15 +113,34 @@ jobs:
         run: |
           go test -timeout 30m ./internal/implementation_webassembly -v
           go test -timeout 30m ./webassembly -v
+      - name: Test all packages (32 bit)
+        run: |
+          export GOARCH="386"
+          go test -timeout 30m ./internal/implementation_webassembly -v
+          go test -timeout 30m ./webassembly -v
       - name: Test all packages - Experimental (non-Windows)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
+      - name: Test all packages - Experimental (non-Windows) 32 bit
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          export IS_EXPERIMENTAL="1"
+          export GOARCH="386"
+          go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
+          go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Test all packages - Experimental (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:IS_EXPERIMENTAL = '1'
+          go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
+          go test -timeout 30m ./webassembly -tags pdfium_experimental -v
+      - name: Test all packages - Experimental (Windows 32 bit)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:IS_EXPERIMENTAL = '1'
+          $env:GOARCH = '386'
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
