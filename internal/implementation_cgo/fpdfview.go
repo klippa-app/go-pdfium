@@ -575,10 +575,8 @@ func (p *PdfiumImplementation) FPDFBitmap_GetBuffer(request *requests.FPDFBitmap
 	// The pointer to the first byte of the bitmap buffer.
 	buffer := C.FPDFBitmap_GetBuffer(bitmapHandle.handle)
 
-	// We create a Go slice backed by a C array (without copying the original data),
-	// and acquire its length at runtime and use a type conversion to a pointer to a very big array and then slice it to the length that we want.
-	// Refer https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices
-	data := (*[1<<50 - 1]byte)(unsafe.Pointer(buffer))[:size:size] // For 64-bit machine, the max number it can go is 50 as per https://github.com/golang/go/issues/13656#issuecomment-291957684
+	// We create a Go slice backed by a C array (without copying the original data).
+	data := unsafe.Slice((*byte)(unsafe.Pointer(buffer)), uint64(size))
 
 	return &responses.FPDFBitmap_GetBuffer{
 		Buffer: data,

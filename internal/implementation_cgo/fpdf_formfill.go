@@ -364,7 +364,9 @@ func go_formfill_FFI_SetTextFieldFocus_cb(me *C.FPDF_FORMFILLINFO, value C.FPDF_
 	}
 
 	size := uint64(valueLen) * 2
-	target := (*[1<<50 - 1]byte)(unsafe.Pointer(value))[:size:size]
+	// We create a Go slice backed by a C array (without copying the original data).
+	target := unsafe.Slice((*byte)(unsafe.Pointer(value)), uint64(size))
+
 	decodedValue, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(target)
 	if err != nil {
 		return

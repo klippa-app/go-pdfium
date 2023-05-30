@@ -405,18 +405,18 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, page requests.Page, wid
 	alpha := *(*int32)(unsafe.Pointer(&res[0]))
 
 	// White
-	fillColor := 0xFFFFFFFF
+	fillColor := uint64(0xFFFFFFFF)
 
 	hasTransparency := int(alpha) == 1
 
 	// When the page has transparency, fill with black, not white.
 	if hasTransparency {
 		// Black
-		fillColor = 0x00000000
+		fillColor = uint64(0x00000000)
 	}
 
 	// Fill the page rect with the specified color.
-	_, err = p.Module.ExportedFunction("FPDFBitmap_FillRect").Call(p.Context, bitmap, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(fillColor))
+	_, err = p.Module.ExportedFunction("FPDFBitmap_FillRect").Call(p.Context, bitmap, uint64(0), uint64(offset), uint64(width), uint64(height), fillColor)
 	if err != nil {
 		return 0, false, err
 	}

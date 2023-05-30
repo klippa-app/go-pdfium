@@ -53,10 +53,9 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 		return C.int(0)
 	}
 
-	// We create a Go slice backed by a C array (without copying the original data),
-	// and acquire its length at runtime and use a type conversion to a pointer to a very big array and then slice it to the length that we want.
-	// Refer https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices
-	target := (*[1<<50 - 1]byte)(unsafe.Pointer(pBuf))[:size:size] // For 64-bit machine, the max number it can go is 50 as per https://github.com/golang/go/issues/13656#issuecomment-291957684
+	// We create a Go slice backed by a C array (without copying the original data).
+	target := unsafe.Slice((*byte)(unsafe.Pointer(pBuf)), uint64(size))
+
 	readBytes, err := r.Read(target)
 	if err != nil {
 		return C.int(0)
