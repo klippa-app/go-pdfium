@@ -56,13 +56,6 @@ jobs:
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export GODEBUG=cgocheck=2
           go test -timeout 30m `go list ./... | grep -v webassembly` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
-      - name: Test all packages (Linux & MacOS 32 bit)
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-        run: |
-          export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          export GODEBUG=cgocheck=2
-          export GOARCH="386"
-          go test -timeout 30m `go list ./... | grep -v webassembly` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Linux & MacOS) - Experimental
         if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
@@ -70,26 +63,11 @@ jobs:
           export GODEBUG=cgocheck=2
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
-      - name: Test all packages (Linux & MacOS 32 bit) - Experimental
-        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
-        run: |
-          export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          export GODEBUG=cgocheck=2
-          export IS_EXPERIMENTAL="1"
-          export GOARCH="386"
-          go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go test -timeout 30m $(go list ./... | grep -v webassembly) -v
-      - name: Test all packages (Windows 32 bit)
-        if: matrix.os == 'windows-latest'
-        run: |
-          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
-          $env:Path += ";D:\opt\pdfium\bin"
-          $env:GOARCH = '386'
           go test -timeout 30m $(go list ./... | grep -v webassembly) -v
       - name: Test all packages (Windows) - Experimental
         if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
@@ -97,14 +75,6 @@ jobs:
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
           $env:IS_EXPERIMENTAL = '1'
-          go test -timeout 30m $(go list ./... | grep -v webassembly) -tags pdfium_experimental -v
-      - name: Test all packages (Windows 32 bit) - Experimental
-        if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
-        run: |
-          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
-          $env:Path += ";D:\opt\pdfium\bin"
-          $env:IS_EXPERIMENTAL = '1'
-          $env:GOARCH = '386'
           go test -timeout 30m $(go list ./... | grep -v webassembly) -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
@@ -143,34 +113,15 @@ jobs:
         run: |
           go test -timeout 30m ./internal/implementation_webassembly -v
           go test -timeout 30m ./webassembly -v
-      - name: Test all packages (32 bit)
-        run: |
-          export GOARCH="386"
-          go test -timeout 30m ./internal/implementation_webassembly -v
-          go test -timeout 30m ./webassembly -v
       - name: Test all packages - Experimental (non-Windows)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
-      - name: Test all packages - Experimental (non-Windows) 32 bit
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-        run: |
-          export IS_EXPERIMENTAL="1"
-          export GOARCH="386"
-          go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
-          go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Test all packages - Experimental (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:IS_EXPERIMENTAL = '1'
-          go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
-          go test -timeout 30m ./webassembly -tags pdfium_experimental -v
-      - name: Test all packages - Experimental (Windows 32 bit)
-        if: matrix.os == 'windows-latest'
-        run: |
-          $env:IS_EXPERIMENTAL = '1'
-          $env:GOARCH = '386'
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
