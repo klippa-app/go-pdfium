@@ -212,7 +212,7 @@ import (
 )
 
 func main() {
-	worker.StartWorker()
+	worker.StartWorker(nil)
 }
 ```
 
