@@ -152,6 +152,11 @@ type FPDFImageObj_GetImageMetadata struct {
 	ImageMetadata structs.FPDF_IMAGEOBJ_METADATA
 }
 
+type FPDFImageObj_GetImagePixelSize struct {
+	Width  uint
+	Height uint
+}
+
 type FPDFPageObj_CreateNewPath struct {
 	PageObject references.FPDF_PAGEOBJECT
 }

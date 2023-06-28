@@ -306,3 +306,9 @@ func (p *PdfiumImplementation) FPDFGlyphPath_CountGlyphSegments(request *request
 func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *requests.FPDFGlyphPath_GetGlyphPathSegment) (*responses.FPDFGlyphPath_GetGlyphPathSegment, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFImageObj_GetImagePixelSize get the image size in pixels. Faster method to get only image size.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

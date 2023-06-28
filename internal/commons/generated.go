@@ -171,6 +171,7 @@ type Pdfium interface {
 	FPDFImageObj_GetImageFilter(*requests.FPDFImageObj_GetImageFilter) (*responses.FPDFImageObj_GetImageFilter, error)
 	FPDFImageObj_GetImageFilterCount(*requests.FPDFImageObj_GetImageFilterCount) (*responses.FPDFImageObj_GetImageFilterCount, error)
 	FPDFImageObj_GetImageMetadata(*requests.FPDFImageObj_GetImageMetadata) (*responses.FPDFImageObj_GetImageMetadata, error)
+	FPDFImageObj_GetImagePixelSize(*requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error)
 	FPDFImageObj_GetRenderedBitmap(*requests.FPDFImageObj_GetRenderedBitmap) (*responses.FPDFImageObj_GetRenderedBitmap, error)
 	FPDFImageObj_LoadJpegFile(*requests.FPDFImageObj_LoadJpegFile) (*responses.FPDFImageObj_LoadJpegFile, error)
 	FPDFImageObj_LoadJpegFileInline(*requests.FPDFImageObj_LoadJpegFileInline) (*responses.FPDFImageObj_LoadJpegFileInline, error)
@@ -2033,6 +2034,16 @@ func (g *PdfiumRPC) FPDFImageObj_GetImageFilterCount(request *requests.FPDFImage
 func (g *PdfiumRPC) FPDFImageObj_GetImageMetadata(request *requests.FPDFImageObj_GetImageMetadata) (*responses.FPDFImageObj_GetImageMetadata, error) {
 	resp := &responses.FPDFImageObj_GetImageMetadata{}
 	err := g.client.Call("Plugin.FPDFImageObj_GetImageMetadata", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
+	resp := &responses.FPDFImageObj_GetImagePixelSize{}
+	err := g.client.Call("Plugin.FPDFImageObj_GetImagePixelSize", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -7652,6 +7663,24 @@ func (s *PdfiumRPCServer) FPDFImageObj_GetImageMetadata(request *requests.FPDFIm
 	}()
 
 	implResp, err := s.Impl.FPDFImageObj_GetImageMetadata(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize, resp *responses.FPDFImageObj_GetImagePixelSize) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFImageObj_GetImagePixelSize", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFImageObj_GetImagePixelSize(request)
 	if err != nil {
 		return err
 	}

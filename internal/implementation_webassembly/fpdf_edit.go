@@ -783,6 +783,55 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImageMetadata(request *requests.F
 	}, nil
 }
 
+// FPDFImageObj_GetImagePixelSize get the image size in pixels. Faster method to get only image size.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	widthPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer widthPointer.Free()
+
+	heightPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer heightPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFImageObj_GetImagePixelSize").Call(p.Context, *imageObjectHandle.handle, widthPointer.Pointer, heightPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get image pixel size")
+	}
+
+	widthValue, err := widthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	heightValue, err := heightPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFImageObj_GetImagePixelSize{
+		Width:  widthValue,
+		Height: heightValue,
+	}, nil
+}
+
 // FPDFPageObj_CreateNewPath creates a new path object at an initial position.
 func (p *PdfiumImplementation) FPDFPageObj_CreateNewPath(request *requests.FPDFPageObj_CreateNewPath) (*responses.FPDFPageObj_CreateNewPath, error) {
 	p.Lock()

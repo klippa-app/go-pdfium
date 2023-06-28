@@ -2237,6 +2237,20 @@ func (i *pdfiumInstance) FPDFImageObj_GetImageMetadata(request *requests.FPDFIma
 	return i.worker.Instance.FPDFImageObj_GetImageMetadata(request)
 }
 
+func (i *pdfiumInstance) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (resp *responses.FPDFImageObj_GetImagePixelSize, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFImageObj_GetImagePixelSize", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFImageObj_GetImagePixelSize(request)
+}
+
 func (i *pdfiumInstance) FPDFImageObj_GetRenderedBitmap(request *requests.FPDFImageObj_GetRenderedBitmap) (resp *responses.FPDFImageObj_GetRenderedBitmap, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

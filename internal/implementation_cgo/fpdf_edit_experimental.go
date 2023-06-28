@@ -1162,3 +1162,28 @@ func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *reques
 		GlyphPathSegment: segmentHandle.nativeRef,
 	}, nil
 }
+
+// FPDFImageObj_GetImagePixelSize get the image size in pixels. Faster method to get only image size.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	width := C.uint(0)
+	height := C.uint(0)
+
+	result := C.FPDFImageObj_GetImagePixelSize(imageObjectHandle.handle, &width, &height)
+	if int(result) == 0 {
+		return nil, errors.New("could not get image pixel size")
+	}
+
+	return &responses.FPDFImageObj_GetImagePixelSize{
+		Width:  uint(width),
+		Height: uint(height),
+	}, nil
+}
