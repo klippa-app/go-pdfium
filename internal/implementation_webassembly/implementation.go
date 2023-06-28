@@ -413,11 +413,16 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.dataAvailRefs {
-		delete(FileAvailables, uint32(*p.dataAvailRefs[i].fileAvail))
+		FileAvailables.Mutex.Lock()
+		delete(FileAvailables.Refs, uint32(*p.dataAvailRefs[i].fileAvail))
+		FileAvailables.Mutex.Unlock()
+
 		p.Free(*p.dataAvailRefs[i].fileAvail)
 		p.Free(*p.dataAvailRefs[i].handle)
 		if *p.dataAvailRefs[i].hints != 0 {
-			delete(FileHints, uint32(*p.dataAvailRefs[i].hints))
+			FileHints.Mutex.Lock()
+			delete(FileHints.Refs, uint32(*p.dataAvailRefs[i].hints))
+			FileHints.Mutex.Unlock()
 			p.Free(*p.dataAvailRefs[i].hints)
 		}
 		delete(p.dataAvailRefs, i)
@@ -455,7 +460,10 @@ func (p *PdfiumImplementation) Close() error {
 		p.fileReaders[i].FileAccess = nil
 
 		delete(p.fileReaders, i)
-		delete(FileReaders, i)
+
+		FileReaders.Mutex.Lock()
+		delete(FileReaders.Refs, i)
+		FileReaders.Mutex.Unlock()
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"sync"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -21,12 +22,21 @@ type FileReaderRef struct {
 	ParamPointer *uint64
 }
 
-var FileReaders = map[uint32]*FileReaderRef{}
-var FileReadersCounter = uint32(0)
+var FileReaders = struct {
+	Refs    map[uint32]*FileReaderRef
+	Counter uint32
+	Mutex   *sync.Mutex
+}{
+	Refs:    map[uint32]*FileReaderRef{},
+	Counter: 0,
+	Mutex:   &sync.Mutex{},
+}
 
 func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.ReadSeeker) (*uint64, *uint32, error) {
-	fileReaderIndex := FileReadersCounter
-	FileReadersCounter++
+	FileReaders.Mutex.Lock()
+	defer FileReaders.Mutex.Unlock()
+	fileReaderIndex := FileReaders.Counter
+	FileReaders.Counter++
 
 	paramPointer, err := p.Malloc(4)
 	if err != nil {
@@ -48,7 +58,7 @@ func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.
 		ParamPointer: &paramPointer,
 	}
 
-	FileReaders[fileReaderIndex] = fileReaderRef
+	FileReaders.Refs[fileReaderIndex] = fileReaderRef
 	p.fileReaders[fileReaderIndex] = fileReaderRef
 
 	return &fileAccessPointer, &fileReaderIndex, nil
@@ -59,8 +69,15 @@ type FileWriterRef struct {
 	FileWrite *uint64
 }
 
-var FileWriters = map[uint32]*FileWriterRef{}
-var FileWritersCounter = uint32(0)
+var FileWriters = struct {
+	Refs    map[uint32]*FileWriterRef
+	Counter uint32
+	Mutex   *sync.Mutex
+}{
+	Refs:    map[uint32]*FileWriterRef{},
+	Counter: 0,
+	Mutex:   &sync.Mutex{},
+}
 
 type CString struct {
 	Pointer uint64
