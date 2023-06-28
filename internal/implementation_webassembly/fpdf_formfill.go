@@ -2,6 +2,7 @@ package implementation_webassembly
 
 import (
 	"errors"
+	"sync"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -194,7 +195,13 @@ func (f *FormFillInfo) FFI_DoGoToAction(nPageIndex, zoomMode, fPosArray, sizeofA
 	f.FormFillInfo.FFI_DoGoToAction(int(nPageIndex), enums.FPDF_ZOOM_MODE(zoomMode), pos)
 }
 
-var FormFillInfoHandles = map[uint32]*FormFillInfo{}
+var FormFillInfoHandles = struct {
+	Refs  map[uint32]*FormFillInfo
+	Mutex *sync.Mutex
+}{
+	Refs:  map[uint32]*FormFillInfo{},
+	Mutex: &sync.Mutex{},
+}
 
 // FPDFDOC_InitFormFillEnvironment initializes form fill environment
 // This function should be called before any form fill operation.
@@ -269,7 +276,9 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		Instance:         p,
 	}
 
-	FormFillInfoHandles[uint32(formInfoStruct)] = formFillInfo
+	FormFillInfoHandles.Mutex.Lock()
+	FormFillInfoHandles.Refs[uint32(formInfoStruct)] = formFillInfo
+	FormFillInfoHandles.Mutex.Unlock()
 
 	return &responses.FPDFDOC_InitFormFillEnvironment{
 		FormHandle: formHandleHandle.nativeRef,
@@ -291,9 +300,11 @@ func (p *PdfiumImplementation) FPDFDOC_ExitFormFillEnvironment(request *requests
 		return nil, err
 	}
 
-	if _, ok := FormFillInfoHandles[uint32(*formHandleHandle.formInfo)]; ok {
-		delete(FormFillInfoHandles, uint32(*formHandleHandle.formInfo))
+	FormFillInfoHandles.Mutex.Lock()
+	if _, ok := FormFillInfoHandles.Refs[uint32(*formHandleHandle.formInfo)]; ok {
+		delete(FormFillInfoHandles.Refs, uint32(*formHandleHandle.formInfo))
 	}
+	FormFillInfoHandles.Mutex.Unlock()
 
 	delete(p.formHandleRefs, request.FormHandle)
 

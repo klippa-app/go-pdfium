@@ -7,7 +7,7 @@ import (
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/klippa-app/go-pdfium/references"
-	
+
 	"github.com/tetratelabs/wazero/api"
 )
 
@@ -29,7 +29,9 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 	}
 
 	// Check if we have the file referenced in param.
-	openFile, ok := implementation_webassembly.FileReaders[param]
+	implementation_webassembly.FileReaders.Mutex.Lock()
+	openFile, ok := implementation_webassembly.FileReaders.Refs[param]
+	implementation_webassembly.FileReaders.Mutex.Unlock()
 	if !ok {
 		stack[0] = uint64(0)
 		return
@@ -71,7 +73,9 @@ func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []ui
 	mem := mod.Memory()
 
 	// Check if we have the file referenced in param.
-	openWriter, ok := implementation_webassembly.FileWriters[fileWritePointer]
+	implementation_webassembly.FileWriters.Mutex.Lock()
+	openWriter, ok := implementation_webassembly.FileWriters.Refs[fileWritePointer]
+	implementation_webassembly.FileWriters.Mutex.Unlock()
 	if !ok {
 		stack[0] = uint64(0)
 		return
@@ -101,7 +105,9 @@ func (cb FX_FILEAVAIL_IS_DATA_AVAILABLE_CB) Call(ctx context.Context, mod api.Mo
 	offset := uint32(stack[1])
 	size := uint32(stack[2])
 
-	fileAvail, ok := implementation_webassembly.FileAvailables[me]
+	implementation_webassembly.FileAvailables.Mutex.Lock()
+	fileAvail, ok := implementation_webassembly.FileAvailables.Refs[me]
+	implementation_webassembly.FileAvailables.Mutex.Unlock()
 	if !ok {
 		stack[0] = uint64(0)
 		return
@@ -124,7 +130,9 @@ func (cb FX_DOWNLOADHINTS_ADD_SEGMENT_CB) Call(ctx context.Context, mod api.Modu
 	offset := uint32(stack[1])
 	size := uint32(stack[2])
 
-	fileHint, ok := implementation_webassembly.FileHints[me]
+	implementation_webassembly.FileHints.Mutex.Lock()
+	fileHint, ok := implementation_webassembly.FileHints.Refs[me]
+	implementation_webassembly.FileHints.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -204,7 +212,9 @@ func (cb FPDF_FORMFILLINFO_Release_CB) Call(ctx context.Context, mod api.Module,
 	me := uint32(stack[0])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -226,7 +236,9 @@ func (cb FPDF_FORMFILLINFO_FFI_Invalidate_CB) Call(ctx context.Context, mod api.
 	bottom := uint64(stack[5])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -246,7 +258,9 @@ func (cb FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB) Call(ctx context.Context, 
 	bottom := uint64(stack[5])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -262,7 +276,9 @@ func (cb FPDF_FORMFILLINFO_FFI_SetCursor_CB) Call(ctx context.Context, mod api.M
 	cursor := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -279,7 +295,9 @@ func (cb FPDF_FORMFILLINFO_FFI_SetTimer_CB) Call(ctx context.Context, mod api.Mo
 	lpTimerFunc := uint32(stack[2])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -296,7 +314,9 @@ func (cb FPDF_FORMFILLINFO_FFI_KillTimer_CB) Call(ctx context.Context, mod api.M
 	nTimerID := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -314,7 +334,9 @@ func (cb FPDF_FORMFILLINFO_FFI_GetLocalTime_CB) Call(ctx context.Context, mod ap
 	me := uint32(stack[0])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -354,7 +376,9 @@ func (cb FPDF_FORMFILLINFO_FFI_OnChange_CB) Call(ctx context.Context, mod api.Mo
 	me := uint32(stack[0])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -371,7 +395,9 @@ func (cb FPDF_FORMFILLINFO_FFI_GetPage_CB) Call(ctx context.Context, mod api.Mod
 	pageIndex := uint32(stack[2])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -387,7 +413,9 @@ func (cb FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB) Call(ctx context.Context, mod 
 	document := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -403,7 +431,9 @@ func (cb FPDF_FORMFILLINFO_FFI_GetRotation_CB) Call(ctx context.Context, mod api
 	page := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -419,7 +449,9 @@ func (cb FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB) Call(ctx context.Context, 
 	namedAction := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -437,7 +469,9 @@ func (cb FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB) Call(ctx context.Context, m
 	isFocus := uint32(stack[3])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -453,7 +487,9 @@ func (cb FPDF_FORMFILLINFO_FFI_DoURIAction_CB) Call(ctx context.Context, mod api
 	bsURI := uint32(stack[1])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}
@@ -476,7 +512,9 @@ func (cb FPDF_FORMFILLINFO_FFI_DoGoToAction_CB) Call(ctx context.Context, mod ap
 	sizeofArray := uint32(stack[4])
 
 	// Check if we still have the callback.
-	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Lock()
+	formFillInfoHandle, ok := implementation_webassembly.FormFillInfoHandles.Refs[me]
+	implementation_webassembly.FormFillInfoHandles.Mutex.Unlock()
 	if !ok {
 		return
 	}

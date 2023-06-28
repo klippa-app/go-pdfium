@@ -2,6 +2,7 @@ package implementation_webassembly
 
 import (
 	"errors"
+	"sync"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -9,8 +10,21 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 )
 
-var FileAvailables = map[uint32]*DataAvailHandle{}
-var FileHints = map[uint32]*DataAvailHandle{}
+var FileAvailables = struct {
+	Refs  map[uint32]*DataAvailHandle
+	Mutex *sync.Mutex
+}{
+	Refs:  map[uint32]*DataAvailHandle{},
+	Mutex: &sync.Mutex{},
+}
+
+var FileHints = struct {
+	Refs  map[uint32]*DataAvailHandle
+	Mutex *sync.Mutex
+}{
+	Refs:  map[uint32]*DataAvailHandle{},
+	Mutex: &sync.Mutex{},
+}
 
 // FPDFAvail_Create creates a document availability provider.
 // FPDFAvail_Destroy() must be called when done with the availability provider.
@@ -61,10 +75,14 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 
 	dataAvailHandle := p.registerDataAvail(&fPDFAvail, &fXFileAvail, &hints, fileReaderIndex, request.IsDataAvailableCallback, request.AddSegmentCallback)
 
-	FileAvailables[uint32(fXFileAvail)] = dataAvailHandle
+	FileAvailables.Mutex.Lock()
+	FileAvailables.Refs[uint32(fXFileAvail)] = dataAvailHandle
+	FileAvailables.Mutex.Unlock()
 
 	if hints != 0 {
-		FileHints[uint32(hints)] = dataAvailHandle
+		FileHints.Mutex.Lock()
+		FileHints.Refs[uint32(hints)] = dataAvailHandle
+		FileHints.Mutex.Unlock()
 	}
 
 	return &responses.FPDFAvail_Create{
@@ -91,13 +109,20 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 	p.Free(*dataAvailHandler.fileAvail)
 	p.Free(*dataAvailHandler.handle)
 	delete(p.fileReaders, *dataAvailHandler.reader)
-	delete(FileReaders, *dataAvailHandler.reader)
+	FileReaders.Mutex.Lock()
+	delete(FileReaders.Refs, *dataAvailHandler.reader)
+	FileReaders.Mutex.Unlock()
 	delete(p.dataAvailRefs, dataAvailHandler.nativeRef)
-	delete(FileAvailables, uint32(*dataAvailHandler.fileAvail))
+
+	FileAvailables.Mutex.Lock()
+	delete(FileAvailables.Refs, uint32(*dataAvailHandler.fileAvail))
+	FileAvailables.Mutex.Unlock()
 
 	if dataAvailHandler.hints != nil {
 		p.Free(*dataAvailHandler.hints)
-		delete(FileHints, uint32(*dataAvailHandler.hints))
+		FileHints.Mutex.Lock()
+		delete(FileHints.Refs, uint32(*dataAvailHandler.hints))
+		FileHints.Mutex.Unlock()
 	}
 
 	return &responses.FPDFAvail_Destroy{}, nil

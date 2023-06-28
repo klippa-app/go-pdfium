@@ -145,7 +145,10 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 		pi.Free(*pi.fileReaders[*d.fileHandleRef].ParamPointer)
 		pi.fileReaders[*d.fileHandleRef].FileAccess = nil
 		delete(pi.fileReaders, *d.fileHandleRef)
-		delete(FileReaders, *d.fileHandleRef)
+
+		FileReaders.Mutex.Lock()
+		delete(FileReaders.Refs, *d.fileHandleRef)
+		FileReaders.Mutex.Unlock()
 	}
 
 	return nil
