@@ -4,15 +4,17 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"os"
 	"os/exec"
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	pool "github.com/jolestar/go-commons-pool/v2"
+
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/commons"
 )
@@ -173,6 +175,18 @@ func Init(config Config) pdfium.Pool {
 	poolRefs[newPool.poolRef] = newPool
 
 	return newPool
+}
+
+func (p *pdfiumPool) GetNumActive() int {
+	return p.workerPool.GetNumActive()
+}
+
+func (p *pdfiumPool) GetNumIdle() int {
+	return p.workerPool.GetNumIdle()
+}
+
+func (p *pdfiumPool) GetDestroyedCount() int {
+	return p.workerPool.GetDestroyedCount()
 }
 
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
