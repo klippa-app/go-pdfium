@@ -586,6 +586,10 @@ type Pdfium interface {
 	// failure to retrieve any specific parameter would result in its value being 0.
 	FPDFImageObj_GetImageMetadata(request *requests.FPDFImageObj_GetImageMetadata) (*responses.FPDFImageObj_GetImageMetadata, error)
 
+	// FPDFImageObj_GetImagePixelSize get the image size in pixels. Faster method to get only image size.
+	// Experimental API.
+	FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error)
+
 	// FPDFPageObj_CreateNewPath creates a new path object at an initial position.
 	FPDFPageObj_CreateNewPath(request *requests.FPDFPageObj_CreateNewPath) (*responses.FPDFPageObj_CreateNewPath, error)
 

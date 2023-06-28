@@ -150,7 +150,14 @@ func Init(config Config) (pdfium.Pool, error) {
 			newWorker.Module = mod
 
 			malloc := mod.ExportedFunction("malloc")
+			if malloc == nil {
+				return nil, fmt.Errorf("could not find malloc in exported methods")
+			}
+
 			free := mod.ExportedFunction("free")
+			if malloc == nil {
+				return nil, fmt.Errorf("could not find free in exported methods")
+			}
 
 			newWorker.Functions = map[string]api.Function{
 				"malloc": malloc,

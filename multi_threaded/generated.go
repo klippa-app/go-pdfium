@@ -1243,6 +1243,14 @@ func (i *pdfiumInstance) FPDFImageObj_GetImageMetadata(request *requests.FPDFIma
 	return i.worker.plugin.FPDFImageObj_GetImageMetadata(request)
 }
 
+func (i *pdfiumInstance) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFImageObj_GetImagePixelSize(request)
+}
+
 func (i *pdfiumInstance) FPDFImageObj_GetRenderedBitmap(request *requests.FPDFImageObj_GetRenderedBitmap) (*responses.FPDFImageObj_GetRenderedBitmap, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

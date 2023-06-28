@@ -170,6 +170,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_GetRotatedBounds).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFImageObj_GetImagePixelSize", func() {
+				FPDFImageObj_GetImagePixelSize, err := PdfiumInstance.FPDFImageObj_GetImagePixelSize(&requests.FPDFImageObj_GetImagePixelSize{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFImageObj_GetImagePixelSize).To(BeNil())
+			})
 		})
 	})
 
@@ -948,6 +954,17 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFBitmap_Destroy).To(Equal(&responses.FPDFBitmap_Destroy{}))
+				})
+
+				It("returns the correct image pixel size", func() {
+					FPDFImageObj_GetImagePixelSize, err := PdfiumInstance.FPDFImageObj_GetImagePixelSize(&requests.FPDFImageObj_GetImagePixelSize{
+						ImageObject: imageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFImageObj_GetImagePixelSize).To(Equal(&responses.FPDFImageObj_GetImagePixelSize{
+						Width:  109,
+						Height: 88,
+					}))
 				})
 
 				It("gives an error when trying to remove an object without giving the page object", func() {
