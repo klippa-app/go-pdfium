@@ -21,6 +21,8 @@ var skipMethods = map[string]bool{
 	"FPDF_DestroyLibrary":                        true, // Implemented internally
 	"FPDF_RenderPageSkp":                         true, // Skia render engine method
 	"FPDF_FFLRecord":                             true, // Skia render engine method
+	"FPDF_RenderPageSkia":                        true, // Skia render engine method
+	"FPDF_FFLDrawSkia":                           true, // Skia render engine method
 	"FPDF_GetRecommendedV8Flags":                 true, // V8 method
 	"FPDF_GetArrayBufferAllocatorSharedInstance": true, // V8 method
 	"FPDF_BStr_Init":                             true, // XFA method
