@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tetratelabs/wazero v1.2.1
 	golang.org/x/net v0.11.0
-	golang.org/x/text v0.10.0
+	golang.org/x/text v0.11.0
 )
 
 require (
