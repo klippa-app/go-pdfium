@@ -8,11 +8,11 @@ require (
 	github.com/hashicorp/go-plugin v1.4.10
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.11.0
-	github.com/onsi/gomega v1.27.8
+	github.com/onsi/gomega v1.27.10
 	github.com/stretchr/testify v1.8.4
-	github.com/tetratelabs/wazero v1.2.1
-	golang.org/x/net v0.11.0
-	golang.org/x/text v0.10.0
+	github.com/tetratelabs/wazero v1.3.1
+	golang.org/x/net v0.12.0
+	golang.org/x/text v0.11.0
 )
 
 require (
@@ -29,7 +29,7 @@ require (
 	github.com/mitchellh/go-testing-interface v0.0.0-20171004221916-a61a99592b77 // indirect
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/sys v0.9.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	google.golang.org/grpc v1.53.0 // indirect
