@@ -10,6 +10,8 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
+
+	"github.com/tetratelabs/wazero/api"
 )
 
 // FPDF_CreateNewDocument returns a new document.
@@ -313,7 +315,7 @@ func (p *PdfiumImplementation) FPDFPageObj_Transform(request *requests.FPDFPageO
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPageObj_Transform").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Transform.A)), *(*uint64)(unsafe.Pointer(&request.Transform.B)), *(*uint64)(unsafe.Pointer(&request.Transform.C)), *(*uint64)(unsafe.Pointer(&request.Transform.D)), *(*uint64)(unsafe.Pointer(&request.Transform.E)), *(*uint64)(unsafe.Pointer(&request.Transform.F)))
+	_, err = p.Module.ExportedFunction("FPDFPageObj_Transform").Call(p.Context, *pageObjectHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +339,7 @@ func (p *PdfiumImplementation) FPDFPage_TransformAnnots(request *requests.FPDFPa
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_TransformAnnots").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Transform.A)), *(*uint64)(unsafe.Pointer(&request.Transform.B)), *(*uint64)(unsafe.Pointer(&request.Transform.C)), *(*uint64)(unsafe.Pointer(&request.Transform.D)), *(*uint64)(unsafe.Pointer(&request.Transform.E)), *(*uint64)(unsafe.Pointer(&request.Transform.F)))
+	_, err = p.Module.ExportedFunction("FPDFPage_TransformAnnots").Call(p.Context, *pageHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
@@ -398,12 +400,19 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFile(request *requests.FPDFI
 		fileReader = request.FileReader
 	} else if request.FileData != nil {
 		fileReader = NewBytesReaderCloser(request.FileData)
+		request.FileReaderSize = int64(len(request.FileData))
 	} else {
 		openedFile, err := os.Open(request.FilePath)
 		if err != nil {
 			return nil, err
 		}
 
+		stat, err := openedFile.Stat()
+		if err != nil {
+			return nil, err
+		}
+
+		request.FileReaderSize = stat.Size()
 		fileReader = openedFile
 	}
 
@@ -457,12 +466,19 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFileInline(request *requests
 		fileReader = request.FileReader
 	} else if request.FileData != nil {
 		fileReader = NewBytesReaderCloser(request.FileData)
+		request.FileReaderSize = int64(len(request.FileData))
 	} else {
 		openedFile, err := os.Open(request.FilePath)
 		if err != nil {
 			return nil, err
 		}
 
+		stat, err := openedFile.Stat()
+		if err != nil {
+			return nil, err
+		}
+
+		request.FileReaderSize = stat.Size()
 		fileReader = openedFile
 	}
 
@@ -501,7 +517,7 @@ func (p *PdfiumImplementation) FPDFImageObj_SetMatrix(request *requests.FPDFImag
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFImageObj_SetMatrix").Call(p.Context, *imageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Transform.A)), *(*uint64)(unsafe.Pointer(&request.Transform.B)), *(*uint64)(unsafe.Pointer(&request.Transform.C)), *(*uint64)(unsafe.Pointer(&request.Transform.D)), *(*uint64)(unsafe.Pointer(&request.Transform.E)), *(*uint64)(unsafe.Pointer(&request.Transform.F)))
+	res, err := p.Module.ExportedFunction("FPDFImageObj_SetMatrix").Call(p.Context, *imageObjectHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
