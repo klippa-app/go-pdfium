@@ -347,12 +347,19 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFile(request *requests.FPDFI
 		fileReader = request.FileReader
 	} else if request.FileData != nil {
 		fileReader = NewBytesReaderCloser(request.FileData)
+		request.FileReaderSize = int64(len(request.FileData))
 	} else {
 		openedFile, err := os.Open(request.FilePath)
 		if err != nil {
 			return nil, err
 		}
 
+		stat, err := openedFile.Stat()
+		if err != nil {
+			return nil, err
+		}
+
+		request.FileReaderSize = stat.Size()
 		fileReader = openedFile
 	}
 
@@ -416,12 +423,19 @@ func (p *PdfiumImplementation) FPDFImageObj_LoadJpegFileInline(request *requests
 		fileReader = request.FileReader
 	} else if request.FileData != nil {
 		fileReader = NewBytesReaderCloser(request.FileData)
+		request.FileReaderSize = int64(len(request.FileData))
 	} else {
 		openedFile, err := os.Open(request.FilePath)
 		if err != nil {
 			return nil, err
 		}
 
+		stat, err := openedFile.Stat()
+		if err != nil {
+			return nil, err
+		}
+
+		request.FileReaderSize = stat.Size()
 		fileReader = openedFile
 	}
 
