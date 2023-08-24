@@ -138,7 +138,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 5907
+Version: 5961
 Requires:
 
 Libs: -L${libdir} -lpdfium
@@ -654,6 +654,22 @@ Document/image saving allows you to save using a `io.Writer`. Please be aware th
 single-threaded or WebAssembly usage. It's not possible to encode the `io.Writer` with gRPC. Or share it between
 processes for that
 matter.
+
+## Support Policy
+
+We offer an API stability promise with semantic versioning. In other words, we promise to not break any exported
+function signature without incrementing the major version. New features and behaviors happen with a minor version 
+increment, e.g. 1.0.11 to 1.1.0. We also fix bugs or change internal details with a patch version, e.g. 1.0.0 to 1.0.1.
+Upgrades of the supported PDFium version will cause a minor version update.
+
+### Go
+
+This project will support the last 3 version of Go, this means that if the last version of Go is 1.21, our `go.mod`
+will be set to Go 1.19, and our CI tests will be run on Go 1.19, 1.20 and 1.21. It won't mean that the library won't
+work with older versions of Go, but it will tell you what to expect of the supported  Go versions. If we change the
+supported Go versions, we will make that a minor version upgrade. This policy allows you to not be forced to the latest
+Go version for a pretty long time, but it still allows us to use new language features in a pretty reasonable
+time-frame.
 
 ## About Klippa
 
