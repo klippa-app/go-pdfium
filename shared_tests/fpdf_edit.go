@@ -752,7 +752,7 @@ var _ = Describe("fpdf_edit", func() {
 							},
 							FileData: fileData,
 						})
-						Expect(err).To(MatchError("incorrect page"))
+						Expect(err).To(MatchError("6: incorrect page"))
 						Expect(FPDFImageObj_LoadJpegFile).To(BeNil())
 					})
 
@@ -842,7 +842,7 @@ var _ = Describe("fpdf_edit", func() {
 							},
 							FileData: fileData,
 						})
-						Expect(err).To(MatchError("incorrect page"))
+						Expect(err).To(MatchError("6: incorrect page"))
 						Expect(FPDFImageObj_LoadJpegFileInline).To(BeNil())
 					})
 
@@ -942,7 +942,7 @@ var _ = Describe("fpdf_edit", func() {
 							},
 						},
 					})
-					Expect(err).To(MatchError("incorrect page"))
+					Expect(err).To(MatchError("6: incorrect page"))
 					Expect(FPDFImageObj_SetBitmap).To(BeNil())
 				})
 
@@ -1200,7 +1200,7 @@ var _ = Describe("fpdf_edit", func() {
 							},
 						},
 					})
-					Expect(err).To(MatchError("incorrect page"))
+					Expect(err).To(MatchError("6: incorrect page"))
 					Expect(FPDFImageObj_GetImageMetadata).To(BeNil())
 				})
 

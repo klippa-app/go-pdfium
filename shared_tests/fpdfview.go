@@ -253,7 +253,7 @@ var _ = Describe("fpdfview", func() {
 					Document: doc,
 					Index:    23,
 				})
-				Expect(err).To(MatchError("incorrect page"))
+				Expect(err).To(MatchError("6: incorrect page"))
 				Expect(FPDF_LoadPage).To(BeNil())
 			})
 
