@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-hclog v1.5.0
-	github.com/hashicorp/go-plugin v1.5.0
+	github.com/hashicorp/go-plugin v1.5.1
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.12.0
 	github.com/onsi/gomega v1.27.10
