@@ -271,6 +271,28 @@ func (p *PdfiumImplementation) FPDFText_IsGenerated(request *requests.FPDFText_I
 	}, nil
 }
 
+// FPDFText_IsHyphen returns whether a character in a page is a hyphen.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	textPageHandle, err := p.getTextPageHandle(request.TextPage)
+	if err != nil {
+		return nil, err
+	}
+
+	isHyphen := C.FPDFText_IsHyphen(textPageHandle.handle, C.int(request.Index))
+	if int(isHyphen) == -1 {
+		return nil, errors.New("could not get whether text is a hyphen")
+	}
+
+	return &responses.FPDFText_IsHyphen{
+		Index:    request.Index,
+		IsHyphen: int(isHyphen) == 1,
+	}, nil
+}
+
 // FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {

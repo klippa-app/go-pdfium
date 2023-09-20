@@ -1190,6 +1190,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 
+	// FPDFText_IsHyphen returns whether a character in a page is a hyphen.
+	// Experimental API.
+	FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error)
+
 	// FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
 	// Experimental API.
 	FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error)

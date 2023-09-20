@@ -72,6 +72,12 @@ func (p *PdfiumImplementation) FPDFText_IsGenerated(request *requests.FPDFText_I
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFText_IsHyphen returns whether a character in a page is a hyphen.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFText_HasUnicodeMapError a character in a page has an invalid unicode mapping.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error) {

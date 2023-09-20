@@ -1030,6 +1030,123 @@ var _ = Describe("fpdf_text", func() {
 		})
 	})
 
+	Context("a PDF file with hypthen text", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bug_781804.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("a text page is opened", func() {
+			var textPage references.FPDF_TEXTPAGE
+
+			BeforeEach(func() {
+				textPageResp, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(textPageResp).To(Not(BeNil()))
+
+				textPage = textPageResp.TextPage
+			})
+
+			AfterEach(func() {
+				resp, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(resp).To(Not(BeNil()))
+			})
+
+			It("returns correctly whether character at index 0 is a hyphen", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: textPage,
+					Index:    0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsHyphen).To(Equal(&responses.FPDFText_IsHyphen{
+					Index:    0,
+					IsHyphen: false,
+				}))
+			})
+
+			It("returns correctly whether character at index 6 is a hyphen", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: textPage,
+					Index:    6,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsHyphen).To(Equal(&responses.FPDFText_IsHyphen{
+					Index:    6,
+					IsHyphen: true,
+				}))
+			})
+
+			It("returns correctly whether character at index 14 is a hyphen", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: textPage,
+					Index:    14,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsHyphen).To(Equal(&responses.FPDFText_IsHyphen{
+					Index:    14,
+					IsHyphen: false,
+				}))
+			})
+
+			It("returns correctly whether character at index 18 is a hyphen", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: textPage,
+					Index:    18,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_IsHyphen).To(Equal(&responses.FPDFText_IsHyphen{
+					Index:    18,
+					IsHyphen: false,
+				}))
+			})
+
+			It("returns an error when giving an invalid character", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: textPage,
+					Index:    9999999,
+				})
+				Expect(err).To(MatchError("could not get whether text is a hyphen"))
+				Expect(FPDFText_IsHyphen).To(BeNil())
+			})
+
+			It("returns an error when giving an invalid text page", func() {
+				FPDFText_IsHyphen, err := PdfiumInstance.FPDFText_IsHyphen(&requests.FPDFText_IsHyphen{
+					TextPage: "dffddf",
+					Index:    9999999,
+				})
+				Expect(err).To(MatchError("could not find textPage handle, perhaps the textPage was already closed or you tried to share textPages between instances"))
+				Expect(FPDFText_IsHyphen).To(BeNil())
+			})
+		})
+	})
+
 	Context("a PDF file with invalid unicode", func() {
 		var doc references.FPDF_DOCUMENT
 
