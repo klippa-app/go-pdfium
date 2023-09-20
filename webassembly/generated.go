@@ -4435,6 +4435,20 @@ func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGener
 	return i.worker.Instance.FPDFText_IsGenerated(request)
 }
 
+func (i *pdfiumInstance) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (resp *responses.FPDFText_IsHyphen, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_IsHyphen", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFText_IsHyphen(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (resp *responses.FPDFText_LoadFont, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

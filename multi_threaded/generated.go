@@ -2507,6 +2507,14 @@ func (i *pdfiumInstance) FPDFText_IsGenerated(request *requests.FPDFText_IsGener
 	return i.worker.plugin.FPDFText_IsGenerated(request)
 }
 
+func (i *pdfiumInstance) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_IsHyphen(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
