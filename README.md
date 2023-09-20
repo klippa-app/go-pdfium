@@ -655,6 +655,20 @@ single-threaded or WebAssembly usage. It's not possible to encode the `io.Writer
 processes for that
 matter.
 
+## Improving JPEG rendering speed
+
+By default, this library renders images with the `image/jpeg` package that comes with Go to make distribution as simple
+as possible. However, this package is quite slow compared to other native libraries like libjpeg and libjpeg-turbo, you
+can enable the usage of libjpeg-turbo by using the build tag `pdfium_use_turbojpeg`, this will require you to have the
+package `libturbojpeg-dev` installed during build time and the `libturbojpeg` package during runtime and build time.
+
+Speed improvements that can be expected are significant, for example: on a simple PDF the full process of rendering a
+page is 3x as fast compared to a build without libjpeg-turbo.
+
+This is supported in both the CGO and WebAssembly implementation, please note that the WebAssembly implementation also
+uses CGO for libjpeg-turbo for now. There are plans to compile libjpeg-turbo to WebAssembly for the WebAssembly
+implementation to keep the WebAssembly implementation actually full WebAssembly.
+
 ## Support Policy
 
 We offer an API stability promise with semantic versioning. In other words, we promise to not break any exported
