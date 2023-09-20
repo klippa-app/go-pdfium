@@ -20,6 +20,7 @@ import (
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/internal/image/image_jpeg"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -483,6 +484,10 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		var opt jpeg.Options
 		opt.Quality = 95
 
+		if request.OutputQuality > 0 {
+			opt.Quality = request.OutputQuality
+		}
+
 		// If any of the pages have transparency, place a white background under
 		// the image. When you render a JPG image in Go, it will make the transparent
 		// background black. With the added background we make sure that the
@@ -496,7 +501,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		for {
-			err := jpeg.Encode(&imgBuf, renderedImage, &opt)
+			err := image_jpeg.Encode(&imgBuf, renderedImage, &opt)
 			if err != nil {
 				return nil, err
 			}
