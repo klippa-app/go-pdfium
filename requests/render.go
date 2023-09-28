@@ -49,6 +49,7 @@ type RenderToFile struct {
 	OutputFormat        RenderToFileOutputFormat // The format to output the image as
 	OutputTarget        RenderToFileOutputTarget // Where to output the image
 	OutputQuality       int                      // Only used when OutputFormat RenderToFileOutputFormatJPG. Ranges from 1 to 100 inclusive, higher is better. The default is 95.
+	Progressive         bool                     // Only used when OutputFormat RenderToFileOutputFormatJPG and with build tag pdfium_use_turbojpeg. Will render a progressive jpeg.
 	MaxFileSize         int64                    // The maximum file size, when OutputFormat RenderToFileOutputFormatJPG, it will try to lower the quality it until it fits.
 	TargetFilePath      string                   // When OutputTarget is file, the path to write it to, if not given, a temp file is created
 }
