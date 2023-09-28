@@ -41,12 +41,10 @@ jobs:
         run: |
           curl -L https://master.dl.sourceforge.net/project/libjpeg-turbo/3.0.0/libjpeg-turbo-3.0.0-gcc64.exe -o libjpeg-turbo-3.0.0-gcc64.exe
           ./libjpeg-turbo-3.0.0-gcc64.exe /S
-
-      - uses: GuillaumeFalourd/wait-sleep-action@v1
-        name: Wait for jpeg-turbo silent install (Windows)
-        if: matrix.os == 'windows-latest'
-        with:
-          time: '120'
+          until [[ -d "C:\libjpeg-turbo-gcc64\lib\pkgconfig"  ]]
+          do
+            echo "exists"
+          done
 
       - name: Test package (non-Windows)
         if: matrix.os != 'windows-latest'
