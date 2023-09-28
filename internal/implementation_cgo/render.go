@@ -481,11 +481,14 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 	var imgBuf bytes.Buffer
 
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
-		var opt jpeg.Options
-		opt.Quality = 95
+		opt := image_jpeg.Options{
+			Options: &jpeg.Options{
+				Quality: 95,
+			},
+		}
 
 		if request.OutputQuality > 0 {
-			opt.Quality = request.OutputQuality
+			opt.Options.Quality = request.OutputQuality
 		}
 
 		// If any of the pages have transparency, place a white background under
@@ -501,7 +504,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		for {
-			err := image_jpeg.Encode(&imgBuf, renderedImage, &opt)
+			err := image_jpeg.Encode(&imgBuf, renderedImage, opt)
 			if err != nil {
 				return nil, err
 			}

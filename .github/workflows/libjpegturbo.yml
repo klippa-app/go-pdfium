@@ -1,0 +1,52 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - main
+      - development
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  test-libjpegturbo:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        go: [ "1.19", "1.20", "1.21" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Set up libturbojpeg library (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt install libturbojpeg libturbojpeg-dev
+
+      - name: Set up jpeg-turbo library (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install jpeg-turbo
+
+      - name: Set up jpeg-turbo library (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          curl -L https://master.dl.sourceforge.net/project/libjpeg-turbo/3.0.0/libjpeg-turbo-3.0.0-gcc64.exe -o libjpeg-turbo-3.0.0-gcc64.exe
+          ./libjpeg-turbo-3.0.0-gcc64.exe /S
+
+      - uses: GuillaumeFalourd/wait-sleep-action@v1
+        name: Wait for jpeg-turbo silent install
+        with:
+          time: '60'
+
+      - name: Test package
+        run: |
+          go test ./internal/image/image_jpeg -tags pdfium_use_turbojpeg -v
