@@ -42,8 +42,9 @@ jobs:
           curl -L https://master.dl.sourceforge.net/project/libjpeg-turbo/3.0.0/libjpeg-turbo-3.0.0-gcc64.exe -o libjpeg-turbo-3.0.0-gcc64.exe
           ./libjpeg-turbo-3.0.0-gcc64.exe /S
           $Folder = 'C:\libjpeg-turbo-gcc64\lib\pkgconfig'
-          if (Test-Path -Path $Folder) {
-              "Path exists!"
+          while (!(Test-Path -Path $Folder)) {
+            "libjpeg-turbo does not exist yet!"
+            Start-Sleep -s 5
           }
 
       - name: Test package (non-Windows)
