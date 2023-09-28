@@ -41,10 +41,10 @@ jobs:
         run: |
           curl -L https://master.dl.sourceforge.net/project/libjpeg-turbo/3.0.0/libjpeg-turbo-3.0.0-gcc64.exe -o libjpeg-turbo-3.0.0-gcc64.exe
           ./libjpeg-turbo-3.0.0-gcc64.exe /S
-          until [[ -d "C:\libjpeg-turbo-gcc64\lib\pkgconfig"  ]]
-          do
-            echo "exists"
-          done
+          $Folder = 'C:\libjpeg-turbo-gcc64\lib\pkgconfig'
+          if (Test-Path -Path $Folder) {
+              "Path exists!"
+          }
 
       - name: Test package (non-Windows)
         if: matrix.os != 'windows-latest'
