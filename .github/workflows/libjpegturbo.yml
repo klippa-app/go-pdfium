@@ -46,7 +46,7 @@ jobs:
         name: Wait for jpeg-turbo silent install (Windows)
         if: matrix.os == 'windows-latest'
         with:
-          time: '60'
+          time: '120'
 
       - name: Test package (non-Windows)
         if: matrix.os != 'windows-latest'
