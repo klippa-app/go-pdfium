@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        go: [ "1.19", "1.20", "1.21" ]
+        go: [ "1.20", "1.21" ]
         pdfium: [ "4849", "6015" ]
     env:
       PDFIUM_EXPERIMENTAL_VERSION: "6015"
