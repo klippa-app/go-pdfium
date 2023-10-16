@@ -9,6 +9,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gleak"
 )
 
 var _ = BeforeSuite(func() {
@@ -51,6 +52,8 @@ var _ = AfterSuite(func() {
 
 	err = shared_tests.PdfiumPool.Close()
 	Expect(err).To(BeNil())
+
+	Eventually(Goroutines).ShouldNot(HaveLeaked())
 })
 
 var _ = Describe("Multi Threaded", func() {
