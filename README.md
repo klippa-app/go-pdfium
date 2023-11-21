@@ -544,7 +544,7 @@ func getPageCount(filePath string) (int, error) {
 	})
 
 	pageCount, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
-		Document: doc,
+		Document: doc.Document,
 	})
 	if err != nil {
 		return 0, err
@@ -605,7 +605,7 @@ func renderPage(filePath string, page int, output string) error {
 		DPI: 200, // The DPI to render the page in.
 		Page: requests.Page{
 			ByIndex: &requests.PageByIndex{
-				Document: doc,
+				Document: doc.Document,
 				Index:    0,
 			},
 		}, // The page to render, 0-indexed.
@@ -626,7 +626,7 @@ func renderPage(filePath string, page int, output string) error {
 	}
 	defer f.Close()
 
-	err = png.Encode(f, pageRender.Image)
+	err = png.Encode(f, pageRender.Result.Image)
 	if err != nil {
 		return err
 	}
