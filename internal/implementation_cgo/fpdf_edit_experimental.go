@@ -1210,7 +1210,7 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 		valueData[i] = C.int(request.PageIndices[i])
 	}
 
-	result := C.FPDF_MovePages(documentHandle.handle, &valueData[0], C.size_t(len(valueData)), C.int(request.DestPageIndex))
+	result := C.FPDF_MovePages(documentHandle.handle, &valueData[0], C.ulong(len(valueData)), C.int(request.DestPageIndex))
 	if int(result) == 0 {
 		return nil, errors.New("could not move pages")
 	}
