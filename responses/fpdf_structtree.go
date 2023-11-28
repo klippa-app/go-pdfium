@@ -57,7 +57,7 @@ type FPDF_StructElement_GetChildAtIndex struct {
 }
 
 type FPDF_StructElement_GetChildMarkedContentID struct {
-	MarkedContentID int // The marked content ID of the child. If no ID exists, returns -1.
+	ChildMarkedContentID int // The marked content ID of the child. If no ID exists, return an error.
 }
 
 type FPDF_StructElement_GetActualText struct {

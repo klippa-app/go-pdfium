@@ -1077,9 +1077,12 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(reques
 		return nil, err
 	}
 
-	markedContentID := res[0]
+	childMarkedContentID := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(childMarkedContentID) == -1 {
+		return nil, errors.New("could not get struct element child marked content id")
+	}
 
 	return &responses.FPDF_StructElement_GetChildMarkedContentID{
-		MarkedContentID: int(markedContentID),
+		ChildMarkedContentID: int(childMarkedContentID),
 	}, nil
 }
