@@ -80,6 +80,26 @@ var _ = Describe("document", func() {
 					}))
 				})
 
+				It("returns the correct references permissions", func() {
+					docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+						Document: doc,
+					})
+					Expect(err).To(BeNil())
+					Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+						DocUserPermissions:                  0xffffffff, // 0xffffffff (4294967295) = not protected
+						PrintDocument:                       true,
+						ModifyContents:                      true,
+						CopyOrExtractText:                   true,
+						AddOrModifyTextAnnotations:          true,
+						FillInInteractiveFormFields:         true,
+						CreateOrModifyInteractiveFormFields: true,
+						FillInExistingInteractiveFormFields: true,
+						ExtractTextAndGraphics:              true,
+						AssembleDocument:                    true,
+						PrintDocumentAsFaithfulDigitalCopy:  true,
+					}))
+				})
+
 				It("returns the correct security handler revision", func() {
 					securityHandlerRevision, err := PdfiumInstance.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
 						Document: doc,
@@ -412,6 +432,24 @@ var _ = Describe("document", func() {
 						PrintDocumentAsFaithfulDigitalCopy:  true,
 					}))
 
+					docUserPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+						Document: doc.Document,
+					})
+					Expect(err).To(BeNil())
+					Expect(docUserPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+						DocUserPermissions:                  4294963392, // 4294963392 = user password
+						PrintDocument:                       false,
+						ModifyContents:                      false,
+						CopyOrExtractText:                   false,
+						AddOrModifyTextAnnotations:          false,
+						FillInInteractiveFormFields:         false,
+						CreateOrModifyInteractiveFormFields: false,
+						FillInExistingInteractiveFormFields: false,
+						ExtractTextAndGraphics:              false,
+						AssembleDocument:                    false,
+						PrintDocumentAsFaithfulDigitalCopy:  false,
+					}))
+
 					securityHandlerRevision, err := PdfiumInstance.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{
 						Document: doc.Document,
 					})
@@ -475,6 +513,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963392,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 
@@ -523,6 +581,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963392,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 		})
@@ -561,6 +639,26 @@ var _ = Describe("document", func() {
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocPermissions{
 							DocPermissions:                      4294965444,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294965444,
 							PrintDocument:                       true,
 							ModifyContents:                      false,
 							CopyOrExtractText:                   false,
@@ -618,6 +716,26 @@ var _ = Describe("document", func() {
 							FillInExistingInteractiveFormFields: true,
 							ExtractTextAndGraphics:              true,
 							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294965444,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
@@ -671,6 +789,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963396,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 
@@ -717,6 +855,26 @@ var _ = Describe("document", func() {
 							ExtractTextAndGraphics:              true,
 							AssembleDocument:                    true,
 							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963396,
+							PrintDocument:                       true,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
 				})
@@ -769,6 +927,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294964424,
+							PrintDocument:                       false,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 
@@ -815,6 +993,26 @@ var _ = Describe("document", func() {
 							ExtractTextAndGraphics:              true,
 							AssembleDocument:                    true,
 							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294964424,
+							PrintDocument:                       false,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
 				})
@@ -867,6 +1065,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294964416,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 
@@ -913,6 +1131,26 @@ var _ = Describe("document", func() {
 							ExtractTextAndGraphics:              true,
 							AssembleDocument:                    true,
 							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294964416,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
 				})
@@ -965,6 +1203,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  false,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963920,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 
@@ -1013,6 +1271,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963920,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 		})
@@ -1051,6 +1329,26 @@ var _ = Describe("document", func() {
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocPermissions{
 							DocPermissions:                      4294963904,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963904,
 							PrintDocument:                       false,
 							ModifyContents:                      false,
 							CopyOrExtractText:                   false,
@@ -1111,6 +1409,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963904,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: false,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 		})
@@ -1149,6 +1467,26 @@ var _ = Describe("document", func() {
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocPermissions{
 							DocPermissions:                      4294963680,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963680,
 							PrintDocument:                       false,
 							ModifyContents:                      false,
 							CopyOrExtractText:                   false,
@@ -1209,6 +1547,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963680,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 		})
@@ -1247,6 +1605,26 @@ var _ = Describe("document", func() {
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocPermissions{
 							DocPermissions:                      4294963648,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963648,
 							PrintDocument:                       false,
 							ModifyContents:                      false,
 							CopyOrExtractText:                   false,
@@ -1307,6 +1685,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294963648,
+							PrintDocument:                       false,
+							ModifyContents:                      false,
+							CopyOrExtractText:                   false,
+							AddOrModifyTextAnnotations:          false,
+							FillInInteractiveFormFields:         false,
+							CreateOrModifyInteractiveFormFields: false,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              false,
+							AssembleDocument:                    false,
+							PrintDocumentAsFaithfulDigitalCopy:  false,
+						}))
+					})
 				})
 			})
 		})
@@ -1357,6 +1755,26 @@ var _ = Describe("document", func() {
 							PrintDocumentAsFaithfulDigitalCopy:  true,
 						}))
 					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
 				})
 			})
 
@@ -1393,6 +1811,46 @@ var _ = Describe("document", func() {
 						Expect(err).To(BeNil())
 						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocPermissions{
 							DocPermissions:                      4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294967292,
+							PrintDocument:                       true,
+							ModifyContents:                      true,
+							CopyOrExtractText:                   true,
+							AddOrModifyTextAnnotations:          true,
+							FillInInteractiveFormFields:         true,
+							CreateOrModifyInteractiveFormFields: true,
+							FillInExistingInteractiveFormFields: true,
+							ExtractTextAndGraphics:              true,
+							AssembleDocument:                    true,
+							PrintDocumentAsFaithfulDigitalCopy:  true,
+						}))
+					})
+
+					It("returns the correct user permission", func() {
+						docPermissions, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{
+							Document: doc,
+						})
+						Expect(err).To(BeNil())
+						Expect(docPermissions).To(Equal(&responses.FPDF_GetDocUserPermissions{
+							DocUserPermissions:                  4294967292,
 							PrintDocument:                       true,
 							ModifyContents:                      true,
 							CopyOrExtractText:                   true,

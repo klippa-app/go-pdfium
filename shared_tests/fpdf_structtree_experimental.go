@@ -5,11 +5,10 @@ package shared_tests
 
 import (
 	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/responses"
-	"io/ioutil"
-
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
+	"io/ioutil"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -126,6 +125,12 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				FPDF_StructElement_GetMarkedContentIdAtIndex, err := PdfiumInstance.FPDF_StructElement_GetMarkedContentIdAtIndex(&requests.FPDF_StructElement_GetMarkedContentIdAtIndex{})
 				Expect(err).To(MatchError("structElement not given"))
 				Expect(FPDF_StructElement_GetMarkedContentIdAtIndex).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_StructElement_GetChildMarkedContentID", func() {
+				FPDF_StructElement_GetChildMarkedContentID, err := PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{})
+				Expect(err).To(MatchError("structElement not given"))
+				Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
 			})
 		})
 	})
@@ -854,5 +859,208 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				})
 			})
 		})
+	})
+
+	Context("a normal PDF file with tagged marked content multipage", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_mcr_multipage.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		pageIndexes := []int{0, 1}
+		for i := range pageIndexes {
+			page_i := i
+			When("is opened", func() {
+				When("a page structtree is opened", func() {
+					var structTree references.FPDF_STRUCTTREE
+
+					BeforeEach(func() {
+						FPDF_StructTree_GetForPage, err := PdfiumInstance.FPDF_StructTree_GetForPage(&requests.FPDF_StructTree_GetForPage{
+							Page: requests.Page{
+								ByIndex: &requests.PageByIndex{
+									Document: doc,
+									Index:    page_i,
+								},
+							},
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructTree_GetForPage).To(Not(BeNil()))
+
+						structTree = FPDF_StructTree_GetForPage.StructTree
+					})
+
+					AfterEach(func() {
+						FPDF_StructTree_Close, err := PdfiumInstance.FPDF_StructTree_Close(&requests.FPDF_StructTree_Close{
+							StructTree: structTree,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructTree_Close).To(Not(BeNil()))
+					})
+
+					It("returns the correct struct tree children count", func() {
+						FPDF_StructTree_CountChildren, err := PdfiumInstance.FPDF_StructTree_CountChildren(&requests.FPDF_StructTree_CountChildren{
+							StructTree: structTree,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructTree_CountChildren).To(Equal(&responses.FPDF_StructTree_CountChildren{
+							Count: 1,
+						}))
+					})
+
+					When("a struct tree struct element is opened", func() {
+						var struct_doc references.FPDF_STRUCTELEMENT
+
+						BeforeEach(func() {
+							FPDF_StructTree_GetChildAtIndex, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+								StructTree: structTree,
+								Index:      0,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructTree_GetChildAtIndex).To(Not(BeNil()))
+
+							struct_doc = FPDF_StructTree_GetChildAtIndex.StructElement
+						})
+
+						It("gives an error when loading children", func() {
+							FPDF_StructElement_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+								StructElement: struct_doc,
+								Index:         0,
+							})
+							Expect(err).To(MatchError("could not load struct element child"))
+							Expect(FPDF_StructElement_GetChildAtIndex).To(BeNil())
+						})
+
+						It("returns the correct marked content id for the struct doc", func() {
+							FPDF_StructElement_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+								StructElement: struct_doc,
+								Index:         1,
+							})
+							Expect(err).To(MatchError("could not load struct element child"))
+							Expect(FPDF_StructElement_GetChildAtIndex).To(BeNil())
+						})
+
+						It("returns the correct children count for the struct doc", func() {
+							FPDF_StructElement_CountChildren, err := PdfiumInstance.FPDF_StructElement_CountChildren(&requests.FPDF_StructElement_CountChildren{
+								StructElement: struct_doc,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructElement_CountChildren).To(Equal(&responses.FPDF_StructElement_CountChildren{
+								Count: 2,
+							}))
+						})
+
+						It("returns the correct marked contetn id count for the struct doc", func() {
+							FPDF_StructElement_GetMarkedContentIdCount, err := PdfiumInstance.FPDF_StructElement_GetMarkedContentIdCount(&requests.FPDF_StructElement_GetMarkedContentIdCount{
+								StructElement: struct_doc,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructElement_GetMarkedContentIdCount).To(Equal(&responses.FPDF_StructElement_GetMarkedContentIdCount{
+								Count: 2,
+							}))
+						})
+
+						// Both MCID are returned as if part of this page, while they are not.
+						// So `FPDF_StructElement_GetMarkedContentIdAtIndex(...)` does not work
+						// for StructElement spanning multiple pages.
+
+						It("returns the correct marked content id", func() {
+							FPDF_StructElement_GetMarkedContentIdAtIndex, err := PdfiumInstance.FPDF_StructElement_GetMarkedContentIdAtIndex(&requests.FPDF_StructElement_GetMarkedContentIdAtIndex{
+								StructElement: struct_doc,
+								Index:         0,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructElement_GetMarkedContentIdAtIndex).To(Equal(&responses.FPDF_StructElement_GetMarkedContentIdAtIndex{}))
+						})
+
+						It("returns the correct marked content id", func() {
+							FPDF_StructElement_GetMarkedContentIdAtIndex, err := PdfiumInstance.FPDF_StructElement_GetMarkedContentIdAtIndex(&requests.FPDF_StructElement_GetMarkedContentIdAtIndex{
+								StructElement: struct_doc,
+								Index:         1,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructElement_GetMarkedContentIdAtIndex).To(Equal(&responses.FPDF_StructElement_GetMarkedContentIdAtIndex{}))
+						})
+
+						// One MCR is pointing to page 1, another to page2, so those are different
+						// for different pages.
+
+						It("returns the correct child marked content id", func() {
+							FPDF_StructElement_GetChildMarkedContentID, err := PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{
+								StructElement: struct_doc,
+								Index:         0,
+							})
+
+							if page_i == 0 {
+								Expect(err).To(BeNil())
+								Expect(FPDF_StructElement_GetChildMarkedContentID).To(Equal(&responses.FPDF_StructElement_GetChildMarkedContentID{
+									ChildMarkedContentID: 0,
+								}))
+							} else {
+								Expect(err).To(MatchError("could not get struct element child marked content id"))
+								Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
+							}
+						})
+
+						It("returns the correct child marked content id", func() {
+							FPDF_StructElement_GetChildMarkedContentID, err := PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{
+								StructElement: struct_doc,
+								Index:         1,
+							})
+
+							if page_i == 1 {
+								Expect(err).To(BeNil())
+								Expect(FPDF_StructElement_GetChildMarkedContentID).To(Equal(&responses.FPDF_StructElement_GetChildMarkedContentID{
+									ChildMarkedContentID: 0,
+								}))
+							} else {
+								Expect(err).To(MatchError("could not get struct element child marked content id"))
+								Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
+							}
+						})
+
+						It("returns an error when giving an invalid child index", func() {
+							FPDF_StructElement_GetChildMarkedContentID, err := PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{
+								StructElement: struct_doc,
+								Index:         -1,
+							})
+							Expect(err).To(MatchError("could not get struct element child marked content id"))
+							Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
+
+							FPDF_StructElement_GetChildMarkedContentID, err = PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{
+								StructElement: struct_doc,
+								Index:         2,
+							})
+							Expect(err).To(MatchError("could not get struct element child marked content id"))
+							Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
+						})
+
+						It("returns an error when giving an invalid struct element", func() {
+							FPDF_StructElement_GetChildMarkedContentID, err := PdfiumInstance.FPDF_StructElement_GetChildMarkedContentID(&requests.FPDF_StructElement_GetChildMarkedContentID{
+								Index: 0,
+							})
+							Expect(err).To(MatchError("structElement not given"))
+							Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
+						})
+					})
+				})
+			})
+		}
 	})
 })

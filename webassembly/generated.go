@@ -4687,6 +4687,20 @@ func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPer
 	return i.worker.Instance.FPDF_GetDocPermissions(request)
 }
 
+func (i *pdfiumInstance) FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions) (resp *responses.FPDF_GetDocUserPermissions, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetDocUserPermissions", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_GetDocUserPermissions(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (resp *responses.FPDF_GetFileIdentifier, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -5149,6 +5163,20 @@ func (i *pdfiumInstance) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (resp *res
 	return i.worker.Instance.FPDF_LoadXFA(request)
 }
 
+func (i *pdfiumInstance) FPDF_MovePages(request *requests.FPDF_MovePages) (resp *responses.FPDF_MovePages, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_MovePages", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_MovePages(request)
+}
+
 func (i *pdfiumInstance) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (resp *responses.FPDF_NewFormObjectFromXObject, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -5567,6 +5595,20 @@ func (i *pdfiumInstance) FPDF_StructElement_GetChildAtIndex(request *requests.FP
 	}()
 
 	return i.worker.Instance.FPDF_StructElement_GetChildAtIndex(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (resp *responses.FPDF_StructElement_GetChildMarkedContentID, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetChildMarkedContentID", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_StructElement_GetChildMarkedContentID(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (resp *responses.FPDF_StructElement_GetID, err error) {

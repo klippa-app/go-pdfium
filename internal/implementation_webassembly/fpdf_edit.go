@@ -75,6 +75,49 @@ func (p *PdfiumImplementation) FPDFPage_Delete(request *requests.FPDFPage_Delete
 	return &responses.FPDFPage_Delete{}, nil
 }
 
+// FPDF_MovePages Move the given pages to a new index position.
+// When this call fails, the document may be left in an indeterminate state.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(request.PageIndices) == 0 {
+		return nil, errors.New("no page indices were given")
+	}
+
+	pageIndicesSize := uint64(uint64(len(request.PageIndices)))
+
+	// Create an array that's big enough.
+	valueDataPointer, err := p.IntArrayPointer(pageIndicesSize)
+	if err != nil {
+		return nil, err
+	}
+	defer valueDataPointer.Free()
+
+	// Put the values in the array.
+	for i := range request.PageIndices {
+		p.Module.Memory().WriteUint32Le(uint32(valueDataPointer.Pointer+(p.CSizeInt()*uint64(i))), uint32(request.PageIndices[i]))
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_MovePages").Call(p.Context, *documentHandle.handle, valueDataPointer.Pointer, pageIndicesSize, *(*uint64)(unsafe.Pointer(&request.DestPageIndex)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not move pages")
+	}
+
+	return &responses.FPDF_MovePages{}, nil
+}
+
 // FPDFPage_GetRotation returns the page rotation.
 func (p *PdfiumImplementation) FPDFPage_GetRotation(request *requests.FPDFPage_GetRotation) (*responses.FPDFPage_GetRotation, error) {
 	p.Lock()

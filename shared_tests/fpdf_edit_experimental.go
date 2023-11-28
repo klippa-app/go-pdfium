@@ -60,6 +60,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
 			})
+
+			It("returns an error when calling FPDF_MovePages", func() {
+				FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDF_MovePages).To(BeNil())
+			})
 		})
 	})
 
@@ -354,6 +360,48 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFFont_Close).To(Equal(&responses.FPDFFont_Close{}))
+				})
+			})
+
+			Context("when moving pages", func() {
+				It("returns an error when not giving page indices", func() {
+					FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{
+						Document: doc,
+					})
+					Expect(err).To(MatchError("no page indices were given"))
+					Expect(FPDF_MovePages).To(BeNil())
+				})
+				It("returns an error when giving invalid page indices", func() {
+					FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{
+						Document: doc,
+						PageIndices: []int{
+							23,
+						},
+					})
+					Expect(err).To(MatchError("could not move pages"))
+					Expect(FPDF_MovePages).To(BeNil())
+				})
+				It("returns an error when giving an invalid dest page index", func() {
+					FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{
+						Document: doc,
+						PageIndices: []int{
+							0,
+						},
+						DestPageIndex: 23,
+					})
+					Expect(err).To(MatchError("could not move pages"))
+					Expect(FPDF_MovePages).To(BeNil())
+				})
+				It("works when giving page indices", func() {
+					FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{
+						Document: doc,
+						PageIndices: []int{
+							0,
+						},
+						DestPageIndex: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_MovePages).ToNot(BeNil())
 				})
 			})
 		})

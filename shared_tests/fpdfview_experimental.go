@@ -66,6 +66,12 @@ var _ = Describe("fpdfview", func() {
 				Expect(pageCount).To(BeNil())
 			})
 
+			It("returns an error when getting the doc user permissions", func() {
+				pageCount, err := PdfiumInstance.FPDF_GetDocUserPermissions(&requests.FPDF_GetDocUserPermissions{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(pageCount).To(BeNil())
+			})
+
 			It("returns an error when getting the doc revision number of security handler", func() {
 				pageCount, err := PdfiumInstance.FPDF_GetSecurityHandlerRevision(&requests.FPDF_GetSecurityHandlerRevision{})
 				Expect(err).To(MatchError("document not given"))

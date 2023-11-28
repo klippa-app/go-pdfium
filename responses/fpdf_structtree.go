@@ -56,6 +56,10 @@ type FPDF_StructElement_GetChildAtIndex struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }
 
+type FPDF_StructElement_GetChildMarkedContentID struct {
+	ChildMarkedContentID int // The marked content ID of the child. If no ID exists, return an error.
+}
+
 type FPDF_StructElement_GetActualText struct {
 	Actualtext string
 }

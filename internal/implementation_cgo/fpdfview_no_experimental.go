@@ -85,3 +85,9 @@ func (p *PdfiumImplementation) FPDF_GetXFAPacketName(request *requests.FPDF_GetX
 func (p *PdfiumImplementation) FPDF_GetXFAPacketContent(request *requests.FPDF_GetXFAPacketContent) (*responses.FPDF_GetXFAPacketContent, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDF_GetDocUserPermissions returns the user permissions of the PDF.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

@@ -179,6 +179,11 @@ type Pdfium interface {
 	// FPDF_GetDocPermissions returns the permission flags of the file.
 	FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
 
+	// FPDF_GetDocUserPermissions returns the user permission flags of the file.
+	// Always returns user permissions, even if the document was unlocked by the owner.
+	// Experimental API.
+	FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error)
+
 	// FPDF_GetSecurityHandlerRevision returns the revision number of security handlers of the file.
 	FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
 
@@ -376,6 +381,11 @@ type Pdfium interface {
 
 	// FPDFPage_Delete deletes the page at the given index.
 	FPDFPage_Delete(request *requests.FPDFPage_Delete) (*responses.FPDFPage_Delete, error)
+
+	// FPDF_MovePages Move the given pages to a new index position.
+	// When this call fails, the document may be left in an indeterminate state.
+	// Experimental API.
+	FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error)
 
 	// FPDFPage_SetRotation sets the page rotation for a given page.
 	FPDFPage_SetRotation(request *requests.FPDFPage_SetRotation) (*responses.FPDFPage_SetRotation, error)
@@ -883,6 +893,8 @@ type Pdfium interface {
 	// Start fpdf_doc.h
 
 	// FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
+	// Note that another name for the bookmarks is the document outline, as
+	// described in ISO 32000-1:2008, section 12.3.3.
 	FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 
 	// FPDFBookmark_GetNextSibling returns the next bookmark item at the same level.
@@ -1517,6 +1529,14 @@ type Pdfium interface {
 	// If the child exists but is not an element, then this function will
 	// return an error. This will also return an error for out of bounds indices.
 	FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error)
+
+	// FPDF_StructElement_GetChildMarkedContentID returns the child's content id.
+	// If the child exists but is not a stream or object, then this
+	// function will return an error. This will also return an error for out of bounds
+	// indices. Compared to FPDF_StructElement_GetMarkedContentIdAtIndex,
+	// it is scoped to the current page.
+	// Experimental API.
+	FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error)
 
 	// FPDF_StructElement_GetParent returns the parent of the structure element.
 	// If structure element is StructTreeRoot, then this function will return an error.

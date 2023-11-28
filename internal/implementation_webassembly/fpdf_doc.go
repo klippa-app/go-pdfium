@@ -12,6 +12,8 @@ import (
 )
 
 // FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
+// Note that another name for the bookmarks is the document outline, as
+// described in ISO 32000-1:2008, section 12.3.3.
 func (p *PdfiumImplementation) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error) {
 	p.Lock()
 	defer p.Unlock()
