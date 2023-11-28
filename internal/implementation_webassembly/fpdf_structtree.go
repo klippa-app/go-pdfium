@@ -1,5 +1,6 @@
 package implementation_webassembly
 
+import "C"
 import (
 	"errors"
 	"unsafe"
@@ -1052,6 +1053,33 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentIdAtIndex(requ
 	}
 
 	return &responses.FPDF_StructElement_GetMarkedContentIdAtIndex{
+		MarkedContentID: int(markedContentID),
+	}, nil
+}
+
+// FPDF_StructElement_GetChildMarkedContentID returns the child's content id.
+// If the child exists but is not a stream or object, then this
+// function will return an error. This will also return an error for out of bounds
+// indices. Compared to FPDF_StructElement_GetMarkedContentIdAtIndex,
+// it is scoped to the current page.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	parentStructElementHandle, err := p.getStructElementHandle(request.StructElement)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_GetChildMarkedContentID").Call(p.Context, *parentStructElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	markedContentID := res[0]
+
+	return &responses.FPDF_StructElement_GetChildMarkedContentID{
 		MarkedContentID: int(markedContentID),
 	}, nil
 }

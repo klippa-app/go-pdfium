@@ -1187,3 +1187,29 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.
 		Height: uint(height),
 	}, nil
 }
+
+// FPDF_MovePages Move the given pages to a new index position.
+// When this call fails, the document may be left in an indeterminate state.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an array that's big enough.
+	valueData := make([]C.int, len(request.PageIndices))
+	for i := range request.PageIndices {
+		valueData[i] = C.int(request.PageIndices[i])
+	}
+
+	result := C.FPDF_MovePages(documentHandle.handle, &valueData[0], C.size_t(len(valueData)), C.int(request.DestPageIndex))
+	if int(result) == 0 {
+		return nil, errors.New("could not move pages")
+	}
+
+	return &responses.FPDF_MovePages{}, nil
+}

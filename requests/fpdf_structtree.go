@@ -57,6 +57,11 @@ type FPDF_StructElement_GetChildAtIndex struct {
 	Index         int // The index for the child, 0-based.
 }
 
+type FPDF_StructElement_GetChildMarkedContentID struct {
+	StructElement references.FPDF_STRUCTELEMENT
+	Index         int // The index for the child, 0-based.
+}
+
 type FPDF_StructElement_GetActualText struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }

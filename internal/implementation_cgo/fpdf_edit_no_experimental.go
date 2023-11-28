@@ -312,3 +312,10 @@ func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *reques
 func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDF_MovePages Move the given pages to a new index position.
+// When this call fails, the document may be left in an indeterminate state.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

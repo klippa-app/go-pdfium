@@ -346,6 +346,7 @@ type Pdfium interface {
 	FPDF_DocumentHasValidCrossReferenceTable(*requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
 	FPDF_FFLDraw(*requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error)
 	FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
+	FPDF_GetDocUserPermissions(*requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error)
 	FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
 	FPDF_GetFileVersion(*requests.FPDF_GetFileVersion) (*responses.FPDF_GetFileVersion, error)
 	FPDF_GetFormType(*requests.FPDF_GetFormType) (*responses.FPDF_GetFormType, error)
@@ -379,6 +380,7 @@ type Pdfium interface {
 	FPDF_LoadMemDocument64(*requests.FPDF_LoadMemDocument64) (*responses.FPDF_LoadMemDocument64, error)
 	FPDF_LoadPage(*requests.FPDF_LoadPage) (*responses.FPDF_LoadPage, error)
 	FPDF_LoadXFA(*requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error)
+	FPDF_MovePages(*requests.FPDF_MovePages) (*responses.FPDF_MovePages, error)
 	FPDF_NewFormObjectFromXObject(*requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error)
 	FPDF_NewXObjectFromPage(*requests.FPDF_NewXObjectFromPage) (*responses.FPDF_NewXObjectFromPage, error)
 	FPDF_PageToDevice(*requests.FPDF_PageToDevice) (*responses.FPDF_PageToDevice, error)
@@ -409,6 +411,7 @@ type Pdfium interface {
 	FPDF_StructElement_GetAttributeAtIndex(*requests.FPDF_StructElement_GetAttributeAtIndex) (*responses.FPDF_StructElement_GetAttributeAtIndex, error)
 	FPDF_StructElement_GetAttributeCount(*requests.FPDF_StructElement_GetAttributeCount) (*responses.FPDF_StructElement_GetAttributeCount, error)
 	FPDF_StructElement_GetChildAtIndex(*requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error)
+	FPDF_StructElement_GetChildMarkedContentID(*requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error)
 	FPDF_StructElement_GetID(*requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error)
 	FPDF_StructElement_GetLang(*requests.FPDF_StructElement_GetLang) (*responses.FPDF_StructElement_GetLang, error)
 	FPDF_StructElement_GetMarkedContentID(*requests.FPDF_StructElement_GetMarkedContentID) (*responses.FPDF_StructElement_GetMarkedContentID, error)
@@ -3792,6 +3795,16 @@ func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissi
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error) {
+	resp := &responses.FPDF_GetDocUserPermissions{}
+	err := g.client.Call("Plugin.FPDF_GetDocUserPermissions", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
 	resp := &responses.FPDF_GetFileIdentifier{}
 	err := g.client.Call("Plugin.FPDF_GetFileIdentifier", request, resp)
@@ -4122,6 +4135,16 @@ func (g *PdfiumRPC) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*responses.FPD
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error) {
+	resp := &responses.FPDF_MovePages{}
+	err := g.client.Call("Plugin.FPDF_MovePages", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
 	resp := &responses.FPDF_NewFormObjectFromXObject{}
 	err := g.client.Call("Plugin.FPDF_NewFormObjectFromXObject", request, resp)
@@ -4415,6 +4438,16 @@ func (g *PdfiumRPC) FPDF_StructElement_GetAttributeCount(request *requests.FPDF_
 func (g *PdfiumRPC) FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error) {
 	resp := &responses.FPDF_StructElement_GetChildAtIndex{}
 	err := g.client.Call("Plugin.FPDF_StructElement_GetChildAtIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error) {
+	resp := &responses.FPDF_StructElement_GetChildMarkedContentID{}
+	err := g.client.Call("Plugin.FPDF_StructElement_GetChildMarkedContentID", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -10834,6 +10867,24 @@ func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPe
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions, resp *responses.FPDF_GetDocUserPermissions) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetDocUserPermissions", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_GetDocUserPermissions(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier, resp *responses.FPDF_GetFileIdentifier) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -11428,6 +11479,24 @@ func (s *PdfiumRPCServer) FPDF_LoadXFA(request *requests.FPDF_LoadXFA, resp *res
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDF_MovePages(request *requests.FPDF_MovePages, resp *responses.FPDF_MovePages) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_MovePages", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_MovePages(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject, resp *responses.FPDF_NewFormObjectFromXObject) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -11958,6 +12027,24 @@ func (s *PdfiumRPCServer) FPDF_StructElement_GetChildAtIndex(request *requests.F
 	}()
 
 	implResp, err := s.Impl.FPDF_StructElement_GetChildAtIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID, resp *responses.FPDF_StructElement_GetChildMarkedContentID) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetChildMarkedContentID", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_StructElement_GetChildMarkedContentID(request)
 	if err != nil {
 		return err
 	}

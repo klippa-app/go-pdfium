@@ -35,6 +35,27 @@ type FPDFPage_Delete struct {
 	PageIndex int // The index of the page to delete.
 }
 
+type FPDF_MovePages struct {
+	Document references.FPDF_DOCUMENT
+
+	// Example: The PDF document starts out with pages [A, B, C, D], with indices
+	// [0, 1, 2, 3].
+	//
+	// >  Move(doc, [3, 2], 2, 1); // returns success
+	// >  // The document has pages [A, D, C, B].
+	// >
+	// >  Move(doc, [0, 4, 3], 3, 1); // returns error
+	// >  // Returned an error because index 4 is out of range.
+	// >
+	// >  Move(doc, [0, 3, 1], 3, 2); // returns error
+	// >  // Returned an error because index 2 is out of range for 3 page indices.
+	// >
+	// >  Move(doc, [2, 2], 2, 0); // returns error
+	// >  // Returned an error because [2, 2] contains duplicates.
+	PageIndices   []int // The ordered list of pages to move. No duplicates allowed.
+	DestPageIndex int   // The new index position to which the pages in PageIndices are moved.
+}
+
 type FPDFPage_InsertObject struct {
 	Page       Page
 	PageObject references.FPDF_PAGEOBJECT

@@ -62,6 +62,10 @@ type FPDF_GetDocPermissions struct {
 	Document references.FPDF_DOCUMENT
 }
 
+type FPDF_GetDocUserPermissions struct {
+	Document references.FPDF_DOCUMENT
+}
+
 type FPDF_GetSecurityHandlerRevision struct {
 	Document references.FPDF_DOCUMENT
 }

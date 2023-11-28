@@ -2651,6 +2651,14 @@ func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPer
 	return i.worker.plugin.FPDF_GetDocPermissions(request)
 }
 
+func (i *pdfiumInstance) FPDF_GetDocUserPermissions(request *requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_GetDocUserPermissions(request)
+}
+
 func (i *pdfiumInstance) FPDF_GetFileIdentifier(request *requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2927,6 +2935,14 @@ func (i *pdfiumInstance) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*response
 	return i.worker.plugin.FPDF_LoadXFA(request)
 }
 
+func (i *pdfiumInstance) FPDF_MovePages(request *requests.FPDF_MovePages) (*responses.FPDF_MovePages, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_MovePages(request)
+}
+
 func (i *pdfiumInstance) FPDF_NewFormObjectFromXObject(request *requests.FPDF_NewFormObjectFromXObject) (*responses.FPDF_NewFormObjectFromXObject, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3149,6 +3165,14 @@ func (i *pdfiumInstance) FPDF_StructElement_GetChildAtIndex(request *requests.FP
 	}
 
 	return i.worker.plugin.FPDF_StructElement_GetChildAtIndex(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_GetChildMarkedContentID(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error) {

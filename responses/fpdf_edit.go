@@ -28,6 +28,8 @@ type FPDFPage_New struct {
 
 type FPDFPage_Delete struct{}
 
+type FPDF_MovePages struct{}
+
 type FPDFPage_InsertObject struct{}
 
 type FPDFPage_RemoveObject struct{}
