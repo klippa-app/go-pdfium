@@ -322,7 +322,7 @@ var _ = Describe("fpdf_text", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDFText_GetFontInfo).To(Equal(&responses.FPDFText_GetFontInfo{
 					Index:    0,
-					FontName: "CGKWYO+DejaVuSans",
+					FontName: "DejaVuSans",
 					Flags:    524320,
 				}))
 			})

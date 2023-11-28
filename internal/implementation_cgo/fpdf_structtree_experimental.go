@@ -493,7 +493,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(reques
 	}
 
 	markedContentID := C.FPDF_StructElement_GetChildMarkedContentID(parentStructElementHandle.handle, C.int(request.Index))
-	if markedContentID == nil || int(markedContentID) == -1 {
+	if int(markedContentID) == -1 {
 		return nil, errors.New("could not load the child's content id")
 	}
 

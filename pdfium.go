@@ -893,6 +893,8 @@ type Pdfium interface {
 	// Start fpdf_doc.h
 
 	// FPDFBookmark_GetFirstChild returns the first child of a bookmark item, or the first top level bookmark item.
+	// Note that another name for the bookmarks is the document outline, as
+	// described in ISO 32000-1:2008, section 12.3.3.
 	FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 
 	// FPDFBookmark_GetNextSibling returns the next bookmark item at the same level.
