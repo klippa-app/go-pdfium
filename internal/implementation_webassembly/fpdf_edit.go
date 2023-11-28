@@ -88,6 +88,10 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 		return nil, err
 	}
 
+	if len(request.PageIndices) == 0 {
+		return nil, errors.New("no page indices were given")
+	}
+
 	pageIndicesSize := uint64(uint64(len(request.PageIndices)))
 
 	// Create an array that's big enough.
@@ -102,9 +106,14 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 		p.Module.Memory().WriteUint32Le(uint32(valueDataPointer.Pointer+(p.CSizeInt()*uint64(i))), uint32(request.PageIndices[i]))
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_MovePages").Call(p.Context, *documentHandle.handle, valueDataPointer.Pointer, pageIndicesSize, *(*uint64)(unsafe.Pointer(&request.DestPageIndex)))
+	res, err := p.Module.ExportedFunction("FPDF_MovePages").Call(p.Context, *documentHandle.handle, valueDataPointer.Pointer, pageIndicesSize, *(*uint64)(unsafe.Pointer(&request.DestPageIndex)))
 	if err != nil {
 		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not move pages")
 	}
 
 	return &responses.FPDF_MovePages{}, nil

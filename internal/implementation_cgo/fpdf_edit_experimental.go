@@ -1200,6 +1200,10 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 		return nil, err
 	}
 
+	if len(request.PageIndices) == 0 {
+		return nil, errors.New("no page indices were given")
+	}
+
 	// Create an array that's big enough.
 	valueData := make([]C.int, len(request.PageIndices))
 	for i := range request.PageIndices {
