@@ -1,6 +1,5 @@
 package implementation_webassembly
 
-import "C"
 import (
 	"errors"
 	"io"
