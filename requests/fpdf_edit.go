@@ -431,14 +431,21 @@ type FPDFText_SetCharcodes struct {
 
 type FPDFText_LoadFont struct {
 	Document references.FPDF_DOCUMENT
-	Data     []byte
-	FontType enums.FPDF_FONT
-	CID      bool // Whether the font is a CID font or not.
+	Data     []byte          // The stream of font data, which will be copied by the font object.
+	FontType enums.FPDF_FONT // FPDF_FONT_TYPE1 or FPDF_FONT_TRUETYPE depending on the font type.
+	CID      bool            // Whether the font is a CID font or not.
 }
 
 type FPDFText_LoadStandardFont struct {
 	Document references.FPDF_DOCUMENT
 	Font     string
+}
+
+type FPDFText_LoadCidType2Font struct {
+        Document        references.FPDF_DOCUMENT
+        FontData        []byte // The stream of font data, which will be copied by the font object.
+        ToUnicodeCmap   string // The ToUnicode data.
+        CIDToGIDMapData []byte // the stream of CIDToGIDMap data.
 }
 
 type FPDFTextObj_GetFontSize struct {

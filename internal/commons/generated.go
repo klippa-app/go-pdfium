@@ -329,6 +329,7 @@ type Pdfium interface {
 	FPDFText_HasUnicodeMapError(*requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error)
 	FPDFText_IsGenerated(*requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
 	FPDFText_IsHyphen(*requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error)
+	FPDFText_LoadCidType2Font(*requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error)
 	FPDFText_LoadFont(*requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
 	FPDFText_LoadPage(*requests.FPDFText_LoadPage) (*responses.FPDFText_LoadPage, error)
 	FPDFText_LoadStandardFont(*requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
@@ -3618,6 +3619,16 @@ func (g *PdfiumRPC) FPDFText_IsGenerated(request *requests.FPDFText_IsGenerated)
 func (g *PdfiumRPC) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) (*responses.FPDFText_IsHyphen, error) {
 	resp := &responses.FPDFText_IsHyphen{}
 	err := g.client.Call("Plugin.FPDFText_IsHyphen", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
+	resp := &responses.FPDFText_LoadCidType2Font{}
+	err := g.client.Call("Plugin.FPDFText_LoadCidType2Font", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -10551,6 +10562,24 @@ func (s *PdfiumRPCServer) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen,
 	}()
 
 	implResp, err := s.Impl.FPDFText_IsHyphen(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font, resp *responses.FPDFText_LoadCidType2Font) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_LoadCidType2Font", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFText_LoadCidType2Font(request)
 	if err != nil {
 		return err
 	}

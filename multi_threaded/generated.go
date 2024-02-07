@@ -2515,6 +2515,14 @@ func (i *pdfiumInstance) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) 
 	return i.worker.plugin.FPDFText_IsHyphen(request)
 }
 
+func (i *pdfiumInstance) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_LoadCidType2Font(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
