@@ -3130,7 +3130,7 @@ func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFT
                 return nil, errors.New("could not load CID Type2 font")
         }
 
-        fontHandle := p.registerFont(font)
+        fontHandle := p.registerFont(&font)
 
         return &responses.FPDFText_LoadCidType2Font{
                 Font: fontHandle.nativeRef,
