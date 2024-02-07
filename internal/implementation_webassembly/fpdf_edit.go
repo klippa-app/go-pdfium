@@ -3105,7 +3105,11 @@ func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFT
 
         defer fontData.Free()
 
-        toUnicodeCmapPointer := p.CString(request.ToUnicodeCmap)
+        toUnicodeCmapPointer, err := p.CString(request.ToUnicodeCmap)
+        if err != nil {
+                return nil, err
+        }
+
         defer toUnicodeCmapPointer.Free()
 
         cidToGIDMapDataLength := uint32(len(request.CIDToGIDMapData))
