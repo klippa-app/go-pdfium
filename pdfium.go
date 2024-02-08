@@ -721,16 +721,24 @@ type Pdfium interface {
 	FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error)
 
 	// FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
-	// into the document.
-	// The loaded font can be closed using FPDFFont_Close.
+	// into the document. Various font data structures, such as the ToUnicode data, are auto-generated based
+	// on the inputs
+	// The loaded font can be closed using FPDFFont_Close().
 	FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error)
 
 	// FPDFText_LoadStandardFont loads one of the standard 14 fonts per PDF spec 1.7 page 416. The preferred
 	// way of using font style is using a dash to separate the name from the style,
 	// for example 'Helvetica-BoldItalic'.
-	// The loaded font can be closed using FPDFFont_Close.
+	// The loaded font can be closed using FPDFFont_Close().
 	// Experimental API.
 	FPDFText_LoadStandardFont(request *requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
+
+	// FPDFText_LoadCidType2Font returns a font object loaded from a stream of data for a type 2 CID font.
+	// The font is loaded into the document. Unlike FPDFText_LoadFont(), the ToUnicode data and the CIDToGIDMap
+	// data are caller provided, instead of auto-generated.
+	// The loaded font can be closed using FPDFFont_Close().
+	// Experimental API.
+	FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error)
 
 	// FPDFTextObj_GetFontSize returns the font size of a text object.
 	FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)

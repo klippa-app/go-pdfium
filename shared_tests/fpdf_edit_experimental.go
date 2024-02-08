@@ -55,6 +55,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFText_LoadStandardFont).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFText_LoadCidType2Font", func() {
+				FPDFText_LoadCidType2Font, err := PdfiumInstance.FPDFText_LoadCidType2Font(&requests.FPDFText_LoadCidType2Font{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFText_LoadCidType2Font).To(BeNil())
+			})
+
 			It("returns an error when calling FPDFTextObj_GetRenderedBitmap", func() {
 				FPDFTextObj_GetRenderedBitmap, err := PdfiumInstance.FPDFTextObj_GetRenderedBitmap(&requests.FPDFTextObj_GetRenderedBitmap{})
 				Expect(err).To(MatchError("document not given"))
@@ -442,6 +448,61 @@ var _ = Describe("fpdf_edit", func() {
 
 				FPDFFont_Close, err := PdfiumInstance.FPDFFont_Close(&requests.FPDFFont_Close{
 					Font: FPDFText_LoadStandardFont.Font,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFFont_Close).To(Equal(&responses.FPDFFont_Close{}))
+			})
+
+			It("allows a CID Type 2 font to be loaded, a text object to be created with it and to be closed", func() {
+				fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
+				Expect(err).To(BeNil())
+
+				FPDFText_LoadCidType2Font, err := PdfiumInstance.FPDFText_LoadCidType2Font(&requests.FPDFText_LoadCidType2Font{
+					Document: doc,
+					FontData: fontData,
+					ToUnicodeCmap: `(
+/CIDInit /ProcSet findresource begin
+12 dict begin
+begincmap
+/CIDSystemInfo <<
+  /Registry (Adobe)
+  /Ordering (Identity)
+  /Supplement 0
+>> def
+/CMapName /Adobe-Identity-H def
+/CMapType 2 def
+1 begincodespacerange
+<0000> <FFFF>
+endcodespacerange
+5 beginbfrange
+<0001> <0003> [<0020> <3002> <2F00>]
+<0003> <0004> [<4E00> <2F06>]
+<0004> <0005> [<4E8C> <53E5>]
+<0005> <0008> [<F906> <662F> <7B2C> <884C>]
+<0008> <0009> [<FA08> <8FD9>]
+endbfrange
+endcmap
+CMapName currentdict /CMap defineresource pop
+end
+end
+)`,
+					CIDToGIDMapData: []byte{0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_LoadCidType2Font).To(Not(BeNil()))
+				Expect(FPDFText_LoadCidType2Font.Font).To(Not(BeEmpty()))
+
+				FPDFPageObj_CreateTextObj, err := PdfiumInstance.FPDFPageObj_CreateTextObj(&requests.FPDFPageObj_CreateTextObj{
+					Font:     FPDFText_LoadCidType2Font.Font,
+					Document: doc,
+					FontSize: 20,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateTextObj).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateTextObj.PageObject).To(Not(BeEmpty()))
+
+				FPDFFont_Close, err := PdfiumInstance.FPDFFont_Close(&requests.FPDFFont_Close{
+					Font: FPDFText_LoadCidType2Font.Font,
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDFFont_Close).To(Equal(&responses.FPDFFont_Close{}))

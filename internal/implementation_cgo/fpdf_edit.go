@@ -1253,8 +1253,9 @@ func (p *PdfiumImplementation) FPDFText_SetCharcodes(request *requests.FPDFText_
 }
 
 // FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
-// into the document.
-// The loaded font can be closed using FPDFFont_Close.
+// into the document. Various font data structures, such as the ToUnicode data, are auto-generated based
+// on the inputs.
+// The loaded font can be closed using FPDFFont_Close().
 func (p *PdfiumImplementation) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (*responses.FPDFText_LoadFont, error) {
 	p.Lock()
 	defer p.Unlock()

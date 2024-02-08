@@ -4449,6 +4449,20 @@ func (i *pdfiumInstance) FPDFText_IsHyphen(request *requests.FPDFText_IsHyphen) 
 	return i.worker.Instance.FPDFText_IsHyphen(request)
 }
 
+func (i *pdfiumInstance) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (resp *responses.FPDFText_LoadCidType2Font, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_LoadCidType2Font", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFText_LoadCidType2Font(request)
+}
+
 func (i *pdfiumInstance) FPDFText_LoadFont(request *requests.FPDFText_LoadFont) (resp *responses.FPDFText_LoadFont, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

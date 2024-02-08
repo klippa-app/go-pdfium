@@ -196,9 +196,18 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPa
 // FPDFText_LoadStandardFont loads one of the standard 14 fonts per PDF spec 1.7 page 416. The preferred
 // way of using font style is using a dash to separate the name from the style,
 // for example 'Helvetica-BoldItalic'.
-// The loaded font can be closed using FPDFFont_Close.
+// The loaded font can be closed using FPDFFont_Close().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFText_LoadCidType2Font returns a font object loaded from a stream of data for a type 2 CID font.
+// The font is loaded into the document. Unlike FPDFText_LoadFont(), the ToUnicode data and the CIDToGIDMap
+// data are caller provided, instead of auto-generated.
+// The loaded font can be closed using FPDFFont_Close().
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

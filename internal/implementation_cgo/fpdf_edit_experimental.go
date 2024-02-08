@@ -739,7 +739,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPa
 // FPDFText_LoadStandardFont loads one of the standard 14 fonts per PDF spec 1.7 page 416. The preferred
 // way of using font style is using a dash to separate the name from the style,
 // for example 'Helvetica-BoldItalic'.
-// The loaded font can be closed using FPDFFont_Close.
+// The loaded font can be closed using FPDFFont_Close().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error) {
 	p.Lock()
@@ -761,6 +761,35 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 	fontHandle := p.registerFont(font)
 
 	return &responses.FPDFText_LoadStandardFont{
+		Font: fontHandle.nativeRef,
+	}, nil
+}
+
+// FPDFText_LoadCidType2Font returns a font object loaded from a stream of data for a type 2 CID font.
+// The font is loaded into the document. Unlike FPDFText_LoadFont(), the ToUnicode data and the CIDToGIDMap
+// data are caller provided, instead of auto-generated.
+// The loaded font can be closed using FPDFFont_Close().
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	toUnicodeCmap := C.CString(request.ToUnicodeCmap)
+	defer C.free(unsafe.Pointer(toUnicodeCmap))
+
+	font := C.FPDFText_LoadCidType2Font(documentHandle.handle, (*C.uchar)(unsafe.Pointer(&request.FontData[0])), C.uint32_t(len(request.FontData)), toUnicodeCmap, (*C.uchar)(unsafe.Pointer(&request.CIDToGIDMapData[0])), C.uint32_t(len(request.CIDToGIDMapData)))
+	if font == nil {
+		return nil, errors.New("could not load CID Type2 font")
+	}
+
+	fontHandle := p.registerFont(font)
+
+	return &responses.FPDFText_LoadCidType2Font{
 		Font: fontHandle.nativeRef,
 	}, nil
 }
