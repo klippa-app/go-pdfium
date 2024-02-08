@@ -442,10 +442,10 @@ type FPDFText_LoadStandardFont struct {
 }
 
 type FPDFText_LoadCidType2Font struct {
-        Document        references.FPDF_DOCUMENT
-        FontData        []byte // The stream of font data, which will be copied by the font object.
-        ToUnicodeCmap   string // The ToUnicode data.
-        CIDToGIDMapData []byte // the stream of CIDToGIDMap data.
+	Document        references.FPDF_DOCUMENT
+	FontData        []byte // The stream of font data, which will be copied by the font object.
+	ToUnicodeCmap   string // The ToUnicode data.
+	CIDToGIDMapData []byte // the stream of CIDToGIDMap data.
 }
 
 type FPDFTextObj_GetFontSize struct {

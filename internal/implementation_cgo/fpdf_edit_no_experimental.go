@@ -208,7 +208,7 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 // The loaded font can be closed using FPDFFont_Close().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
-        return nil, pdfium_errors.ErrExperimentalUnsupported
+	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
 // FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.

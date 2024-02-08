@@ -3089,52 +3089,52 @@ func (p *PdfiumImplementation) FPDFText_LoadStandardFont(request *requests.FPDFT
 // The loaded font can be closed using FPDFFont_Close().
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error) {
-        p.Lock()
-        defer p.Unlock()
+	p.Lock()
+	defer p.Unlock()
 
-        documentHandle, err := p.getDocumentHandle(request.Document)
-        if err != nil {
-                return nil, err
-        }
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
 
-        fontDataLength := uint32(len(request.FontData))
-        fontData, err := p.ByteArrayPointer(uint64(len(request.FontData)), request.FontData)
-        if err != nil {
-                return nil, err
-        }
+	fontDataLength := uint32(len(request.FontData))
+	fontData, err := p.ByteArrayPointer(uint64(len(request.FontData)), request.FontData)
+	if err != nil {
+		return nil, err
+	}
 
-        defer fontData.Free()
+	defer fontData.Free()
 
-        toUnicodeCmapPointer, err := p.CString(request.ToUnicodeCmap)
-        if err != nil {
-                return nil, err
-        }
+	toUnicodeCmapPointer, err := p.CString(request.ToUnicodeCmap)
+	if err != nil {
+		return nil, err
+	}
 
-        defer toUnicodeCmapPointer.Free()
+	defer toUnicodeCmapPointer.Free()
 
-        cidToGIDMapDataLength := uint32(len(request.CIDToGIDMapData))
-        cidToGIDMapData, err := p.ByteArrayPointer(uint64(len(request.CIDToGIDMapData)), request.CIDToGIDMapData)
-        if err != nil {
-                return nil, err
-        }
+	cidToGIDMapDataLength := uint32(len(request.CIDToGIDMapData))
+	cidToGIDMapData, err := p.ByteArrayPointer(uint64(len(request.CIDToGIDMapData)), request.CIDToGIDMapData)
+	if err != nil {
+		return nil, err
+	}
 
-        defer cidToGIDMapData.Free()
+	defer cidToGIDMapData.Free()
 
-        res, err := p.Module.ExportedFunction("C.FPDFText_LoadCidType2Font").Call(p.Context, *documentHandle.handle, fontData.Pointer, *(*uint64)(unsafe.Pointer(&fontDataLength)), toUnicodeCmapPointer.Pointer, cidToGIDMapData.Pointer, *(*uint64)(unsafe.Pointer(&cidToGIDMapDataLength)))
-        if err != nil {
-                return nil, err
-        }
+	res, err := p.Module.ExportedFunction("FPDFText_LoadCidType2Font").Call(p.Context, *documentHandle.handle, fontData.Pointer, *(*uint64)(unsafe.Pointer(&fontDataLength)), toUnicodeCmapPointer.Pointer, cidToGIDMapData.Pointer, *(*uint64)(unsafe.Pointer(&cidToGIDMapDataLength)))
+	if err != nil {
+		return nil, err
+	}
 
-        font := res[0]
-        if font == 0 {
-                return nil, errors.New("could not load CID Type2 font")
-        }
+	font := res[0]
+	if font == 0 {
+		return nil, errors.New("could not load CID Type2 font")
+	}
 
-        fontHandle := p.registerFont(&font)
+	fontHandle := p.registerFont(&font)
 
-        return &responses.FPDFText_LoadCidType2Font{
-                Font: fontHandle.nativeRef,
-        }, nil
+	return &responses.FPDFText_LoadCidType2Font{
+		Font: fontHandle.nativeRef,
+	}, nil
 }
 
 // FPDFTextObj_SetTextRenderMode sets the text rendering mode of a text object.

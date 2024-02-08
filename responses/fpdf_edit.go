@@ -279,7 +279,7 @@ type FPDFText_LoadStandardFont struct {
 }
 
 type FPDFText_LoadCidType2Font struct {
-        Font references.FPDF_FONT
+	Font references.FPDF_FONT
 }
 
 type FPDFTextObj_GetRenderedBitmap struct {

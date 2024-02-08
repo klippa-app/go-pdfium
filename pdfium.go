@@ -737,8 +737,8 @@ type Pdfium interface {
 	// The font is loaded into the document. Unlike FPDFText_LoadFont(), the ToUnicode data and the CIDToGIDMap
 	// data are caller provided, instead of auto-generated.
 	// The loaded font can be closed using FPDFFont_Close().
-        // Experimental API.
-        FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error)
+	// Experimental API.
+	FPDFText_LoadCidType2Font(request *requests.FPDFText_LoadCidType2Font) (*responses.FPDFText_LoadCidType2Font, error)
 
 	// FPDFTextObj_GetFontSize returns the font size of a text object.
 	FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)
