@@ -1,14 +1,14 @@
 module github.com/klippa-app/go-pdfium
 
-go 1.19
+go 1.20
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-hclog v1.6.2
 	github.com/hashicorp/go-plugin v1.6.0
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
-	github.com/onsi/ginkgo/v2 v2.14.0
-	github.com/onsi/gomega v1.30.0
+	github.com/onsi/ginkgo/v2 v2.15.0
+	github.com/onsi/gomega v1.31.1
 	github.com/stretchr/testify v1.8.4
 	github.com/tetratelabs/wazero v1.6.0
 	golang.org/x/net v0.20.0
