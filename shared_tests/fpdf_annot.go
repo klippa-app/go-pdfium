@@ -353,7 +353,7 @@ var _ = Describe("fpdf_annot", func() {
 			enums.FPDF_ANNOT_SUBTYPE_CARET:          false,
 			enums.FPDF_ANNOT_SUBTYPE_INK:            true,
 			enums.FPDF_ANNOT_SUBTYPE_POPUP:          true,
-			enums.FPDF_ANNOT_SUBTYPE_FILEATTACHMENT: false,
+			enums.FPDF_ANNOT_SUBTYPE_FILEATTACHMENT: true,
 			enums.FPDF_ANNOT_SUBTYPE_SOUND:          false,
 			enums.FPDF_ANNOT_SUBTYPE_MOVIE:          false,
 			enums.FPDF_ANNOT_SUBTYPE_WIDGET:         false,
@@ -1857,6 +1857,247 @@ var _ = Describe("fpdf_annot", func() {
 				Expect(FPDFAnnot_GetFormAdditionalActionJavaScript).To(Equal(&responses.FPDFAnnot_GetFormAdditionalActionJavaScript{
 					FormAdditionalActionJavaScript: "AFDate_FormatEx(\"yyyy-mm-dd\");",
 				}))
+			})
+		})
+	})
+
+	Context("a PDF file with a file attached to an annotation", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annotation_fileattachment.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFileAttachment without a document", func() {
+			FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{})
+			Expect(err).To(MatchError("document not given"))
+			Expect(FPDFAnnot_GetFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFileAttachment without a valid document", func() {
+			FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{
+				Document: "test123",
+			})
+			Expect(err).To(MatchError("could not find document handle, perhaps the doc was already closed or you tried to share documents between instances"))
+			Expect(FPDFAnnot_GetFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFileAttachment without an annotation", func() {
+			FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{
+				Document: doc,
+			})
+			Expect(err).To(MatchError("annotation not given"))
+			Expect(FPDFAnnot_GetFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_GetFileAttachment without a valid annotation", func() {
+			FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{
+				Document:   doc,
+				Annotation: "test123",
+			})
+			Expect(err).To(MatchError("could not find annotation handle, perhaps the annotation was already closed or you tried to share annotations between instances"))
+			Expect(FPDFAnnot_GetFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_AddFileAttachment without a document", func() {
+			FPDFAnnot_AddFileAttachment, err := PdfiumInstance.FPDFAnnot_AddFileAttachment(&requests.FPDFAnnot_AddFileAttachment{})
+			Expect(err).To(MatchError("document not given"))
+			Expect(FPDFAnnot_AddFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_AddFileAttachment without a valid document", func() {
+			FPDFAnnot_AddFileAttachment, err := PdfiumInstance.FPDFAnnot_AddFileAttachment(&requests.FPDFAnnot_AddFileAttachment{
+				Document: "test123",
+			})
+			Expect(err).To(MatchError("could not find document handle, perhaps the doc was already closed or you tried to share documents between instances"))
+			Expect(FPDFAnnot_AddFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_AddFileAttachment without an annotation", func() {
+			FPDFAnnot_AddFileAttachment, err := PdfiumInstance.FPDFAnnot_AddFileAttachment(&requests.FPDFAnnot_AddFileAttachment{
+				Document: doc,
+			})
+			Expect(err).To(MatchError("annotation not given"))
+			Expect(FPDFAnnot_AddFileAttachment).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFAnnot_AddFileAttachment without a valid annotation", func() {
+			FPDFAnnot_AddFileAttachment, err := PdfiumInstance.FPDFAnnot_AddFileAttachment(&requests.FPDFAnnot_AddFileAttachment{
+				Document:   doc,
+				Annotation: "test123",
+			})
+			Expect(err).To(MatchError("could not find annotation handle, perhaps the annotation was already closed or you tried to share annotations between instances"))
+			Expect(FPDFAnnot_AddFileAttachment).To(BeNil())
+		})
+
+		When("an annotation has been loaded", func() {
+			var annotation references.FPDF_ANNOTATION
+			BeforeEach(func() {
+				FPDFPage_GetAnnot, err := PdfiumInstance.FPDFPage_GetAnnot(&requests.FPDFPage_GetAnnot{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					Index: 0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnot).To(Not(BeNil()))
+				Expect(FPDFPage_GetAnnot.Annotation).To(Not(BeNil()))
+				annotation = FPDFPage_GetAnnot.Annotation
+			})
+
+			It("returns the correct annotation count", func() {
+				FPDFPage_GetAnnotCount, err := PdfiumInstance.FPDFPage_GetAnnotCount(&requests.FPDFPage_GetAnnotCount{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnotCount).To(Equal(&responses.FPDFPage_GetAnnotCount{
+					Count: 1,
+				}))
+			})
+
+			It("returns the correct annotation subtype", func() {
+				FPDFAnnot_GetSubtype, err := PdfiumInstance.FPDFAnnot_GetSubtype(&requests.FPDFAnnot_GetSubtype{
+					Annotation: annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetSubtype).To(Equal(&responses.FPDFAnnot_GetSubtype{
+					Subtype: enums.FPDF_ANNOT_SUBTYPE_FILEATTACHMENT,
+				}))
+			})
+
+			When("an attachment has been loaded", func() {
+				var attachment references.FPDF_ATTACHMENT
+				BeforeEach(func() {
+					FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{
+						Document:   doc,
+						Annotation: annotation,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFAnnot_GetFileAttachment).To(Not(BeNil()))
+					Expect(FPDFAnnot_GetFileAttachment.Attachment).To(Not(BeNil()))
+					attachment = FPDFAnnot_GetFileAttachment.Attachment
+				})
+
+				It("returns the correct filename", func() {
+					FPDFAttachment_GetName, err := PdfiumInstance.FPDFAttachment_GetName(&requests.FPDFAttachment_GetName{
+						Attachment: attachment,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFAttachment_GetName).To(Equal(&responses.FPDFAttachment_GetName{
+						Name: "test.txt",
+					}))
+				})
+
+				It("returns the correct file data", func() {
+					FPDFAttachment_GetFile, err := PdfiumInstance.FPDFAttachment_GetFile(&requests.FPDFAttachment_GetFile{
+						Attachment: attachment,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFAttachment_GetFile).To(Equal(&responses.FPDFAttachment_GetFile{
+						Contents: []byte("test text"),
+					}))
+				})
+			})
+		})
+
+		When("an annotation has been added", func() {
+			var annotation references.FPDF_ANNOTATION
+			BeforeEach(func() {
+				FPDFPage_CreateAnnot, err := PdfiumInstance.FPDFPage_CreateAnnot(&requests.FPDFPage_CreateAnnot{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					Subtype: enums.FPDF_ANNOT_SUBTYPE_FILEATTACHMENT,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_CreateAnnot).To(Not(BeNil()))
+				Expect(FPDFPage_CreateAnnot.Annotation).To(Not(BeNil()))
+				annotation = FPDFPage_CreateAnnot.Annotation
+
+				FPDFAnnot_AddFileAttachment, err := PdfiumInstance.FPDFAnnot_AddFileAttachment(&requests.FPDFAnnot_AddFileAttachment{
+					Document:   doc,
+					Annotation: annotation,
+					Name:       "0.txt",
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_AddFileAttachment).To(Not(BeNil()))
+				Expect(FPDFAnnot_AddFileAttachment.Attachment).To(Not(BeNil()))
+			})
+
+			It("returns the correct annotation count", func() {
+				FPDFPage_GetAnnotCount, err := PdfiumInstance.FPDFPage_GetAnnotCount(&requests.FPDFPage_GetAnnotCount{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnotCount).To(Equal(&responses.FPDFPage_GetAnnotCount{
+					Count: 2,
+				}))
+			})
+
+			It("returns the correct annotation subtype", func() {
+				FPDFAnnot_GetSubtype, err := PdfiumInstance.FPDFAnnot_GetSubtype(&requests.FPDFAnnot_GetSubtype{
+					Annotation: annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetSubtype).To(Equal(&responses.FPDFAnnot_GetSubtype{
+					Subtype: enums.FPDF_ANNOT_SUBTYPE_FILEATTACHMENT,
+				}))
+			})
+
+			When("an attachment has been loaded", func() {
+				var attachment references.FPDF_ATTACHMENT
+				BeforeEach(func() {
+					FPDFAnnot_GetFileAttachment, err := PdfiumInstance.FPDFAnnot_GetFileAttachment(&requests.FPDFAnnot_GetFileAttachment{
+						Document:   doc,
+						Annotation: annotation,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFAnnot_GetFileAttachment).To(Not(BeNil()))
+					Expect(FPDFAnnot_GetFileAttachment.Attachment).To(Not(BeNil()))
+					attachment = FPDFAnnot_GetFileAttachment.Attachment
+				})
+
+				It("returns the correct filename", func() {
+					FPDFAttachment_GetName, err := PdfiumInstance.FPDFAttachment_GetName(&requests.FPDFAttachment_GetName{
+						Attachment: attachment,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFAttachment_GetName).To(Equal(&responses.FPDFAttachment_GetName{
+						Name: "0.txt",
+					}))
+				})
 			})
 		})
 	})

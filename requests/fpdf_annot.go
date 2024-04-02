@@ -304,3 +304,14 @@ type FPDFAnnot_SetURI struct {
 	Annotation references.FPDF_ANNOTATION
 	URI        string
 }
+
+type FPDFAnnot_GetFileAttachment struct {
+	Document   references.FPDF_DOCUMENT
+	Annotation references.FPDF_ANNOTATION
+}
+
+type FPDFAnnot_AddFileAttachment struct {
+	Document   references.FPDF_DOCUMENT
+	Annotation references.FPDF_ANNOTATION
+	Name       string
+}

@@ -1,5 +1,6 @@
 package implementation_webassembly
 
+import "C"
 import (
 	"errors"
 	"unsafe"
@@ -2192,4 +2193,76 @@ func (p *PdfiumImplementation) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetU
 	}
 
 	return &responses.FPDFAnnot_SetURI{}, nil
+}
+
+// FPDFAnnot_GetFileAttachment get the attachment from the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFAnnot_GetFileAttachment").Call(p.Context, *annotationHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	handle := res[0]
+	if handle == 0 {
+		return nil, errors.New("could not get attachment object")
+	}
+
+	attachmentHandle := p.registerAttachment(&handle, documentHandle)
+
+	return &responses.FPDFAnnot_GetFileAttachment{
+		Attachment: attachmentHandle.nativeRef,
+	}, nil
+}
+
+// FPDFAnnot_AddFileAttachment Add an embedded file to the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	namePointer, err := p.CFPDF_WIDESTRING(request.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer namePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFAnnot_AddFileAttachment").Call(p.Context, *annotationHandle.handle, namePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	handle := res[0]
+	if handle == 0 {
+		return nil, errors.New("could not get attachment object")
+	}
+
+	attachmentHandle := p.registerAttachment(&handle, documentHandle)
+
+	return &responses.FPDFAnnot_AddFileAttachment{
+		Attachment: attachmentHandle.nativeRef,
+	}, nil
 }

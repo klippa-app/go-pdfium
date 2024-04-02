@@ -47,6 +47,7 @@ type Pdfium interface {
 	FPDFAction_GetFilePath(*requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
 	FPDFAction_GetType(*requests.FPDFAction_GetType) (*responses.FPDFAction_GetType, error)
 	FPDFAction_GetURIPath(*requests.FPDFAction_GetURIPath) (*responses.FPDFAction_GetURIPath, error)
+	FPDFAnnot_AddFileAttachment(*requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error)
 	FPDFAnnot_AddInkStroke(*requests.FPDFAnnot_AddInkStroke) (*responses.FPDFAnnot_AddInkStroke, error)
 	FPDFAnnot_AppendAttachmentPoints(*requests.FPDFAnnot_AppendAttachmentPoints) (*responses.FPDFAnnot_AppendAttachmentPoints, error)
 	FPDFAnnot_AppendObject(*requests.FPDFAnnot_AppendObject) (*responses.FPDFAnnot_AppendObject, error)
@@ -55,6 +56,7 @@ type Pdfium interface {
 	FPDFAnnot_GetAttachmentPoints(*requests.FPDFAnnot_GetAttachmentPoints) (*responses.FPDFAnnot_GetAttachmentPoints, error)
 	FPDFAnnot_GetBorder(*requests.FPDFAnnot_GetBorder) (*responses.FPDFAnnot_GetBorder, error)
 	FPDFAnnot_GetColor(*requests.FPDFAnnot_GetColor) (*responses.FPDFAnnot_GetColor, error)
+	FPDFAnnot_GetFileAttachment(*requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error)
 	FPDFAnnot_GetFlags(*requests.FPDFAnnot_GetFlags) (*responses.FPDFAnnot_GetFlags, error)
 	FPDFAnnot_GetFocusableSubtypes(*requests.FPDFAnnot_GetFocusableSubtypes) (*responses.FPDFAnnot_GetFocusableSubtypes, error)
 	FPDFAnnot_GetFocusableSubtypesCount(*requests.FPDFAnnot_GetFocusableSubtypesCount) (*responses.FPDFAnnot_GetFocusableSubtypesCount, error)
@@ -806,6 +808,16 @@ func (g *PdfiumRPC) FPDFAction_GetURIPath(request *requests.FPDFAction_GetURIPat
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error) {
+	resp := &responses.FPDFAnnot_AddFileAttachment{}
+	err := g.client.Call("Plugin.FPDFAnnot_AddFileAttachment", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFAnnot_AddInkStroke(request *requests.FPDFAnnot_AddInkStroke) (*responses.FPDFAnnot_AddInkStroke, error) {
 	resp := &responses.FPDFAnnot_AddInkStroke{}
 	err := g.client.Call("Plugin.FPDFAnnot_AddInkStroke", request, resp)
@@ -879,6 +891,16 @@ func (g *PdfiumRPC) FPDFAnnot_GetBorder(request *requests.FPDFAnnot_GetBorder) (
 func (g *PdfiumRPC) FPDFAnnot_GetColor(request *requests.FPDFAnnot_GetColor) (*responses.FPDFAnnot_GetColor, error) {
 	resp := &responses.FPDFAnnot_GetColor{}
 	err := g.client.Call("Plugin.FPDFAnnot_GetColor", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error) {
+	resp := &responses.FPDFAnnot_GetFileAttachment{}
+	err := g.client.Call("Plugin.FPDFAnnot_GetFileAttachment", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -5496,6 +5518,24 @@ func (s *PdfiumRPCServer) FPDFAction_GetURIPath(request *requests.FPDFAction_Get
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment, resp *responses.FPDFAnnot_AddFileAttachment) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_AddFileAttachment", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_AddFileAttachment(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFAnnot_AddInkStroke(request *requests.FPDFAnnot_AddInkStroke, resp *responses.FPDFAnnot_AddInkStroke) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -5630,6 +5670,24 @@ func (s *PdfiumRPCServer) FPDFAnnot_GetColor(request *requests.FPDFAnnot_GetColo
 	}()
 
 	implResp, err := s.Impl.FPDFAnnot_GetColor(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment, resp *responses.FPDFAnnot_GetFileAttachment) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_GetFileAttachment", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_GetFileAttachment(request)
 	if err != nil {
 		return err
 	}
