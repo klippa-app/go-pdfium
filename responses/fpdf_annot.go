@@ -223,3 +223,11 @@ type FPDFAnnot_GetFormFieldExportValue struct {
 }
 
 type FPDFAnnot_SetURI struct{}
+
+type FPDFAnnot_GetFileAttachment struct {
+	Attachment references.FPDF_ATTACHMENT
+}
+
+type FPDFAnnot_AddFileAttachment struct {
+	Attachment references.FPDF_ATTACHMENT
+}

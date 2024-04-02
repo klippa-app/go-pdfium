@@ -440,3 +440,15 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldExportValue(request *reques
 func (p *PdfiumImplementation) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFAnnot_GetFileAttachment get the attachment from the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFAnnot_AddFileAttachment Add an embedded file to the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

@@ -1919,6 +1919,14 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error)
 
+	// FPDFAnnot_GetFileAttachment get the attachment from the given annotation.
+	// Experimental API.
+	FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error)
+
+	// FPDFAnnot_AddFileAttachment Add an embedded file to the given annotation.
+	// Experimental API.
+	FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error)
+
 	// End fpdf_annot.h
 
 	// Start fpdf_formfill.h

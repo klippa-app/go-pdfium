@@ -138,7 +138,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 6281
+Version: 6392
 Requires:
 
 Libs: -L${libdir} -lpdfium

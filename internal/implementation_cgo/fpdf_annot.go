@@ -1626,3 +1626,64 @@ func (p *PdfiumImplementation) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetU
 
 	return &responses.FPDFAnnot_SetURI{}, nil
 }
+
+// FPDFAnnot_GetFileAttachment get the attachment from the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	handle := C.FPDFAnnot_GetFileAttachment(annotationHandle.handle)
+	if handle == nil {
+		return nil, errors.New("could not get attachment object")
+	}
+
+	attachmentHandle := p.registerAttachment(handle, documentHandle)
+
+	return &responses.FPDFAnnot_GetFileAttachment{
+		Attachment: attachmentHandle.nativeRef,
+	}, nil
+}
+
+// FPDFAnnot_AddFileAttachment Add an embedded file to the given annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedName, err := p.transformUTF8ToUTF16LE(request.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	handle := C.FPDFAnnot_AddFileAttachment(annotationHandle.handle, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedName[0])))
+	if handle == nil {
+		return nil, errors.New("could not get attachment object")
+	}
+
+	attachmentHandle := p.registerAttachment(handle, documentHandle)
+
+	return &responses.FPDFAnnot_AddFileAttachment{
+		Attachment: attachmentHandle.nativeRef,
+	}, nil
+}

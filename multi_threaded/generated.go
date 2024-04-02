@@ -291,6 +291,14 @@ func (i *pdfiumInstance) FPDFAction_GetURIPath(request *requests.FPDFAction_GetU
 	return i.worker.plugin.FPDFAction_GetURIPath(request)
 }
 
+func (i *pdfiumInstance) FPDFAnnot_AddFileAttachment(request *requests.FPDFAnnot_AddFileAttachment) (*responses.FPDFAnnot_AddFileAttachment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_AddFileAttachment(request)
+}
+
 func (i *pdfiumInstance) FPDFAnnot_AddInkStroke(request *requests.FPDFAnnot_AddInkStroke) (*responses.FPDFAnnot_AddInkStroke, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -353,6 +361,14 @@ func (i *pdfiumInstance) FPDFAnnot_GetColor(request *requests.FPDFAnnot_GetColor
 	}
 
 	return i.worker.plugin.FPDFAnnot_GetColor(request)
+}
+
+func (i *pdfiumInstance) FPDFAnnot_GetFileAttachment(request *requests.FPDFAnnot_GetFileAttachment) (*responses.FPDFAnnot_GetFileAttachment, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_GetFileAttachment(request)
 }
 
 func (i *pdfiumInstance) FPDFAnnot_GetFlags(request *requests.FPDFAnnot_GetFlags) (*responses.FPDFAnnot_GetFlags, error) {
