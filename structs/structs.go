@@ -24,8 +24,10 @@ type FPDF_FS_QUADPOINTSF struct {
 }
 
 // FPDF_FS_MATRIX is a matrix that is composed as:
-//   | A C E |
-//   | B D F |
+//
+//	| A C E |
+//	| B D F |
+//
 // and can be used to scale, rotate, shear and translate.
 type FPDF_FS_MATRIX struct {
 	A float32
@@ -186,6 +188,4 @@ type FPDF_FORMFILLINFO struct {
 	// See the Destinations description of <<PDF Reference, version 1.7>>
 	// in 8.2.1 for more details.
 	FFI_DoGoToAction func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32)
-
-	// Note: the XFA methods are not implemmeted because we do not support XFA for now.
 }

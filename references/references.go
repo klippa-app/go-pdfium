@@ -83,3 +83,9 @@ type FPDF_GLYPHPATH string
 
 // FPDF_STRUCTELEMENT_ATTR is an internal reference to a C.FPDF_STRUCTELEMENT_ATTR handle.
 type FPDF_STRUCTELEMENT_ATTR string
+
+// FPDF_BStr is an internal reference to a C.FPDF_BStr handle.
+type FPDF_BStr string
+
+// ArrayBufferAllocator is an internal reference to a C.v8::ArrayBuffer::Allocator handle.
+type ArrayBufferAllocator string

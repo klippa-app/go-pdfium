@@ -252,3 +252,19 @@ type FORM_IsIndexSelected struct {
 type FPDF_LoadXFA struct {
 	Document references.FPDF_DOCUMENT
 }
+
+type FPDF_GetRecommendedV8Flags struct{}
+
+type FPDF_GetArrayBufferAllocatorSharedInstance struct{}
+
+type FPDF_BStr_Init struct {
+}
+
+type FPDF_BStr_Set struct {
+	FPDF_BStr references.FPDF_BStr
+	Value     string
+}
+
+type FPDF_BStr_Clear struct {
+	FPDF_BStr references.FPDF_BStr
+}

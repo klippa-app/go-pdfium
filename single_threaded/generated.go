@@ -4561,6 +4561,48 @@ func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (r
 	return i.pdfium.FPDFText_SetText(request)
 }
 
+func (i *pdfiumInstance) FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (resp *responses.FPDF_BStr_Clear, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Clear", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_BStr_Clear(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (resp *responses.FPDF_BStr_Init, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Init", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_BStr_Init(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (resp *responses.FPDF_BStr_Set, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Set", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_BStr_Set(request)
+}
+
 func (i *pdfiumInstance) FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (resp *responses.FPDF_CloseDocument, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4713,6 +4755,20 @@ func (i *pdfiumInstance) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (resp *res
 	}()
 
 	return i.pdfium.FPDF_FFLDraw(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (resp *responses.FPDF_GetArrayBufferAllocatorSharedInstance, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetArrayBufferAllocatorSharedInstance", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_GetArrayBufferAllocatorSharedInstance(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (resp *responses.FPDF_GetDocPermissions, err error) {
@@ -4979,6 +5035,20 @@ func (i *pdfiumInstance) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF
 	}()
 
 	return i.pdfium.FPDF_GetPageWidthF(request)
+}
+
+func (i *pdfiumInstance) FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (resp *responses.FPDF_GetRecommendedV8Flags, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetRecommendedV8Flags", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_GetRecommendedV8Flags(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (resp *responses.FPDF_GetSecurityHandlerRevision, err error) {
