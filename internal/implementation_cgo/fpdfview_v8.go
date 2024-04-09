@@ -3,17 +3,18 @@
 
 package implementation_cgo
 
+// #cgo pkg-config: pdfium
+// #cgo CFLAGS: -DPDF_ENABLE_V8
+// #include "fpdfview.h"
+import "C"
+
 import (
+	"log"
+
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-	"log"
 )
-
-// #cgo pkg-config: pdfium
-// #include "fpdfview.h"
-// #include <stdlib.h>
-import "C"
 
 // FPDF_GetRecommendedV8Flags returns a space-separated string of command
 // line flags that are recommended to be passed into V8 via
@@ -50,7 +51,7 @@ func (p *PdfiumImplementation) FPDF_GetArrayBufferAllocatorSharedInstance(reques
 
 	arrayBufferAllocator := C.FPDF_GetArrayBufferAllocatorSharedInstance()
 	log.Println(arrayBufferAllocator)
-	
+
 	// @todo: implement me.
 	return nil, pdfium_errors.ErrV8Unsupported
 }

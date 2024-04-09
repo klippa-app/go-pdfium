@@ -3,10 +3,15 @@
 
 package implementation_cgo
 
+// #cgo pkg-config: pdfium
+// #cgo CFLAGS: -DPDF_ENABLE_XFA
+// #include "fpdfview.h"
+import "C"
 import (
 	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+	"log"
 )
 
 // FPDF_BStr_Init initializes a FPDF_BSTR.
@@ -17,7 +22,7 @@ func (p *PdfiumImplementation) FPDF_BStr_Init(request *requests.FPDF_BStr_Init) 
 	p.Lock()
 	defer p.Unlock()
 
-	FPDF_BStr := C.FPDF_BStr{}
+	FPDF_BStr := C.FPDF_BSTR{}
 	log.Println(FPDF_BStr)
 	C.FPDF_BStr_Init(&FPDF_BStr)
 	log.Println(FPDF_BStr)

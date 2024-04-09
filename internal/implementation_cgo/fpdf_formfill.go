@@ -21,6 +21,26 @@ extern void go_formfill_FFI_SetTextFieldFocus_cb(struct _FPDF_FORMFILLINFO *this
 extern void go_formfill_FFI_DoURIAction_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING bsURI);
 extern void go_formfill_FFI_DoGoToAction_cb(struct _FPDF_FORMFILLINFO *this, int nPageIndex, int zoomMode, float* fPosArray, int sizeofArray);
 
+// XFA methods.
+extern void go_formfill_FFI_DisplayCaret_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, FPDF_BOOL bVisible, double left, double top, double right, double bottom);
+extern int go_formfill_FFI_GetCurrentPageIndex_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document);
+extern void go_formfill_FFI_SetCurrentPage_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, int iCurPage);
+extern void go_formfill_FFI_GotoURL_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, FPDF_WIDESTRING wsURL);
+extern void go_formfill_FFI_GetPageViewRect_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double* left, double* top, double* right, double* bottom);
+extern void go_formfill_FFI_PageEvent_cb(struct _FPDF_FORMFILLINFO *this, int page_count, FPDF_DWORD event_type);
+extern FPDF_BOOL go_formfill_FFI_PopupMenu_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, FPDF_WIDGET hWidget, int menuFlag, float x, float y);
+typedef const char* ccharp;
+extern FPDF_FILEHANDLER* go_formfill_FFI_OpenFile_cb(struct _FPDF_FORMFILLINFO *this, int fileFlag, FPDF_WIDESTRING wsURL, ccharp mode);
+extern void go_formfill_FFI_EmailTo_cb(struct _FPDF_FORMFILLINFO *this, FPDF_FILEHANDLER* fileHandler, FPDF_WIDESTRING pTo, FPDF_WIDESTRING pSubject, FPDF_WIDESTRING pCC, FPDF_WIDESTRING pBcc, FPDF_WIDESTRING pMsg);
+extern void go_formfill_FFI_UploadTo_cb(struct _FPDF_FORMFILLINFO *this, FPDF_FILEHANDLER* fileHandler, int fileFlag, FPDF_WIDESTRING uploadTo);
+extern int go_formfill_FFI_GetPlatform_cb(struct _FPDF_FORMFILLINFO *this, void* platform, int length);
+extern int go_formfill_FFI_GetLanguage_cb(struct _FPDF_FORMFILLINFO *this, void* language, int length);
+extern FPDF_FILEHANDLER* go_formfill_FFI_DownloadFromURL_cb(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING URL);
+extern FPDF_BOOL go_formfill_FFI_PostRequestURL_cb(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING wsURL, FPDF_WIDESTRING wsData, FPDF_WIDESTRING wsContentType, FPDF_WIDESTRING wsEncode, FPDF_WIDESTRING wsHeader, FPDF_BSTR* response);
+extern FPDF_BOOL go_formfill_FFI_PutRequestURL_cb(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING wsURL, FPDF_WIDESTRING wsData, FPDF_WIDESTRING wsEncode);
+extern void go_formfill_FFI_OnFocusChange_cb(struct _FPDF_FORMFILLINFO *this, FPDF_ANNOTATION annot, int page_index);
+extern void go_formfill_FFI_DoURIActionWithKeyboardModifier_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING uri, int modifiers);
+
 static inline void FPDF_FORMFILLINFO_SET_CB(FPDF_FORMFILLINFO *f) {
 	f->Release = &go_formfill_Release_cb;
 	f->FFI_Invalidate = &go_formfill_FFI_Invalidate_cb;
@@ -37,6 +57,27 @@ static inline void FPDF_FORMFILLINFO_SET_CB(FPDF_FORMFILLINFO *f) {
 	f->FFI_SetTextFieldFocus = &go_formfill_FFI_SetTextFieldFocus_cb;
 	f->FFI_DoURIAction = &go_formfill_FFI_DoURIAction_cb;
 	f->FFI_DoGoToAction = &go_formfill_FFI_DoGoToAction_cb;
+
+    // XFA methods.
+	if (f->version > 1) {
+     	f->FFI_DisplayCaret = &go_formfill_FFI_DisplayCaret_cb;
+     	f->FFI_GetCurrentPageIndex = &go_formfill_FFI_GetCurrentPageIndex_cb;
+     	f->FFI_SetCurrentPage = &go_formfill_FFI_SetCurrentPage_cb;
+     	f->FFI_GotoURL = &go_formfill_FFI_GotoURL_cb;
+     	f->FFI_GetPageViewRect = &go_formfill_FFI_GetPageViewRect_cb;
+     	f->FFI_PageEvent = &go_formfill_FFI_PageEvent_cb;
+     	f->FFI_PopupMenu = &go_formfill_FFI_PopupMenu_cb;
+     	f->FFI_OpenFile = &go_formfill_FFI_OpenFile_cb;
+     	f->FFI_EmailTo = &go_formfill_FFI_EmailTo_cb;
+     	f->FFI_UploadTo = &go_formfill_FFI_UploadTo_cb;
+     	f->FFI_GetPlatform = &go_formfill_FFI_GetPlatform_cb;
+     	f->FFI_GetLanguage = &go_formfill_FFI_GetLanguage_cb;
+     	f->FFI_DownloadFromURL = &go_formfill_FFI_DownloadFromURL_cb;
+     	f->FFI_PostRequestURL = &go_formfill_FFI_PostRequestURL_cb;
+     	f->FFI_PutRequestURL = &go_formfill_FFI_PutRequestURL_cb;
+     	f->FFI_OnFocusChange = &go_formfill_FFI_OnFocusChange_cb;
+     	f->FFI_DoURIActionWithKeyboardModifier = &go_formfill_FFI_DoURIActionWithKeyboardModifier_cb;
+    }
 }
 
 static inline void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
@@ -429,6 +470,399 @@ func go_formfill_FFI_DoGoToAction_cb(me *C.FPDF_FORMFILLINFO, nPageIndex C.int, 
 	return
 }
 
+// XFA methods
+
+// go_formfill_FFI_DisplayCaret_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_DisplayCaret.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_DisplayCaret_cb
+func go_formfill_FFI_DisplayCaret_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, bVisible C.FPDF_BOOL, left, top, right, bottom C.double) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_DisplayCaret == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_GetCurrentPageIndex_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GetCurrentPageIndex.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_GetCurrentPageIndex_cb
+func go_formfill_FFI_GetCurrentPageIndex_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_DOCUMENT) C.int {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_GetCurrentPageIndex == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_formfill_FFI_SetCurrentPage_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_SetCurrentPage.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_SetCurrentPage_cb
+func go_formfill_FFI_SetCurrentPage_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_DOCUMENT, iCurPage C.int) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_SetCurrentPage == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_GotoURL_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GotoURL.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_GotoURL_cb
+func go_formfill_FFI_GotoURL_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_DOCUMENT, wsURL C.FPDF_WIDESTRING) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_GotoURL == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_GetPageViewRect_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GetPageViewRect.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_GetPageViewRect_cb
+func go_formfill_FFI_GetPageViewRect_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, left, top, right, bottom *C.double) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_GetPageViewRect == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_PageEvent_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_PageEvent.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_PageEvent_cb
+func go_formfill_FFI_PageEvent_cb(me *C.FPDF_FORMFILLINFO, page_count C.int, event_type C.FPDF_DWORD) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_PageEvent == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_PopupMenu_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_PopupMenu.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_PopupMenu_cb
+func go_formfill_FFI_PopupMenu_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, hWidget C.FPDF_WIDGET, menuFlag C.int, x, y C.float) C.FPDF_BOOL {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.FPDF_BOOL(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_PopupMenu == nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	// @todo: implement me.
+
+	return C.FPDF_BOOL(0)
+}
+
+// go_formfill_FFI_OpenFile_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_OpenFile.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_OpenFile_cb
+func go_formfill_FFI_OpenFile_cb(me *C.FPDF_FORMFILLINFO, fileFlag C.int, wsURL C.FPDF_WIDESTRING, mode C.ccharp) *C.FPDF_FILEHANDLER {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return nil
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_OpenFile == nil {
+		return nil
+	}
+
+	// @todo: implement me.
+
+	return nil
+}
+
+// go_formfill_FFI_EmailTo_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_EmailTo.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_EmailTo_cb
+func go_formfill_FFI_EmailTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FILEHANDLER, pTo, pSubject, pCC, pBcc, pMsg C.FPDF_WIDESTRING) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_EmailTo == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_UploadTo_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_UploadTo.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_UploadTo_cb
+func go_formfill_FFI_UploadTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FILEHANDLER, fileFlag C.int, uploadTo C.FPDF_WIDESTRING) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_UploadTo == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_GetPlatform_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GetPlatform.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_GetPlatform_cb
+func go_formfill_FFI_GetPlatform_cb(me *C.FPDF_FORMFILLINFO, platform unsafe.Pointer, length C.int) C.int {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_GetPlatform == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_formfill_FFI_GetLanguage_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GetLanguage.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_GetLanguage_cb
+func go_formfill_FFI_GetLanguage_cb(me *C.FPDF_FORMFILLINFO, language unsafe.Pointer, length C.int) C.int {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_GetLanguage == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_formfill_FFI_DownloadFromURL_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_DownloadFromURL.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_DownloadFromURL_cb
+func go_formfill_FFI_DownloadFromURL_cb(me *C.FPDF_FORMFILLINFO, URL C.FPDF_WIDESTRING) *C.FPDF_FILEHANDLER {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return nil
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_DownloadFromURL == nil {
+		return nil
+	}
+
+	// @todo: implement me.
+
+	return nil
+}
+
+// go_formfill_FFI_PostRequestURL_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_PostRequestURL.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_PostRequestURL_cb
+func go_formfill_FFI_PostRequestURL_cb(me *C.FPDF_FORMFILLINFO, wsURL, wsData, wsContentType, wsEncode, wsHeader C.FPDF_WIDESTRING, response *C.FPDF_BSTR) C.FPDF_BOOL {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.FPDF_BOOL(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_PostRequestURL == nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	// @todo: implement me.
+
+	return C.FPDF_BOOL(0)
+}
+
+// go_formfill_FFI_PutRequestURL_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_PutRequestURL.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_PutRequestURL_cb
+func go_formfill_FFI_PutRequestURL_cb(me *C.FPDF_FORMFILLINFO, wsURL, wsData, wsEncode C.FPDF_WIDESTRING) C.FPDF_BOOL {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.FPDF_BOOL(0)
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_PutRequestURL == nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	// @todo: implement me.
+
+	return C.FPDF_BOOL(0)
+}
+
+// go_formfill_FFI_OnFocusChange_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_OnFocusChange.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_OnFocusChange_cb
+func go_formfill_FFI_OnFocusChange_cb(me *C.FPDF_FORMFILLINFO, annot C.FPDF_ANNOTATION, page_index C.int) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_OnFocusChange == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_formfill_FFI_DoURIActionWithKeyboardModifier_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_DoURIActionWithKeyboardModifier.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FORMFILLINFO structs.
+//
+//export go_formfill_FFI_DoURIActionWithKeyboardModifier_cb
+func go_formfill_FFI_DoURIActionWithKeyboardModifier_cb(me *C.FPDF_FORMFILLINFO, uri C.FPDF_BYTESTRING, modifiers C.int) {
+	pointer := unsafe.Pointer(me)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.FormFillInfo.FFI_DoURIActionWithKeyboardModifier == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
 type FormFillInfo struct {
 	Struct           *C.FPDF_FORMFILLINFO
 	FormFillInfo     *structs.FPDF_FORMFILLINFO
@@ -448,6 +882,15 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
+	}
+
+	// Set default version to 1.
+	if request.FormFillInfo.Version == 0 {
+		request.FormFillInfo.Version = 1
+	}
+
+	if request.FormFillInfo.Version > 2 {
+		return nil, errors.New("FormFillInfo version bigger than 2 is not supported")
 	}
 
 	if request.FormFillInfo.FFI_Invalidate == nil {
@@ -482,8 +925,61 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
 	}
 
+	if request.FormFillInfo.Version >= 2 {
+		if request.FormFillInfo.FFI_DisplayCaret == nil {
+			return nil, errors.New("FormFillInfo callback FFI_DisplayCaret is required for version 2")
+		}
+		if request.FormFillInfo.FFI_GetCurrentPageIndex == nil {
+			return nil, errors.New("FormFillInfo callback FFI_GetCurrentPageIndex is required for version 2")
+		}
+		if request.FormFillInfo.FFI_SetCurrentPage == nil {
+			return nil, errors.New("FormFillInfo callback FFI_SetCurrentPage is required for version 2")
+		}
+		if request.FormFillInfo.FFI_GotoURL == nil {
+			return nil, errors.New("FormFillInfo callback FFI_GotoURL is required for version 2")
+		}
+		if request.FormFillInfo.FFI_GetPageViewRect == nil {
+			return nil, errors.New("FormFillInfo callback FFI_GetPageViewRect is required for version 2")
+		}
+		if request.FormFillInfo.FFI_PageEvent == nil {
+			return nil, errors.New("FormFillInfo callback FFI_PageEvent is required for version 2")
+		}
+		if request.FormFillInfo.FFI_PopupMenu == nil {
+			return nil, errors.New("FormFillInfo callback FFI_PopupMenu is required for version 2")
+		}
+		if request.FormFillInfo.FFI_OpenFile == nil {
+			return nil, errors.New("FormFillInfo callback FFI_OpenFile is required for version 2")
+		}
+		if request.FormFillInfo.FFI_EmailTo == nil {
+			return nil, errors.New("FormFillInfo callback FFI_EmailTo is required for version 2")
+		}
+		if request.FormFillInfo.FFI_UploadTo == nil {
+			return nil, errors.New("FormFillInfo callback FFI_UploadTo is required for version 2")
+		}
+		if request.FormFillInfo.FFI_GetPlatform == nil {
+			return nil, errors.New("FormFillInfo callback FFI_GetPlatform is required for version 2")
+		}
+		if request.FormFillInfo.FFI_GetLanguage == nil {
+			return nil, errors.New("FormFillInfo callback FFI_GetLanguage is required for version 2")
+		}
+		if request.FormFillInfo.FFI_DownloadFromURL == nil {
+			return nil, errors.New("FormFillInfo callback FFI_DownloadFromURL is required for version 2")
+		}
+		if request.FormFillInfo.FFI_PostRequestURL == nil {
+			return nil, errors.New("FormFillInfo callback FFI_PostRequestURL is required for version 2")
+		}
+		if request.FormFillInfo.FFI_PutRequestURL == nil {
+			return nil, errors.New("FormFillInfo callback FFI_PostRequestURL is required for version 2")
+		}
+	}
+
 	formInfoStruct := &C.FPDF_FORMFILLINFO{}
-	formInfoStruct.version = 1
+	formInfoStruct.version = C.int(request.FormFillInfo.Version)
+	if request.FormFillInfo.XFA_disabled {
+		formInfoStruct.xfa_disabled = C.FPDF_BOOL(1)
+	} else {
+		formInfoStruct.xfa_disabled = C.FPDF_BOOL(0)
+	}
 	C.FPDF_FORMFILLINFO_SET_CB(formInfoStruct)
 
 	formHandle := C.FPDFDOC_InitFormFillEnvironment(documentHandle.handle, formInfoStruct)

@@ -3,7 +3,10 @@
 
 package implementation_cgo
 
+// #cgo pkg-config: pdfium
+// #cgo CFLAGS: -DPDF_ENABLE_XFA
+// #include "fpdfview.h"
 import "C"
 
-var CFPDF_ERR_XFALOAD = C.FPDF_ERR_XFALOAD
-var CFPDF_ERR_XFALAYOUT = C.FPDF_ERR_XFALAYOUT
+var CFPDF_ERR_XFALOAD = C.ulong(C.FPDF_ERR_XFALOAD)
+var CFPDF_ERR_XFALAYOUT = C.ulong(C.FPDF_ERR_XFALAYOUT)
