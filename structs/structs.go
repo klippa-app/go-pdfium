@@ -349,7 +349,7 @@ type FPDF_FORMFILLINFO struct {
 	//
 	// Required for XFA, otherwise set to nil.
 	// Ignored on non-XFA builds.
-	FFI_PostRequestURL func(url, data, contentType, encode, header string, response references.FPDF_BStr) bool
+	FFI_PostRequestURL func(url, data, contentType, encode, header string, response references.FPDF_BSTR) bool
 
 	// FFI_PostRequestURL will put the request to the server URL.
 	// Parameters:

@@ -261,10 +261,10 @@ type FPDF_BStr_Init struct {
 }
 
 type FPDF_BStr_Set struct {
-	FPDF_BStr references.FPDF_BStr
+	FPDF_BStr references.FPDF_BSTR
 	Value     string
 }
 
 type FPDF_BStr_Clear struct {
-	FPDF_BStr references.FPDF_BStr
+	FPDF_BStr references.FPDF_BSTR
 }

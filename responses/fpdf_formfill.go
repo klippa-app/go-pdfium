@@ -119,7 +119,7 @@ type FPDF_GetArrayBufferAllocatorSharedInstance struct {
 }
 
 type FPDF_BStr_Init struct {
-	FPDF_BStr references.FPDF_BStr
+	FPDF_BStr references.FPDF_BSTR
 }
 
 type FPDF_BStr_Set struct{}

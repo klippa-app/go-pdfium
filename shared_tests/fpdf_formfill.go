@@ -467,6 +467,7 @@ var _ = Describe("fpdf_formfill", func() {
 
 			renderCount = 0
 			img = image.NewRGBA(image.Rect(0, 0, 300, 300))
+			img.Pix = buffer
 			FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
 				Width:   300,
 				Height:  300,
