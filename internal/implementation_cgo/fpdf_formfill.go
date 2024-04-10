@@ -884,15 +884,6 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, err
 	}
 
-	// Set default version to 1.
-	if request.FormFillInfo.Version == 0 {
-		request.FormFillInfo.Version = 1
-	}
-
-	if request.FormFillInfo.Version > 2 {
-		return nil, errors.New("FormFillInfo version bigger than 2 is not supported")
-	}
-
 	if request.FormFillInfo.FFI_Invalidate == nil {
 		return nil, errors.New("FormFillInfo callback FFI_Invalidate is required")
 	}
@@ -925,56 +916,8 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
 	}
 
-	if request.FormFillInfo.Version >= 2 {
-		if request.FormFillInfo.FFI_DisplayCaret == nil {
-			return nil, errors.New("FormFillInfo callback FFI_DisplayCaret is required for version 2")
-		}
-		if request.FormFillInfo.FFI_GetCurrentPageIndex == nil {
-			return nil, errors.New("FormFillInfo callback FFI_GetCurrentPageIndex is required for version 2")
-		}
-		if request.FormFillInfo.FFI_SetCurrentPage == nil {
-			return nil, errors.New("FormFillInfo callback FFI_SetCurrentPage is required for version 2")
-		}
-		if request.FormFillInfo.FFI_GotoURL == nil {
-			return nil, errors.New("FormFillInfo callback FFI_GotoURL is required for version 2")
-		}
-		if request.FormFillInfo.FFI_GetPageViewRect == nil {
-			return nil, errors.New("FormFillInfo callback FFI_GetPageViewRect is required for version 2")
-		}
-		if request.FormFillInfo.FFI_PageEvent == nil {
-			return nil, errors.New("FormFillInfo callback FFI_PageEvent is required for version 2")
-		}
-		if request.FormFillInfo.FFI_PopupMenu == nil {
-			return nil, errors.New("FormFillInfo callback FFI_PopupMenu is required for version 2")
-		}
-		if request.FormFillInfo.FFI_OpenFile == nil {
-			return nil, errors.New("FormFillInfo callback FFI_OpenFile is required for version 2")
-		}
-		if request.FormFillInfo.FFI_EmailTo == nil {
-			return nil, errors.New("FormFillInfo callback FFI_EmailTo is required for version 2")
-		}
-		if request.FormFillInfo.FFI_UploadTo == nil {
-			return nil, errors.New("FormFillInfo callback FFI_UploadTo is required for version 2")
-		}
-		if request.FormFillInfo.FFI_GetPlatform == nil {
-			return nil, errors.New("FormFillInfo callback FFI_GetPlatform is required for version 2")
-		}
-		if request.FormFillInfo.FFI_GetLanguage == nil {
-			return nil, errors.New("FormFillInfo callback FFI_GetLanguage is required for version 2")
-		}
-		if request.FormFillInfo.FFI_DownloadFromURL == nil {
-			return nil, errors.New("FormFillInfo callback FFI_DownloadFromURL is required for version 2")
-		}
-		if request.FormFillInfo.FFI_PostRequestURL == nil {
-			return nil, errors.New("FormFillInfo callback FFI_PostRequestURL is required for version 2")
-		}
-		if request.FormFillInfo.FFI_PutRequestURL == nil {
-			return nil, errors.New("FormFillInfo callback FFI_PostRequestURL is required for version 2")
-		}
-	}
-
 	formInfoStruct := &C.FPDF_FORMFILLINFO{}
-	formInfoStruct.version = C.int(request.FormFillInfo.Version)
+	formInfoStruct.version = C.int(getFormFillVersion())
 	if request.FormFillInfo.XFA_disabled {
 		formInfoStruct.xfa_disabled = C.FPDF_BOOL(1)
 	} else {

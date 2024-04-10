@@ -85,20 +85,6 @@ type FPDF_SYSTEMTIME struct {
 
 // FPDF_FORMFILLINFO is the callback interface for form filling.
 type FPDF_FORMFILLINFO struct {
-	// Version is the number of the interface.
-	// Version 1 contains stable interfaces. Version 2 has additional
-	// experimental interfaces.
-	// When PDFium is built without the XFA module, version can be 1 or 2.
-	// With version 1, only stable interfaces are called. With version 2,
-	// additional experimental interfaces are also called.
-	// When PDFium is built with the XFA module, version must be 2.
-	// All the XFA related interfaces are experimental. If PDFium is built with
-	// the XFA module and version 1 then none of the XFA related interfaces
-	// would be called. When PDFium is built with XFA module then the version
-	// must be 2.
-	// Default version is 1.
-	Version int
-
 	// Give the implementation a chance to release any resources after the
 	// interface is no longer used.
 	// Called by PDFium during the final cleanup process.
