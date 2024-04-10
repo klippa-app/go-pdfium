@@ -189,13 +189,13 @@ type FPDF_FORMFILLINFO struct {
 	// in 8.2.1 for more details.
 	FFI_DoGoToAction func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32)
 
-	// A IPDF_JsPlatform instance.
-	// Unused if PDFium is built without V8 support. Otherwise, if NULL, then
+	// A IPDF_JSPLATFORM instance.
+	// Unused if PDFium is built without V8 support. Otherwise, if nil, then
 	// JavaScript will be prevented from executing while rendering the document.
-	JsPlatform *IPDF_JsPlatform
+	JsPlatform *IPDF_JSPLATFORM
 
 	// Whether the XFA module is disabled when built with the XFA module.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	XFA_disabled bool
 
 	// FFI_DisplayCaret shows the caret at specified position.
@@ -211,7 +211,7 @@ type FPDF_FORMFILLINFO struct {
 	//                           coordinates.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_DisplayCaret func(page references.FPDF_PAGE, bVisible bool, left, top, right, bottom float64)
 
 	// FFI_GetCurrentPageIndex returns the current page index.
@@ -219,7 +219,7 @@ type FPDF_FORMFILLINFO struct {
 	//       document        -   Handle to document from FPDF_LoadDocument().
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_GetCurrentPageIndex func(document references.FPDF_DOCUMENT) int
 
 	// FFI_SetCurrentPage sets the current page.
@@ -228,7 +228,7 @@ type FPDF_FORMFILLINFO struct {
 	//       iCurPage        -   The index of the PDF page.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_SetCurrentPage func(document references.FPDF_DOCUMENT, iCurPage int)
 
 	// FFI_GotoURL will navigate to the specified URL.
@@ -237,7 +237,7 @@ type FPDF_FORMFILLINFO struct {
 	//       url             -   The URL to navigate to
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_GotoURL func(document references.FPDF_DOCUMENT, url string)
 
 	// FFI_GetPageViewRect will get the current page view rectangle.
@@ -253,7 +253,7 @@ type FPDF_FORMFILLINFO struct {
 	//                           page view area in PDF page coordinates.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_GetPageViewRect func(document references.FPDF_DOCUMENT, url string) (left, top, right, bottom float64)
 
 	// FFI_PageEvent fires when pages have been added to or deleted from
@@ -263,7 +263,7 @@ type FPDF_FORMFILLINFO struct {
 	//       event_type      -   A enums.FXFA_PAGEVIEWEVENT value.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_PageEvent func(page_count int, event_type enums.FXFA_PAGEVIEWEVENT)
 
 	// FFI_PopupMenu will track the right context menu for XFA fields.
@@ -278,7 +278,7 @@ type FPDF_FORMFILLINFO struct {
 	//                           coordinates.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_PopupMenu func(page references.FPDF_PAGE, menuFlag int, x, y float32) bool
 
 	// FFI_OpenFile will open the specified file with the specified mode.
@@ -289,7 +289,7 @@ type FPDF_FORMFILLINFO struct {
 	//       mode            -   The mode for open file, e.g. "rb" or "wb".
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_OpenFile func(fileFlag enums.FXFA_SAVEAS, url, mode string) *FPDF_FILEHANDLER
 
 	// FFI_EmailTo will email the specified file stream to the specified
@@ -303,7 +303,7 @@ type FPDF_FORMFILLINFO struct {
 	//       msg            -   The message to be sent.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_EmailTo func(fileHandler *FPDF_FILEHANDLER, to, subject, cc, bcc, msg string)
 
 	// FFI_UploadTo will upload the specified file stream to the
@@ -321,13 +321,13 @@ type FPDF_FORMFILLINFO struct {
 	// FFI_GetPlatform will return the current platform.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_GetPlatform func() string
 
 	// FFI_GetLanguage will return the current language.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_GetLanguage func() string
 
 	// FFI_DownloadFromURL will download the specified file from the URL.
@@ -335,7 +335,7 @@ type FPDF_FORMFILLINFO struct {
 	//       url             -   The file url to download.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_DownloadFromURL func(fileFlag enums.FXFA_SAVEAS, url, mode string) *FPDF_FILEHANDLER
 
 	// FFI_PostRequestURL will post the request to the server URL.
@@ -348,7 +348,7 @@ type FPDF_FORMFILLINFO struct {
 	//       response        -   A FPDF_BSTR to write the response to.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_PostRequestURL func(url, data, contentType, encode, header string, response references.FPDF_BStr) bool
 
 	// FFI_PostRequestURL will put the request to the server URL.
@@ -358,7 +358,7 @@ type FPDF_FORMFILLINFO struct {
 	//       encode          -   The encode type.
 	//
 	// Required for XFA, otherwise set to nil.
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_PutRequestURL func(url, data, encode string) bool
 
 	// FFI_PostRequestURL is called when the focused annotation is updated.
@@ -367,7 +367,7 @@ type FPDF_FORMFILLINFO struct {
 	//       page_index      -   Index number of the page which contains the
 	//                           focused annotation. 0 for the first page.
 	//
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_OnFocusChange func(annot references.FPDF_ANNOTATION, page_index int)
 
 	// FFI_DoURIActionWithKeyboardModifier asks the implementation to navigate
@@ -377,12 +377,12 @@ type FPDF_FORMFILLINFO struct {
 	//       modifiers       -   Keyboard modifier that indicates which of
 	//                           the virtual keys are down, if any.
 	//
-	// Ignored if Version is lower than 2.
+	// Ignored on non-XFA builds.
 	FFI_DoURIActionWithKeyboardModifier func(uri string, modifiers int)
 }
 
-// IPDF_JsPlatform is the callback interface for XFA JS handling.
-type IPDF_JsPlatform struct {
+// IPDF_JSPLATFORM is the callback interface for XFA JS handling.
+type IPDF_JSPLATFORM struct {
 	// Pop up a dialog to show warning or hint.
 	// Parameters:
 	//       msg            -   A string containing the message to be displayed.
@@ -523,7 +523,7 @@ type FPDF_FILEHANDLER struct {
 	//   *       offset       -  Offset position starts from the beginning of file
 	//   *                       stream. This parameter indicates reading position.
 	//   *       buffer       -  Memory buffer to store data which are read from
-	//   *                       file stream. This parameter should not be NULL.
+	//   *                       file stream. This parameter should not be nil.
 	//   *       size         -  Size of data which should be read from file stream,
 	//   *                       in bytes. The buffer indicated by |buffer| must be
 	//   *                       large enough to store specified data.
@@ -543,7 +543,7 @@ type FPDF_FILEHANDLER struct {
 	//   *       offset       -  Offset position starts from the beginning of file
 	//   *                       stream. This parameter indicates writing position.
 	//   *       buffer       -  Memory buffer contains data which is written into
-	//   *                       file stream. This parameter should not be NULL.
+	//   *                       file stream. This parameter should not be nil.
 	//   *       size         -  Size of data which should be written into file
 	//   *                       stream, in bytes.
 	//   * Returns:

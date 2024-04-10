@@ -84,14 +84,36 @@ static inline void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
 	t(id);
 }
 
+extern int go_jsplatform_app_alert_cb(struct _IPDF_JsPlatform *this, FPDF_WIDESTRING Msg, FPDF_WIDESTRING Title, int Type, int Icon);
+extern void go_jsplatform_app_beep_cb(struct _IPDF_JsPlatform *this, int nType);
+extern int go_jsplatform_app_response_cb(struct _IPDF_JsPlatform *this, FPDF_WIDESTRING Question, FPDF_WIDESTRING Title, FPDF_WIDESTRING Default, FPDF_WIDESTRING cLabel, FPDF_BOOL bPassword, void* response, int length);
+extern int go_jsplatform_Doc_getFilePath_cb(struct _IPDF_JsPlatform *this, void* filePath, int length);
+extern void go_jsplatform_Doc_mail_cb(struct _IPDF_JsPlatform *this, void* mailData, int length, FPDF_BOOL bUI, FPDF_WIDESTRING To, FPDF_WIDESTRING Subject, FPDF_WIDESTRING CC, FPDF_WIDESTRING BCC, FPDF_WIDESTRING Msg);
+extern void go_jsplatform_Doc_print_cb(struct _IPDF_JsPlatform *this, FPDF_BOOL bUI, int nStart, int nEnd, FPDF_BOOL bSilent, FPDF_BOOL bShrinkToFit, FPDF_BOOL bPrintAsImage, FPDF_BOOL bReverse, FPDF_BOOL bAnnotations);
+extern void go_jsplatform_Doc_submitForm_cb(struct _IPDF_JsPlatform *this, void* formData, int length, FPDF_WIDESTRING URL);
+extern void go_jsplatform_Doc_gotoPage_cb(struct _IPDF_JsPlatform *this, int nPageNum);
+extern int go_jsplatform_Field_browse_cb(struct _IPDF_JsPlatform *this, void* filePath, int length);
+
+static inline void IPDF_JSPLATFORM_SET_CB(IPDF_JSPLATFORM *jsP) {
+     	jsP->app_alert = &go_jsplatform_app_alert_cb;
+     	jsP->app_beep = &go_jsplatform_app_beep_cb;
+     	jsP->app_response = &go_jsplatform_app_response_cb;
+     	jsP->Doc_getFilePath = &go_jsplatform_Doc_getFilePath_cb;
+     	jsP->Doc_mail = &go_jsplatform_Doc_mail_cb;
+     	jsP->Doc_print = &go_jsplatform_Doc_print_cb;
+     	jsP->Doc_submitForm = &go_jsplatform_Doc_submitForm_cb;
+     	jsP->Doc_gotoPage = &go_jsplatform_Doc_gotoPage_cb;
+     	jsP->Field_browse = &go_jsplatform_Field_browse_cb;
+}
+
 */
 import "C"
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/enums"
-	"github.com/klippa-app/go-pdfium/references"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
@@ -863,9 +885,217 @@ func go_formfill_FFI_DoURIActionWithKeyboardModifier_cb(me *C.FPDF_FORMFILLINFO,
 	return
 }
 
+// go_jsplatform_app_alert_cb is the Go implementation of IPDF_JSPLATFORM::app_alert.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_app_alert_cb
+func go_jsplatform_app_alert_cb(me *C.IPDF_JSPLATFORM, msg, title C.FPDF_WIDESTRING, alertType, icon C.int) C.int {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.App_alert == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_jsplatform_app_beep_cb is the Go implementation of IPDF_JSPLATFORM::app_beep.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_app_beep_cb
+func go_jsplatform_app_beep_cb(me *C.IPDF_JSPLATFORM, nType C.int) {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.App_beep == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_jsplatform_app_response_cb is the Go implementation of IPDF_JSPLATFORM::app_response.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_app_response_cb
+func go_jsplatform_app_response_cb(me *C.IPDF_JSPLATFORM, question, title, defaultValue, cLabel C.FPDF_WIDESTRING, bPassword C.FPDF_BOOL, response unsafe.Pointer, length C.int) C.int {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.App_response == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_jsplatform_Doc_getFilePath_cb is the Go implementation of IPDF_JSPLATFORM::Doc_getFilePath.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Doc_getFilePath_cb
+func go_jsplatform_Doc_getFilePath_cb(me *C.IPDF_JSPLATFORM, filePath unsafe.Pointer, length C.int) C.int {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Doc_getFilePath == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
+// go_jsplatform_Doc_mail_cb is the Go implementation of IPDF_JSPLATFORM::Doc_mail.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Doc_mail_cb
+func go_jsplatform_Doc_mail_cb(me *C.IPDF_JSPLATFORM, mailData unsafe.Pointer, length C.int, bUI C.FPDF_BOOL, to, subject, cc, bcc, msg C.FPDF_WIDESTRING) {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Doc_mail == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_jsplatform_Doc_print_cb is the Go implementation of IPDF_JSPLATFORM::Doc_print.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Doc_print_cb
+func go_jsplatform_Doc_print_cb(me *C.IPDF_JSPLATFORM, bUI C.FPDF_BOOL, nStart, nEnd C.int, bSilent, bShrinkToFit, bPrintAsImage, bReverse, bAnnotations C.FPDF_BOOL) {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Doc_print == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_jsplatform_Doc_submitForm_cb is the Go implementation of IPDF_JSPLATFORM::Doc_submitForm.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Doc_submitForm_cb
+func go_jsplatform_Doc_submitForm_cb(me *C.IPDF_JSPLATFORM, formData unsafe.Pointer, length C.int, url C.FPDF_WIDESTRING) {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Doc_submitForm == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_jsplatform_Doc_gotoPage_cb is the Go implementation of IPDF_JSPLATFORM::Doc_gotoPage.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Doc_gotoPage_cb
+func go_jsplatform_Doc_gotoPage_cb(me *C.IPDF_JSPLATFORM, nPageNum C.int) {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Doc_gotoPage == nil {
+		return
+	}
+
+	// @todo: implement me.
+
+	return
+}
+
+// go_jsplatform_Field_browse_cb is the Go implementation of IPDF_JSPLATFORM::Field_browse.
+// It is exported through cgo so that we can use the reference to it and set
+// it on IPDF_JSPLATFORM structs.
+//
+//export go_jsplatform_Field_browse_cb
+func go_jsplatform_Field_browse_cb(me *C.IPDF_JSPLATFORM, filePath unsafe.Pointer, length C.int) C.int {
+	pointer := unsafe.Pointer(me.m_pFormfillinfo)
+
+	// Check if we still have the callback.
+	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return C.int(0)
+	}
+
+	if formFillInfoHandle.JSPlatform == nil || formFillInfoHandle.JSPlatform.Field_browse == nil {
+		return C.int(0)
+	}
+
+	// @todo: implement me.
+
+	return C.int(0)
+}
+
 type FormFillInfo struct {
 	Struct           *C.FPDF_FORMFILLINFO
 	FormFillInfo     *structs.FPDF_FORMFILLINFO
+	JSPlatform       *structs.IPDF_JSPLATFORM
 	FormHandleHandle *FormHandleHandle
 	Instance         *PdfiumImplementation
 }
@@ -925,6 +1155,14 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 	}
 	C.FPDF_FORMFILLINFO_SET_CB(formInfoStruct)
 
+	if request.FormFillInfo.JsPlatform != nil {
+		jsPlatformStruct := &C.IPDF_JSPLATFORM{}
+		jsPlatformStruct.version = C.int(3)
+		jsPlatformStruct.m_pFormfillinfo = unsafe.Pointer(formInfoStruct)
+		formInfoStruct.m_pJsPlatform = jsPlatformStruct
+		C.IPDF_JSPLATFORM_SET_CB(jsPlatformStruct)
+	}
+
 	formHandle := C.FPDFDOC_InitFormFillEnvironment(documentHandle.handle, formInfoStruct)
 	if formHandle == nil {
 		return nil, errors.New("could not init form fill environment")
@@ -935,6 +1173,7 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 	formFillInfo := &FormFillInfo{
 		Struct:           formInfoStruct,
 		FormFillInfo:     &request.FormFillInfo,
+		JSPlatform:       request.FormFillInfo.JsPlatform,
 		FormHandleHandle: formHandleHandle,
 		Instance:         p,
 	}
