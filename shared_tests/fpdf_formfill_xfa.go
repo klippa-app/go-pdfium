@@ -289,10 +289,10 @@ var _ = Describe("fpdf_formfill", func() {
 							Args: []interface{}{document, url},
 						})
 					},
-					FFI_GetPageViewRect: func(document references.FPDF_DOCUMENT, url string) (left, top, right, bottom float64) {
+					FFI_GetPageViewRect: func(page references.FPDF_PAGE) (left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPageViewRect",
-							Args: []interface{}{document, url},
+							Args: []interface{}{page},
 						})
 						return 0, 0, 0, 0
 					},
@@ -342,10 +342,10 @@ var _ = Describe("fpdf_formfill", func() {
 						})
 						return ""
 					},
-					FFI_DownloadFromURL: func(fileFlag enums.FXFA_SAVEAS, url, mode string) *structs.FPDF_FILEHANDLER {
+					FFI_DownloadFromURL: func(url string) *structs.FPDF_FILEHANDLER {
 						addToHistory(FormHistory{
 							Name: "FFI_DownloadFromURL",
-							Args: []interface{}{fileFlag, url, mode},
+							Args: []interface{}{url},
 						})
 						return nil
 					},

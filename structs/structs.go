@@ -254,7 +254,7 @@ type FPDF_FORMFILLINFO struct {
 	//
 	// Required for XFA, otherwise set to nil.
 	// Ignored on non-XFA builds.
-	FFI_GetPageViewRect func(document references.FPDF_DOCUMENT, url string) (left, top, right, bottom float64)
+	FFI_GetPageViewRect func(page references.FPDF_PAGE) (left, top, right, bottom float64)
 
 	// FFI_PageEvent fires when pages have been added to or deleted from
 	// the XFA document.
@@ -336,7 +336,7 @@ type FPDF_FORMFILLINFO struct {
 	//
 	// Required for XFA, otherwise set to nil.
 	// Ignored on non-XFA builds.
-	FFI_DownloadFromURL func(fileFlag enums.FXFA_SAVEAS, url, mode string) *FPDF_FILEHANDLER
+	FFI_DownloadFromURL func(url string) *FPDF_FILEHANDLER
 
 	// FFI_PostRequestURL will post the request to the server URL.
 	// Parameters:

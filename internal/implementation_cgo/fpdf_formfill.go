@@ -512,7 +512,15 @@ func go_formfill_FFI_DisplayCaret_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, 
 		return
 	}
 
-	// @todo: implement me.
+	var pageRef references.FPDF_PAGE
+	if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+		pageRef = pointerPageRef
+	} else {
+		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+		pageRef = pageHandle.nativeRef
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_DisplayCaret(pageRef, int(bVisible) == 1, float64(left), float64(top), float64(right), float64(bottom))
 
 	return
 }
@@ -535,9 +543,15 @@ func go_formfill_FFI_GetCurrentPageIndex_cb(me *C.FPDF_FORMFILLINFO, document C.
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	var docRef references.FPDF_DOCUMENT
+	if pointerDocRef, ok := formFillInfoHandle.FormHandleHandle.documentPointers[unsafe.Pointer(document)]; ok {
+		docRef = pointerDocRef
+	} else {
+		docHandle := formFillInfoHandle.Instance.registerDocument(document)
+		docRef = docHandle.nativeRef
+	}
 
-	return C.int(0)
+	return C.int(formFillInfoHandle.FormFillInfo.FFI_GetCurrentPageIndex(docRef))
 }
 
 // go_formfill_FFI_SetCurrentPage_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_SetCurrentPage.
@@ -558,7 +572,15 @@ func go_formfill_FFI_SetCurrentPage_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_
 		return
 	}
 
-	// @todo: implement me.
+	var docRef references.FPDF_DOCUMENT
+	if pointerDocRef, ok := formFillInfoHandle.FormHandleHandle.documentPointers[unsafe.Pointer(document)]; ok {
+		docRef = pointerDocRef
+	} else {
+		docHandle := formFillInfoHandle.Instance.registerDocument(document)
+		docRef = docHandle.nativeRef
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_SetCurrentPage(docRef, int(iCurPage))
 
 	return
 }
@@ -581,7 +603,21 @@ func go_formfill_FFI_GotoURL_cb(me *C.FPDF_FORMFILLINFO, document C.FPDF_DOCUMEN
 		return
 	}
 
-	// @todo: implement me.
+	var docRef references.FPDF_DOCUMENT
+	if pointerDocRef, ok := formFillInfoHandle.FormHandleHandle.documentPointers[unsafe.Pointer(document)]; ok {
+		docRef = pointerDocRef
+	} else {
+		docHandle := formFillInfoHandle.Instance.registerDocument(document)
+		docRef = docHandle.nativeRef
+	}
+
+	url := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsURL))
+	decodedValue, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(url)
+	if err != nil {
+		return
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_GotoURL(docRef, decodedValue)
 
 	return
 }
@@ -604,7 +640,24 @@ func go_formfill_FFI_GetPageViewRect_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAG
 		return
 	}
 
-	// @todo: implement me.
+	var pageRef references.FPDF_PAGE
+	if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+		pageRef = pointerPageRef
+	} else {
+		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+		pageRef = pageHandle.nativeRef
+	}
+
+	pageViewRectLeft, pageViewRectTop, pageViewRectRight, pageViewRectBottom := formFillInfoHandle.FormFillInfo.FFI_GetPageViewRect(pageRef)
+	cgoPageViewRectLeft := C.double(pageViewRectLeft)
+	cgoPageViewRectTop := C.double(pageViewRectTop)
+	cgoPageViewRectRight := C.double(pageViewRectRight)
+	cgoPageViewRectBottom := C.double(pageViewRectBottom)
+
+	left = &cgoPageViewRectLeft
+	top = &cgoPageViewRectTop
+	right = &cgoPageViewRectRight
+	bottom = &cgoPageViewRectBottom
 
 	return
 }
@@ -627,7 +680,7 @@ func go_formfill_FFI_PageEvent_cb(me *C.FPDF_FORMFILLINFO, page_count C.int, eve
 		return
 	}
 
-	// @todo: implement me.
+	formFillInfoHandle.FormFillInfo.FFI_PageEvent(int(page_count), enums.FXFA_PAGEVIEWEVENT(event_type))
 
 	return
 }
@@ -650,7 +703,18 @@ func go_formfill_FFI_PopupMenu_cb(me *C.FPDF_FORMFILLINFO, page C.FPDF_PAGE, hWi
 		return C.FPDF_BOOL(0)
 	}
 
-	// @todo: implement me.
+	var pageRef references.FPDF_PAGE
+	if pointerPageRef, ok := formFillInfoHandle.FormHandleHandle.pagePointers[unsafe.Pointer(page)]; ok {
+		pageRef = pointerPageRef
+	} else {
+		pageHandle := formFillInfoHandle.Instance.registerPage(page, 0, nil)
+		pageRef = pageHandle.nativeRef
+	}
+
+	result := formFillInfoHandle.FormFillInfo.FFI_PopupMenu(pageRef, int(menuFlag), float32(x), float32(y))
+	if result {
+		return C.FPDF_BOOL(1)
+	}
 
 	return C.FPDF_BOOL(0)
 }
@@ -673,7 +737,14 @@ func go_formfill_FFI_OpenFile_cb(me *C.FPDF_FORMFILLINFO, fileFlag C.int, wsURL 
 		return nil
 	}
 
-	// @todo: implement me.
+	url := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsURL))
+	decodedURL, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(url)
+	if err != nil {
+		return nil
+	}
+
+	// @todo: turn Go filehandler into Cgo.
+	formFillInfoHandle.FormFillInfo.FFI_OpenFile(enums.FXFA_SAVEAS(fileFlag), decodedURL, C.GoString(mode))
 
 	return nil
 }
@@ -696,7 +767,38 @@ func go_formfill_FFI_EmailTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FIL
 		return
 	}
 
-	// @todo: implement me.
+	to := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(pTo))
+	decodedTo, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(to)
+	if err != nil {
+		return
+	}
+
+	subject := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(pSubject))
+	decodedSubject, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(subject)
+	if err != nil {
+		return
+	}
+
+	cc := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(pCC))
+	decodedCC, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(cc)
+	if err != nil {
+		return
+	}
+
+	bcc := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(pBcc))
+	decodedBcc, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(bcc)
+	if err != nil {
+		return
+	}
+
+	msg := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(pMsg))
+	decodedMsg, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(msg)
+	if err != nil {
+		return
+	}
+
+	// @todo: turn CGo filehandler into Go handler.
+	formFillInfoHandle.FormFillInfo.FFI_EmailTo(nil, decodedTo, decodedSubject, decodedCC, decodedBcc, decodedMsg)
 
 	return
 }
@@ -719,7 +821,14 @@ func go_formfill_FFI_UploadTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FI
 		return
 	}
 
-	// @todo: implement me.
+	uploadToGo := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(uploadTo))
+	decodedUploadTo, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(uploadToGo)
+	if err != nil {
+		return
+	}
+
+	// @todo: turn CGo filehandler into Go handler.
+	formFillInfoHandle.FormFillInfo.FFI_UploadTo(nil, enums.FXFA_SAVEAS(fileFlag), decodedUploadTo)
 
 	return
 }
@@ -742,9 +851,20 @@ func go_formfill_FFI_GetPlatform_cb(me *C.FPDF_FORMFILLINFO, platform unsafe.Poi
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	goPlatform := formFillInfoHandle.FormFillInfo.FFI_GetPlatform()
+	if platform != nil && length > 0 {
+		target := unsafe.Slice((*byte)(platform), uint64(length))
+		platformUTF16, err := formFillInfoHandle.Instance.transformUTF8ToUTF16LE(goPlatform)
+		if err != nil {
+			return C.int(0)
+		}
+		copy(target, platformUTF16)
 
-	return C.int(0)
+		// Set last byte to NULL terminator.
+		target[uint64(length)-1] = 0x00
+	}
+
+	return C.int((len(goPlatform) * 2) + 1)
 }
 
 // go_formfill_FFI_GetLanguage_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_GetLanguage.
@@ -765,9 +885,19 @@ func go_formfill_FFI_GetLanguage_cb(me *C.FPDF_FORMFILLINFO, language unsafe.Poi
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	goLanguage := formFillInfoHandle.FormFillInfo.FFI_GetLanguage()
+	if language != nil && length > 0 {
+		target := unsafe.Slice((*byte)(language), uint64(length))
+		languageUTF16, err := formFillInfoHandle.Instance.transformUTF8ToUTF16LE(goLanguage)
+		if err != nil {
+			return C.int(0)
+		}
+		copy(target, languageUTF16)
+		// Set last byte to NULL terminator.
+		target[uint64(length)-1] = 0x00
+	}
 
-	return C.int(0)
+	return C.int((len(goLanguage) * 2) + 1)
 }
 
 // go_formfill_FFI_DownloadFromURL_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_DownloadFromURL.
@@ -788,7 +918,14 @@ func go_formfill_FFI_DownloadFromURL_cb(me *C.FPDF_FORMFILLINFO, URL C.FPDF_WIDE
 		return nil
 	}
 
-	// @todo: implement me.
+	url := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(URL))
+	decodedURL, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(url)
+	if err != nil {
+		return nil
+	}
+
+	// @todo: turn Go filehandler into Cgo.
+	formFillInfoHandle.FormFillInfo.FFI_DownloadFromURL(decodedURL)
 
 	return nil
 }
@@ -811,7 +948,41 @@ func go_formfill_FFI_PostRequestURL_cb(me *C.FPDF_FORMFILLINFO, wsURL, wsData, w
 		return C.FPDF_BOOL(0)
 	}
 
-	// @todo: implement me.
+	url := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsURL))
+	decodedURL, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(url)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	data := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsData))
+	decodedData, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(data)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	contentType := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsContentType))
+	decodedContentType, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(contentType)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	encode := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsEncode))
+	decodedEncode, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(encode)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	header := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsHeader))
+	decodedHeader, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(header)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	// @todo: convert FPDF_BSTR into Go.
+	result := formFillInfoHandle.FormFillInfo.FFI_PostRequestURL(decodedURL, decodedData, decodedContentType, decodedEncode, decodedHeader, references.FPDF_BSTR(""))
+	if result {
+		return C.FPDF_BOOL(1)
+	}
 
 	return C.FPDF_BOOL(0)
 }
