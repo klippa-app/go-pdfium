@@ -1005,7 +1005,28 @@ func go_formfill_FFI_PutRequestURL_cb(me *C.FPDF_FORMFILLINFO, wsURL, wsData, ws
 		return C.FPDF_BOOL(0)
 	}
 
-	// @todo: implement me.
+	URL := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsURL))
+	decodedURL, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(URL)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	data := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsData))
+	decodedData, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(data)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	encode := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(wsEncode))
+	decodedEncode, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(encode)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	result := formFillInfoHandle.FormFillInfo.FFI_PutRequestURL(decodedURL, decodedData, decodedEncode)
+	if result {
+		return C.FPDF_BOOL(1)
+	}
 
 	return C.FPDF_BOOL(0)
 }
@@ -1028,7 +1049,16 @@ func go_formfill_FFI_OnFocusChange_cb(me *C.FPDF_FORMFILLINFO, annot C.FPDF_ANNO
 		return
 	}
 
-	// @todo: implement me.
+	var annotationRef references.FPDF_ANNOTATION
+	if pointerAnnotationRef, ok := formFillInfoHandle.FormHandleHandle.annotationPointers[unsafe.Pointer(annot)]; ok {
+		annotationRef = pointerAnnotationRef
+	} else {
+		annotationHandle := formFillInfoHandle.Instance.registerAnnotation(annot)
+		annotationRef = annotationHandle.nativeRef
+		formFillInfoHandle.FormHandleHandle.annotationPointers[unsafe.Pointer(annotationHandle.handle)] = annotationHandle.nativeRef
+	}
+
+	formFillInfoHandle.FormFillInfo.FFI_OnFocusChange(annotationRef, int(page_index))
 
 	return
 }
@@ -1051,7 +1081,7 @@ func go_formfill_FFI_DoURIActionWithKeyboardModifier_cb(me *C.FPDF_FORMFILLINFO,
 		return
 	}
 
-	// @todo: implement me.
+	formFillInfoHandle.FormFillInfo.FFI_DoURIActionWithKeyboardModifier(C.GoString((*C.char)(uri)), int(modifiers))
 
 	return
 }
@@ -1074,9 +1104,19 @@ func go_jsplatform_app_alert_cb(me *C.IPDF_JSPLATFORM, msg, title C.FPDF_WIDESTR
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	wsMsg := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(msg))
+	decodedMsg, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsMsg)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
 
-	return C.int(0)
+	wsTitle := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(title))
+	decodedTitle, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsTitle)
+	if err != nil {
+		return C.FPDF_BOOL(0)
+	}
+
+	return C.int(formFillInfoHandle.JSPlatform.App_alert(decodedMsg, decodedTitle, enums.JSPLATFORM_ALERT_BUTTON(alertType), enums.JSPLATFORM_ALERT_ICON(icon)))
 }
 
 // go_jsplatform_app_beep_cb is the Go implementation of IPDF_JSPLATFORM::app_beep.
@@ -1097,7 +1137,7 @@ func go_jsplatform_app_beep_cb(me *C.IPDF_JSPLATFORM, nType C.int) {
 		return
 	}
 
-	// @todo: implement me.
+	formFillInfoHandle.JSPlatform.App_beep(enums.JSPLATFORM_BEEP(nType))
 
 	return
 }
@@ -1120,9 +1160,37 @@ func go_jsplatform_app_response_cb(me *C.IPDF_JSPLATFORM, question, title, defau
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	wsQuestion := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(question))
+	decodedQuestion, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsQuestion)
+	if err != nil {
+		return C.int(0)
+	}
 
-	return C.int(0)
+	wsTitle := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(title))
+	decodedTitle, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsTitle)
+	if err != nil {
+		return C.int(0)
+	}
+
+	wsDefaultValue := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(defaultValue))
+	decodedDefaultValue, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsDefaultValue)
+	if err != nil {
+		return C.int(0)
+	}
+
+	wsCLabel := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(cLabel))
+	decodedCLabel, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsCLabel)
+	if err != nil {
+		return C.int(0)
+	}
+
+	returnedResponse := formFillInfoHandle.JSPlatform.App_response(decodedQuestion, decodedTitle, decodedDefaultValue, decodedCLabel, bPassword == C.FPDF_BOOL(1))
+	if int(length) > 0 {
+		target := unsafe.Slice((*byte)(response), uint64(length))
+		copy(target, append([]byte(returnedResponse), 0x00))
+	}
+
+	return C.int(len(returnedResponse))
 }
 
 // go_jsplatform_Doc_getFilePath_cb is the Go implementation of IPDF_JSPLATFORM::Doc_getFilePath.
@@ -1143,9 +1211,15 @@ func go_jsplatform_Doc_getFilePath_cb(me *C.IPDF_JSPLATFORM, filePath unsafe.Poi
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	returnedFilePath := formFillInfoHandle.JSPlatform.Doc_getFilePath()
+	neededLength := len(returnedFilePath) + 1
 
-	return C.int(0)
+	if int(length) > 0 && int(length) >= neededLength {
+		target := unsafe.Slice((*byte)(filePath), uint64(length))
+		copy(target, append([]byte(returnedFilePath), 0x00))
+	}
+
+	return C.int(neededLength)
 }
 
 // go_jsplatform_Doc_mail_cb is the Go implementation of IPDF_JSPLATFORM::Doc_mail.
@@ -1166,7 +1240,39 @@ func go_jsplatform_Doc_mail_cb(me *C.IPDF_JSPLATFORM, mailData unsafe.Pointer, l
 		return
 	}
 
-	// @todo: implement me.
+	data := unsafe.Slice((*byte)(mailData), uint64(length))
+
+	wsTo := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(to))
+	decodedTo, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsTo)
+	if err != nil {
+		return
+	}
+
+	wsSubject := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(subject))
+	decodedSubject, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsSubject)
+	if err != nil {
+		return
+	}
+
+	wsCc := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(cc))
+	decodedCc, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsCc)
+	if err != nil {
+		return
+	}
+
+	wsBcc := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(bcc))
+	decodedBcc, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsBcc)
+	if err != nil {
+		return
+	}
+
+	wsMsg := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(msg))
+	decodedMsg, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsMsg)
+	if err != nil {
+		return
+	}
+
+	formFillInfoHandle.JSPlatform.Doc_mail(data, bUI == C.FPDF_BOOL(1), decodedTo, decodedSubject, decodedCc, decodedBcc, decodedMsg)
 
 	return
 }
@@ -1189,7 +1295,7 @@ func go_jsplatform_Doc_print_cb(me *C.IPDF_JSPLATFORM, bUI C.FPDF_BOOL, nStart, 
 		return
 	}
 
-	// @todo: implement me.
+	formFillInfoHandle.JSPlatform.Doc_print(bUI == C.FPDF_BOOL(1), int(nStart), int(nEnd), bSilent == C.FPDF_BOOL(1), bShrinkToFit == C.FPDF_BOOL(1), bPrintAsImage == C.FPDF_BOOL(1), bReverse == C.FPDF_BOOL(1), bAnnotations == C.FPDF_BOOL(1))
 
 	return
 }
@@ -1212,7 +1318,15 @@ func go_jsplatform_Doc_submitForm_cb(me *C.IPDF_JSPLATFORM, formData unsafe.Poin
 		return
 	}
 
-	// @todo: implement me.
+	data := unsafe.Slice((*byte)(formData), uint64(length))
+
+	wsURL := formFillInfoHandle.Instance.readBytesUntilTerminator(unsafe.Pointer(url))
+	decodedURL, err := formFillInfoHandle.Instance.transformUTF16LEToUTF8(wsURL)
+	if err != nil {
+		return
+	}
+
+	formFillInfoHandle.JSPlatform.Doc_submitForm(data, decodedURL)
 
 	return
 }
@@ -1235,7 +1349,7 @@ func go_jsplatform_Doc_gotoPage_cb(me *C.IPDF_JSPLATFORM, nPageNum C.int) {
 		return
 	}
 
-	// @todo: implement me.
+	formFillInfoHandle.JSPlatform.Doc_gotoPage(int(nPageNum))
 
 	return
 }
@@ -1258,9 +1372,15 @@ func go_jsplatform_Field_browse_cb(me *C.IPDF_JSPLATFORM, filePath unsafe.Pointe
 		return C.int(0)
 	}
 
-	// @todo: implement me.
+	returnedFilePath := formFillInfoHandle.JSPlatform.Field_browse()
+	neededLength := len(returnedFilePath) + 1
 
-	return C.int(0)
+	if int(length) > 0 && int(length) >= neededLength {
+		target := unsafe.Slice((*byte)(filePath), uint64(length))
+		copy(target, append([]byte(returnedFilePath), 0x00))
+	}
+
+	return C.int(neededLength)
 }
 
 type FormFillInfo struct {
