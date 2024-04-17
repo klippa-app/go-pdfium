@@ -192,6 +192,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		pageObjectMarkRefs:         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle{},
 		fontRefs:                   map[references.FPDF_FONT]*FontHandle{},
 		glyphPathRefs:              map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
+		bStrRefs:                   map[references.FPDF_BSTR]*BStrHandle{},
 		fileReaders:                map[string]*fileReaderRef{},
 	}
 
@@ -237,6 +238,7 @@ type PdfiumImplementation struct {
 	pageObjectMarkRefs         map[references.FPDF_PAGEOBJECTMARK]*PageObjectMarkHandle
 	fontRefs                   map[references.FPDF_FONT]*FontHandle
 	glyphPathRefs              map[references.FPDF_GLYPHPATH]*GlyphPathHandle
+	bStrRefs                   map[references.FPDF_BSTR]*BStrHandle
 	fileReaders                map[string]*fileReaderRef
 
 	// We need to keep track of our own instance.
@@ -505,6 +507,10 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.glyphPathRefs {
 		delete(p.glyphPathRefs, i)
+	}
+
+	for i := range p.bStrRefs {
+		delete(p.bStrRefs, i)
 	}
 
 	for i := range p.fileReaders {
@@ -842,4 +848,16 @@ func (p *PdfiumImplementation) getFormHandleHandle(formHandle references.FPDF_FO
 	}
 
 	return nil, errors.New("could not find formHandle handle, perhaps the formHandle was already closed or you tried to share formHandles between instances")
+}
+
+func (p *PdfiumImplementation) getBStrHandle(bStr references.FPDF_BSTR) (*BStrHandle, error) {
+	if bStr == "" {
+		return nil, errors.New("bStr not given")
+	}
+
+	if val, ok := p.bStrRefs[bStr]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("could not find bStr handle, perhaps the bStr was already closed or you tried to share bStrs between instances")
 }

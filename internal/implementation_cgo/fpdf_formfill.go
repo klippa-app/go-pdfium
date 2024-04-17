@@ -106,6 +106,24 @@ static inline void IPDF_JSPLATFORM_SET_CB(IPDF_JSPLATFORM *jsP) {
      	jsP->Field_browse = &go_jsplatform_Field_browse_cb;
 }
 
+extern void go_filehandler_Release_cb(void* clientData);
+extern FPDF_DWORD go_filehandler_GetSize_cb(void* clientData);
+extern FPDF_RESULT go_filehandler_ReadBlock_cb(void* clientData, FPDF_DWORD offset, void* buffer, FPDF_DWORD size);
+typedef const void* cvoidp;
+extern FPDF_RESULT go_filehandler_WriteBlock_cb(void* clientData, FPDF_DWORD offset, cvoidp buffer, FPDF_DWORD size);
+extern FPDF_RESULT go_filehandler_Flush_cb(void* clientData);
+extern FPDF_RESULT go_filehandler_Truncate_cb(void* clientData, FPDF_DWORD size);
+
+static inline void FPDF_FILEHANDLER_SET_CB(FPDF_FILEHANDLER *f, char *id) {
+    f->clientData = id;
+	f->Release = &go_filehandler_Release_cb;
+	f->GetSize = &go_filehandler_GetSize_cb;
+	f->ReadBlock = &go_filehandler_ReadBlock_cb;
+	f->WriteBlock = &go_filehandler_WriteBlock_cb;
+	f->Flush = &go_filehandler_Flush_cb;
+	f->Truncate = &go_filehandler_Truncate_cb;
+}
+
 */
 import "C"
 import (
@@ -117,6 +135,8 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
+
+	"github.com/google/uuid"
 )
 
 // go_formfill_Release_cb is the Go implementation of FPDF_FORMFILLINFO::Release.
@@ -133,11 +153,11 @@ func go_formfill_Release_cb(me *C.FPDF_FORMFILLINFO) {
 		return
 	}
 
-	// @todo: do I have anything to cleanup for myself?
-
 	if formFillInfoHandle.FormFillInfo.Release != nil {
 		formFillInfoHandle.FormFillInfo.Release()
 	}
+
+	delete(formFillInfoHandles, pointer)
 }
 
 // go_formfill_FFI_Invalidate_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_Invalidate.
@@ -743,8 +763,28 @@ func go_formfill_FFI_OpenFile_cb(me *C.FPDF_FORMFILLINFO, fileFlag C.int, wsURL 
 		return nil
 	}
 
-	// @todo: turn Go filehandler into Cgo.
-	formFillInfoHandle.FormFillInfo.FFI_OpenFile(enums.FXFA_SAVEAS(fileFlag), decodedURL, C.GoString(mode))
+	resp := formFillInfoHandle.FormFillInfo.FFI_OpenFile(enums.FXFA_SAVEAS(fileFlag), decodedURL, C.GoString(mode))
+	if resp != nil {
+		fileHandlerStruct := &C.FPDF_FILEHANDLER{}
+		fileHandlerStruct.clientData = pointer
+
+		fileHandlerRef := uuid.New()
+		fileHandlerRefString := fileHandlerRef.String()
+		cFileHandlerRef := C.CString(fileHandlerRefString)
+
+		C.FPDF_FILEHANDLER_SET_CB(fileHandlerStruct, cFileHandlerRef)
+
+		fileHandlerInstance := &fileHandler{
+			Struct:      fileHandlerStruct,
+			FileHandler: resp,
+			stringRef:   unsafe.Pointer(cFileHandlerRef),
+		}
+
+		fileHandlerHandles[fileHandlerRefString] = fileHandlerInstance
+		fileHandlerPointers[unsafe.Pointer(fileHandlerStruct)] = fileHandlerInstance
+
+		return fileHandlerStruct
+	}
 
 	return nil
 }
@@ -759,6 +799,12 @@ func go_formfill_FFI_EmailTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FIL
 
 	// Check if we still have the callback.
 	formFillInfoHandle, ok := formFillInfoHandles[pointer]
+	if !ok {
+		return
+	}
+
+	// Check if we still have the file handler.
+	fileHandlerHandler, ok := fileHandlerPointers[unsafe.Pointer(fileHandler)]
 	if !ok {
 		return
 	}
@@ -797,8 +843,7 @@ func go_formfill_FFI_EmailTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FIL
 		return
 	}
 
-	// @todo: turn CGo filehandler into Go handler.
-	formFillInfoHandle.FormFillInfo.FFI_EmailTo(nil, decodedTo, decodedSubject, decodedCC, decodedBcc, decodedMsg)
+	formFillInfoHandle.FormFillInfo.FFI_EmailTo(fileHandlerHandler.FileHandler, decodedTo, decodedSubject, decodedCC, decodedBcc, decodedMsg)
 
 	return
 }
@@ -817,6 +862,12 @@ func go_formfill_FFI_UploadTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FI
 		return
 	}
 
+	// Check if we still have the file handler.
+	fileHandlerHandler, ok := fileHandlerPointers[unsafe.Pointer(fileHandler)]
+	if !ok {
+		return
+	}
+
 	if formFillInfoHandle.FormFillInfo.FFI_UploadTo == nil {
 		return
 	}
@@ -827,8 +878,7 @@ func go_formfill_FFI_UploadTo_cb(me *C.FPDF_FORMFILLINFO, fileHandler *C.FPDF_FI
 		return
 	}
 
-	// @todo: turn CGo filehandler into Go handler.
-	formFillInfoHandle.FormFillInfo.FFI_UploadTo(nil, enums.FXFA_SAVEAS(fileFlag), decodedUploadTo)
+	formFillInfoHandle.FormFillInfo.FFI_UploadTo(fileHandlerHandler.FileHandler, enums.FXFA_SAVEAS(fileFlag), decodedUploadTo)
 
 	return
 }
@@ -924,7 +974,6 @@ func go_formfill_FFI_DownloadFromURL_cb(me *C.FPDF_FORMFILLINFO, URL C.FPDF_WIDE
 		return nil
 	}
 
-	// @todo: turn Go filehandler into Cgo.
 	formFillInfoHandle.FormFillInfo.FFI_DownloadFromURL(decodedURL)
 
 	return nil
@@ -978,8 +1027,16 @@ func go_formfill_FFI_PostRequestURL_cb(me *C.FPDF_FORMFILLINFO, wsURL, wsData, w
 		return C.FPDF_BOOL(0)
 	}
 
-	// @todo: convert FPDF_BSTR into Go.
-	result := formFillInfoHandle.FormFillInfo.FFI_PostRequestURL(decodedURL, decodedData, decodedContentType, decodedEncode, decodedHeader, references.FPDF_BSTR(""))
+	var bStrRef references.FPDF_BSTR
+	if pointerBStrRef, ok := formFillInfoHandle.FormHandleHandle.bStrPointers[unsafe.Pointer(response)]; ok {
+		bStrRef = pointerBStrRef
+	} else {
+		bStrHandle := formFillInfoHandle.Instance.registerBStr(*response)
+		bStrRef = bStrHandle.nativeRef
+		formFillInfoHandle.FormHandleHandle.bStrPointers[unsafe.Pointer(response)] = bStrHandle.nativeRef
+	}
+
+	result := formFillInfoHandle.FormFillInfo.FFI_PostRequestURL(decodedURL, decodedData, decodedContentType, decodedEncode, decodedHeader, bStrRef)
 	if result {
 		return C.FPDF_BOOL(1)
 	}
@@ -1383,6 +1440,153 @@ func go_jsplatform_Field_browse_cb(me *C.IPDF_JSPLATFORM, filePath unsafe.Pointe
 	return C.int(neededLength)
 }
 
+// go_filehandler_Release_cb is the Go implementation of FPDF_FILEHANDLER::Release.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_Release_cb
+func go_filehandler_Release_cb(clientData unsafe.Pointer) {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return
+	}
+
+	if fileHandlerHandle.FileHandler.Release != nil {
+		fileHandlerHandle.FileHandler.Release()
+	}
+
+	C.free(fileHandlerHandle.stringRef)
+
+	delete(fileHandlerHandles, fileHandlerRef)
+	delete(fileHandlerPointers, unsafe.Pointer(fileHandlerHandle.FileHandler))
+}
+
+// go_filehandler_GetSize_cb is the Go implementation of FPDF_FILEHANDLER::GetSize.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_GetSize_cb
+func go_filehandler_GetSize_cb(clientData unsafe.Pointer) C.FPDF_DWORD {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return C.FPDF_DWORD(0)
+	}
+
+	if fileHandlerHandle.FileHandler.GetSize != nil {
+		return C.FPDF_DWORD(fileHandlerHandle.FileHandler.GetSize())
+	}
+
+	return C.FPDF_DWORD(0)
+}
+
+// go_filehandler_ReadBlock_cb is the Go implementation of FPDF_FILEHANDLER::ReadBlock.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_ReadBlock_cb
+func go_filehandler_ReadBlock_cb(clientData unsafe.Pointer, offset C.FPDF_DWORD, buffer unsafe.Pointer, size C.FPDF_DWORD) C.FPDF_RESULT {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return C.FPDF_RESULT(0)
+	}
+
+	if fileHandlerHandle.FileHandler.ReadBlock != nil {
+		data, err := fileHandlerHandle.FileHandler.ReadBlock(uint64(offset), uint64(size))
+		if err != nil {
+			return C.FPDF_RESULT(1)
+		}
+
+		if int(size) > 0 && int(size) >= len(data) {
+			target := unsafe.Slice((*byte)(buffer), uint64(size))
+			copy(target, data)
+		}
+	}
+
+	return C.FPDF_RESULT(0)
+}
+
+// go_filehandler_WriteBlock_cb is the Go implementation of FPDF_FILEHANDLER::WriteBlock.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_WriteBlock_cb
+func go_filehandler_WriteBlock_cb(clientData unsafe.Pointer, offset C.FPDF_DWORD, buffer C.cvoidp, size C.FPDF_DWORD) C.FPDF_RESULT {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return C.FPDF_RESULT(0)
+	}
+
+	if fileHandlerHandle.FileHandler.WriteBlock != nil {
+		data := unsafe.Slice((*byte)(buffer), uint64(size))
+		err := fileHandlerHandle.FileHandler.WriteBlock(uint64(offset), data)
+		if err != nil {
+			return C.FPDF_RESULT(1)
+		}
+	}
+
+	return C.FPDF_RESULT(0)
+}
+
+// go_filehandler_Flush_cb is the Go implementation of FPDF_FILEHANDLER::Flush.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_Flush_cb
+func go_filehandler_Flush_cb(clientData unsafe.Pointer) C.FPDF_RESULT {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return C.FPDF_RESULT(0)
+	}
+
+	if fileHandlerHandle.FileHandler.Flush != nil {
+		err := fileHandlerHandle.FileHandler.Flush()
+		if err != nil {
+			return C.FPDF_RESULT(1)
+		}
+	}
+
+	return C.FPDF_RESULT(0)
+}
+
+// go_filehandler_Truncate_cb is the Go implementation of FPDF_FILEHANDLER::Truncate.
+// It is exported through cgo so that we can use the reference to it and set
+// it on FPDF_FILEHANDLER structs.
+//
+//export go_filehandler_Truncate_cb
+func go_filehandler_Truncate_cb(clientData unsafe.Pointer, size C.FPDF_DWORD) C.FPDF_RESULT {
+	fileHandlerRef := C.GoString((*C.char)(clientData))
+
+	// Check if we still have the callback.
+	fileHandlerHandle, ok := fileHandlerHandles[fileHandlerRef]
+	if !ok {
+		return C.FPDF_RESULT(0)
+	}
+
+	if fileHandlerHandle.FileHandler.Truncate != nil {
+		err := fileHandlerHandle.FileHandler.Truncate(uint64(size))
+		if err != nil {
+			return C.FPDF_RESULT(1)
+		}
+	}
+
+	return C.FPDF_RESULT(0)
+}
+
 type FormFillInfo struct {
 	Struct           *C.FPDF_FORMFILLINFO
 	JSPlatformStruct *C.IPDF_JSPLATFORM
@@ -1393,6 +1597,15 @@ type FormFillInfo struct {
 }
 
 var formFillInfoHandles = map[unsafe.Pointer]*FormFillInfo{}
+
+type fileHandler struct {
+	Struct      *C.FPDF_FILEHANDLER
+	FileHandler *structs.FPDF_FILEHANDLER
+	stringRef   unsafe.Pointer
+}
+
+var fileHandlerHandles = map[string]*fileHandler{}
+var fileHandlerPointers = map[unsafe.Pointer]*fileHandler{}
 
 // FPDFDOC_InitFormFillEnvironment initializes form fill environment
 // This function should be called before any form fill operation.

@@ -488,92 +488,35 @@ type IPDF_JSPLATFORM struct {
 // Note: This is a handler and should be implemented by callers,
 // and is only used from XFA.
 type FPDF_FILEHANDLER struct {
-	// @todo: implement me.
-	//   /*
-	//   * User-defined data.
-	//   * Note: Callers can use this field to track controls.
-	//   */
-	//  void* clientData;
-	//
-	//  /*
-	//   * Callback function to release the current file stream object.
-	//   *
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   * Returns:
-	//   *       None.
-	//   */
-	//  void (*Release)(void* clientData);
-	//
-	//  /*
-	//   * Callback function to retrieve the current file stream size.
-	//   *
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   * Returns:
-	//   *       Size of file stream.
-	//   */
-	//  FPDF_DWORD (*GetSize)(void* clientData);
-	//
-	//  /*
-	//   * Callback function to read data from the current file stream.
-	//   *
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   *       offset       -  Offset position starts from the beginning of file
-	//   *                       stream. This parameter indicates reading position.
-	//   *       buffer       -  Memory buffer to store data which are read from
-	//   *                       file stream. This parameter should not be nil.
-	//   *       size         -  Size of data which should be read from file stream,
-	//   *                       in bytes. The buffer indicated by |buffer| must be
-	//   *                       large enough to store specified data.
-	//   * Returns:
-	//   *       0 for success, other value for failure.
-	//   */
-	//  FPDF_RESULT (*ReadBlock)(void* clientData,
-	//                           FPDF_DWORD offset,
-	//                           void* buffer,
-	//                           FPDF_DWORD size);
-	//
-	//  /*
-	//   * Callback function to write data into the current file stream.
-	//   *
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   *       offset       -  Offset position starts from the beginning of file
-	//   *                       stream. This parameter indicates writing position.
-	//   *       buffer       -  Memory buffer contains data which is written into
-	//   *                       file stream. This parameter should not be nil.
-	//   *       size         -  Size of data which should be written into file
-	//   *                       stream, in bytes.
-	//   * Returns:
-	//   *       0 for success, other value for failure.
-	//   */
-	//  FPDF_RESULT (*WriteBlock)(void* clientData,
-	//                            FPDF_DWORD offset,
-	//                            const void* buffer,
-	//                            FPDF_DWORD size);
-	//  /*
-	//   * Callback function to flush all internal accessing buffers.
-	//   *
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   * Returns:
-	//   *       0 for success, other value for failure.
-	//   */
-	//  FPDF_RESULT (*Flush)(void* clientData);
-	//
-	//  /*
-	//   * Callback function to change file size.
-	//   *
-	//   * Description:
-	//   *       This function is called under writing mode usually. Implementer
-	//   *       can determine whether to realize it based on application requests.
-	//   * Parameters:
-	//   *       clientData   -  Pointer to user-defined data.
-	//   *       size         -  New size of file stream, in bytes.
-	//   * Returns:
-	//   *       0 for success, other value for failure.
-	//   */
-	//  FPDF_RESULT (*Truncate)(void* clientData, FPDF_DWORD size);
+	// Release releases the current file stream object.
+	Release func()
+
+	// GetSize returns the current file stream size.
+	GetSize func() uint64
+
+	// ReadBlock reads data from the current file stream.
+	// Parameters:
+	//   offset       -  Offset position starts from the beginning of file
+	//                   stream. This parameter indicates reading position.
+	//   size         -  Size of data which should be read from file stream,
+	//                   in bytes.
+	ReadBlock func(offset uint64, size uint64) ([]byte, error)
+
+	// Writes data into the current file stream.
+	// Parameters:
+	//   offset       -  Offset position starts from the beginning of file
+	//                   stream. This parameter indicates writing position.
+	//   data         -  A byte slice that contains data which is written into
+	//                   file stream.
+	WriteBlock func(offset uint64, data []byte) error
+
+	// Flush flushes all internal accessing buffers.
+	Flush func() error
+
+	// Truncate changes the file size.
+	// This function is called under writing mode usually. Implementer
+	// can determine whether to realize it based on application requests.
+	// Parameters:
+	//   size         -  New size of file stream, in bytes.
+	Truncate func(size uint64) error
 }

@@ -1,7 +1,6 @@
 package implementation_cgo
 
 // #cgo pkg-config: pdfium
-// #cgo CFLAGS: -DPDF_ENABLE_XFA
 // #include "fpdfview.h"
 import "C"
 import (
@@ -9,14 +8,14 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 )
 
-func (p *PdfiumImplementation) registerAnnotation(annotation C.FPDF_ANNOTATION) *AnnotationHandle {
+func (p *PdfiumImplementation) registerBStr(bstr C.FPDF_BSTR) *BStrHandle {
 	ref := uuid.New()
-	handle := &AnnotationHandle{
-		handle:    annotation,
-		nativeRef: references.FPDF_ANNOTATION(ref.String()),
+	handle := &BStrHandle{
+		handle:    bstr,
+		nativeRef: references.FPDF_BSTR(ref.String()),
 	}
 
-	p.annotationRefs[handle.nativeRef] = handle
+	p.bStrRefs[handle.nativeRef] = handle
 
 	return handle
 }
