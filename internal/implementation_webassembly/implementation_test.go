@@ -12,6 +12,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gleak"
 )
 
 var _ = BeforeSuite(func() {
@@ -57,4 +58,8 @@ var _ = AfterSuite(func() {
 
 var _ = Describe("Implementation", func() {
 	shared_tests.Import()
+})
+
+var _ = AfterEach(func() {
+	Eventually(Goroutines).ShouldNot(HaveLeaked())
 })
