@@ -119,7 +119,25 @@ func Init(config Config) pdfium.Pool {
 			newWorker.plugin = pdfium
 
 			return newWorker, nil
-		}, nil, func(ctx goctx.Context, object *pool.PooledObject) bool {
+		}, func(ctx goctx.Context, object *pool.PooledObject) error {
+			worker := object.Object.(*worker)
+			err := worker.plugin.Close()
+			if err != nil {
+				return err
+			}
+
+			client, err := worker.pluginClient.Client()
+			if err != nil {
+				return err
+			}
+
+			err = client.Close()
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}, func(ctx goctx.Context, object *pool.PooledObject) bool {
 			worker := object.Object.(*worker)
 			if worker.pluginClient.Exited() {
 				config.LogCallback("Worker exited")
