@@ -111,7 +111,7 @@ type FORM_IsIndexSelected struct {
 type FPDF_LoadXFA struct{}
 
 type FPDF_BStr_Init struct {
-	FPDF_BStr references.FPDF_BSTR
+	FPDF_BSTR references.FPDF_BSTR
 }
 
 type FPDF_BStr_Set struct{}
