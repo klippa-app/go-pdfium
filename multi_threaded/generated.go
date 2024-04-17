@@ -2691,14 +2691,6 @@ func (i *pdfiumInstance) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*response
 	return i.worker.plugin.FPDF_FFLDraw(request)
 }
 
-func (i *pdfiumInstance) FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FPDF_GetArrayBufferAllocatorSharedInstance(request)
-}
-
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2849,14 +2841,6 @@ func (i *pdfiumInstance) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF
 	}
 
 	return i.worker.plugin.FPDF_GetPageWidthF(request)
-}
-
-func (i *pdfiumInstance) FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	return i.worker.plugin.FPDF_GetRecommendedV8Flags(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error) {

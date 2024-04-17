@@ -16,13 +16,15 @@ import (
 )
 
 var skipMethods = map[string]bool{
-	"FPDF_InitLibrary":           true, // Implemented internally
-	"FPDF_InitLibraryWithConfig": true, // Implemented internally
-	"FPDF_DestroyLibrary":        true, // Implemented internally
-	"FPDF_RenderPageSkp":         true, // Skia render engine method
-	"FPDF_FFLRecord":             true, // Skia render engine method
-	"FPDF_RenderPageSkia":        true, // Skia render engine method
-	"FPDF_FFLDrawSkia":           true, // Skia render engine method
+	"FPDF_InitLibrary":                           true, // Implemented internally
+	"FPDF_InitLibraryWithConfig":                 true, // Implemented internally
+	"FPDF_DestroyLibrary":                        true, // Implemented internally
+	"FPDF_RenderPageSkp":                         true, // Skia render engine method
+	"FPDF_FFLRecord":                             true, // Skia render engine method
+	"FPDF_RenderPageSkia":                        true, // Skia render engine method
+	"FPDF_FFLDrawSkia":                           true, // Skia render engine method
+	"FPDF_GetRecommendedV8Flags":                 true, // V8 method, we could implement it, but you can't use it in pdfium-binaries.
+	"FPDF_GetArrayBufferAllocatorSharedInstance": true, // V8 method, we could implement it, but you can't use it in pdfium-binaries.
 }
 
 func main() {

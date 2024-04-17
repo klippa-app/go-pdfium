@@ -86,6 +86,3 @@ type FPDF_STRUCTELEMENT_ATTR string
 
 // FPDF_BSTR is an internal reference to a C.FPDF_BSTR handle.
 type FPDF_BSTR string
-
-// ArrayBufferAllocator is an internal reference to a C.v8::ArrayBuffer::Allocator handle.
-type ArrayBufferAllocator string

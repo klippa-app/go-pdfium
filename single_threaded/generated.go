@@ -4757,20 +4757,6 @@ func (i *pdfiumInstance) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (resp *res
 	return i.pdfium.FPDF_FFLDraw(request)
 }
 
-func (i *pdfiumInstance) FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (resp *responses.FPDF_GetArrayBufferAllocatorSharedInstance, err error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetArrayBufferAllocatorSharedInstance", panicError)
-		}
-	}()
-
-	return i.pdfium.FPDF_GetArrayBufferAllocatorSharedInstance(request)
-}
-
 func (i *pdfiumInstance) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (resp *responses.FPDF_GetDocPermissions, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -5035,20 +5021,6 @@ func (i *pdfiumInstance) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF
 	}()
 
 	return i.pdfium.FPDF_GetPageWidthF(request)
-}
-
-func (i *pdfiumInstance) FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (resp *responses.FPDF_GetRecommendedV8Flags, err error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetRecommendedV8Flags", panicError)
-		}
-	}()
-
-	return i.pdfium.FPDF_GetRecommendedV8Flags(request)
 }
 
 func (i *pdfiumInstance) FPDF_GetSecurityHandlerRevision(request *requests.FPDF_GetSecurityHandlerRevision) (resp *responses.FPDF_GetSecurityHandlerRevision, err error) {

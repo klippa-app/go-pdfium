@@ -20,18 +20,14 @@ var _ = BeforeSuite(func() {
 	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
 	experimental := os.Getenv("IS_EXPERIMENTAL") == "1"
 	xfa := os.Getenv("IS_XFA") == "1"
-	v8 := os.Getenv("IS_V8") == "1"
 
-	if experimental || xfa || v8 {
+	if experimental || xfa {
 		tags := []string{}
 		if experimental {
 			tags = append(tags, "pdfium_experimental")
 		}
 		if xfa {
 			tags = append(tags, "pdfium_xfa")
-		}
-		if v8 {
-			tags = append(tags, "pdfium_v8")
 		}
 		args = append(args, "-tags", strings.Join(tags, ","))
 	}

@@ -36,7 +36,7 @@
     * Thumbnails
     * Attachments
     * XFA packet handling
-    * XFA/v8 JS methods
+    * XFA/v8 form handling
     * ViewerRef (print settings)
     * Windows features (`FPDF_SetPrintMode`, `FPDF_RenderPage`)
     * Transformations (page boxes, clip paths)
@@ -49,6 +49,7 @@
 * Methods that won't be implemented for now:
     * fpdf_sysfontinfo.h (probably too complicated)
     * Skia methods ([not in pre-built binaries](https://github.com/bblanchon/pdfium-binaries/issues/29))
+    * v8 methods (`FPDF_GetRecommendedV8Flags`/`FPDF_GetArrayBufferAllocatorSharedInstance`, can't be used in `pdfium-binaries`)
 * Useful helpers to make your life easier:
     * Get all document metadata
     * Get all document bookmarks

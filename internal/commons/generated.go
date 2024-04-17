@@ -351,7 +351,6 @@ type Pdfium interface {
 	FPDF_DeviceToPage(*requests.FPDF_DeviceToPage) (*responses.FPDF_DeviceToPage, error)
 	FPDF_DocumentHasValidCrossReferenceTable(*requests.FPDF_DocumentHasValidCrossReferenceTable) (*responses.FPDF_DocumentHasValidCrossReferenceTable, error)
 	FPDF_FFLDraw(*requests.FPDF_FFLDraw) (*responses.FPDF_FFLDraw, error)
-	FPDF_GetArrayBufferAllocatorSharedInstance(*requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error)
 	FPDF_GetDocPermissions(*requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error)
 	FPDF_GetDocUserPermissions(*requests.FPDF_GetDocUserPermissions) (*responses.FPDF_GetDocUserPermissions, error)
 	FPDF_GetFileIdentifier(*requests.FPDF_GetFileIdentifier) (*responses.FPDF_GetFileIdentifier, error)
@@ -371,7 +370,6 @@ type Pdfium interface {
 	FPDF_GetPageSizeByIndexF(*requests.FPDF_GetPageSizeByIndexF) (*responses.FPDF_GetPageSizeByIndexF, error)
 	FPDF_GetPageWidth(*requests.FPDF_GetPageWidth) (*responses.FPDF_GetPageWidth, error)
 	FPDF_GetPageWidthF(*requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error)
-	FPDF_GetRecommendedV8Flags(*requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error)
 	FPDF_GetSecurityHandlerRevision(*requests.FPDF_GetSecurityHandlerRevision) (*responses.FPDF_GetSecurityHandlerRevision, error)
 	FPDF_GetSignatureCount(*requests.FPDF_GetSignatureCount) (*responses.FPDF_GetSignatureCount, error)
 	FPDF_GetSignatureObject(*requests.FPDF_GetSignatureObject) (*responses.FPDF_GetSignatureObject, error)
@@ -3853,16 +3851,6 @@ func (g *PdfiumRPC) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*responses.FPD
 	return resp, nil
 }
 
-func (g *PdfiumRPC) FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error) {
-	resp := &responses.FPDF_GetArrayBufferAllocatorSharedInstance{}
-	err := g.client.Call("Plugin.FPDF_GetArrayBufferAllocatorSharedInstance", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
 func (g *PdfiumRPC) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions) (*responses.FPDF_GetDocPermissions, error) {
 	resp := &responses.FPDF_GetDocPermissions{}
 	err := g.client.Call("Plugin.FPDF_GetDocPermissions", request, resp)
@@ -4046,16 +4034,6 @@ func (g *PdfiumRPC) FPDF_GetPageWidth(request *requests.FPDF_GetPageWidth) (*res
 func (g *PdfiumRPC) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidthF) (*responses.FPDF_GetPageWidthF, error) {
 	resp := &responses.FPDF_GetPageWidthF{}
 	err := g.client.Call("Plugin.FPDF_GetPageWidthF", request, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (g *PdfiumRPC) FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error) {
-	resp := &responses.FPDF_GetRecommendedV8Flags{}
-	err := g.client.Call("Plugin.FPDF_GetRecommendedV8Flags", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -11045,24 +11023,6 @@ func (s *PdfiumRPCServer) FPDF_FFLDraw(request *requests.FPDF_FFLDraw, resp *res
 	return nil
 }
 
-func (s *PdfiumRPCServer) FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance, resp *responses.FPDF_GetArrayBufferAllocatorSharedInstance) (err error) {
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetArrayBufferAllocatorSharedInstance", panicError)
-		}
-	}()
-
-	implResp, err := s.Impl.FPDF_GetArrayBufferAllocatorSharedInstance(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
 func (s *PdfiumRPCServer) FPDF_GetDocPermissions(request *requests.FPDF_GetDocPermissions, resp *responses.FPDF_GetDocPermissions) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -11395,24 +11355,6 @@ func (s *PdfiumRPCServer) FPDF_GetPageWidthF(request *requests.FPDF_GetPageWidth
 	}()
 
 	implResp, err := s.Impl.FPDF_GetPageWidthF(request)
-	if err != nil {
-		return err
-	}
-
-	// Overwrite the target address of resp to the target address of implResp.
-	*resp = *implResp
-
-	return nil
-}
-
-func (s *PdfiumRPCServer) FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags, resp *responses.FPDF_GetRecommendedV8Flags) (err error) {
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_GetRecommendedV8Flags", panicError)
-		}
-	}()
-
-	implResp, err := s.Impl.FPDF_GetRecommendedV8Flags(request)
 	if err != nil {
 		return err
 	}

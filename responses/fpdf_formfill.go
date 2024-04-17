@@ -110,14 +110,6 @@ type FORM_IsIndexSelected struct {
 
 type FPDF_LoadXFA struct{}
 
-type FPDF_GetRecommendedV8Flags struct {
-	RecommendedV8Flags string
-}
-
-type FPDF_GetArrayBufferAllocatorSharedInstance struct {
-	ArrayBufferAllocatorSharedInstance references.ArrayBufferAllocator
-}
-
 type FPDF_BStr_Init struct {
 	FPDF_BStr references.FPDF_BSTR
 }

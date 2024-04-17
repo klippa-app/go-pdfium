@@ -17,5 +17,4 @@ var (
 	ErrWindowsUnsupported       = errors.New("this functionality is Windows only")
 	ErrUnsupportedOnWebassembly = errors.New("this functionality is not supported on Webassembly")
 	ErrXFAUnsupported           = errors.New("this functionality is only supported when using the pdfium_xfa build flag, see https://github.com/klippa-app/go-pdfium#xfa for more information")
-	ErrV8Unsupported            = errors.New("this functionality is only supported when using the pdfium_v8 build flag, see https://github.com/klippa-app/go-pdfium#v8 for more information")
 )

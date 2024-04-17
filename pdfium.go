@@ -2172,28 +2172,6 @@ type Pdfium interface {
 	// FPDF_LoadXFA load XFA fields of the document if it consists of XFA fields.
 	FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*responses.FPDF_LoadXFA, error)
 
-	// FPDF_GetRecommendedV8Flags returns a space-separated string of command
-	// line flags that are recommended to be passed into V8 via
-	// V8::SetFlagsFromString() prior to initializing the PDFium library.
-	//
-	// Only available when using a build that includes V8 and when using the
-	// build flag pdfium_v8.
-	FPDF_GetRecommendedV8Flags(request *requests.FPDF_GetRecommendedV8Flags) (*responses.FPDF_GetRecommendedV8Flags, error)
-
-	// FPDF_GetArrayBufferAllocatorSharedInstance initializes V8 isolates that
-	// will use PDFium's internal memory management.
-	//
-	// Use is optional, but allows external creation of isolates matching the
-	// ones PDFium will make when none is provided via
-	// |FPDF_LIBRARY_CONFIG::m_pIsolate|.
-	//
-	// Can only be called when the library is in an uninitialized or destroyed
-	// state.
-	//
-	// Only available when using a build that includes V8 and when using the
-	// build flag pdfium_v8.
-	FPDF_GetArrayBufferAllocatorSharedInstance(request *requests.FPDF_GetArrayBufferAllocatorSharedInstance) (*responses.FPDF_GetArrayBufferAllocatorSharedInstance, error)
-
 	// FPDF_BStr_Init initializes a FPDF_BSTR.
 	//
 	// Only available when using a build that includes XFA and when using the
