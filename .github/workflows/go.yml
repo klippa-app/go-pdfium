@@ -126,7 +126,7 @@ jobs:
         run: |
           curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-v8-win-x64.tgz -o pdfium-v8-win-x64.tgz
           mkdir -p D:\opt\pdfium
-          tar -C D:\opt\pdfium -xvf pdfium-win-x64.tgz
+          tar -C D:\opt\pdfium -xvf pdfium-v8-win-x64.tgz
           rm pdfium-v8-win-x64.tgz
           mkdir D:\opt\pkgconfig
           cp ./.github/workflows/pdfium-windows.pc D:\opt\pkgconfig\pdfium.pc
