@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.0
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.17.1
-	github.com/onsi/gomega v1.32.0
+	github.com/onsi/gomega v1.33.0
 	github.com/stretchr/testify v1.9.0
 	github.com/tetratelabs/wazero v1.7.1
 	golang.org/x/net v0.24.0
