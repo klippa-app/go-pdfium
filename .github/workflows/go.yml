@@ -10,6 +10,10 @@ on:
       - main
       - development
 
+env:
+  PDFIUM_EXPERIMENTAL_VERSION: "6392"
+  PDFIUM_EXPERIMENTAL_GO_VERSION: "1.22"
+
 jobs:
   test-cgo:
     strategy:
@@ -18,9 +22,6 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         go: [ "1.20", "1.21", "1.22" ]
         pdfium: [ "4849", "6392" ]
-    env:
-      PDFIUM_EXPERIMENTAL_VERSION: "6392"
-      PDFIUM_EXPERIMENTAL_GO_VERSION: "1.22"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -92,14 +93,74 @@ jobs:
         with:
           files: coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-cgo-v8:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        go: [ "1.20", "1.21", "1.22" ]
+        pdfium: [ "4849", "6392" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Set up PDFium library with V8 (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-v8-linux-x64.tgz -o pdfium-v8-linux-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-v8-linux-x64.tgz
+          sudo rm pdfium-v8-linux-x64.tgz
+          sudo cp ./.github/workflows/pdfium.pc /usr/lib/pkgconfig/pdfium.pc
+      - name: Set up PDFium library with V8 (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-v8-mac-x64.tgz -o pdfium-v8-mac-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-v8-mac-x64.tgz
+          sudo rm pdfium-v8-mac-x64.tgz
+          sudo cp ./.github/workflows/pdfium.pc /usr/local/lib/pkgconfig/pdfium.pc
+      - name: Set up PDFium library with V8 (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-v8-win-x64.tgz -o pdfium-v8-win-x64.tgz
+          mkdir -p D:\opt\pdfium
+          tar -C D:\opt\pdfium -xvf pdfium-win-x64.tgz
+          rm pdfium-v8-win-x64.tgz
+          mkdir D:\opt\pkgconfig
+          cp ./.github/workflows/pdfium-windows.pc D:\opt\pkgconfig\pdfium.pc
+      - name: Test all packages with XFA support (Linux & MacOS)
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
+          go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_xfa -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+      - name: Test all packages (Linux & MacOS) - Experimental
+        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        run: |
+          export LD_LIBRARY_PATH="/opt/pdfium/lib"
+          export IS_EXPERIMENTAL="1"
+          go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental,pdfium_xfa -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+      - name: Test all packages (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
+          $env:Path += ";D:\opt\pdfium\bin"
+          go test -timeout 30m $(go list ./... | grep -v webassembly) -tags pdfium_xfa -v
+      - name: Test all packages (Windows) - Experimental
+        if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
+        run: |
+          $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
+          $env:Path += ";D:\opt\pdfium\bin"
+          $env:IS_EXPERIMENTAL = '1'
+          go test -timeout 30m $(go list ./... | grep -v webassembly) -tags pdfium_experimental,pdfium_xfa -v
+
   test-webassembly:
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         go: [ "1.20", "1.21", "1.22" ]
-    env:
-      PDFIUM_EXPERIMENTAL_GO_VERSION: "1.22"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
