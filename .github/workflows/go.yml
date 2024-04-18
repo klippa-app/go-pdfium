@@ -100,7 +100,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         go: [ "1.20", "1.21", "1.22" ]
-        pdfium: [ "4849", "6392" ]
+        pdfium: [ "5692", "6392" ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
