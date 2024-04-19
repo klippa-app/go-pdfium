@@ -230,12 +230,15 @@ type ClipPathHandle struct {
 }
 
 type FormHandleHandle struct {
-	handle           C.FPDF_FORMHANDLE
-	documentRef      references.FPDF_DOCUMENT
-	nativeRef        references.FPDF_FORMHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
-	formInfo         unsafe.Pointer
-	pagePointers     map[unsafe.Pointer]references.FPDF_PAGE
-	documentPointers map[unsafe.Pointer]references.FPDF_DOCUMENT
+	handle              C.FPDF_FORMHANDLE
+	documentRef         references.FPDF_DOCUMENT
+	nativeRef           references.FPDF_FORMHANDLE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	formInfo            unsafe.Pointer
+	pagePointers        map[unsafe.Pointer]references.FPDF_PAGE
+	documentPointers    map[unsafe.Pointer]references.FPDF_DOCUMENT
+	annotationPointers  map[unsafe.Pointer]references.FPDF_ANNOTATION
+	bStrPointers        map[unsafe.Pointer]references.FPDF_BSTR
+	fileHandlerPointers map[unsafe.Pointer]references.FPDF_FILEHANDLER
 }
 
 type AnnotationHandle struct {
@@ -302,4 +305,9 @@ type FontHandle struct {
 type GlyphPathHandle struct {
 	handle    C.FPDF_GLYPHPATH
 	nativeRef references.FPDF_GLYPHPATH // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+}
+
+type BStrHandle struct {
+	handle    C.FPDF_BSTR
+	nativeRef references.FPDF_BSTR // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 }

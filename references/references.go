@@ -83,3 +83,9 @@ type FPDF_GLYPHPATH string
 
 // FPDF_STRUCTELEMENT_ATTR is an internal reference to a C.FPDF_STRUCTELEMENT_ATTR handle.
 type FPDF_STRUCTELEMENT_ATTR string
+
+// FPDF_BSTR is an internal reference to a C.FPDF_BSTR handle.
+type FPDF_BSTR string
+
+// FPDF_FILEHANDLER is an internal reference to a C.FPDF_FILEHANDLER handle.
+type FPDF_FILEHANDLER string

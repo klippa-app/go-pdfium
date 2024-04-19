@@ -2579,6 +2579,30 @@ func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (*
 	return i.worker.plugin.FPDFText_SetText(request)
 }
 
+func (i *pdfiumInstance) FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (*responses.FPDF_BStr_Clear, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_BStr_Clear(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (*responses.FPDF_BStr_Init, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_BStr_Init(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (*responses.FPDF_BStr_Set, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_BStr_Set(request)
+}
+
 func (i *pdfiumInstance) FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (*responses.FPDF_CloseDocument, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

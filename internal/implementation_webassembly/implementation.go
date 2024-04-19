@@ -287,6 +287,10 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 			pdfiumError = pdfium_errors.ErrSecurity
 		case FPDF_ERR_PAGE:
 			pdfiumError = pdfium_errors.ErrPage
+		case FPDF_ERR_XFALOAD:
+			pdfiumError = pdfium_errors.ErrXFALoad
+		case FPDF_ERR_XFALAYOUT:
+			pdfiumError = pdfium_errors.ErrXFALayout
 		default:
 			pdfiumError = pdfium_errors.ErrUnexpected
 		}

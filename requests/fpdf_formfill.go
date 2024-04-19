@@ -252,3 +252,15 @@ type FORM_IsIndexSelected struct {
 type FPDF_LoadXFA struct {
 	Document references.FPDF_DOCUMENT
 }
+
+type FPDF_BStr_Init struct {
+}
+
+type FPDF_BStr_Set struct {
+	FPDF_BSTR references.FPDF_BSTR
+	Value     string
+}
+
+type FPDF_BStr_Clear struct {
+	FPDF_BSTR references.FPDF_BSTR
+}

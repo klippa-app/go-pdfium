@@ -2,6 +2,7 @@ package multi_threaded_test
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/multi_threaded"
@@ -18,9 +19,18 @@ var _ = BeforeSuite(func() {
 	Expect(err).To(BeNil())
 
 	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
-	experimental := os.Getenv("IS_EXPERIMENTAL")
-	if experimental == "1" {
-		args = append(args, []string{"-tags", "pdfium_experimental"}...)
+	experimental := os.Getenv("IS_EXPERIMENTAL") == "1"
+	xfa := os.Getenv("IS_XFA") == "1"
+
+	if experimental || xfa {
+		tags := []string{}
+		if experimental {
+			tags = append(tags, "pdfium_experimental")
+		}
+		if xfa {
+			tags = append(tags, "pdfium_xfa")
+		}
+		args = append(args, "-tags", strings.Join(tags, ","))
 	}
 
 	args = append(args, "../examples/multi_threaded/worker/main.go")

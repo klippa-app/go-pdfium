@@ -109,3 +109,11 @@ type FORM_IsIndexSelected struct {
 }
 
 type FPDF_LoadXFA struct{}
+
+type FPDF_BStr_Init struct {
+	FPDF_BSTR references.FPDF_BSTR
+}
+
+type FPDF_BStr_Set struct{}
+
+type FPDF_BStr_Clear struct{}

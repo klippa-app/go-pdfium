@@ -337,6 +337,9 @@ type Pdfium interface {
 	FPDFText_LoadStandardFont(*requests.FPDFText_LoadStandardFont) (*responses.FPDFText_LoadStandardFont, error)
 	FPDFText_SetCharcodes(*requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error)
 	FPDFText_SetText(*requests.FPDFText_SetText) (*responses.FPDFText_SetText, error)
+	FPDF_BStr_Clear(*requests.FPDF_BStr_Clear) (*responses.FPDF_BStr_Clear, error)
+	FPDF_BStr_Init(*requests.FPDF_BStr_Init) (*responses.FPDF_BStr_Init, error)
+	FPDF_BStr_Set(*requests.FPDF_BStr_Set) (*responses.FPDF_BStr_Set, error)
 	FPDF_CloseDocument(*requests.FPDF_CloseDocument) (*responses.FPDF_CloseDocument, error)
 	FPDF_ClosePage(*requests.FPDF_ClosePage) (*responses.FPDF_ClosePage, error)
 	FPDF_CloseXObject(*requests.FPDF_CloseXObject) (*responses.FPDF_CloseXObject, error)
@@ -3701,6 +3704,36 @@ func (g *PdfiumRPC) FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcode
 func (g *PdfiumRPC) FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error) {
 	resp := &responses.FPDFText_SetText{}
 	err := g.client.Call("Plugin.FPDFText_SetText", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (*responses.FPDF_BStr_Clear, error) {
+	resp := &responses.FPDF_BStr_Clear{}
+	err := g.client.Call("Plugin.FPDF_BStr_Clear", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (*responses.FPDF_BStr_Init, error) {
+	resp := &responses.FPDF_BStr_Init{}
+	err := g.client.Call("Plugin.FPDF_BStr_Init", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (*responses.FPDF_BStr_Set, error) {
+	resp := &responses.FPDF_BStr_Set{}
+	err := g.client.Call("Plugin.FPDF_BStr_Set", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -10728,6 +10761,60 @@ func (s *PdfiumRPCServer) FPDFText_SetText(request *requests.FPDFText_SetText, r
 	}()
 
 	implResp, err := s.Impl.FPDFText_SetText(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear, resp *responses.FPDF_BStr_Clear) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Clear", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_BStr_Clear(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_BStr_Init(request *requests.FPDF_BStr_Init, resp *responses.FPDF_BStr_Init) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Init", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_BStr_Init(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_BStr_Set(request *requests.FPDF_BStr_Set, resp *responses.FPDF_BStr_Set) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Set", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_BStr_Set(request)
 	if err != nil {
 		return err
 	}

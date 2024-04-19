@@ -4561,6 +4561,48 @@ func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (r
 	return i.worker.Instance.FPDFText_SetText(request)
 }
 
+func (i *pdfiumInstance) FPDF_BStr_Clear(request *requests.FPDF_BStr_Clear) (resp *responses.FPDF_BStr_Clear, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Clear", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_BStr_Clear(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Init(request *requests.FPDF_BStr_Init) (resp *responses.FPDF_BStr_Init, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Init", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_BStr_Init(request)
+}
+
+func (i *pdfiumInstance) FPDF_BStr_Set(request *requests.FPDF_BStr_Set) (resp *responses.FPDF_BStr_Set, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_BStr_Set", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_BStr_Set(request)
+}
+
 func (i *pdfiumInstance) FPDF_CloseDocument(request *requests.FPDF_CloseDocument) (resp *responses.FPDF_CloseDocument, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

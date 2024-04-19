@@ -230,6 +230,22 @@ func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, 
 	return string(decoded), nil
 }
 
+func (p *PdfiumImplementation) readBytesUntilTerminator(data unsafe.Pointer) []byte {
+	var result []byte
+
+	done := false
+	for done {
+		result = unsafe.Slice((*byte)(data), uint64(len(result)+1))
+
+		// When last byte is termination, stop reading.
+		if result[len(result)-1] == 0x00 {
+			done = true
+		}
+	}
+
+	return result
+}
+
 func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
 	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
