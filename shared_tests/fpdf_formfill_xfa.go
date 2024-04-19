@@ -10,7 +10,6 @@ import (
 	"image/jpeg"
 	"io/ioutil"
 	"time"
-	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -60,8 +59,9 @@ var _ = Describe("fpdf_formfill", func() {
 		formHistory := []FormHistory{}
 		timers := map[int]*FormTicker{}
 		var bitmap references.FPDF_BITMAP
-		var img *image.RGBA
 		renderCount := 0
+		width := 900
+		height := 1164
 
 		addToHistory := func(history FormHistory) {
 			formHistory = append(formHistory, history)
@@ -112,6 +112,15 @@ var _ = Describe("fpdf_formfill", func() {
 
 			Expect(err).To(BeNil())
 			Expect(FPDF_FFLDraw).To(Equal(&responses.FPDF_FFLDraw{}))
+
+			FPDFBitmap_Buffer, err := PdfiumInstance.FPDFBitmap_GetBuffer(&requests.FPDFBitmap_GetBuffer{
+				Bitmap: bitmap,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFBitmap_Buffer).To(Not(BeNil()))
+
+			img := image.NewRGBA(image.Rect(0, 0, width, height))
+			img.Pix = FPDFBitmap_Buffer.Buffer
 
 			var opt jpeg.Options
 			opt.Quality = 95
@@ -465,27 +474,15 @@ var _ = Describe("fpdf_formfill", func() {
 			Expect(err).To(BeNil())
 			Expect(FORM_OnAfterLoadPage).To(Equal(&responses.FORM_OnAfterLoadPage{}))
 
-			width := 900
-			height := 1164
-			stride := width * 4
-
-			fileSize := stride * height
-			buffer := make([]byte, fileSize)
-			pointer := unsafe.Pointer(&buffer[0])
-
 			renderCount = 0
-			img = image.NewRGBA(image.Rect(0, 0, 900, 1164))
-			img.Pix = buffer
-			FPDFBitmap_CreateEx, err := PdfiumInstance.FPDFBitmap_CreateEx(&requests.FPDFBitmap_CreateEx{
-				Width:   900,
-				Height:  1164,
-				Format:  enums.FPDF_BITMAP_FORMAT_BGRA,
-				Pointer: pointer,
-				Stride:  img.Stride,
+			FPDFBitmap_Create, err := PdfiumInstance.FPDFBitmap_Create(&requests.FPDFBitmap_Create{
+				Width:  width,
+				Height: height,
+				Alpha:  1,
 			})
 			Expect(err).To(BeNil())
-			Expect(FPDFBitmap_CreateEx).To(Not(BeNil()))
-			bitmap = FPDFBitmap_CreateEx.Bitmap
+			Expect(FPDFBitmap_Create).To(Not(BeNil()))
+			bitmap = FPDFBitmap_Create.Bitmap
 		})
 
 		AfterEach(func() {

@@ -1594,6 +1594,7 @@ func go_filehandler_Truncate_cb(clientData unsafe.Pointer, size C.FPDF_DWORD) C.
 
 type FormFillInfo struct {
 	Struct           *C.FPDF_FORMFILLINFO
+	JSPlatformStruct *C.IPDF_JSPLATFORM
 	FormFillInfo     *structs.FPDF_FORMFILLINFO
 	JSPlatform       *structs.IPDF_JSPLATFORM
 	FormHandleHandle *FormHandleHandle
@@ -1680,6 +1681,7 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 
 	formFillInfo := &FormFillInfo{
 		Struct:           formInfoStruct,
+		JSPlatformStruct: formInfoStruct.m_pJsPlatform,
 		FormFillInfo:     &request.FormFillInfo,
 		JSPlatform:       request.FormFillInfo.JsPlatform,
 		FormHandleHandle: formHandleHandle,
