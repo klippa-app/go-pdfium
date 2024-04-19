@@ -1588,8 +1588,8 @@ func go_filehandler_Truncate_cb(clientData unsafe.Pointer, size C.FPDF_DWORD) C.
 }
 
 type FormFillInfo struct {
-	Struct           C.FPDF_FORMFILLINFO
-	JSPlatformStruct C.IPDF_JSPLATFORM
+	Struct           *C.FPDF_FORMFILLINFO
+	JSPlatformStruct *C.IPDF_JSPLATFORM
 	FormFillInfo     *structs.FPDF_FORMFILLINFO
 	JSPlatform       *structs.IPDF_JSPLATFORM
 	FormHandleHandle *FormHandleHandle
@@ -1651,7 +1651,7 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
 	}
 
-	formInfoStruct := C.FPDF_FORMFILLINFO{}
+	formInfoStruct := &C.FPDF_FORMFILLINFO{}
 	formInfoStruct.version = C.int(getFormFillVersion())
 	if request.FormFillInfo.XFA_disabled {
 		formInfoStruct.xfa_disabled = C.FPDF_BOOL(1)
@@ -1659,24 +1659,22 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		formInfoStruct.xfa_disabled = C.FPDF_BOOL(0)
 	}
 
-	var jsPlatformStruct C.IPDF_JSPLATFORM
+	var jsPlatformStruct *C.IPDF_JSPLATFORM
 	if request.FormFillInfo.JsPlatform != nil {
-		jsPlatformStruct = C.IPDF_JSPLATFORM{}
+		jsPlatformStruct = &C.IPDF_JSPLATFORM{}
 		jsPlatformStruct.version = C.int(3)
-		// We need to do this before setting m_pFormfillinfo to prevent the error:
-		// cgo argument has Go pointer to unpinned Go pointer.
-		C.IPDF_JSPLATFORM_SET_CB(&jsPlatformStruct)
-		jsPlatformStruct.m_pFormfillinfo = unsafe.Pointer(&formInfoStruct)
+		C.IPDF_JSPLATFORM_SET_CB(jsPlatformStruct)
+		jsPlatformStruct.m_pFormfillinfo = unsafe.Pointer(formInfoStruct)
 	}
 
-	C.FPDF_FORMFILLINFO_SET_CB(&formInfoStruct)
+	C.FPDF_FORMFILLINFO_SET_CB(formInfoStruct)
 
-	formHandle := C.FPDFDOC_InitFormFillEnvironment(documentHandle.handle, &formInfoStruct)
+	formHandle := C.FPDFDOC_InitFormFillEnvironment(documentHandle.handle, formInfoStruct)
 	if formHandle == nil {
 		return nil, errors.New("could not init form fill environment")
 	}
 
-	formHandleHandle := p.registerFormHandle(formHandle, unsafe.Pointer(&formInfoStruct))
+	formHandleHandle := p.registerFormHandle(formHandle, unsafe.Pointer(formInfoStruct))
 
 	formFillInfo := &FormFillInfo{
 		Struct:           formInfoStruct,
@@ -1687,11 +1685,11 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 		Instance:         p,
 	}
 
-	formFillInfoHandles[unsafe.Pointer(&formInfoStruct)] = formFillInfo
+	formFillInfoHandles[unsafe.Pointer(formInfoStruct)] = formFillInfo
 
 	// We need to do this at the end to prevent the following error:
 	// cgo argument has Go pointer to unpinned Go pointer.
-	formInfoStruct.m_pJsPlatform = &jsPlatformStruct
+	formInfoStruct.m_pJsPlatform = jsPlatformStruct
 
 	return &responses.FPDFDOC_InitFormFillEnvironment{
 		FormHandle: formHandleHandle.nativeRef,
