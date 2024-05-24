@@ -38,8 +38,8 @@ jobs:
       - name: Set up PDFium library (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-mac-x64.tgz -o pdfium-mac-x64.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-mac-x64.tgz
-          sudo rm pdfium-mac-x64.tgz
+          sudo curl -L https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F${{ matrix.pdfium }}/pdfium-mac-univ.tgz -o pdfium-mac-univ.tgz && sudo mkdir /opt/pdfium && sudo tar -C /opt/pdfium -xvf pdfium-mac-univ.tgz
+          sudo rm pdfium-mac-univ.tgz
           sudo cp ./.github/workflows/pdfium.pc /opt/pdfium/pdfium.pc
       - name: Set up PDFium library (Windows)
         if: matrix.os == 'windows-latest'
@@ -53,7 +53,6 @@ jobs:
       - name: Test all packages (Linux & MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
-          echo "$PKG_CONFIG_PATH"
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export PKG_CONFIG_PATH="/opt/pdfium"
           go test -timeout 30m `go list ./... | grep -v webassembly` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
@@ -81,7 +80,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          export PKG_CONFIG="/opt/pdfium"
+          export PKG_CONFIG_PATH="/opt/pdfium"
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_cgo ./internal/implementation_webassembly -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
       - name: Archive code coverage results
