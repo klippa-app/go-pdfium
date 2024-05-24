@@ -53,8 +53,9 @@ jobs:
       - name: Test all packages (Linux & MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
+          echo "$PKG_CONFIG_PATH"
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
-          export PKG_CONFIG="/opt/pdfium"
+          export PKG_CONFIG_PATH="/opt/pdfium"
           go test -timeout 30m `go list ./... | grep -v webassembly` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Linux & MacOS) - Experimental
         if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
