@@ -100,6 +100,7 @@ jobs:
         go: [ "1.20", "1.21", "1.22" ]
     env:
       PDFIUM_EXPERIMENTAL_GO_VERSION: "1.22"
+      CGO_ENABLED: "0"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
