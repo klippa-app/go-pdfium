@@ -111,7 +111,10 @@ func Init(config Config) (pdfium.Pool, error) {
 		config.RuntimeConfig = wazero.NewRuntimeConfig()
 	}
 
-	poolContext := context.WithValue(context.Background(), experimental.FunctionListenerFactoryKey{}, logging.NewLoggingListenerFactory(os.Stdout))
+	poolContext := experimental.WithFunctionListenerFactory(context.Background(), logging.NewLoggingListenerFactory(os.Stdout))
+
+	// Uncomment the line below if you want function call logging,
+	// useful for debugging.
 	poolContext = context.Background()
 
 	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
