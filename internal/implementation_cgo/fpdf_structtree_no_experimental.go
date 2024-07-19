@@ -79,6 +79,14 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDF_StructElement_Attr_GetValue returns a handle to a value for an attribute in a structure element
+// attribute map. The caller does not own the handle. The handle remains valid as long as the
+// struct_attribute, remains valid.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetValue(request *requests.FPDF_StructElement_Attr_GetValue) (*responses.FPDF_StructElement_Attr_GetValue, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDF_StructElement_Attr_GetBooleanValue returns the value of a boolean attribute in an attribute map by name as
 // FPDF_BOOL. FPDF_StructElement_Attr_GetType() should have returned
 // FPDF_OBJECT_BOOLEAN for this property.
@@ -107,6 +115,19 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 // string.
 // Experimental API.
 func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *requests.FPDF_StructElement_Attr_GetBlobValue) (*responses.FPDF_StructElement_Attr_GetBlobValue, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDF_StructElement_Attr_CountChildren returns the count of the number of children values in an attribute.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_Attr_CountChildren(request *requests.FPDF_StructElement_Attr_CountChildren) (*responses.FPDF_StructElement_Attr_CountChildren, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDF_StructElement_Attr_GetChildAtIndex returns a child from an attribute at the given index.
+// The index must be less than the result of FPDF_StructElement_Attr_CountChildren().
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetChildAtIndex(request *requests.FPDF_StructElement_Attr_GetChildAtIndex) (*responses.FPDF_StructElement_Attr_GetChildAtIndex, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

@@ -298,6 +298,11 @@ var _ = Describe("fpdf_annot", func() {
 			Expect(err).To(MatchError("formHandle not given"))
 			Expect(FPDFAnnot_GetFontSize).To(BeNil())
 		})
+		It("returns an error when FPDFAnnot_GetFontColor is called", func() {
+			FPDFAnnot_GetFontColor, err := PdfiumInstance.FPDFAnnot_GetFontColor(&requests.FPDFAnnot_GetFontColor{})
+			Expect(err).To(MatchError("formHandle not given"))
+			Expect(FPDFAnnot_GetFontColor).To(BeNil())
+		})
 		It("returns an error when FPDFAnnot_IsChecked is called", func() {
 			FPDFAnnot_IsChecked, err := PdfiumInstance.FPDFAnnot_IsChecked(&requests.FPDFAnnot_IsChecked{})
 			Expect(err).To(MatchError("formHandle not given"))

@@ -92,29 +92,38 @@ type FPDF_StructElement_Attr_GetName struct {
 	Index                  int
 }
 
-type FPDF_StructElement_Attr_GetType struct {
+type FPDF_StructElement_Attr_GetValue struct {
 	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
 	Name                   string
+}
+
+type FPDF_StructElement_Attr_GetType struct {
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_Attr_GetBooleanValue struct {
-	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
-	Name                   string
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_Attr_GetNumberValue struct {
-	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
-	Name                   string
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_Attr_GetStringValue struct {
-	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
-	Name                   string
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_Attr_GetBlobValue struct {
-	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
-	Name                   string
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
+}
+
+type FPDF_StructElement_Attr_CountChildren struct {
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
+}
+
+type FPDF_StructElement_Attr_GetChildAtIndex struct {
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
+	Index                       int
 }
 
 type FPDF_StructElement_GetMarkedContentIdCount struct {
