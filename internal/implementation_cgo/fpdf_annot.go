@@ -1380,8 +1380,33 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 // FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFontColor(request *requests.FPDFAnnot_GetFontColor) (*responses.FPDFAnnot_GetFontColor, error) {
-	// @todo: implement me me.
-	return nil, nil
+	p.Lock()
+	defer p.Unlock()
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	r := C.uint(0)
+	g := C.uint(0)
+	b := C.uint(0)
+
+	success := C.FPDFAnnot_GetFontColor(formHandle.handle, annotationHandle.handle, &r, &g, &b)
+	if int(success) == 0 {
+		return nil, errors.New("could not get font color")
+	}
+
+	return &responses.FPDFAnnot_GetFontColor{
+		R: uint(r),
+		G: uint(g),
+		B: uint(b),
+	}, nil
 }
 
 // FPDFAnnot_IsChecked returns whether the given annotation is a form widget that is checked. Intended for use with

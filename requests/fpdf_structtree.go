@@ -98,28 +98,23 @@ type FPDF_StructElement_Attr_GetValue struct {
 }
 
 type FPDF_StructElement_Attr_GetType struct {
-	StructElementAttribute references.FPDF_STRUCTELEMENT_ATTR
-	Name                   string
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_Attr_GetBooleanValue struct {
 	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
-	Name                        string
 }
 
 type FPDF_StructElement_Attr_GetNumberValue struct {
 	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
-	Name                        string
 }
 
 type FPDF_StructElement_Attr_GetStringValue struct {
 	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
-	Name                        string
 }
 
 type FPDF_StructElement_Attr_GetBlobValue struct {
 	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
-	Name                        string
 }
 
 type FPDF_StructElement_Attr_CountChildren struct {

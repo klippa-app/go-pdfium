@@ -756,13 +756,6 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetName(request *requests
 // struct_attribute, remains valid.
 // Experimental API.
 func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetValue(request *requests.FPDF_StructElement_Attr_GetValue) (*responses.FPDF_StructElement_Attr_GetValue, error) {
-	// @todo: implement me.
-	return nil, nil
-}
-
-// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
-// Experimental API.
-func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -777,7 +770,35 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests
 	}
 	defer attributeName.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetType").Call(p.Context, *structElementAttributeHandle.handle, attributeName.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetValue").Call(p.Context, *structElementAttributeHandle.handle, attributeName.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	structElementAttributeValue := res[0]
+	if structElementAttributeValue == 0 {
+		return nil, errors.New("could not get struct element attribute value")
+	}
+
+	structElementAttributeValueHandle := p.registerStructElementAttributeValue(&structElementAttributeValue)
+
+	return &responses.FPDF_StructElement_Attr_GetValue{
+		StructElementAttributeValue: structElementAttributeValueHandle.nativeRef,
+	}, nil
+}
+
+// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	structElementAttributeValueHandle, err := p.getStructElementAttributeValueHandle(request.StructElementAttributeValue)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetType").Call(p.Context, *structElementAttributeValueHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -802,19 +823,13 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBooleanValue(request *
 		return nil, err
 	}
 
-	attributeName, err := p.CString(request.Name)
-	if err != nil {
-		return nil, err
-	}
-	defer attributeName.Free()
-
 	outValuePointer, err := p.IntPointer()
 	if err != nil {
 		return nil, err
 	}
 	defer outValuePointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBooleanValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, outValuePointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBooleanValue").Call(p.Context, *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -847,19 +862,13 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetNumberValue(request *r
 		return nil, err
 	}
 
-	attributeName, err := p.CString(request.Name)
-	if err != nil {
-		return nil, err
-	}
-	defer attributeName.Free()
-
 	outValuePointer, err := p.FloatPointer(nil)
 	if err != nil {
 		return nil, err
 	}
 	defer outValuePointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetNumberValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, outValuePointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetNumberValue").Call(p.Context, *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -892,19 +901,13 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 		return nil, err
 	}
 
-	attributeName, err := p.CString(request.Name)
-	if err != nil {
-		return nil, err
-	}
-	defer attributeName.Free()
-
 	objTypeLengthPointer, err := p.ULongPointer()
 	if err != nil {
 		return nil, err
 	}
 	defer objTypeLengthPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, 0, 0, objTypeLengthPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, 0, 0, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -924,7 +927,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 		return nil, err
 	}
 
-	res, err = p.Module.ExportedFunction("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
+	res, err = p.Module.ExportedFunction("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -961,19 +964,13 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 		return nil, err
 	}
 
-	attributeName, err := p.CString(request.Name)
-	if err != nil {
-		return nil, err
-	}
-	defer attributeName.Free()
-
 	blobLengthPointer, err := p.ULongPointer()
 	if err != nil {
 		return nil, err
 	}
 	defer blobLengthPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, 0, 0, blobLengthPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, 0, 0, blobLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -993,7 +990,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 		return nil, err
 	}
 
-	res, err = p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, attributeName.Pointer, charDataPointer.Pointer, blobLength, blobLengthPointer.Pointer)
+	res, err = p.Module.ExportedFunction("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, charDataPointer.Pointer, blobLength, blobLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

@@ -293,13 +293,6 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetName(request *requests
 // struct_attribute, remains valid.
 // Experimental API.
 func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetValue(request *requests.FPDF_StructElement_Attr_GetValue) (*responses.FPDF_StructElement_Attr_GetValue, error) {
-	// @todo: implement me.
-	return nil, nil
-}
-
-// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
-// Experimental API.
-func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -311,7 +304,30 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests
 	attributeName := C.CString(request.Name)
 	defer C.free(unsafe.Pointer(attributeName))
 
-	attrType := C.FPDF_StructElement_Attr_GetType(structElementAttributeHandle.handle, attributeName)
+	structElementAttributeValue := C.FPDF_StructElement_Attr_GetValue(structElementAttributeHandle.handle, attributeName)
+	if structElementAttributeValue == nil {
+		return nil, errors.New("could not get struct element attribute value")
+	}
+
+	structElementAttributeValueHandle := p.registerStructElementAttributeValue(structElementAttributeValue)
+
+	return &responses.FPDF_StructElement_Attr_GetValue{
+		StructElementAttributeValue: structElementAttributeValueHandle.nativeRef,
+	}, nil
+}
+
+// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	structElementAttributeValueHandle, err := p.getStructElementAttributeValueHandle(request.StructElementAttributeValue)
+	if err != nil {
+		return nil, err
+	}
+
+	attrType := C.FPDF_StructElement_Attr_GetType(structElementAttributeValueHandle.handle)
 
 	return &responses.FPDF_StructElement_Attr_GetType{
 		ObjectType: enums.FPDF_OBJECT_TYPE(attrType),
@@ -331,12 +347,9 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBooleanValue(request *
 		return nil, err
 	}
 
-	attributeName := C.CString(request.Name)
-	defer C.free(unsafe.Pointer(attributeName))
-
 	outValue := C.FPDF_BOOL(0)
 
-	success := C.FPDF_StructElement_Attr_GetBooleanValue(structElementAttributeValueHandle.handle, attributeName, &outValue)
+	success := C.FPDF_StructElement_Attr_GetBooleanValue(structElementAttributeValueHandle.handle, &outValue)
 	if int(success) == 0 {
 		return nil, errors.New("could not get boolean value")
 	}
@@ -359,12 +372,9 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetNumberValue(request *r
 		return nil, err
 	}
 
-	attributeName := C.CString(request.Name)
-	defer C.free(unsafe.Pointer(attributeName))
-
 	outValue := C.float(0)
 
-	success := C.FPDF_StructElement_Attr_GetNumberValue(structElementAttributeValueHandle.handle, attributeName, &outValue)
+	success := C.FPDF_StructElement_Attr_GetNumberValue(structElementAttributeValueHandle.handle, &outValue)
 	if int(success) == 0 {
 		return nil, errors.New("could not get number value")
 	}
@@ -387,17 +397,14 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 		return nil, err
 	}
 
-	attributeName := C.CString(request.Name)
-	defer C.free(unsafe.Pointer(attributeName))
-
 	objTypeLength := C.ulong(0)
-	success := C.FPDF_StructElement_Attr_GetStringValue(structElementAttributeValueHandle.handle, attributeName, nil, 0, &objTypeLength)
+	success := C.FPDF_StructElement_Attr_GetStringValue(structElementAttributeValueHandle.handle, nil, 0, &objTypeLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get string value")
 	}
 
 	charData := make([]byte, uint64(objTypeLength))
-	success = C.FPDF_StructElement_Attr_GetStringValue(structElementAttributeValueHandle.handle, attributeName, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &objTypeLength)
+	success = C.FPDF_StructElement_Attr_GetStringValue(structElementAttributeValueHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &objTypeLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get string value")
 	}
@@ -424,17 +431,14 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 		return nil, err
 	}
 
-	attributeName := C.CString(request.Name)
-	defer C.free(unsafe.Pointer(attributeName))
-
 	blobLength := C.ulong(0)
-	success := C.FPDF_StructElement_Attr_GetBlobValue(structElementAttributeValueHandle.handle, attributeName, nil, 0, &blobLength)
+	success := C.FPDF_StructElement_Attr_GetBlobValue(structElementAttributeValueHandle.handle, nil, 0, &blobLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get blob value")
 	}
 
 	blobData := make([]byte, uint64(blobLength))
-	success = C.FPDF_StructElement_Attr_GetBlobValue(structElementAttributeValueHandle.handle, attributeName, unsafe.Pointer(&blobData[0]), C.ulong(len(blobData)), &blobLength)
+	success = C.FPDF_StructElement_Attr_GetBlobValue(structElementAttributeValueHandle.handle, unsafe.Pointer(&blobData[0]), C.ulong(len(blobData)), &blobLength)
 	if int(success) == 0 {
 		return nil, errors.New("could not get blob value")
 	}

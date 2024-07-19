@@ -1864,8 +1864,67 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 // FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFAnnot_GetFontColor(request *requests.FPDFAnnot_GetFontColor) (*responses.FPDFAnnot_GetFontColor, error) {
-	// @todo: implement me me.
-	return nil, nil
+	p.Lock()
+	defer p.Unlock()
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	rPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer rPointer.Free()
+
+	gPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer gPointer.Free()
+
+	bPointer, err := p.UIntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer bPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFAnnot_GetFontColor").Call(p.Context, *formHandle.handle, *annotationHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get font color")
+	}
+
+	rValue, err := rPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	gValue, err := gPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	bValue, err := bPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFAnnot_GetFontColor{
+		R: rValue,
+		G: gValue,
+		B: bValue,
+	}, nil
 }
 
 // FPDFAnnot_IsChecked returns whether the given annotation is a form widget that is checked. Intended for use with
