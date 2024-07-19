@@ -263,6 +263,11 @@ type FPDFAnnot_GetFontSize struct {
 	Annotation references.FPDF_ANNOTATION
 }
 
+type FPDFAnnot_GetFontColor struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+}
+
 type FPDFAnnot_IsChecked struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Annotation references.FPDF_ANNOTATION

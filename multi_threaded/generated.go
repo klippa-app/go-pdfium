@@ -395,6 +395,14 @@ func (i *pdfiumInstance) FPDFAnnot_GetFocusableSubtypesCount(request *requests.F
 	return i.worker.plugin.FPDFAnnot_GetFocusableSubtypesCount(request)
 }
 
+func (i *pdfiumInstance) FPDFAnnot_GetFontColor(request *requests.FPDFAnnot_GetFontColor) (*responses.FPDFAnnot_GetFontColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_GetFontColor(request)
+}
+
 func (i *pdfiumInstance) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFontSize) (*responses.FPDFAnnot_GetFontSize, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3087,6 +3095,14 @@ func (i *pdfiumInstance) FPDF_SetSandBoxPolicy(request *requests.FPDF_SetSandBox
 	return i.worker.plugin.FPDF_SetSandBoxPolicy(request)
 }
 
+func (i *pdfiumInstance) FPDF_StructElement_Attr_CountChildren(request *requests.FPDF_StructElement_Attr_CountChildren) (*responses.FPDF_StructElement_Attr_CountChildren, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_Attr_CountChildren(request)
+}
+
 func (i *pdfiumInstance) FPDF_StructElement_Attr_GetBlobValue(request *requests.FPDF_StructElement_Attr_GetBlobValue) (*responses.FPDF_StructElement_Attr_GetBlobValue, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3101,6 +3117,14 @@ func (i *pdfiumInstance) FPDF_StructElement_Attr_GetBooleanValue(request *reques
 	}
 
 	return i.worker.plugin.FPDF_StructElement_Attr_GetBooleanValue(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetChildAtIndex(request *requests.FPDF_StructElement_Attr_GetChildAtIndex) (*responses.FPDF_StructElement_Attr_GetChildAtIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_Attr_GetChildAtIndex(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_Attr_GetCount(request *requests.FPDF_StructElement_Attr_GetCount) (*responses.FPDF_StructElement_Attr_GetCount, error) {
@@ -3141,6 +3165,14 @@ func (i *pdfiumInstance) FPDF_StructElement_Attr_GetType(request *requests.FPDF_
 	}
 
 	return i.worker.plugin.FPDF_StructElement_Attr_GetType(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_Attr_GetValue(request *requests.FPDF_StructElement_Attr_GetValue) (*responses.FPDF_StructElement_Attr_GetValue, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_Attr_GetValue(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_CountChildren(request *requests.FPDF_StructElement_CountChildren) (*responses.FPDF_StructElement_CountChildren, error) {

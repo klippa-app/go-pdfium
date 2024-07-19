@@ -1570,6 +1570,12 @@ type Pdfium interface {
 	// Experimental API.
 	FPDF_StructElement_Attr_GetName(request *requests.FPDF_StructElement_Attr_GetName) (*responses.FPDF_StructElement_Attr_GetName, error)
 
+	// FPDF_StructElement_Attr_GetValue returns a handle to a value for an attribute in a structure element
+	// attribute map. The caller does not own the handle. The handle remains valid as long as the
+	// struct_attribute, remains valid.
+	// Experimental API.
+	FPDF_StructElement_Attr_GetValue(request *requests.FPDF_StructElement_Attr_GetValue) (*responses.FPDF_StructElement_Attr_GetValue, error)
+
 	// FPDF_StructElement_Attr_GetType returns the type of an attribute in a structure element attribute map.
 	// Experimental API.
 	FPDF_StructElement_Attr_GetType(request *requests.FPDF_StructElement_Attr_GetType) (*responses.FPDF_StructElement_Attr_GetType, error)
@@ -1596,6 +1602,15 @@ type Pdfium interface {
 	// string.
 	// Experimental API.
 	FPDF_StructElement_Attr_GetBlobValue(request *requests.FPDF_StructElement_Attr_GetBlobValue) (*responses.FPDF_StructElement_Attr_GetBlobValue, error)
+
+	// FPDF_StructElement_Attr_CountChildren returns the count of the number of children values in an attribute.
+	// Experimental API.
+	FPDF_StructElement_Attr_CountChildren(request *requests.FPDF_StructElement_Attr_CountChildren) (*responses.FPDF_StructElement_Attr_CountChildren, error)
+
+	// FPDF_StructElement_Attr_GetChildAtIndex returns a child from an attribute at the given index.
+	// The index must be less than the result of FPDF_StructElement_Attr_CountChildren().
+	// Experimental API.
+	FPDF_StructElement_Attr_GetChildAtIndex(request *requests.FPDF_StructElement_Attr_GetChildAtIndex) (*responses.FPDF_StructElement_Attr_GetChildAtIndex, error)
 
 	// FPDF_StructElement_GetMarkedContentIdCount returns the count of marked content ids for a given element.
 	// Experimental API.
@@ -1872,6 +1887,10 @@ type Pdfium interface {
 	// the height of the annotation rectangle.
 	// Experimental API.
 	FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFontSize) (*responses.FPDFAnnot_GetFontSize, error)
+
+	// FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
+	// Experimental API.
+	FPDFAnnot_GetFontColor(request *requests.FPDFAnnot_GetFontColor) (*responses.FPDFAnnot_GetFontColor, error)
 
 	// FPDFAnnot_IsChecked returns whether the given annotation is a form widget that is checked. Intended for use with
 	// checkbox and radio button widgets.
