@@ -304,7 +304,7 @@ func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPD
 		return nil, err
 	}
 
-	hasUnicodeMapError := C.FPDFText_IsGenerated(textPageHandle.handle, C.int(request.Index))
+	hasUnicodeMapError := C.FPDFText_HasUnicodeMapError(textPageHandle.handle, C.int(request.Index))
 	if int(hasUnicodeMapError) == -1 {
 		return nil, errors.New("could not get whether text has a unicode map error")
 	}
