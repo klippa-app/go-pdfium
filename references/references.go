@@ -83,3 +83,6 @@ type FPDF_GLYPHPATH string
 
 // FPDF_STRUCTELEMENT_ATTR is an internal reference to a C.FPDF_STRUCTELEMENT_ATTR handle.
 type FPDF_STRUCTELEMENT_ATTR string
+
+// FPDF_STRUCTELEMENT_ATTR_VALUE is an internal reference to a C.FPDF_STRUCTELEMENT_ATTR_VALUE handle.
+type FPDF_STRUCTELEMENT_ATTR_VALUE string
