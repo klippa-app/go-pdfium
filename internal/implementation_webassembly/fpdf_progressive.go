@@ -2,6 +2,7 @@ package implementation_webassembly
 
 import (
 	"errors"
+	"sync"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -18,10 +19,15 @@ type PauseHandle struct {
 	Callback  func() bool
 }
 
-var PauseHandles = map[references.FPDF_PAGE]*PauseHandle{}
+var PauseHandles = struct {
+	Refs  map[references.FPDF_PAGE]*PauseHandle
+	Mutex *sync.RWMutex
+}{
+	Refs:  map[references.FPDF_PAGE]*PauseHandle{},
+	Mutex: &sync.RWMutex{},
+}
 
 // FPDF_RenderPageBitmap_Start starts to render page contents to a device independent bitmap progressively.
-// Not supported on multi-threaded usage.
 func (p *PdfiumImplementation) FPDF_RenderPageBitmap_Start(request *requests.FPDF_RenderPageBitmap_Start) (*responses.FPDF_RenderPageBitmap_Start, error) {
 	p.Lock()
 	defer p.Unlock()
@@ -58,7 +64,9 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap_Start(request *requests.FPD
 		Callback:  request.NeedToPauseNowCallback,
 	}
 
-	PauseHandles[pageHandle.nativeRef] = pauseHandle
+	PauseHandles.Mutex.Lock()
+	PauseHandles.Refs[pageHandle.nativeRef] = pauseHandle
+	PauseHandles.Mutex.Unlock()
 
 	res, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap_Start").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), pausePointer)
 	if err != nil {
@@ -84,11 +92,13 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_R
 	}
 
 	// Check if we already have the reference. Clean it up.
-	if _, ok := PauseHandles[pageHandle.nativeRef]; ok {
-		p.Free(PauseHandles[pageHandle.nativeRef].Pointer)
-		p.Free(PauseHandles[pageHandle.nativeRef].StringRef)
-		delete(PauseHandles, pageHandle.nativeRef)
+	PauseHandles.Mutex.Lock()
+	if _, ok := PauseHandles.Refs[pageHandle.nativeRef]; ok {
+		p.Free(PauseHandles.Refs[pageHandle.nativeRef].Pointer)
+		p.Free(PauseHandles.Refs[pageHandle.nativeRef].StringRef)
+		delete(PauseHandles.Refs, pageHandle.nativeRef)
 	}
+	PauseHandles.Mutex.Unlock()
 
 	pausePointer := uint64(0)
 	if request.NeedToPauseNowCallback != nil {
@@ -109,7 +119,9 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_R
 			Callback:  request.NeedToPauseNowCallback,
 		}
 
-		PauseHandles[pageHandle.nativeRef] = pauseHandle
+		PauseHandles.Mutex.Lock()
+		PauseHandles.Refs[pageHandle.nativeRef] = pauseHandle
+		PauseHandles.Mutex.Unlock()
 		pausePointer = newPausePointer
 	}
 
@@ -142,11 +154,13 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Close(request *requests.FPDF_Rend
 	}
 
 	// Check if we have the reference. Clean it up.
-	if _, ok := PauseHandles[pageHandle.nativeRef]; ok {
-		p.Free(PauseHandles[pageHandle.nativeRef].StringRef)
-		p.Free(PauseHandles[pageHandle.nativeRef].Pointer)
-		delete(PauseHandles, pageHandle.nativeRef)
+	PauseHandles.Mutex.Lock()
+	if _, ok := PauseHandles.Refs[pageHandle.nativeRef]; ok {
+		p.Free(PauseHandles.Refs[pageHandle.nativeRef].StringRef)
+		p.Free(PauseHandles.Refs[pageHandle.nativeRef].Pointer)
+		delete(PauseHandles.Refs, pageHandle.nativeRef)
 	}
+	PauseHandles.Mutex.Unlock()
 
 	return &responses.FPDF_RenderPage_Close{}, nil
 }
@@ -189,7 +203,9 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithColorScheme_Start(reques
 		Callback:  request.NeedToPauseNowCallback,
 	}
 
-	PauseHandles[pageHandle.nativeRef] = pauseHandle
+	PauseHandles.Mutex.Lock()
+	PauseHandles.Refs[pageHandle.nativeRef] = pauseHandle
+	PauseHandles.Mutex.Unlock()
 
 	colorSchemeSize := p.CSizeULong() * 4
 	colorScheme := uint64(0)
