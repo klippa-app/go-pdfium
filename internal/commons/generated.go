@@ -328,6 +328,7 @@ type Pdfium interface {
 	FPDFText_GetStrokeColor(*requests.FPDFText_GetStrokeColor) (*responses.FPDFText_GetStrokeColor, error)
 	FPDFText_GetText(*requests.FPDFText_GetText) (*responses.FPDFText_GetText, error)
 	FPDFText_GetTextIndexFromCharIndex(*requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error)
+	FPDFText_GetTextObject(*requests.FPDFText_GetTextObject) (*responses.FPDFText_GetTextObject, error)
 	FPDFText_GetUnicode(*requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error)
 	FPDFText_HasUnicodeMapError(*requests.FPDFText_HasUnicodeMapError) (*responses.FPDFText_HasUnicodeMapError, error)
 	FPDFText_IsGenerated(*requests.FPDFText_IsGenerated) (*responses.FPDFText_IsGenerated, error)
@@ -3615,6 +3616,16 @@ func (g *PdfiumRPC) FPDFText_GetText(request *requests.FPDFText_GetText) (*respo
 func (g *PdfiumRPC) FPDFText_GetTextIndexFromCharIndex(request *requests.FPDFText_GetTextIndexFromCharIndex) (*responses.FPDFText_GetTextIndexFromCharIndex, error) {
 	resp := &responses.FPDFText_GetTextIndexFromCharIndex{}
 	err := g.client.Call("Plugin.FPDFText_GetTextIndexFromCharIndex", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject) (*responses.FPDFText_GetTextObject, error) {
+	resp := &responses.FPDFText_GetTextObject{}
+	err := g.client.Call("Plugin.FPDFText_GetTextObject", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -10610,6 +10621,24 @@ func (s *PdfiumRPCServer) FPDFText_GetTextIndexFromCharIndex(request *requests.F
 	}()
 
 	implResp, err := s.Impl.FPDFText_GetTextIndexFromCharIndex(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject, resp *responses.FPDFText_GetTextObject) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetTextObject", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFText_GetTextObject(request)
 	if err != nil {
 		return err
 	}

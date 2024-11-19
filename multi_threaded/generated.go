@@ -2507,6 +2507,14 @@ func (i *pdfiumInstance) FPDFText_GetTextIndexFromCharIndex(request *requests.FP
 	return i.worker.plugin.FPDFText_GetTextIndexFromCharIndex(request)
 }
 
+func (i *pdfiumInstance) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject) (*responses.FPDFText_GetTextObject, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_GetTextObject(request)
+}
+
 func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (*responses.FPDFText_GetUnicode, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

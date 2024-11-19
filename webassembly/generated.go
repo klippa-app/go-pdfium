@@ -4435,6 +4435,20 @@ func (i *pdfiumInstance) FPDFText_GetTextIndexFromCharIndex(request *requests.FP
 	return i.worker.Instance.FPDFText_GetTextIndexFromCharIndex(request)
 }
 
+func (i *pdfiumInstance) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject) (resp *responses.FPDFText_GetTextObject, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetTextObject", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFText_GetTextObject(request)
+}
+
 func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (resp *responses.FPDFText_GetUnicode, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
