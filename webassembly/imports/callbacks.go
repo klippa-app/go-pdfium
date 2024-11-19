@@ -550,12 +550,14 @@ func (cb IFSDK_PAUSE_NeedToPauseNow_CB) Call(ctx context.Context, mod api.Module
 	}
 
 	// Check if we still have the reference.
-	if _, ok := implementation_webassembly.PauseHandles[references.FPDF_PAGE(string(stringRef))]; !ok {
+	implementation_webassembly.PauseHandles.Mutex.RLock()
+	defer implementation_webassembly.PauseHandles.Mutex.RUnlock()
+	if _, ok := implementation_webassembly.PauseHandles.Refs[references.FPDF_PAGE(string(stringRef))]; !ok {
 		stack[0] = api.EncodeI32(int32(1))
 		return
 	}
 
-	shouldPause := implementation_webassembly.PauseHandles[references.FPDF_PAGE(string(stringRef))].Callback()
+	shouldPause := implementation_webassembly.PauseHandles.Refs[references.FPDF_PAGE(string(stringRef))].Callback()
 	if shouldPause {
 		stack[0] = api.EncodeI32(int32(1))
 		return
