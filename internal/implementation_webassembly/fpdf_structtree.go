@@ -1013,16 +1013,56 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 // FPDF_StructElement_Attr_CountChildren returns the count of the number of children values in an attribute.
 // Experimental API.
 func (p *PdfiumImplementation) FPDF_StructElement_Attr_CountChildren(request *requests.FPDF_StructElement_Attr_CountChildren) (*responses.FPDF_StructElement_Attr_CountChildren, error) {
-	// @todo: implement me.
-	return nil, nil
+	p.Lock()
+	defer p.Unlock()
+
+	structElementAttributeHandle, err := p.getStructElementAttributeValueHandle(request.StructElementAttributeValue)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_CountChildren").Call(p.Context, *structElementAttributeHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	count := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(count) == -1 {
+		return nil, errors.New("could not get struct element attribute children count")
+	}
+
+	return &responses.FPDF_StructElement_Attr_CountChildren{
+		Count: int(count),
+	}, nil
 }
 
 // FPDF_StructElement_Attr_GetChildAtIndex returns a child from an attribute at the given index.
 // The index must be less than the result of FPDF_StructElement_Attr_CountChildren().
 // Experimental API.
 func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetChildAtIndex(request *requests.FPDF_StructElement_Attr_GetChildAtIndex) (*responses.FPDF_StructElement_Attr_GetChildAtIndex, error) {
-	// @todo: implement me.
-	return nil, nil
+	p.Lock()
+	defer p.Unlock()
+
+	structElementAttributeValueHandle, err := p.getStructElementAttributeValueHandle(request.StructElementAttributeValue)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDF_StructElement_Attr_GetChildAtIndex").Call(p.Context, *structElementAttributeValueHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	structElementAttributeChild := res[0]
+	if structElementAttributeChild == 0 {
+		return nil, errors.New("could not get struct element attribute child")
+	}
+
+	structElementAttributeChildValueHandle := p.registerStructElementAttributeValue(&structElementAttributeChild)
+
+	return &responses.FPDF_StructElement_Attr_GetChildAtIndex{
+		StructElementAttributeValue: structElementAttributeChildValueHandle.nativeRef,
+	}, nil
 }
 
 // FPDF_StructElement_GetMarkedContentIdCount returns the count of marked content ids for a given element.
