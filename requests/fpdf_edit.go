@@ -487,7 +487,11 @@ type FPDFTextObj_GetFont struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
-type FPDFFont_GetFontName struct {
+type FPDFFont_GetBaseFontName struct {
+	Font references.FPDF_FONT
+}
+
+type FPDFFont_GetFamilyName struct {
 	Font references.FPDF_FONT
 }
 

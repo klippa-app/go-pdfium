@@ -2013,6 +2013,20 @@ func (i *pdfiumInstance) FPDFFont_GetAscent(request *requests.FPDFFont_GetAscent
 	return i.worker.Instance.FPDFFont_GetAscent(request)
 }
 
+func (i *pdfiumInstance) FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (resp *responses.FPDFFont_GetBaseFontName, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetBaseFontName", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFFont_GetBaseFontName(request)
+}
+
 func (i *pdfiumInstance) FPDFFont_GetDescent(request *requests.FPDFFont_GetDescent) (resp *responses.FPDFFont_GetDescent, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2025,6 +2039,20 @@ func (i *pdfiumInstance) FPDFFont_GetDescent(request *requests.FPDFFont_GetDesce
 	}()
 
 	return i.worker.Instance.FPDFFont_GetDescent(request)
+}
+
+func (i *pdfiumInstance) FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (resp *responses.FPDFFont_GetFamilyName, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetFamilyName", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFFont_GetFamilyName(request)
 }
 
 func (i *pdfiumInstance) FPDFFont_GetFlags(request *requests.FPDFFont_GetFlags) (resp *responses.FPDFFont_GetFlags, err error) {
@@ -2053,20 +2081,6 @@ func (i *pdfiumInstance) FPDFFont_GetFontData(request *requests.FPDFFont_GetFont
 	}()
 
 	return i.worker.Instance.FPDFFont_GetFontData(request)
-}
-
-func (i *pdfiumInstance) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (resp *responses.FPDFFont_GetFontName, err error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFont_GetFontName", panicError)
-		}
-	}()
-
-	return i.worker.Instance.FPDFFont_GetFontName(request)
 }
 
 func (i *pdfiumInstance) FPDFFont_GetGlyphPath(request *requests.FPDFFont_GetGlyphPath) (resp *responses.FPDFFont_GetGlyphPath, err error) {
@@ -4419,20 +4433,6 @@ func (i *pdfiumInstance) FPDFText_GetTextIndexFromCharIndex(request *requests.FP
 	}()
 
 	return i.worker.Instance.FPDFText_GetTextIndexFromCharIndex(request)
-}
-
-func (i *pdfiumInstance) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (resp *responses.FPDFText_GetTextRenderMode, err error) {
-	if i.closed {
-		return nil, errors.New("instance is closed")
-	}
-
-	defer func() {
-		if panicError := recover(); panicError != nil {
-			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_GetTextRenderMode", panicError)
-		}
-	}()
-
-	return i.worker.Instance.FPDFText_GetTextRenderMode(request)
 }
 
 func (i *pdfiumInstance) FPDFText_GetUnicode(request *requests.FPDFText_GetUnicode) (resp *responses.FPDFText_GetUnicode, err error) {

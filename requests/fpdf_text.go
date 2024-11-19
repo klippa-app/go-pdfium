@@ -49,11 +49,6 @@ type FPDFText_GetFontWeight struct {
 	Index    int
 }
 
-type FPDFText_GetTextRenderMode struct {
-	TextPage references.FPDF_TEXTPAGE
-	Index    int
-}
-
 type FPDFText_GetFillColor struct {
 	TextPage references.FPDF_TEXTPAGE
 	Index    int

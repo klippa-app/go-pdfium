@@ -1,7 +1,6 @@
 package responses
 
 import (
-	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/structs"
 )
@@ -50,11 +49,6 @@ type FPDFText_GetFontInfo struct {
 type FPDFText_GetFontWeight struct {
 	Index      int
 	FontWeight int
-}
-
-type FPDFText_GetTextRenderMode struct {
-	Index          int
-	TextRenderMode enums.FPDF_TEXT_RENDERMODE
 }
 
 type FPDFText_GetFillColor struct {

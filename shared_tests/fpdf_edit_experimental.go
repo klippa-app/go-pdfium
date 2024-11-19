@@ -4,14 +4,16 @@
 package shared_tests
 
 import (
+	"io/ioutil"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("fpdf_edit", func() {
@@ -240,9 +242,15 @@ var _ = Describe("fpdf_edit", func() {
 	Context("no font object", func() {
 		When("is opened", func() {
 			It("returns an error when calling FPDFFont_GetFontName", func() {
-				FPDFFont_GetFontName, err := PdfiumInstance.FPDFFont_GetFontName(&requests.FPDFFont_GetFontName{})
+				FPDFFont_GetBaseFontName, err := PdfiumInstance.FPDFFont_GetBaseFontName(&requests.FPDFFont_GetBaseFontName{})
 				Expect(err).To(MatchError("font not given"))
-				Expect(FPDFFont_GetFontName).To(BeNil())
+				Expect(FPDFFont_GetBaseFontName).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFFont_GetFamilyName", func() {
+				FPDFFont_GetFamilyName, err := PdfiumInstance.FPDFFont_GetFamilyName(&requests.FPDFFont_GetFamilyName{})
+				Expect(err).To(MatchError("font not given"))
+				Expect(FPDFFont_GetFamilyName).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFFont_GetFontData", func() {
@@ -654,13 +662,23 @@ end
 						font = FPDFTextObj_GetFont.Font
 					})
 
-					It("allows us getting the font name", func() {
-						FPDFFont_GetFontName, err := PdfiumInstance.FPDFFont_GetFontName(&requests.FPDFFont_GetFontName{
+					It("allows us getting the base font name", func() {
+						FPDFFont_GetBaseFontName, err := PdfiumInstance.FPDFFont_GetBaseFontName(&requests.FPDFFont_GetBaseFontName{
 							Font: font,
 						})
 						Expect(err).To(BeNil())
-						Expect(FPDFFont_GetFontName).To(Equal(&responses.FPDFFont_GetFontName{
-							FontName: "Liberation Serif",
+						Expect(FPDFFont_GetBaseFontName).To(Equal(&responses.FPDFFont_GetBaseFontName{
+							BaseFontName: "LiberationSerif",
+						}))
+					})
+
+					It("allows us getting the family name", func() {
+						FPDFFont_GetFamilyName, err := PdfiumInstance.FPDFFont_GetFamilyName(&requests.FPDFFont_GetFamilyName{
+							Font: font,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDFFont_GetFamilyName).To(Equal(&responses.FPDFFont_GetFamilyName{
+							FamilyName: "Liberation Serif",
 						}))
 					})
 

@@ -3236,9 +3236,9 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj
 	}, nil
 }
 
-// FPDFFont_GetFontName returns the font name of a font.
+// FPDFFont_GetBaseFontName returns the base font name of a font.
 // Experimental API.
-func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
+func (p *PdfiumImplementation) FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (*responses.FPDFFont_GetBaseFontName, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -3248,7 +3248,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}
 
 	// First get the text value length.
-	res, err := p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, 0, 0)
+	res, err := p.Module.ExportedFunction("FPDFFont_GetBaseFontName").Call(p.Context, *fontHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -3265,7 +3265,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
+	_, err = p.Module.ExportedFunction("FPDFFont_GetBaseFontName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
 	if err != nil {
 		return nil, err
 	}
@@ -3275,8 +3275,52 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 		return nil, err
 	}
 
-	return &responses.FPDFFont_GetFontName{
-		FontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	return &responses.FPDFFont_GetBaseFontName{
+		BaseFontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	}, nil
+}
+
+// FPDFFont_GetFamilyName returns the family name of a font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (*responses.FPDFFont_GetFamilyName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	res, err := p.Module.ExportedFunction("FPDFFont_GetFamilyName").Call(p.Context, *fontHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	nameSize := *(*int32)(unsafe.Pointer(&res[0]))
+	if nameSize == 0 {
+		return nil, errors.New("could not get font name")
+	}
+
+	charDataSize := uint64(nameSize)
+	charDataPointer, err := p.ByteArrayPointer(charDataSize, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFFont_GetFamilyName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetFamilyName{
+		FamilyName: string(charData[:len(charData)-1]), // Remove NULL-terminator
 	}, nil
 }
 

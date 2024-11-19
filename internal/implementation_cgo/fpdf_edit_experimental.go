@@ -874,9 +874,9 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj
 	}, nil
 }
 
-// FPDFFont_GetFontName returns the font name of a font.
+// FPDFFont_GetBaseFontName returns the base font name of a font.
 // Experimental API.
-func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
+func (p *PdfiumImplementation) FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (*responses.FPDFFont_GetBaseFontName, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -886,16 +886,41 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}
 
 	// First get the text value length.
-	nameSize := C.FPDFFont_GetFontName(fontHandle.handle, nil, 0)
+	nameSize := C.FPDFFont_GetBaseFontName(fontHandle.handle, nil, 0)
 	if nameSize == 0 {
 		return nil, errors.New("could not get font name")
 	}
 
 	charData := make([]byte, nameSize)
-	C.FPDFFont_GetFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+	C.FPDFFont_GetBaseFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
 
-	return &responses.FPDFFont_GetFontName{
-		FontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	return &responses.FPDFFont_GetBaseFontName{
+		BaseFontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	}, nil
+}
+
+// FPDFFont_GetFamilyName returns the family name of a font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (*responses.FPDFFont_GetFamilyName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	nameSize := C.FPDFFont_GetFamilyName(fontHandle.handle, nil, 0)
+	if nameSize == 0 {
+		return nil, errors.New("could not get font name")
+	}
+
+	charData := make([]byte, nameSize)
+	C.FPDFFont_GetFamilyName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	return &responses.FPDFFont_GetFamilyName{
+		FamilyName: string(charData[:len(charData)-1]), // Remove NULL-terminator
 	}, nil
 }
 

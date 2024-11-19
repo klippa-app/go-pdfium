@@ -4,7 +4,6 @@ import (
 	"errors"
 	"unsafe"
 
-	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
@@ -950,30 +949,6 @@ func (p *PdfiumImplementation) FPDFText_GetFontWeight(request *requests.FPDFText
 	return &responses.FPDFText_GetFontWeight{
 		Index:      request.Index,
 		FontWeight: int(fontWeight),
-	}, nil
-}
-
-// FPDFText_GetTextRenderMode returns the text rendering mode of character.
-// Experimental API.
-func (p *PdfiumImplementation) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	textPageHandle, err := p.getTextPageHandle(request.TextPage)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := p.Module.ExportedFunction("FPDFText_GetTextRenderMode").Call(p.Context, *textPageHandle.handle, uint64(request.Index))
-	if err != nil {
-		return nil, err
-	}
-
-	textRenderMode := *(*int32)(unsafe.Pointer(&res[0]))
-
-	return &responses.FPDFText_GetTextRenderMode{
-		Index:          request.Index,
-		TextRenderMode: enums.FPDF_TEXT_RENDERMODE(textRenderMode),
 	}, nil
 }
 

@@ -21,12 +21,6 @@ func (p *PdfiumImplementation) FPDFText_GetFontWeight(request *requests.FPDFText
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
-// FPDFText_GetTextRenderMode returns the text rendering mode of character.
-// Experimental API.
-func (p *PdfiumImplementation) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
-	return nil, pdfium_errors.ErrExperimentalUnsupported
-}
-
 // FPDFText_GetFillColor returns the fill color of a particular character.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor) (*responses.FPDFText_GetFillColor, error) {

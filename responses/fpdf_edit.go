@@ -309,8 +309,12 @@ type FPDFTextObj_GetFont struct {
 	Font references.FPDF_FONT
 }
 
-type FPDFFont_GetFontName struct {
-	FontName string
+type FPDFFont_GetBaseFontName struct {
+	BaseFontName string
+}
+
+type FPDFFont_GetFamilyName struct {
+	FamilyName string
 }
 
 type FPDFFont_GetFontData struct {

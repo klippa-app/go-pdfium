@@ -771,9 +771,13 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFTextObj_GetFont(request *requests.FPDFTextObj_GetFont) (*responses.FPDFTextObj_GetFont, error)
 
-	// FPDFFont_GetFontName returns the font name of a font.
+	// FPDFFont_GetBaseFontName returns the base font name of a font.
 	// Experimental API.
-	FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error)
+	FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (*responses.FPDFFont_GetBaseFontName, error)
+
+	// FPDFFont_GetFamilyName returns the family name of a font.
+	// Experimental API.
+	FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (*responses.FPDFFont_GetFamilyName, error)
 
 	// FPDFFont_GetFontData returns the decoded data from the given font.
 	// Experimental API.
@@ -1228,10 +1232,6 @@ type Pdfium interface {
 	// FPDFText_GetFontWeight returns the font weight of a particular character.
 	// Experimental API.
 	FPDFText_GetFontWeight(request *requests.FPDFText_GetFontWeight) (*responses.FPDFText_GetFontWeight, error)
-
-	// FPDFText_GetTextRenderMode returns the text rendering mode of character.
-	// Experimental API.
-	FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error)
 
 	// FPDFText_GetFillColor returns the fill color of a particular character.
 	// Experimental API.

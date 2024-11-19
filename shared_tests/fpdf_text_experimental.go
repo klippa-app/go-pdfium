@@ -6,7 +6,6 @@ package shared_tests
 import (
 	"io/ioutil"
 
-	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -68,12 +67,6 @@ var _ = Describe("fpdf_text", func() {
 			FPDFText_GetFontWeight, err := PdfiumInstance.FPDFText_GetFontWeight(&requests.FPDFText_GetFontWeight{})
 			Expect(err).To(MatchError("textPage not given"))
 			Expect(FPDFText_GetFontWeight).To(BeNil())
-		})
-
-		It("returns an error when calling FPDFText_GetTextRenderMode", func() {
-			FPDFText_GetTextRenderMode, err := PdfiumInstance.FPDFText_GetTextRenderMode(&requests.FPDFText_GetTextRenderMode{})
-			Expect(err).To(MatchError("textPage not given"))
-			Expect(FPDFText_GetTextRenderMode).To(BeNil())
 		})
 
 		It("returns an error when calling FPDFText_GetFillColor", func() {
@@ -355,18 +348,6 @@ var _ = Describe("fpdf_text", func() {
 				})
 				Expect(err).To(MatchError("could not get font weight"))
 				Expect(FPDFText_GetFontWeight).To(BeNil())
-			})
-
-			It("returns the correct text render mode for char 0", func() {
-				FPDFText_GetTextRenderMode, err := PdfiumInstance.FPDFText_GetTextRenderMode(&requests.FPDFText_GetTextRenderMode{
-					TextPage: textPage,
-					Index:    0,
-				})
-				Expect(err).To(BeNil())
-				Expect(FPDFText_GetTextRenderMode).To(Equal(&responses.FPDFText_GetTextRenderMode{
-					Index:          0,
-					TextRenderMode: enums.FPDF_TEXTRENDERMODE_FILL,
-				}))
 			})
 
 			It("returns the correct text fill color for char 0", func() {
