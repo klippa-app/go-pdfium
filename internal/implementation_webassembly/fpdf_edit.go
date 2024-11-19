@@ -2059,6 +2059,44 @@ func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_
 	return &responses.FPDFPage_RemoveObject{}, nil
 }
 
+// FPDFPageObj_TransformF transforms the page object by the given matrix.
+// The matrix is composed as:
+//
+//	|a c e|
+//	|b d f|
+//
+// and can be used to scale, rotate, shear and translate the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrixPointer, _, err := p.CStructFS_MATRIX(&request.Transform)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(matrixPointer)
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_TransformF").Call(p.Context, *pageObjectHandle.handle, matrixPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		if int(success) == 0 {
+			return nil, errors.New("could not transform object")
+		}
+	}
+
+	return &responses.FPDFPageObj_TransformF{}, nil
+}
+
 // FPDFPageObj_GetMatrix returns the transform matrix of a page object.
 // The matrix is composed as:
 //
@@ -2143,6 +2181,29 @@ func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageO
 	}
 
 	return &responses.FPDFPageObj_SetMatrix{}, nil
+}
+
+// FPDFPageObj_GetMarkedContentID returns the marked content ID of a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetMarkedContentID").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	markedContentID := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObj_GetMarkedContentID{
+		MarkedContentID: int(markedContentID),
+	}, nil
 }
 
 // FPDFPageObj_CountMarks returns the count of content marks in a page object.

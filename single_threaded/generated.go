@@ -3007,6 +3007,20 @@ func (i *pdfiumInstance) FPDFPageObj_GetMark(request *requests.FPDFPageObj_GetMa
 	return i.pdfium.FPDFPageObj_GetMark(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (resp *responses.FPDFPageObj_GetMarkedContentID, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetMarkedContentID", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_GetMarkedContentID(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (resp *responses.FPDFPageObj_GetMatrix, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3285,6 +3299,20 @@ func (i *pdfiumInstance) FPDFPageObj_TransformClipPath(request *requests.FPDFPag
 	}()
 
 	return i.pdfium.FPDFPageObj_TransformClipPath(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (resp *responses.FPDFPageObj_TransformF, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_TransformF", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_TransformF(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_CloseAnnot(request *requests.FPDFPage_CloseAnnot) (resp *responses.FPDFPage_CloseAnnot, err error) {

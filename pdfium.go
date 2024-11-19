@@ -434,6 +434,14 @@ type Pdfium interface {
 	// and can be used to scale, rotate, shear and translate the page object.
 	FPDFPageObj_Transform(request *requests.FPDFPageObj_Transform) (*responses.FPDFPageObj_Transform, error)
 
+	// FPDFPageObj_TransformF transforms the page object by the given matrix.
+	// The matrix is composed as:
+	//   |a c e|
+	//   |b d f|
+	// and can be used to scale, rotate, shear and translate the page object.
+	// Experimental API.
+	FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error)
+
 	// FPDFPageObj_GetMatrix returns the transform matrix of a page object.
 	// The matrix is composed as:
 	//   |a c e|
@@ -459,6 +467,10 @@ type Pdfium interface {
 
 	// FPDFPageObj_NewImageObj creates a new image object.
 	FPDFPageObj_NewImageObj(request *requests.FPDFPageObj_NewImageObj) (*responses.FPDFPageObj_NewImageObj, error)
+
+	// FPDFPageObj_GetMarkedContentID returns the marked content ID of a page object.
+	// Experimental API.
+	FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error)
 
 	// FPDFPageObj_CountMarks returns the count of content marks in a page object.
 	// Experimental API.

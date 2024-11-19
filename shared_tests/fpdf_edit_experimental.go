@@ -190,6 +190,18 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFImageObj_GetImagePixelSize).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFPageObj_GetMarkedContentID", func() {
+				FPDFPageObj_GetMarkedContentID, err := PdfiumInstance.FPDFPageObj_GetMarkedContentID(&requests.FPDFPageObj_GetMarkedContentID{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_GetMarkedContentID).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFPageObj_TransformF", func() {
+				FPDFPageObj_TransformF, err := PdfiumInstance.FPDFPageObj_TransformF(&requests.FPDFPageObj_TransformF{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_TransformF).To(BeNil())
+			})
 		})
 	})
 
@@ -1483,6 +1495,203 @@ end
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObjMark_RemoveParam).To(Equal(&responses.FPDFPageObjMark_RemoveParam{}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with marks", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_marked_content.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			When("a page object is opened", func() {
+				It("returns the correct marks", func() {
+					By("loading the page object")
+
+					By("getting the mark count")
+					FPDFPage_CountObjects, err := PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
+						Count: 4,
+					}))
+
+					By("loading mark 1")
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+
+					FPDFPageObj_GetMarkedContentID, err := PdfiumInstance.FPDFPageObj_GetMarkedContentID(&requests.FPDFPageObj_GetMarkedContentID{
+						PageObject: FPDFPage_GetObject.PageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetMarkedContentID).To(Equal(&responses.FPDFPageObj_GetMarkedContentID{
+						MarkedContentID: 0,
+					}))
+
+					By("loading mark 2")
+					FPDFPage_GetObject, err = PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 1,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+
+					FPDFPageObj_GetMarkedContentID, err = PdfiumInstance.FPDFPageObj_GetMarkedContentID(&requests.FPDFPageObj_GetMarkedContentID{
+						PageObject: FPDFPage_GetObject.PageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetMarkedContentID).To(Equal(&responses.FPDFPageObj_GetMarkedContentID{
+						MarkedContentID: 1,
+					}))
+
+					By("loading mark 3")
+					FPDFPage_GetObject, err = PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 2,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+
+					FPDFPageObj_GetMarkedContentID, err = PdfiumInstance.FPDFPageObj_GetMarkedContentID(&requests.FPDFPageObj_GetMarkedContentID{
+						PageObject: FPDFPage_GetObject.PageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetMarkedContentID).To(Equal(&responses.FPDFPageObj_GetMarkedContentID{
+						MarkedContentID: 2,
+					}))
+
+					By("loading mark 4")
+					FPDFPage_GetObject, err = PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 3,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+
+					FPDFPageObj_GetMarkedContentID, err = PdfiumInstance.FPDFPageObj_GetMarkedContentID(&requests.FPDFPageObj_GetMarkedContentID{
+						PageObject: FPDFPage_GetObject.PageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetMarkedContentID).To(Equal(&responses.FPDFPageObj_GetMarkedContentID{
+						MarkedContentID: 3,
+					}))
+				})
+			})
+		})
+	})
+
+	Context("a normal PDF file", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when a page object is loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 2,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+				})
+
+				It("allows us to add transformations to a page object", func() {
+					FPDFPageObj_TransformF, err := PdfiumInstance.FPDFPageObj_TransformF(&requests.FPDFPageObj_TransformF{
+						PageObject: pageObject,
+						Transform: structs.FPDF_FS_MATRIX{
+							A: 1,
+							B: 0,
+							C: 0,
+							D: 1,
+							E: 50,
+							F: 200,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_TransformF).To(Not(BeNil()))
+					Expect(FPDFPageObj_TransformF).To(Equal(&responses.FPDFPageObj_TransformF{}))
 				})
 			})
 		})

@@ -226,6 +226,7 @@ type Pdfium interface {
 	FPDFPageObj_GetLineCap(*requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error)
 	FPDFPageObj_GetLineJoin(*requests.FPDFPageObj_GetLineJoin) (*responses.FPDFPageObj_GetLineJoin, error)
 	FPDFPageObj_GetMark(*requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
+	FPDFPageObj_GetMarkedContentID(*requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error)
 	FPDFPageObj_GetMatrix(*requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error)
 	FPDFPageObj_GetRotatedBounds(*requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
 	FPDFPageObj_GetStrokeColor(*requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error)
@@ -246,6 +247,7 @@ type Pdfium interface {
 	FPDFPageObj_SetStrokeWidth(*requests.FPDFPageObj_SetStrokeWidth) (*responses.FPDFPageObj_SetStrokeWidth, error)
 	FPDFPageObj_Transform(*requests.FPDFPageObj_Transform) (*responses.FPDFPageObj_Transform, error)
 	FPDFPageObj_TransformClipPath(*requests.FPDFPageObj_TransformClipPath) (*responses.FPDFPageObj_TransformClipPath, error)
+	FPDFPageObj_TransformF(*requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error)
 	FPDFPage_CloseAnnot(*requests.FPDFPage_CloseAnnot) (*responses.FPDFPage_CloseAnnot, error)
 	FPDFPage_CountObjects(*requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error)
 	FPDFPage_CreateAnnot(*requests.FPDFPage_CreateAnnot) (*responses.FPDFPage_CreateAnnot, error)
@@ -2604,6 +2606,16 @@ func (g *PdfiumRPC) FPDFPageObj_GetMark(request *requests.FPDFPageObj_GetMark) (
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error) {
+	resp := &responses.FPDFPageObj_GetMarkedContentID{}
+	err := g.client.Call("Plugin.FPDFPageObj_GetMarkedContentID", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
 	resp := &responses.FPDFPageObj_GetMatrix{}
 	err := g.client.Call("Plugin.FPDFPageObj_GetMatrix", request, resp)
@@ -2797,6 +2809,16 @@ func (g *PdfiumRPC) FPDFPageObj_Transform(request *requests.FPDFPageObj_Transfor
 func (g *PdfiumRPC) FPDFPageObj_TransformClipPath(request *requests.FPDFPageObj_TransformClipPath) (*responses.FPDFPageObj_TransformClipPath, error) {
 	resp := &responses.FPDFPageObj_TransformClipPath{}
 	err := g.client.Call("Plugin.FPDFPageObj_TransformClipPath", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error) {
+	resp := &responses.FPDFPageObj_TransformF{}
+	err := g.client.Call("Plugin.FPDFPageObj_TransformF", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -8806,6 +8828,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_GetMark(request *requests.FPDFPageObj_GetM
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID, resp *responses.FPDFPageObj_GetMarkedContentID) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetMarkedContentID", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_GetMarkedContentID(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix, resp *responses.FPDFPageObj_GetMatrix) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -9156,6 +9196,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_TransformClipPath(request *requests.FPDFPa
 	}()
 
 	implResp, err := s.Impl.FPDFPageObj_TransformClipPath(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF, resp *responses.FPDFPageObj_TransformF) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_TransformF", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_TransformF(request)
 	if err != nil {
 		return err
 	}

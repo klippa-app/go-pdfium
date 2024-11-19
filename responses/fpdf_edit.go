@@ -56,6 +56,8 @@ type FPDFPageObj_GetType struct {
 
 type FPDFPageObj_Transform struct{}
 
+type FPDFPageObj_TransformF struct{}
+
 type FPDFPageObj_GetMatrix struct {
 	Matrix structs.FPDF_FS_MATRIX
 }
@@ -66,6 +68,10 @@ type FPDFPage_TransformAnnots struct{}
 
 type FPDFPageObj_NewImageObj struct {
 	PageObject references.FPDF_PAGEOBJECT
+}
+
+type FPDFPageObj_GetMarkedContentID struct {
+	MarkedContentID int
 }
 
 type FPDFPageObj_CountMarks struct {
