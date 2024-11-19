@@ -943,7 +943,7 @@ func (p *PdfiumImplementation) FPDFFont_GetBaseFontName(request *requests.FPDFFo
 	}
 
 	charData := make([]byte, nameSize)
-	C.FPDFFont_GetBaseFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+	C.FPDFFont_GetBaseFontName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.size_t(len(charData)))
 
 	return &responses.FPDFFont_GetBaseFontName{
 		BaseFontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
@@ -968,7 +968,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFamilyName(request *requests.FPDFFont
 	}
 
 	charData := make([]byte, nameSize)
-	C.FPDFFont_GetFamilyName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+	C.FPDFFont_GetFamilyName(fontHandle.handle, (*C.char)(unsafe.Pointer(&charData[0])), C.size_t(len(charData)))
 
 	return &responses.FPDFFont_GetFamilyName{
 		FamilyName: string(charData[:len(charData)-1]), // Remove NULL-terminator
