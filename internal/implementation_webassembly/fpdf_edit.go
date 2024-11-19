@@ -2089,9 +2089,7 @@ func (p *PdfiumImplementation) FPDFPageObj_TransformF(request *requests.FPDFPage
 
 	success := *(*int32)(unsafe.Pointer(&res[0]))
 	if int(success) == 0 {
-		if int(success) == 0 {
-			return nil, errors.New("could not transform object")
-		}
+		return nil, errors.New("could not transform object")
 	}
 
 	return &responses.FPDFPageObj_TransformF{}, nil
