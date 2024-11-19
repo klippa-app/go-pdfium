@@ -21,12 +21,6 @@ func (p *PdfiumImplementation) FPDFText_GetFontWeight(request *requests.FPDFText
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
-// FPDFText_GetTextRenderMode returns the text rendering mode of character.
-// Experimental API.
-func (p *PdfiumImplementation) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
-	return nil, pdfium_errors.ErrExperimentalUnsupported
-}
-
 // FPDFText_GetFillColor returns the fill color of a particular character.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor) (*responses.FPDFText_GetFillColor, error) {
@@ -63,6 +57,12 @@ func (p *PdfiumImplementation) FPDFText_GetMatrix(request *requests.FPDFText_Get
 // FPDFLink_GetTextRange returns the start char index and char count for a link.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFLink_GetTextRange(request *requests.FPDFLink_GetTextRange) (*responses.FPDFLink_GetTextRange, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFText_GetTextObject returns the FPDF_PAGEOBJECT associated with a given character.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject) (*responses.FPDFText_GetTextObject, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

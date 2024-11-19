@@ -2059,6 +2059,42 @@ func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_
 	return &responses.FPDFPage_RemoveObject{}, nil
 }
 
+// FPDFPageObj_TransformF transforms the page object by the given matrix.
+// The matrix is composed as:
+//
+//	|a c e|
+//	|b d f|
+//
+// and can be used to scale, rotate, shear and translate the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	matrixPointer, _, err := p.CStructFS_MATRIX(&request.Transform)
+	if err != nil {
+		return nil, err
+	}
+	defer p.Free(matrixPointer)
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_TransformF").Call(p.Context, *pageObjectHandle.handle, matrixPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not transform object")
+	}
+
+	return &responses.FPDFPageObj_TransformF{}, nil
+}
+
 // FPDFPageObj_GetMatrix returns the transform matrix of a page object.
 // The matrix is composed as:
 //
@@ -2143,6 +2179,29 @@ func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageO
 	}
 
 	return &responses.FPDFPageObj_SetMatrix{}, nil
+}
+
+// FPDFPageObj_GetMarkedContentID returns the marked content ID of a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetMarkedContentID").Call(p.Context, *pageObjectHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	markedContentID := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFPageObj_GetMarkedContentID{
+		MarkedContentID: int(markedContentID),
+	}, nil
 }
 
 // FPDFPageObj_CountMarks returns the count of content marks in a page object.
@@ -3236,9 +3295,9 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj
 	}, nil
 }
 
-// FPDFFont_GetFontName returns the font name of a font.
+// FPDFFont_GetBaseFontName returns the base font name of a font.
 // Experimental API.
-func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
+func (p *PdfiumImplementation) FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (*responses.FPDFFont_GetBaseFontName, error) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -3248,7 +3307,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}
 
 	// First get the text value length.
-	res, err := p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, 0, 0)
+	res, err := p.Module.ExportedFunction("FPDFFont_GetBaseFontName").Call(p.Context, *fontHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -3265,7 +3324,7 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FPDFFont_GetFontName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
+	_, err = p.Module.ExportedFunction("FPDFFont_GetBaseFontName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
 	if err != nil {
 		return nil, err
 	}
@@ -3275,8 +3334,52 @@ func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_G
 		return nil, err
 	}
 
-	return &responses.FPDFFont_GetFontName{
-		FontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	return &responses.FPDFFont_GetBaseFontName{
+		BaseFontName: string(charData[:len(charData)-1]), // Remove NULL-terminator
+	}, nil
+}
+
+// FPDFFont_GetFamilyName returns the family name of a font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (*responses.FPDFFont_GetFamilyName, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	fontHandle, err := p.getFontHandle(request.Font)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the text value length.
+	res, err := p.Module.ExportedFunction("FPDFFont_GetFamilyName").Call(p.Context, *fontHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	nameSize := *(*int32)(unsafe.Pointer(&res[0]))
+	if nameSize == 0 {
+		return nil, errors.New("could not get font name")
+	}
+
+	charDataSize := uint64(nameSize)
+	charDataPointer, err := p.ByteArrayPointer(charDataSize, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFFont_GetFamilyName").Call(p.Context, *fontHandle.handle, charDataPointer.Pointer, charDataSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFFont_GetFamilyName{
+		FamilyName: string(charData[:len(charData)-1]), // Remove NULL-terminator
 	}, nil
 }
 

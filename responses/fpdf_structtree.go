@@ -88,6 +88,10 @@ type FPDF_StructElement_Attr_GetName struct {
 	Name string
 }
 
+type FPDF_StructElement_Attr_GetValue struct {
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
+}
+
 type FPDF_StructElement_Attr_GetType struct {
 	ObjectType enums.FPDF_OBJECT_TYPE
 }
@@ -106,6 +110,14 @@ type FPDF_StructElement_Attr_GetStringValue struct {
 
 type FPDF_StructElement_Attr_GetBlobValue struct {
 	Value []byte
+}
+
+type FPDF_StructElement_Attr_CountChildren struct {
+	Count int
+}
+
+type FPDF_StructElement_Attr_GetChildAtIndex struct {
+	StructElementAttributeValue references.FPDF_STRUCTELEMENT_ATTR_VALUE
 }
 
 type FPDF_StructElement_GetMarkedContentIdCount struct {

@@ -1,7 +1,6 @@
 package responses
 
 import (
-	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/structs"
 )
@@ -19,6 +18,11 @@ type FPDFText_CountChars struct {
 type FPDFText_GetUnicode struct {
 	Index   int
 	Unicode uint //The Unicode of the particular character. If a character is not encoded in Unicode and PDFium can't convert to Unicode, the return value will be zero.
+}
+
+type FPDFText_GetTextObject struct {
+	Index      int
+	TextObject references.FPDF_PAGEOBJECT // The associated text object for the character.
 }
 
 type FPDFText_IsGenerated struct {
@@ -50,11 +54,6 @@ type FPDFText_GetFontInfo struct {
 type FPDFText_GetFontWeight struct {
 	Index      int
 	FontWeight int
-}
-
-type FPDFText_GetTextRenderMode struct {
-	Index          int
-	TextRenderMode enums.FPDF_TEXT_RENDERMODE
 }
 
 type FPDFText_GetFillColor struct {

@@ -96,6 +96,11 @@ type FPDFPageObj_Transform struct {
 	Transform  structs.FPDF_FS_MATRIX
 }
 
+type FPDFPageObj_TransformF struct {
+	PageObject references.FPDF_PAGEOBJECT
+	Transform  structs.FPDF_FS_MATRIX
+}
+
 type FPDFPageObj_GetMatrix struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
@@ -112,6 +117,10 @@ type FPDFPage_TransformAnnots struct {
 
 type FPDFPageObj_NewImageObj struct {
 	Document references.FPDF_DOCUMENT
+}
+
+type FPDFPageObj_GetMarkedContentID struct {
+	PageObject references.FPDF_PAGEOBJECT
 }
 
 type FPDFPageObj_CountMarks struct {
@@ -487,7 +496,11 @@ type FPDFTextObj_GetFont struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
-type FPDFFont_GetFontName struct {
+type FPDFFont_GetBaseFontName struct {
+	Font references.FPDF_FONT
+}
+
+type FPDFFont_GetFamilyName struct {
 	Font references.FPDF_FONT
 }
 

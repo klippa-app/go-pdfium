@@ -4,11 +4,12 @@
 package shared_tests
 
 import (
+	"io/ioutil"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-	"io/ioutil"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -85,34 +86,52 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				Expect(FPDF_StructElement_Attr_GetName).To(BeNil())
 			})
 
+			It("returns an error when calling FPDF_StructElement_Attr_GetValue", func() {
+				FPDF_StructElement_Attr_GetValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{})
+				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(FPDF_StructElement_Attr_GetValue).To(BeNil())
+			})
+
 			It("returns an error when calling FPDF_StructElement_Attr_GetType", func() {
 				FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{})
-				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
 				Expect(FPDF_StructElement_Attr_GetType).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_StructElement_Attr_GetBooleanValue", func() {
 				FPDF_StructElement_Attr_GetBooleanValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetBooleanValue(&requests.FPDF_StructElement_Attr_GetBooleanValue{})
-				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
 				Expect(FPDF_StructElement_Attr_GetBooleanValue).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_StructElement_Attr_GetNumberValue", func() {
 				FPDF_StructElement_Attr_GetNumberValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetNumberValue(&requests.FPDF_StructElement_Attr_GetNumberValue{})
-				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
 				Expect(FPDF_StructElement_Attr_GetNumberValue).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_StructElement_Attr_GetStringValue", func() {
 				FPDF_StructElement_Attr_GetStringValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetStringValue(&requests.FPDF_StructElement_Attr_GetStringValue{})
-				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
 				Expect(FPDF_StructElement_Attr_GetStringValue).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_StructElement_Attr_GetBlobValue", func() {
 				FPDF_StructElement_Attr_GetBlobValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetBlobValue(&requests.FPDF_StructElement_Attr_GetBlobValue{})
-				Expect(err).To(MatchError("structElementAttribute not given"))
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
 				Expect(FPDF_StructElement_Attr_GetBlobValue).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_StructElement_Attr_CountChildren", func() {
+				FPDF_StructElement_Attr_CountChildren, err := PdfiumInstance.FPDF_StructElement_Attr_CountChildren(&requests.FPDF_StructElement_Attr_CountChildren{})
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
+				Expect(FPDF_StructElement_Attr_CountChildren).To(BeNil())
+			})
+
+			It("returns an error when calling FPDF_StructElement_Attr_GetChildAtIndex", func() {
+				FPDF_StructElement_Attr_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_Attr_GetChildAtIndex(&requests.FPDF_StructElement_Attr_GetChildAtIndex{})
+				Expect(err).To(MatchError("structElementAttributeValue not given"))
+				Expect(FPDF_StructElement_Attr_GetChildAtIndex).To(BeNil())
 			})
 
 			It("returns an error when calling FPDF_StructElement_GetMarkedContentIdCount", func() {
@@ -201,6 +220,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					BeforeEach(func() {
 						FPDF_StructTree_GetChildAtIndex, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
 							StructTree: structTree,
+							Index:      0,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructTree_GetChildAtIndex).To(Not(BeNil()))
@@ -225,6 +245,75 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
 							Type: "Document",
+						}))
+
+						table, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: structElement,
+							Index:         0,
+						})
+						Expect(err).To(BeNil())
+						Expect(table).To(Not(BeNil()))
+
+						FPDF_StructElement_GetType, err = PdfiumInstance.FPDF_StructElement_GetType(&requests.FPDF_StructElement_GetType{
+							StructElement: table.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
+							Type: "Table",
+						}))
+
+						FPDF_StructElement_CountChildren, err := PdfiumInstance.FPDF_StructElement_CountChildren(&requests.FPDF_StructElement_CountChildren{
+							StructElement: table.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_CountChildren).To(Equal(&responses.FPDF_StructElement_CountChildren{
+							Count: 2,
+						}))
+
+						tr, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: table.StructElement,
+							Index:         0,
+						})
+						Expect(err).To(BeNil())
+						Expect(tr).To(Not(BeNil()))
+
+						FPDF_StructElement_CountChildren, err = PdfiumInstance.FPDF_StructElement_CountChildren(&requests.FPDF_StructElement_CountChildren{
+							StructElement: tr.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_CountChildren).To(Equal(&responses.FPDF_StructElement_CountChildren{
+							Count: 2,
+						}))
+
+						FPDF_StructElement_GetType, err = PdfiumInstance.FPDF_StructElement_GetType(&requests.FPDF_StructElement_GetType{
+							StructElement: tr.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
+							Type: "TR",
+						}))
+
+						th, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: tr.StructElement,
+							Index:         0,
+						})
+						Expect(err).To(BeNil())
+						Expect(th).To(Not(BeNil()))
+
+						FPDF_StructElement_GetAttributeCount, err := PdfiumInstance.FPDF_StructElement_GetAttributeCount(&requests.FPDF_StructElement_GetAttributeCount{
+							StructElement: th.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetAttributeCount).To(Equal(&responses.FPDF_StructElement_GetAttributeCount{
+							Count: 2,
+						}))
+
+						FPDF_StructElement_GetType, err = PdfiumInstance.FPDF_StructElement_GetType(&requests.FPDF_StructElement_GetType{
+							StructElement: th.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
+							Type: "TH",
 						}))
 					})
 
@@ -323,26 +412,28 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 						Expect(err).To(BeNil())
 						Expect(table).To(Not(BeNil()))
 
-						tr, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+						row, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: table.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(tr).To(Not(BeNil()))
+						Expect(row).To(Not(BeNil()))
 
 						FPDF_StructElement_GetAttributeCount, err := PdfiumInstance.FPDF_StructElement_GetAttributeCount(&requests.FPDF_StructElement_GetAttributeCount{
-							StructElement: tr.StructElement,
+							StructElement: row.StructElement,
 						})
 						Expect(err).To(MatchError("could not get struct element attribute count"))
 						Expect(FPDF_StructElement_GetAttributeCount).To(BeNil())
 
-						th, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
-							StructElement: tr.StructElement,
+						headerCell, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: row.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(th).To(Not(BeNil()))
+						Expect(headerCell).To(Not(BeNil()))
 
 						FPDF_StructElement_GetAttributeCount, err = PdfiumInstance.FPDF_StructElement_GetAttributeCount(&requests.FPDF_StructElement_GetAttributeCount{
-							StructElement: th.StructElement,
+							StructElement: headerCell.StructElement,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_GetAttributeCount).To(Equal(&responses.FPDF_StructElement_GetAttributeCount{
@@ -353,18 +444,21 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					It("returns the struct element attribute", func() {
 						table, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: structElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
 						Expect(table).To(Not(BeNil()))
 
 						tr, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: table.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
 						Expect(tr).To(Not(BeNil()))
 
 						th, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: tr.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
 						Expect(th).To(Not(BeNil()))
@@ -408,6 +502,29 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Name: "ColSpan",
 						}))
 
+						FPDF_StructElement_Attr_GetValueColSpan, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
+							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
+							Name:                   "ColSpan",
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetValueColSpan).To(Not(BeNil()))
+
+						FPDF_StructElement_Attr_GetNumberValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetNumberValue(&requests.FPDF_StructElement_Attr_GetNumberValue{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueColSpan.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetNumberValue).To(Equal(&responses.FPDF_StructElement_Attr_GetNumberValue{
+							Value: 2,
+						}))
+
+						FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueColSpan.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+							ObjectType: enums.FPDF_OBJECT_TYPE_NUMBER,
+						}))
+
 						FPDF_StructElement_Attr_GetName, err = PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
 							Index:                  1,
@@ -417,39 +534,12 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Name: "O",
 						}))
 
-						FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+						FPDF_StructElement_Attr_GetValue0, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColSpan",
+							Name:                   FPDF_StructElement_Attr_GetName.Name,
 						})
 						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
-							ObjectType: enums.FPDF_OBJECT_TYPE_NUMBER,
-						}))
-
-						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "O",
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
-							ObjectType: enums.FPDF_OBJECT_TYPE_NAME,
-						}))
-
-						FPDF_StructElement_Attr_GetNumberValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetNumberValue(&requests.FPDF_StructElement_Attr_GetNumberValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "O",
-						})
-						Expect(err).To(MatchError("could not get number value"))
-						Expect(FPDF_StructElement_Attr_GetNumberValue).To(BeNil())
-
-						FPDF_StructElement_Attr_GetNumberValue, err = PdfiumInstance.FPDF_StructElement_Attr_GetNumberValue(&requests.FPDF_StructElement_Attr_GetNumberValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColSpan",
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetNumberValue).To(Equal(&responses.FPDF_StructElement_Attr_GetNumberValue{
-							Value: 2,
-						}))
+						Expect(FPDF_StructElement_Attr_GetValue0).To(Not(BeNil()))
 					})
 
 					It("returns the struct element attribute values", func() {
@@ -496,7 +586,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_Attr_GetCount).To(Equal(&responses.FPDF_StructElement_Attr_GetCount{
-							Count: 3,
+							Count: 4,
 						}))
 
 						FPDF_StructElement_Attr_GetName, err := PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
@@ -508,6 +598,37 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Name: "ColProp",
 						}))
 
+						FPDF_StructElement_Attr_GetValueColProp, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
+							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
+							Name:                   "ColProp",
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetValueColProp).To(Not(BeNil()))
+
+						FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueColProp.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+							ObjectType: enums.FPDF_OBJECT_TYPE_STRING,
+						}))
+
+						FPDF_StructElement_Attr_GetStringValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetStringValue(&requests.FPDF_StructElement_Attr_GetStringValue{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueColProp.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetStringValue).To(Equal(&responses.FPDF_StructElement_Attr_GetStringValue{
+							Value: "Sum",
+						}))
+
+						FPDF_StructElement_Attr_GetBlobValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetBlobValue(&requests.FPDF_StructElement_Attr_GetBlobValue{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueColProp.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetBlobValue).To(Equal(&responses.FPDF_StructElement_Attr_GetBlobValue{
+							Value: []byte{'S', 'u', 'm'},
+						}))
+
 						FPDF_StructElement_Attr_GetName, err = PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
 							Index:                  1,
@@ -517,97 +638,59 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Name: "CurUSD",
 						}))
 
-						FPDF_StructElement_Attr_GetName, err = PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Index:                  2,
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetName).To(Equal(&responses.FPDF_StructElement_Attr_GetName{
-							Name: "O",
-						}))
-
-						FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColProp",
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
-							ObjectType: enums.FPDF_OBJECT_TYPE_STRING,
-						}))
-
-						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+						FPDF_StructElement_Attr_GetValueCurUSD, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
 							Name:                   "CurUSD",
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetValueCurUSD).To(Not(BeNil()))
+
+						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueCurUSD.StructElementAttributeValue,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
 							ObjectType: enums.FPDF_OBJECT_TYPE_BOOLEAN,
 						}))
 
-						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "O",
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
-							ObjectType: enums.FPDF_OBJECT_TYPE_NAME,
-						}))
-
-						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "O",
-						})
-						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
-							ObjectType: enums.FPDF_OBJECT_TYPE_NAME,
-						}))
-
 						FPDF_StructElement_Attr_GetBooleanValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetBooleanValue(&requests.FPDF_StructElement_Attr_GetBooleanValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColProp",
-						})
-						Expect(err).To(MatchError("could not get boolean value"))
-						Expect(FPDF_StructElement_Attr_GetBooleanValue).To(BeNil())
-
-						FPDF_StructElement_Attr_GetStringValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetStringValue(&requests.FPDF_StructElement_Attr_GetStringValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "CurUSD",
-						})
-						Expect(err).To(MatchError("could not get string value"))
-						Expect(FPDF_StructElement_Attr_GetStringValue).To(BeNil())
-
-						FPDF_StructElement_Attr_GetBlobValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetBlobValue(&requests.FPDF_StructElement_Attr_GetBlobValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "CurUSD",
-						})
-						Expect(err).To(MatchError("could not get blob value"))
-						Expect(FPDF_StructElement_Attr_GetBlobValue).To(BeNil())
-
-						FPDF_StructElement_Attr_GetBooleanValue, err = PdfiumInstance.FPDF_StructElement_Attr_GetBooleanValue(&requests.FPDF_StructElement_Attr_GetBooleanValue{
-							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "CurUSD",
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueCurUSD.StructElementAttributeValue,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_Attr_GetBooleanValue).To(Equal(&responses.FPDF_StructElement_Attr_GetBooleanValue{
 							Value: true,
 						}))
 
-						FPDF_StructElement_Attr_GetStringValue, err = PdfiumInstance.FPDF_StructElement_Attr_GetStringValue(&requests.FPDF_StructElement_Attr_GetStringValue{
+						FPDF_StructElement_Attr_GetName, err = PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColProp",
+							Index:                  3,
 						})
 						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetStringValue).To(Equal(&responses.FPDF_StructElement_Attr_GetStringValue{
-							Value: "Sum",
+						Expect(FPDF_StructElement_Attr_GetName).To(Equal(&responses.FPDF_StructElement_Attr_GetName{
+							Name: "RowSpan",
 						}))
 
-						FPDF_StructElement_Attr_GetBlobValue, err = PdfiumInstance.FPDF_StructElement_Attr_GetBlobValue(&requests.FPDF_StructElement_Attr_GetBlobValue{
+						FPDF_StructElement_Attr_GetValueRowSpan, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
 							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-							Name:                   "ColProp",
+							Name:                   "RowSpan",
 						})
 						Expect(err).To(BeNil())
-						Expect(FPDF_StructElement_Attr_GetBlobValue).To(Equal(&responses.FPDF_StructElement_Attr_GetBlobValue{
-							Value: []byte{'S', 'u', 'm'},
+						Expect(FPDF_StructElement_Attr_GetValueRowSpan).To(Not(BeNil()))
+
+						FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueRowSpan.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+							ObjectType: enums.FPDF_OBJECT_TYPE_NUMBER,
+						}))
+
+						FPDF_StructElement_Attr_GetNumberValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetNumberValue(&requests.FPDF_StructElement_Attr_GetNumberValue{
+							StructElementAttributeValue: FPDF_StructElement_Attr_GetValueRowSpan.StructElementAttributeValue,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetNumberValue).To(Equal(&responses.FPDF_StructElement_Attr_GetNumberValue{
+							Value: 3,
 						}))
 					})
 				})
@@ -671,6 +754,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					BeforeEach(func() {
 						FPDF_StructTree_GetChildAtIndex, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
 							StructTree: structTree,
+							Index:      0,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructTree_GetChildAtIndex).To(Not(BeNil()))
@@ -689,6 +773,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					It("returns a parent when there is one", func() {
 						child_element, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: element,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
 						Expect(child_element).To(Not(BeNil()))
@@ -737,6 +822,158 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 						Expect(FPDF_StructElement_GetActualText).To(Equal(&responses.FPDF_StructElement_GetActualText{
 							Actualtext: "Actual Text",
 						}))
+					})
+
+					When("a struct tree struct element child is opened", func() {
+						var child_element references.FPDF_STRUCTELEMENT
+
+						BeforeEach(func() {
+							FPDF_StructElement_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+								StructElement: element,
+								Index:         0,
+							})
+							Expect(err).To(BeNil())
+							Expect(FPDF_StructElement_GetChildAtIndex).To(Not(BeNil()))
+
+							child_element = FPDF_StructElement_GetChildAtIndex.StructElement
+						})
+
+						When("a struct tree struct element child child is opened", func() {
+							var gchild_element references.FPDF_STRUCTELEMENT
+
+							BeforeEach(func() {
+								FPDF_StructElement_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+									StructElement: child_element,
+									Index:         0,
+								})
+								Expect(err).To(BeNil())
+								Expect(FPDF_StructElement_GetChildAtIndex).To(Not(BeNil()))
+
+								gchild_element = FPDF_StructElement_GetChildAtIndex.StructElement
+							})
+
+							It("returns the correct gchild attribute count", func() {
+								FPDF_StructElement_GetAttributeCount, err := PdfiumInstance.FPDF_StructElement_GetAttributeCount(&requests.FPDF_StructElement_GetAttributeCount{
+									StructElement: gchild_element,
+								})
+								Expect(err).To(BeNil())
+								Expect(FPDF_StructElement_GetAttributeCount).To(Equal(&responses.FPDF_StructElement_GetAttributeCount{
+									Count: 1,
+								}))
+							})
+
+							When("a struct tree struct element child child attribute is opened", func() {
+								var attribute references.FPDF_STRUCTELEMENT_ATTR
+
+								BeforeEach(func() {
+									FPDF_StructElement_GetAttributeAtIndex, err := PdfiumInstance.FPDF_StructElement_GetAttributeAtIndex(&requests.FPDF_StructElement_GetAttributeAtIndex{
+										StructElement: gchild_element,
+										Index:         0,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_GetAttributeAtIndex).To(Not(BeNil()))
+
+									attribute = FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute
+								})
+
+								It("returns the correct attribute count", func() {
+									FPDF_StructElement_Attr_GetCount, err := PdfiumInstance.FPDF_StructElement_Attr_GetCount(&requests.FPDF_StructElement_Attr_GetCount{
+										StructElementAttribute: attribute,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetCount).To(Equal(&responses.FPDF_StructElement_Attr_GetCount{
+										Count: 5,
+									}))
+								})
+
+								It("returns the correct attribute name", func() {
+									FPDF_StructElement_Attr_GetName, err := PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
+										StructElementAttribute: attribute,
+										Index:                  1,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetName).To(Equal(&responses.FPDF_StructElement_Attr_GetName{
+										Name: "Height",
+									}))
+								})
+
+								It("returns the correct attribute name and value", func() {
+									FPDF_StructElement_Attr_GetName, err := PdfiumInstance.FPDF_StructElement_Attr_GetName(&requests.FPDF_StructElement_Attr_GetName{
+										StructElementAttribute: attribute,
+										Index:                  0,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetName).To(Equal(&responses.FPDF_StructElement_Attr_GetName{
+										Name: "BBox",
+									}))
+
+									FPDF_StructElement_Attr_GetValue, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
+										StructElementAttribute: attribute,
+										Name:                   FPDF_StructElement_Attr_GetName.Name,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetValue).To(Not(BeNil()))
+
+									FPDF_StructElement_Attr_GetType, err := PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+										ObjectType: enums.FPDF_OBJECT_TYPE_ARRAY,
+									}))
+
+									FPDF_StructElement_Attr_CountChildren, err := PdfiumInstance.FPDF_StructElement_Attr_CountChildren(&requests.FPDF_StructElement_Attr_CountChildren{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_CountChildren).To(Equal(&responses.FPDF_StructElement_Attr_CountChildren{
+										Count: 4,
+									}))
+
+									_, err = PdfiumInstance.FPDF_StructElement_Attr_GetChildAtIndex(&requests.FPDF_StructElement_Attr_GetChildAtIndex{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+										Index:                       -1,
+									})
+									Expect(err).To(MatchError("could not get struct element attribute child"))
+
+									_, err = PdfiumInstance.FPDF_StructElement_Attr_GetChildAtIndex(&requests.FPDF_StructElement_Attr_GetChildAtIndex{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+										Index:                       6,
+									})
+									Expect(err).To(MatchError("could not get struct element attribute child"))
+
+									nested_attr_value0, err := PdfiumInstance.FPDF_StructElement_Attr_GetChildAtIndex(&requests.FPDF_StructElement_Attr_GetChildAtIndex{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+										Index:                       0,
+									})
+									Expect(err).To(BeNil())
+									Expect(nested_attr_value0).To(Not(BeNil()))
+
+									FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+										StructElementAttributeValue: nested_attr_value0.StructElementAttributeValue,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+										ObjectType: enums.FPDF_OBJECT_TYPE_NUMBER,
+									}))
+
+									nested_attr_value3, err := PdfiumInstance.FPDF_StructElement_Attr_GetChildAtIndex(&requests.FPDF_StructElement_Attr_GetChildAtIndex{
+										StructElementAttributeValue: FPDF_StructElement_Attr_GetValue.StructElementAttributeValue,
+										Index:                       3,
+									})
+									Expect(err).To(BeNil())
+									Expect(nested_attr_value3).To(Not(BeNil()))
+
+									FPDF_StructElement_Attr_GetType, err = PdfiumInstance.FPDF_StructElement_Attr_GetType(&requests.FPDF_StructElement_Attr_GetType{
+										StructElementAttributeValue: nested_attr_value3.StructElementAttributeValue,
+									})
+									Expect(err).To(BeNil())
+									Expect(FPDF_StructElement_Attr_GetType).To(Equal(&responses.FPDF_StructElement_Attr_GetType{
+										ObjectType: enums.FPDF_OBJECT_TYPE_NUMBER,
+									}))
+								})
+							})
+						})
 					})
 				})
 			})

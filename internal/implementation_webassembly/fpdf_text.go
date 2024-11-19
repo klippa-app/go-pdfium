@@ -4,7 +4,6 @@ import (
 	"errors"
 	"unsafe"
 
-	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
@@ -953,30 +952,6 @@ func (p *PdfiumImplementation) FPDFText_GetFontWeight(request *requests.FPDFText
 	}, nil
 }
 
-// FPDFText_GetTextRenderMode returns the text rendering mode of character.
-// Experimental API.
-func (p *PdfiumImplementation) FPDFText_GetTextRenderMode(request *requests.FPDFText_GetTextRenderMode) (*responses.FPDFText_GetTextRenderMode, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	textPageHandle, err := p.getTextPageHandle(request.TextPage)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := p.Module.ExportedFunction("FPDFText_GetTextRenderMode").Call(p.Context, *textPageHandle.handle, uint64(request.Index))
-	if err != nil {
-		return nil, err
-	}
-
-	textRenderMode := *(*int32)(unsafe.Pointer(&res[0]))
-
-	return &responses.FPDFText_GetTextRenderMode{
-		Index:          request.Index,
-		TextRenderMode: enums.FPDF_TEXT_RENDERMODE(textRenderMode),
-	}, nil
-}
-
 // FPDFText_GetFillColor returns the fill color of a particular character.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFText_GetFillColor(request *requests.FPDFText_GetFillColor) (*responses.FPDFText_GetFillColor, error) {
@@ -1288,6 +1263,35 @@ func (p *PdfiumImplementation) FPDFLink_GetTextRange(request *requests.FPDFLink_
 		Index:          request.Index,
 		StartCharIndex: int(startCharIndex),
 		CharCount:      int(charCount),
+	}, nil
+}
+
+// FPDFText_GetTextObject returns the FPDF_PAGEOBJECT associated with a given character.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_GetTextObject(request *requests.FPDFText_GetTextObject) (*responses.FPDFText_GetTextObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	textPageHandle, err := p.getTextPageHandle(request.TextPage)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFText_GetTextObject").Call(p.Context, *textPageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	if res[0] == 0 {
+		return nil, errors.New("could not get object")
+	}
+
+	pageObject := &res[0]
+	pageObjectHandle := p.registerPageObject(pageObject)
+
+	return &responses.FPDFText_GetTextObject{
+		TextObject: pageObjectHandle.nativeRef,
+		Index:      request.Index,
 	}, nil
 }
 

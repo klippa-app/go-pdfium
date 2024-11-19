@@ -30,6 +30,12 @@ var _ = Describe("fpdf_catalog", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(isTagged).To(BeNil())
 			})
+
+			It("returns an error when setting the document language", func() {
+				FPDFCatalog_SetLanguage, err := PdfiumInstance.FPDFCatalog_SetLanguage(&requests.FPDFCatalog_SetLanguage{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFCatalog_SetLanguage).To(BeNil())
+			})
 		})
 	})
 
@@ -101,6 +107,45 @@ var _ = Describe("fpdf_catalog", func() {
 				Expect(isTagged).To(Equal(&responses.FPDFCatalog_IsTagged{
 					IsTagged: true,
 				}))
+			})
+
+			It("can have its language changed", func() {
+				FPDFCatalog_SetLanguage, err := PdfiumInstance.FPDFCatalog_SetLanguage(&requests.FPDFCatalog_SetLanguage{
+					Document: doc,
+					Language: "hu",
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
+			})
+		})
+	})
+
+	Context("a new PDF file", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			newDoc, err := PdfiumInstance.FPDF_CreateNewDocument(&requests.FPDF_CreateNewDocument{})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			It("can have its language changed", func() {
+				FPDFCatalog_SetLanguage, err := PdfiumInstance.FPDFCatalog_SetLanguage(&requests.FPDFCatalog_SetLanguage{
+					Document: doc,
+					Language: "hu",
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
 			})
 		})
 	})

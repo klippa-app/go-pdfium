@@ -2,12 +2,12 @@ package shared_tests
 
 import (
 	"bytes"
-	"github.com/klippa-app/go-pdfium/responses"
 	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
+	"github.com/klippa-app/go-pdfium/responses"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -71,7 +71,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(Not(BeNil()))
-					Expect(FPDF_SaveAsCopy.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854
+					Expect(FPDF_SaveAsCopy.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
 				})
 			})
 
@@ -93,7 +93,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(BeNil())
-					Expect(fileStat.Size()).To(SatisfyAny(Equal(int64(11375)), Equal(int64(11183)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854
+					Expect(fileStat.Size()).To(SatisfyAny(Equal(int64(11375)), Equal(int64(11183)), Equal(int64(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
 				})
 			})
 
@@ -126,7 +126,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(BeNil())
-					Expect(buffer.Len()).To(SatisfyAny(Equal(11375), Equal(11183))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854
+					Expect(buffer.Len()).To(SatisfyAny(Equal(11375), Equal(11183), Equal(11188))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
 				})
 			})
 
@@ -139,7 +139,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveWithVersion).To(Not(BeNil()))
 					Expect(FPDF_SaveWithVersion.FileBytes).To(Not(BeNil()))
-					Expect(FPDF_SaveWithVersion.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854
+					Expect(FPDF_SaveWithVersion.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
 
 					savedDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data: FPDF_SaveWithVersion.FileBytes,

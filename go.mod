@@ -10,7 +10,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.20.0
 	github.com/onsi/gomega v1.34.1
 	github.com/stretchr/testify v1.9.0
-	github.com/tetratelabs/wazero v1.7.3
+	github.com/tetratelabs/wazero v1.8.1
 	golang.org/x/net v0.29.0
 	golang.org/x/text v0.18.0
 )

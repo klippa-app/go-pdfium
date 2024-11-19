@@ -17,7 +17,7 @@ func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
-// FPDFPageObj_GetMatrix returns the transform matrix of a page object.
+// FPDFPageObj_TransformF transforms the page object by the given matrix.
 // The matrix is composed as:
 //
 //	|a c e|
@@ -25,7 +25,7 @@ func (p *PdfiumImplementation) FPDFPage_RemoveObject(request *requests.FPDFPage_
 //
 // and can be used to scale, rotate, shear and translate the page object.
 // Experimental API.
-func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
+func (p *PdfiumImplementation) FPDFPageObj_TransformF(request *requests.FPDFPageObj_TransformF) (*responses.FPDFPageObj_TransformF, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
@@ -38,6 +38,24 @@ func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageO
 // and can be used to scale, rotate, shear and translate the page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageObj_SetMatrix) (*responses.FPDFPageObj_SetMatrix, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFPageObj_GetMatrix returns the transform matrix of a page object.
+// The matrix is composed as:
+//
+//	|a c e|
+//	|b d f|
+//
+// and can be used to scale, rotate, shear and translate the page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFPageObj_GetMarkedContentID returns the marked content ID of a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
@@ -233,9 +251,15 @@ func (p *PdfiumImplementation) FPDFTextObj_GetFont(request *requests.FPDFTextObj
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
-// FPDFFont_GetFontName returns the font name of a font.
+// FPDFFont_GetBaseFontName returns the base font name of a font.
 // Experimental API.
-func (p *PdfiumImplementation) FPDFFont_GetFontName(request *requests.FPDFFont_GetFontName) (*responses.FPDFFont_GetFontName, error) {
+func (p *PdfiumImplementation) FPDFFont_GetBaseFontName(request *requests.FPDFFont_GetBaseFontName) (*responses.FPDFFont_GetBaseFontName, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFFont_GetFamilyName returns the family name of a font.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFont_GetFamilyName(request *requests.FPDFFont_GetFamilyName) (*responses.FPDFFont_GetFamilyName, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 

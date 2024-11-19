@@ -192,6 +192,12 @@ type FPDFAnnot_GetFontSize struct {
 	FontSize float32
 }
 
+type FPDFAnnot_GetFontColor struct {
+	R uint
+	G uint
+	B uint
+}
+
 type FPDFAnnot_IsChecked struct {
 	IsChecked bool
 }
