@@ -53,18 +53,6 @@ func (p *PdfiumImplementation) FPDFPageObj_GetMatrix(request *requests.FPDFPageO
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
-// FPDFPageObj_SetMatrix sets the transform matrix on a page object.
-// The matrix is composed as:
-//
-//	|a c e|
-//	|b d f|
-//
-// and can be used to scale, rotate, shear and translate the page object.
-// Experimental API.
-func (p *PdfiumImplementation) FPDFPageObj_SetMatrix(request *requests.FPDFPageObj_SetMatrix) (*responses.FPDFPageObj_SetMatrix, error) {
-	return nil, pdfium_errors.ErrExperimentalUnsupported
-}
-
 // FPDFPageObj_GetMarkedContentID returns the marked content ID of a page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error) {

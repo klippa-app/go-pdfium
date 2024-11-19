@@ -6,6 +6,7 @@ package shared_tests
 import (
 	"io/ioutil"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -151,6 +152,12 @@ var _ = Describe("fpdf_text", func() {
 			FPDFLink_LoadWebLinks, err := PdfiumInstance.FPDFLink_LoadWebLinks(&requests.FPDFLink_LoadWebLinks{})
 			Expect(err).To(MatchError("textPage not given"))
 			Expect(FPDFLink_LoadWebLinks).To(BeNil())
+		})
+
+		It("returns an error when calling FPDFText_GetTextObject", func() {
+			FPDFText_GetTextObject, err := PdfiumInstance.FPDFText_GetTextObject(&requests.FPDFText_GetTextObject{})
+			Expect(err).To(MatchError("textPage not given"))
+			Expect(FPDFText_GetTextObject).To(BeNil())
 		})
 	})
 
@@ -1260,6 +1267,143 @@ var _ = Describe("fpdf_text", func() {
 					Index:              2,
 					HasUnicodeMapError: true,
 				}))
+			})
+		})
+	})
+
+	Context("a PDF file with text render mode", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_render_mode.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("a text page is opened", func() {
+			var textPage references.FPDF_TEXTPAGE
+
+			BeforeEach(func() {
+				textPageResp, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(textPageResp).To(Not(BeNil()))
+
+				textPage = textPageResp.TextPage
+			})
+
+			AfterEach(func() {
+				resp, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(resp).To(Not(BeNil()))
+			})
+
+			It("returns the correct character count", func() {
+				FPDFText_CountChars, err := PdfiumInstance.FPDFText_CountChars(&requests.FPDFText_CountChars{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_CountChars).To(Equal(&responses.FPDFText_CountChars{
+					Count: 12,
+				}))
+			})
+
+			It("returns an error on invalid text object indices", func() {
+				FPDFText_GetTextObject, err := PdfiumInstance.FPDFText_GetTextObject(&requests.FPDFText_GetTextObject{
+					TextPage: textPage,
+					Index:    -1,
+				})
+				Expect(err).To(MatchError("could not get object"))
+				Expect(FPDFText_GetTextObject).To(BeNil())
+
+				FPDFText_GetTextObject, err = PdfiumInstance.FPDFText_GetTextObject(&requests.FPDFText_GetTextObject{
+					TextPage: textPage,
+					Index:    314,
+				})
+				Expect(err).To(MatchError("could not get object"))
+				Expect(FPDFText_GetTextObject).To(BeNil())
+			})
+
+			When("a text object is opened", func() {
+				var textObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFText_GetTextObject, err := PdfiumInstance.FPDFText_GetTextObject(&requests.FPDFText_GetTextObject{
+						TextPage: textPage,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_GetTextObject).To(Not(BeNil()))
+
+					textObject = FPDFText_GetTextObject.TextObject
+				})
+
+				It("returns the correct object type", func() {
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: textObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_TEXT,
+					}))
+				})
+			})
+
+			When("another text object is opened", func() {
+				var textObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFText_GetTextObject, err := PdfiumInstance.FPDFText_GetTextObject(&requests.FPDFText_GetTextObject{
+						TextPage: textPage,
+						Index:    7,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_GetTextObject).To(Not(BeNil()))
+
+					textObject = FPDFText_GetTextObject.TextObject
+				})
+
+				It("returns the correct object type", func() {
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: textObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_TEXT,
+					}))
+				})
+
+				It("returns the correct text render mode", func() {
+					FPDFTextObj_GetTextRenderMode, err := PdfiumInstance.FPDFTextObj_GetTextRenderMode(&requests.FPDFTextObj_GetTextRenderMode{
+						PageObject: textObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetTextRenderMode).To(Equal(&responses.FPDFTextObj_GetTextRenderMode{
+						TextRenderMode: enums.FPDF_TEXTRENDERMODE_STROKE,
+					}))
+				})
 			})
 		})
 	})
