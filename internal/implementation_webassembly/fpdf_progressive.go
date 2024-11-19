@@ -119,9 +119,9 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_R
 			Callback:  request.NeedToPauseNowCallback,
 		}
 
-		PauseHandlesLock.Lock()
-		PauseHandles[pageHandle.nativeRef] = pauseHandle
-		PauseHandlesLock.Unlock()
+		PauseHandles.Mutex.Lock()
+		PauseHandles.Refs[pageHandle.nativeRef] = pauseHandle
+		PauseHandles.Mutex.Unlock()
 		pausePointer = newPausePointer
 	}
 
