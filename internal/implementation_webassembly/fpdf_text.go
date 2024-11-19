@@ -1356,7 +1356,7 @@ func (p *PdfiumImplementation) FPDFText_HasUnicodeMapError(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFText_IsGenerated").Call(p.Context, *textPageHandle.handle, uint64(request.Index))
+	res, err := p.Module.ExportedFunction("FPDFText_HasUnicodeMapError").Call(p.Context, *textPageHandle.handle, uint64(request.Index))
 	if err != nil {
 		return nil, err
 	}

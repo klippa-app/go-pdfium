@@ -1277,7 +1277,7 @@ var _ = Describe("fpdf_text", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDFText_HasUnicodeMapError).To(Equal(&responses.FPDFText_HasUnicodeMapError{
 					Index:              2,
-					HasUnicodeMapError: false, // @todo: this SHOULD be true...
+					HasUnicodeMapError: true,
 				}))
 			})
 		})
