@@ -220,6 +220,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					BeforeEach(func() {
 						FPDF_StructTree_GetChildAtIndex, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
 							StructTree: structTree,
+							Index:      0,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructTree_GetChildAtIndex).To(Not(BeNil()))
@@ -261,22 +262,54 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Type: "Table",
 						}))
 
-						row, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+						FPDF_StructElement_CountChildren, err := PdfiumInstance.FPDF_StructElement_CountChildren(&requests.FPDF_StructElement_CountChildren{
+							StructElement: table.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_CountChildren).To(Equal(&responses.FPDF_StructElement_CountChildren{
+							Count: 2,
+						}))
+
+						tr, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: table.StructElement,
 							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(row).To(Not(BeNil()))
+						Expect(tr).To(Not(BeNil()))
 
-						headerCell, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
-							StructElement: row.StructElement,
+						FPDF_StructElement_CountChildren, err = PdfiumInstance.FPDF_StructElement_CountChildren(&requests.FPDF_StructElement_CountChildren{
+							StructElement: tr.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_CountChildren).To(Equal(&responses.FPDF_StructElement_CountChildren{
+							Count: 2,
+						}))
+
+						FPDF_StructElement_GetType, err = PdfiumInstance.FPDF_StructElement_GetType(&requests.FPDF_StructElement_GetType{
+							StructElement: tr.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
+							Type: "TR",
+						}))
+
+						th, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: tr.StructElement,
 							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(headerCell).To(Not(BeNil()))
+						Expect(th).To(Not(BeNil()))
+
+						FPDF_StructElement_GetAttributeCount, err := PdfiumInstance.FPDF_StructElement_GetAttributeCount(&requests.FPDF_StructElement_GetAttributeCount{
+							StructElement: th.StructElement,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_GetAttributeCount).To(Equal(&responses.FPDF_StructElement_GetAttributeCount{
+							Count: 2,
+						}))
 
 						FPDF_StructElement_GetType, err = PdfiumInstance.FPDF_StructElement_GetType(&requests.FPDF_StructElement_GetType{
-							StructElement: headerCell.StructElement,
+							StructElement: th.StructElement,
 						})
 						Expect(err).To(BeNil())
 						Expect(FPDF_StructElement_GetType).To(Equal(&responses.FPDF_StructElement_GetType{
@@ -411,31 +444,34 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					It("returns the struct element attribute", func() {
 						table, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: structElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
 						Expect(table).To(Not(BeNil()))
 
-						row, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+						tr, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
 							StructElement: table.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(row).To(Not(BeNil()))
+						Expect(tr).To(Not(BeNil()))
 
-						headerCell, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
-							StructElement: row.StructElement,
+						th, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+							StructElement: tr.StructElement,
+							Index:         0,
 						})
 						Expect(err).To(BeNil())
-						Expect(headerCell).To(Not(BeNil()))
+						Expect(th).To(Not(BeNil()))
 
 						FPDF_StructElement_GetAttributeAtIndex, err := PdfiumInstance.FPDF_StructElement_GetAttributeAtIndex(&requests.FPDF_StructElement_GetAttributeAtIndex{
-							StructElement: headerCell.StructElement,
+							StructElement: th.StructElement,
 							Index:         3,
 						})
 						Expect(err).To(MatchError("could not get struct element attribute"))
 						Expect(FPDF_StructElement_GetAttributeAtIndex).To(BeNil())
 
 						FPDF_StructElement_GetAttributeAtIndex, err = PdfiumInstance.FPDF_StructElement_GetAttributeAtIndex(&requests.FPDF_StructElement_GetAttributeAtIndex{
-							StructElement: headerCell.StructElement,
+							StructElement: th.StructElement,
 							Index:         1,
 						})
 						Expect(err).To(BeNil())
@@ -498,15 +534,12 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 							Name: "O",
 						}))
 
-						// @todo: figure out why this fails.
-						/*
-							FPDF_StructElement_Attr_GetValue0, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
-								StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
-								Name:                   "0",
-							})
-							Expect(err).To(BeNil())
-							Expect(FPDF_StructElement_Attr_GetValue0).To(Not(BeNil()))
-						*/
+						FPDF_StructElement_Attr_GetValue0, err := PdfiumInstance.FPDF_StructElement_Attr_GetValue(&requests.FPDF_StructElement_Attr_GetValue{
+							StructElementAttribute: FPDF_StructElement_GetAttributeAtIndex.StructElementAttribute,
+							Name:                   FPDF_StructElement_Attr_GetName.Name,
+						})
+						Expect(err).To(BeNil())
+						Expect(FPDF_StructElement_Attr_GetValue0).To(Not(BeNil()))
 					})
 
 					It("returns the struct element attribute values", func() {
