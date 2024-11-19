@@ -1037,6 +1037,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
 
+	// FPDFCatalog_SetLanguage sets the language of a document.
+	// Experimental API.
+	FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error)
+
 	// End fpdf_catalog.h
 
 	// Start fpdf_signature.h

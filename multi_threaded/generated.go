@@ -975,6 +975,14 @@ func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTa
 	return i.worker.plugin.FPDFCatalog_IsTagged(request)
 }
 
+func (i *pdfiumInstance) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFCatalog_SetLanguage(request)
+}
+
 func (i *pdfiumInstance) FPDFClipPath_CountPathSegments(request *requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

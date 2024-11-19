@@ -1761,6 +1761,20 @@ func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTa
 	return i.pdfium.FPDFCatalog_IsTagged(request)
 }
 
+func (i *pdfiumInstance) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (resp *responses.FPDFCatalog_SetLanguage, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFCatalog_SetLanguage", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFCatalog_SetLanguage(request)
+}
+
 func (i *pdfiumInstance) FPDFClipPath_CountPathSegments(request *requests.FPDFClipPath_CountPathSegments) (resp *responses.FPDFClipPath_CountPathSegments, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

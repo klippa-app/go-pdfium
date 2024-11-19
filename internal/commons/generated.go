@@ -137,6 +137,7 @@ type Pdfium interface {
 	FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
 	FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
 	FPDFCatalog_IsTagged(*requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
+	FPDFCatalog_SetLanguage(*requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error)
 	FPDFClipPath_CountPathSegments(*requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error)
 	FPDFClipPath_CountPaths(*requests.FPDFClipPath_CountPaths) (*responses.FPDFClipPath_CountPaths, error)
 	FPDFClipPath_GetPathSegment(*requests.FPDFClipPath_GetPathSegment) (*responses.FPDFClipPath_GetPathSegment, error)
@@ -1706,6 +1707,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitl
 func (g *PdfiumRPC) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
 	resp := &responses.FPDFCatalog_IsTagged{}
 	err := g.client.Call("Plugin.FPDFCatalog_IsTagged", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
+	resp := &responses.FPDFCatalog_SetLanguage{}
+	err := g.client.Call("Plugin.FPDFCatalog_SetLanguage", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -7183,6 +7194,24 @@ func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsT
 	}()
 
 	implResp, err := s.Impl.FPDFCatalog_IsTagged(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage, resp *responses.FPDFCatalog_SetLanguage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFCatalog_SetLanguage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFCatalog_SetLanguage(request)
 	if err != nil {
 		return err
 	}

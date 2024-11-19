@@ -6,9 +6,13 @@ package implementation_cgo
 /*
 #cgo pkg-config: pdfium
 #include "fpdf_catalog.h"
+#include <stdlib.h>
 */
 import "C"
 import (
+	"errors"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -30,4 +34,26 @@ func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalo
 	return &responses.FPDFCatalog_IsTagged{
 		IsTagged: int(isTagged) == 1,
 	}, nil
+}
+
+// FPDFCatalog_SetLanguage sets the language of a document.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	languageStr := C.CString(request.Language)
+	defer C.free(unsafe.Pointer(languageStr))
+
+	success := C.FPDFCatalog_SetLanguage(documentHandle.handle, languageStr)
+	if int(success) == 0 {
+		return nil, errors.New("could not set language")
+	}
+
+	return &responses.FPDFCatalog_SetLanguage{}, nil
 }
