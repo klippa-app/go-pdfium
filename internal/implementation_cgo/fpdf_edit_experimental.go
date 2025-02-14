@@ -277,7 +277,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetName(request *requests.FPDFPag
 	}
 
 	charData := make([]byte, uint64(nameLength))
-	C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &nameLength)
+	C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &nameLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -330,7 +330,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamKey(request *requests.FPD
 	}
 
 	charData := make([]byte, uint64(keyLength))
-	C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &keyLength)
+	C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &keyLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -417,7 +417,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requ
 	}
 
 	charData := make([]byte, uint64(valueLength))
-	C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &valueLength)
+	C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &valueLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -455,7 +455,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 	}
 
 	valueData := make([]byte, uint64(valueLength))
-	C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&valueData[0]), C.ulong(len(valueData)), &valueLength)
+	C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, (*C.uchar)(unsafe.Pointer(&valueData[0])), C.ulong(len(valueData)), &valueLength)
 
 	return &responses.FPDFPageObjMark_GetParamBlobValue{
 		Value: valueData,
@@ -563,7 +563,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetBlobParam(request *requests.FP
 	key := C.CString(request.Key)
 	defer C.free(unsafe.Pointer(key))
 
-	success := C.FPDFPageObjMark_SetBlobParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, unsafe.Pointer(&request.Value[0]), C.ulong(len(request.Value)))
+	success := C.FPDFPageObjMark_SetBlobParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, (*C.uchar)(unsafe.Pointer(&request.Value[0])), C.ulong(len(request.Value)))
 	if int(success) == 0 {
 		return nil, errors.New("could not set value")
 	}
