@@ -327,8 +327,39 @@ func (p *PdfiumImplementation) FPDFPageObj_HasTransparency(request *requests.FPD
 // internally.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	activePointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+
+	defer activePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_GetIsActive").Call(p.Context, *pageObjectHandle.handle, activePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get active state")
+	}
+
+	isActive, err := activePointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPageObj_GetIsActive{
+		Active: int(isActive) == 1,
+	}, nil
 }
 
 // FPDFPageObj_SetIsActive sets the active state for the given page object
@@ -339,8 +370,30 @@ func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPag
 // wasn't in the document even though it is still held internally.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	isActive := 0
+	if request.Active {
+		isActive = 1
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetIsActive").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&isActive)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set active state")
+	}
+
+	return &responses.FPDFPageObj_SetIsActive{}, nil
 }
 
 // FPDFPageObj_GetType returns the type of the given page object.
@@ -920,8 +973,66 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.
 // be nil. It also returns nil if the image object has no ICC profile.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	iccProfileDataLengthPointer, err := p.IntPointer()
+	if err != nil {
+		return nil, err
+	}
+	defer iccProfileDataLengthPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFImageObj_GetIccProfileDataDecoded").Call(p.Context, *imageObjectHandle.handle, *pageHandle.handle, 0, 0, iccProfileDataLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get ICC Profile Data length")
+	}
+
+	iccProfileDataLength, err := iccProfileDataLengthPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	length := uint64(iccProfileDataLength)
+
+	valueData, err := p.ByteArrayPointer(length, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer valueData.Free()
+
+	res, err = p.Module.ExportedFunction("FPDFImageObj_GetIccProfileDataDecoded").Call(p.Context, *imageObjectHandle.handle, *pageHandle.handle, valueData.Pointer, *(*uint64)(unsafe.Pointer(&length)), iccProfileDataLengthPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success = *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get ICC Profile Data")
+	}
+
+	data, err := valueData.Value(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFImageObj_GetIccProfileDataDecoded{
+		Data: data,
+	}, nil
 }
 
 // FPDFPageObj_CreateNewPath creates a new path object at an initial position.

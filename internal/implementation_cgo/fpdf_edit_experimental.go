@@ -1299,8 +1299,34 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.
 // be nil. It also returns nil if the image object has no ICC profile.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	iccProfileDataLength := C.size_t(0)
+	result := C.FPDFImageObj_GetIccProfileDataDecoded(imageObjectHandle.handle, pageHandle.handle, nil, 0, &iccProfileDataLength)
+	if int(result) == 0 {
+		return nil, errors.New("could not get ICC Profile Data length")
+	}
+
+	valueData := make([]byte, uint64(iccProfileDataLength))
+	result = C.FPDFImageObj_GetIccProfileDataDecoded(imageObjectHandle.handle, pageHandle.handle, unsafe.Pointer(&valueData[0]), C.size_t(len(valueData)), &iccProfileDataLength)
+	if int(result) == 0 {
+		return nil, errors.New("could not get ICC Profile Data")
+	}
+
+	return &responses.FPDFImageObj_GetIccProfileDataDecoded{
+		Data: valueData,
+	}, nil
 }
 
 // FPDF_MovePages Move the given pages to a new index position.
@@ -1340,8 +1366,24 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 // internally.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	isActive := C.FPDF_BOOL(0)
+
+	result := C.FPDFPageObj_GetIsActive(pageObjectHandle.handle, &isActive)
+	if int(result) == 0 {
+		return nil, errors.New("could not get active state")
+	}
+
+	return &responses.FPDFPageObj_GetIsActive{
+		Active: int(isActive) == 1,
+	}, nil
 }
 
 // FPDFPageObj_SetIsActive sets the active state for the given page object
@@ -1352,6 +1394,23 @@ func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPag
 // wasn't in the document even though it is still held internally.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
-	// @todo: implement me.
-	return nil, errors.New("not implemented")
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	isActive := C.FPDF_BOOL(0)
+	if request.Active {
+		isActive = C.FPDF_BOOL(1)
+	}
+
+	result := C.FPDFPageObj_SetIsActive(pageObjectHandle.handle, isActive)
+	if int(result) == 0 {
+		return nil, errors.New("could not set active state")
+	}
+
+	return &responses.FPDFPageObj_SetIsActive{}, nil
 }

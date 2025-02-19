@@ -172,7 +172,7 @@ type FPDFImageObj_GetImagePixelSize struct {
 }
 
 type FPDFImageObj_GetIccProfileDataDecoded struct {
-	IccProfileDataDecoded []byte // Can be nil if the given page object is not an image or has no ICC profile.
+	Data []byte // Can be nil if the given page object is not an image or has no ICC profile.
 }
 
 type FPDFPageObj_CreateNewPath struct {
