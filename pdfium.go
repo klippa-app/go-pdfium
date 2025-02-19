@@ -427,6 +427,23 @@ type Pdfium interface {
 	// FPDFPageObj_GetType returns the type of the given page object.
 	FPDFPageObj_GetType(request *requests.FPDFPageObj_GetType) (*responses.FPDFPageObj_GetType, error)
 
+	// FPDFPageObj_GetIsActive returns the active state for the given page
+	// object within the page.
+	// For page objects where active is filled with false, the page object is
+	// treated as if it wasn't in the document even though it is still held
+	// internally.
+	// Experimental API.
+	FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error)
+
+	// FPDFPageObj_SetIsActive sets the active state for the given page object
+	// within the page.
+	// Page objects all start in the active state by default, and remain in that
+	// state unless this function is called.
+	// When active is false, this makes the page_object be treated as if it
+	// wasn't in the document even though it is still held internally.
+	// Experimental API.
+	FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error)
+
 	// FPDFPageObj_Transform transforms the page object by the given matrix.
 	// The matrix is composed as:
 	//   |a c e|
@@ -611,6 +628,13 @@ type Pdfium interface {
 	// FPDFImageObj_GetImagePixelSize get the image size in pixels. Faster method to get only image size.
 	// Experimental API.
 	FPDFImageObj_GetImagePixelSize(request *requests.FPDFImageObj_GetImagePixelSize) (*responses.FPDFImageObj_GetImagePixelSize, error)
+
+	// FPDFImageObj_GetIccProfileDataDecoded returns the ICC profile decoded
+	// data of the given image object. If the image object is not an image
+	// object or if it does not have an image, then the return value will
+	// be nil. It also returns nil if the image object has no ICC profile.
+	// Experimental API
+	FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error)
 
 	// FPDFPageObj_CreateNewPath creates a new path object at an initial position.
 	FPDFPageObj_CreateNewPath(request *requests.FPDFPageObj_CreateNewPath) (*responses.FPDFPageObj_CreateNewPath, error)

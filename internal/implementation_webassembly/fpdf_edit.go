@@ -320,6 +320,29 @@ func (p *PdfiumImplementation) FPDFPageObj_HasTransparency(request *requests.FPD
 	}, nil
 }
 
+// FPDFPageObj_GetIsActive returns the active state for the given page
+// object within the page.
+// For page objects where active is filled with false, the page object is
+// treated as if it wasn't in the document even though it is still held
+// internally.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
+	// @todo: implement me.
+	return nil, errors.New("not implemented")
+}
+
+// FPDFPageObj_SetIsActive sets the active state for the given page object
+// within the page.
+// Page objects all start in the active state by default, and remain in that
+// state unless this function is called.
+// When active is false, this makes the page_object be treated as if it
+// wasn't in the document even though it is still held internally.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
+	// @todo: implement me.
+	return nil, errors.New("not implemented")
+}
+
 // FPDFPageObj_GetType returns the type of the given page object.
 func (p *PdfiumImplementation) FPDFPageObj_GetType(request *requests.FPDFPageObj_GetType) (*responses.FPDFPageObj_GetType, error) {
 	p.Lock()
@@ -889,6 +912,16 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.
 		Width:  widthValue,
 		Height: heightValue,
 	}, nil
+}
+
+// FPDFImageObj_GetIccProfileDataDecoded returns the ICC profile decoded
+// data of the given image object. If the image object is not an image
+// object or if it does not have an image, then the return value will
+// be nil. It also returns nil if the image object has no ICC profile.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
+	// @todo: implement me.
+	return nil, errors.New("not implemented")
 }
 
 // FPDFPageObj_CreateNewPath creates a new path object at an initial position.

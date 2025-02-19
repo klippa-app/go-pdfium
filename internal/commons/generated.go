@@ -171,6 +171,7 @@ type Pdfium interface {
 	FPDFGlyphPath_CountGlyphSegments(*requests.FPDFGlyphPath_CountGlyphSegments) (*responses.FPDFGlyphPath_CountGlyphSegments, error)
 	FPDFGlyphPath_GetGlyphPathSegment(*requests.FPDFGlyphPath_GetGlyphPathSegment) (*responses.FPDFGlyphPath_GetGlyphPathSegment, error)
 	FPDFImageObj_GetBitmap(*requests.FPDFImageObj_GetBitmap) (*responses.FPDFImageObj_GetBitmap, error)
+	FPDFImageObj_GetIccProfileDataDecoded(*requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error)
 	FPDFImageObj_GetImageDataDecoded(*requests.FPDFImageObj_GetImageDataDecoded) (*responses.FPDFImageObj_GetImageDataDecoded, error)
 	FPDFImageObj_GetImageDataRaw(*requests.FPDFImageObj_GetImageDataRaw) (*responses.FPDFImageObj_GetImageDataRaw, error)
 	FPDFImageObj_GetImageFilter(*requests.FPDFImageObj_GetImageFilter) (*responses.FPDFImageObj_GetImageFilter, error)
@@ -223,6 +224,7 @@ type Pdfium interface {
 	FPDFPageObj_GetDashCount(*requests.FPDFPageObj_GetDashCount) (*responses.FPDFPageObj_GetDashCount, error)
 	FPDFPageObj_GetDashPhase(*requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error)
 	FPDFPageObj_GetFillColor(*requests.FPDFPageObj_GetFillColor) (*responses.FPDFPageObj_GetFillColor, error)
+	FPDFPageObj_GetIsActive(*requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error)
 	FPDFPageObj_GetLineCap(*requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error)
 	FPDFPageObj_GetLineJoin(*requests.FPDFPageObj_GetLineJoin) (*responses.FPDFPageObj_GetLineJoin, error)
 	FPDFPageObj_GetMark(*requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
@@ -240,6 +242,7 @@ type Pdfium interface {
 	FPDFPageObj_SetDashArray(*requests.FPDFPageObj_SetDashArray) (*responses.FPDFPageObj_SetDashArray, error)
 	FPDFPageObj_SetDashPhase(*requests.FPDFPageObj_SetDashPhase) (*responses.FPDFPageObj_SetDashPhase, error)
 	FPDFPageObj_SetFillColor(*requests.FPDFPageObj_SetFillColor) (*responses.FPDFPageObj_SetFillColor, error)
+	FPDFPageObj_SetIsActive(*requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error)
 	FPDFPageObj_SetLineCap(*requests.FPDFPageObj_SetLineCap) (*responses.FPDFPageObj_SetLineCap, error)
 	FPDFPageObj_SetLineJoin(*requests.FPDFPageObj_SetLineJoin) (*responses.FPDFPageObj_SetLineJoin, error)
 	FPDFPageObj_SetMatrix(*requests.FPDFPageObj_SetMatrix) (*responses.FPDFPageObj_SetMatrix, error)
@@ -2056,6 +2059,16 @@ func (g *PdfiumRPC) FPDFImageObj_GetBitmap(request *requests.FPDFImageObj_GetBit
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
+	resp := &responses.FPDFImageObj_GetIccProfileDataDecoded{}
+	err := g.client.Call("Plugin.FPDFImageObj_GetIccProfileDataDecoded", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFImageObj_GetImageDataDecoded(request *requests.FPDFImageObj_GetImageDataDecoded) (*responses.FPDFImageObj_GetImageDataDecoded, error) {
 	resp := &responses.FPDFImageObj_GetImageDataDecoded{}
 	err := g.client.Call("Plugin.FPDFImageObj_GetImageDataDecoded", request, resp)
@@ -2576,6 +2589,16 @@ func (g *PdfiumRPC) FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_GetFi
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
+	resp := &responses.FPDFPageObj_GetIsActive{}
+	err := g.client.Call("Plugin.FPDFPageObj_GetIsActive", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error) {
 	resp := &responses.FPDFPageObj_GetLineCap{}
 	err := g.client.Call("Plugin.FPDFPageObj_GetLineCap", request, resp)
@@ -2739,6 +2762,16 @@ func (g *PdfiumRPC) FPDFPageObj_SetDashPhase(request *requests.FPDFPageObj_SetDa
 func (g *PdfiumRPC) FPDFPageObj_SetFillColor(request *requests.FPDFPageObj_SetFillColor) (*responses.FPDFPageObj_SetFillColor, error) {
 	resp := &responses.FPDFPageObj_SetFillColor{}
 	err := g.client.Call("Plugin.FPDFPageObj_SetFillColor", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
+	resp := &responses.FPDFPageObj_SetIsActive{}
+	err := g.client.Call("Plugin.FPDFPageObj_SetIsActive", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -7838,6 +7871,24 @@ func (s *PdfiumRPCServer) FPDFImageObj_GetBitmap(request *requests.FPDFImageObj_
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded, resp *responses.FPDFImageObj_GetIccProfileDataDecoded) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFImageObj_GetIccProfileDataDecoded", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFImageObj_GetIccProfileDataDecoded(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFImageObj_GetImageDataDecoded(request *requests.FPDFImageObj_GetImageDataDecoded, resp *responses.FPDFImageObj_GetImageDataDecoded) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -8774,6 +8825,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_GetFillColor(request *requests.FPDFPageObj
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive, resp *responses.FPDFPageObj_GetIsActive) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetIsActive", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_GetIsActive(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap, resp *responses.FPDFPageObj_GetLineCap) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -9070,6 +9139,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_SetFillColor(request *requests.FPDFPageObj
 	}()
 
 	implResp, err := s.Impl.FPDFPageObj_SetFillColor(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive, resp *responses.FPDFPageObj_SetIsActive) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_SetIsActive", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_SetIsActive(request)
 	if err != nil {
 		return err
 	}
