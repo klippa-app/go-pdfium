@@ -11,7 +11,7 @@ require (
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.9.0
 	golang.org/x/net v0.33.0
 	golang.org/x/text v0.22.0
