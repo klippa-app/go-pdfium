@@ -1813,6 +1813,43 @@ end
 					Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
 						Count: 8,
 					}))
+
+					FPDFPageObj_SetIsActive, err = PdfiumInstance.FPDFPageObj_SetIsActive(&requests.FPDFPageObj_SetIsActive{
+						PageObject: pageObject,
+						Active:     true,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_SetIsActive).To(Equal(&responses.FPDFPageObj_SetIsActive{}))
+
+					FPDFPageObj_GetIsActive, err = PdfiumInstance.FPDFPageObj_GetIsActive(&requests.FPDFPageObj_GetIsActive{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetIsActive).To(Equal(&responses.FPDFPageObj_GetIsActive{
+						Active: true,
+					}))
+
+					FPDFPage_GenerateContent, err = PdfiumInstance.FPDFPage_GenerateContent(&requests.FPDFPage_GenerateContent{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GenerateContent).To(Not(BeNil()))
+					Expect(FPDFPage_GenerateContent).To(Equal(&responses.FPDFPage_GenerateContent{}))
+
+					FPDFPage_CountObjects, err = PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_CountObjects).To(Not(BeNil()))
+					Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
+						Count: 8,
+					}))
 				})
 			})
 		})
