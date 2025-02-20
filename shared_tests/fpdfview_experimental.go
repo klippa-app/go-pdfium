@@ -4,10 +4,11 @@
 package shared_tests
 
 import (
-	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"io/ioutil"
 	"os"
 	"unsafe"
+
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -471,10 +472,16 @@ var _ = Describe("fpdfview", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(pageCount).To(Equal(&responses.FPDF_GetPageHeight{
-					Page:   0,
-					Height: 841.8897094726562,
-				}))
+				Expect(pageCount).To(Or(
+					Equal(&responses.FPDF_GetPageHeight{
+						Page:   0,
+						Height: 841.8897094726562,
+					}),
+					Equal(&responses.FPDF_GetPageHeight{
+						Page:   0,
+						Height: 841.8897705078125,
+					}),
+				))
 			})
 
 			It("returns an error when calling FPDF_GetPageHeight without a page", func() {
@@ -489,11 +496,18 @@ var _ = Describe("fpdfview", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(pageCount).To(Equal(&responses.FPDF_GetPageSizeByIndex{
-					Page:   0,
-					Width:  595.2755737304688,
-					Height: 841.8897094726562,
-				}))
+				Expect(pageCount).To(Or(
+					Equal(&responses.FPDF_GetPageSizeByIndex{
+						Page:   0,
+						Width:  595.2755737304688,
+						Height: 841.8897094726562,
+					}),
+					Equal(&responses.FPDF_GetPageSizeByIndex{
+						Page:   0,
+						Width:  595.2755737304688,
+						Height: 841.8897705078125,
+					}),
+				))
 			})
 
 			It("returns an error when calling FPDF_GetPageSizeByIndex with an invalid page", func() {
@@ -550,9 +564,14 @@ var _ = Describe("fpdfview", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageHeightF).To(Equal(&responses.FPDF_GetPageHeightF{
-					PageHeight: 841.8897094726562,
-				}))
+				Expect(FPDF_GetPageHeightF).To(Or(
+					Equal(&responses.FPDF_GetPageHeightF{
+						PageHeight: 841.8897094726562,
+					}),
+					Equal(&responses.FPDF_GetPageHeightF{
+						PageHeight: 841.8897705078125,
+					}),
+				))
 			})
 
 			It("returns the correct page bounding box", func() {
@@ -565,14 +584,24 @@ var _ = Describe("fpdfview", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageBoundingBox).To(Equal(&responses.FPDF_GetPageBoundingBox{
-					Rect: structs.FPDF_FS_RECTF{
-						Left:   0,
-						Top:    841.8897094726562,
-						Right:  595.2755737304688,
-						Bottom: 0,
-					},
-				}))
+				Expect(FPDF_GetPageBoundingBox).To(Or(
+					Equal(&responses.FPDF_GetPageBoundingBox{
+						Rect: structs.FPDF_FS_RECTF{
+							Left:   0,
+							Top:    841.8897094726562,
+							Right:  595.2755737304688,
+							Bottom: 0,
+						},
+					}),
+					Equal(&responses.FPDF_GetPageBoundingBox{
+						Rect: structs.FPDF_FS_RECTF{
+							Left:   0,
+							Top:    841.8897705078125,
+							Right:  595.2755737304688,
+							Bottom: 0,
+						},
+					}),
+				))
 			})
 
 			It("returns the correct page size by index in float32", func() {
@@ -581,12 +610,20 @@ var _ = Describe("fpdfview", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDF_GetPageSizeByIndexF).To(Equal(&responses.FPDF_GetPageSizeByIndexF{
-					Size: structs.FPDF_FS_SIZEF{
-						Width:  595.2755737304688,
-						Height: 841.8897094726562,
-					},
-				}))
+				Expect(FPDF_GetPageSizeByIndexF).To(Or(
+					Equal(&responses.FPDF_GetPageSizeByIndexF{
+						Size: structs.FPDF_FS_SIZEF{
+							Width:  595.2755737304688,
+							Height: 841.8897094726562,
+						},
+					}),
+					Equal(&responses.FPDF_GetPageSizeByIndexF{
+						Size: structs.FPDF_FS_SIZEF{
+							Width:  595.2755737304688,
+							Height: 841.8897705078125,
+						},
+					}),
+				))
 			})
 
 			It("returns the correct device to page calculations", func() {

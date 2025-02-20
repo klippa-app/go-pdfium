@@ -1,0 +1,1385 @@
+{
+  "Page": 0,
+  "Chars": [
+    {
+      "Text": "F",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 71.9451904296875,
+        "Top": 797.1782836914062,
+        "Right": 76.55418395996094,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 256,
+        "Top": 2841,
+        "Right": 273,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "i",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 77.89618682861328,
+        "Top": 797.519287109375,
+        "Right": 78.88618469238281,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 278,
+        "Top": 2842,
+        "Right": 281,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "l",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 80.88818359375,
+        "Top": 797.519287109375,
+        "Right": 81.87818908691406,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 288,
+        "Top": 2842,
+        "Right": 292,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "e",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 83.45118713378906,
+        "Top": 795.3192749023438,
+        "Right": 89.02819061279297,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 297,
+        "Top": 2834,
+        "Right": 317,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": ":",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 91.12918853759766,
+        "Top": 794.8463134765625,
+        "Right": 92.26219177246094,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 325,
+        "Top": 2832,
+        "Right": 329,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 93.83518981933594,
+        "Top": 789.1702880859375,
+        "Right": 97.32218933105469,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 334,
+        "Top": 2812,
+        "Right": 347,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "U",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 97.78418731689453,
+        "Top": 797.1782836914062,
+        "Right": 103.92218780517578,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 348,
+        "Top": 2841,
+        "Right": 370,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "n",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 105.8141860961914,
+        "Top": 795.3192749023438,
+        "Right": 110.85218811035156,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 377,
+        "Top": 2834,
+        "Right": 395,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "t",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 112.10618591308594,
+        "Top": 796.8812866210938,
+        "Right": 115.85719299316406,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 399,
+        "Top": 2840,
+        "Right": 413,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "i",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 116.836181640625,
+        "Top": 797.519287109375,
+        "Right": 117.82618713378906,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 416,
+        "Top": 2842,
+        "Right": 420,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "t",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 119.0911865234375,
+        "Top": 796.8812866210938,
+        "Right": 122.8421859741211,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 424,
+        "Top": 2840,
+        "Right": 438,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "l",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 123.83218383789062,
+        "Top": 797.519287109375,
+        "Right": 124.82218933105469,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 441,
+        "Top": 2842,
+        "Right": 445,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "e",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 126.39518737792969,
+        "Top": 795.3192749023438,
+        "Right": 131.97219848632812,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 450,
+        "Top": 2834,
+        "Right": 470,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "d",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 133.39117431640625,
+        "Top": 797.519287109375,
+        "Right": 138.7701873779297,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 475,
+        "Top": 2842,
+        "Right": 494,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 139.76019287109375,
+        "Top": 789.1702880859375,
+        "Right": 143.2471923828125,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 498,
+        "Top": 2812,
+        "Right": 510,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "D",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 143.8411865234375,
+        "Top": 797.1782836914062,
+        "Right": 150.5841827392578,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 513,
+        "Top": 2841,
+        "Right": 537,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "o",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 151.36517333984375,
+        "Top": 795.3192749023438,
+        "Right": 156.88717651367188,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 539,
+        "Top": 2834,
+        "Right": 559,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "c",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 158.36117553710938,
+        "Top": 795.3192749023438,
+        "Right": 163.12417602539062,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 564,
+        "Top": 2834,
+        "Right": 581,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "u",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 164.68618774414062,
+        "Top": 795.3192749023438,
+        "Right": 169.72418212890625,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 587,
+        "Top": 2834,
+        "Right": 605,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "m",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 171.71517944335938,
+        "Top": 795.3192749023438,
+        "Right": 180.49317932128906,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 612,
+        "Top": 2834,
+        "Right": 643,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "e",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 182.3411865234375,
+        "Top": 795.3192749023438,
+        "Right": 187.91818237304688,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 650,
+        "Top": 2834,
+        "Right": 670,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "n",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 189.73318481445312,
+        "Top": 795.3192749023438,
+        "Right": 194.77117919921875,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 676,
+        "Top": 2834,
+        "Right": 694,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "t",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 196.0251922607422,
+        "Top": 796.8812866210938,
+        "Right": 199.77618408203125,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 699,
+        "Top": 2840,
+        "Right": 712,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 199.72119140625,
+        "Top": 789.1702880859375,
+        "Right": 203.20819091796875,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 712,
+        "Top": 2812,
+        "Right": 724,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "2",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 203.5161895751953,
+        "Top": 797.3212890625,
+        "Right": 208.60919189453125,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 725,
+        "Top": 2841,
+        "Right": 743,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 203.3491973876953,
+        "Top": 789.1593017578125,
+        "Right": 203.3491973876953,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 725,
+        "Top": 2812,
+        "Right": 725,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "",
+        "Flags": 0
+      }
+    },
+    {
+      "Text": "P",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 464.4881286621094,
+        "Top": 797.1782836914062,
+        "Right": 469.66912841796875,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1655,
+        "Top": 2841,
+        "Right": 1674,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "a",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 470.06512451171875,
+        "Top": 795.3192749023438,
+        "Right": 475.1471252441406,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 1675,
+        "Top": 2834,
+        "Right": 1693,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "g",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 477.0061340332031,
+        "Top": 795.3192749023438,
+        "Right": 482.3851318359375,
+        "Bottom": 786.88232421875
+      },
+      "PixelPosition": {
+        "Left": 1700,
+        "Top": 2834,
+        "Right": 1719,
+        "Bottom": 2804
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "e",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 483.9801330566406,
+        "Top": 795.3192749023438,
+        "Right": 489.55712890625,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 1725,
+        "Top": 2834,
+        "Right": 1744,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 490.39312744140625,
+        "Top": 789.1702880859375,
+        "Right": 493.880126953125,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1747,
+        "Top": 2812,
+        "Right": 1760,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "1",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 494.5951232910156,
+        "Top": 797.1782836914062,
+        "Right": 499.369140625,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1762,
+        "Top": 2841,
+        "Right": 1779,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 500.3811340332031,
+        "Top": 789.1702880859375,
+        "Right": 503.8681335449219,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1783,
+        "Top": 2812,
+        "Right": 1795,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "o",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 503.9781188964844,
+        "Top": 795.3192749023438,
+        "Right": 509.5001220703125,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 1796,
+        "Top": 2834,
+        "Right": 1816,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "f",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 510.6111145019531,
+        "Top": 797.519287109375,
+        "Right": 514.4391479492188,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1820,
+        "Top": 2842,
+        "Right": 1833,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 514.3621215820312,
+        "Top": 789.1702880859375,
+        "Right": 517.84912109375,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1833,
+        "Top": 2812,
+        "Right": 1845,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "1",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 518.5641479492188,
+        "Top": 797.1782836914062,
+        "Right": 523.338134765625,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1848,
+        "Top": 2841,
+        "Right": 1865,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "\r",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 517.9901123046875,
+        "Top": 789.1593017578125,
+        "Right": 517.9901123046875,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1846,
+        "Top": 2812,
+        "Right": 1846,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "",
+        "Flags": 0
+      }
+    },
+    {
+      "Text": "\n",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 517.9901123046875,
+        "Top": 789.1593017578125,
+        "Right": 517.9901123046875,
+        "Bottom": 789.1593017578125
+      },
+      "PixelPosition": {
+        "Left": 1846,
+        "Top": 2812,
+        "Right": 1846,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "",
+        "Flags": 0
+      }
+    },
+    {
+      "Text": "T",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 71.07418823242188,
+        "Top": 769.4048461914062,
+        "Right": 76.07818603515625,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 253,
+        "Top": 2742,
+        "Right": 271,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "h",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 76.72618865966797,
+        "Top": 769.6838989257812,
+        "Right": 80.48818969726562,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 273,
+        "Top": 2743,
+        "Right": 287,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "i",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 81.64918518066406,
+        "Top": 769.6838989257812,
+        "Right": 85.6631851196289,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 291,
+        "Top": 2743,
+        "Right": 305,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "s",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 86.80618286132812,
+        "Top": 767.8838500976562,
+        "Right": 90.39718627929688,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 309,
+        "Top": 2736,
+        "Right": 322,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 90.86518859863281,
+        "Top": 762.8528442382812,
+        "Right": 96.28318786621094,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 324,
+        "Top": 2718,
+        "Right": 343,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "i",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 96.65219116210938,
+        "Top": 769.6838989257812,
+        "Right": 100.66619110107422,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 344,
+        "Top": 2743,
+        "Right": 359,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "s",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 101.80018615722656,
+        "Top": 767.8838500976562,
+        "Right": 105.39118957519531,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 363,
+        "Top": 2736,
+        "Right": 376,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 105.86819458007812,
+        "Top": 762.8528442382812,
+        "Right": 111.28619384765625,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 377,
+        "Top": 2718,
+        "Right": 397,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "a",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 111.44818878173828,
+        "Top": 767.8838500976562,
+        "Right": 115.51618957519531,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 397,
+        "Top": 2736,
+        "Right": 412,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 115.8671875,
+        "Top": 762.8528442382812,
+        "Right": 121.28519439697266,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 413,
+        "Top": 2718,
+        "Right": 432,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "t",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 121.43818664550781,
+        "Top": 769.161865234375,
+        "Right": 125.398193359375,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 433,
+        "Top": 2741,
+        "Right": 447,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "e",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 126.40618896484375,
+        "Top": 767.8838500976562,
+        "Right": 130.75318908691406,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 450,
+        "Top": 2736,
+        "Right": 466,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "s",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 131.7971954345703,
+        "Top": 767.8838500976562,
+        "Right": 135.38818359375,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 470,
+        "Top": 2736,
+        "Right": 482,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "t",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 136.44119262695312,
+        "Top": 769.161865234375,
+        "Right": 140.40118408203125,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 486,
+        "Top": 2741,
+        "Right": 500,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": " ",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 140.86019897460938,
+        "Top": 762.8528442382812,
+        "Right": 146.2781982421875,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 502,
+        "Top": 2718,
+        "Right": 521,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "P",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 146.7281951904297,
+        "Top": 769.4048461914062,
+        "Right": 150.877197265625,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 523,
+        "Top": 2742,
+        "Right": 538,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "D",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 151.4622039794922,
+        "Top": 769.4048461914062,
+        "Right": 155.71920776367188,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 540,
+        "Top": 2742,
+        "Right": 555,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "F",
+      "Angle": 0,
+      "PointPosition": {
+        "Left": 156.8892059326172,
+        "Top": 769.4048461914062,
+        "Right": 160.75021362304688,
+        "Bottom": 762.8438720703125
+      },
+      "PixelPosition": {
+        "Left": 559,
+        "Top": 2742,
+        "Right": 573,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    }
+  ],
+  "Rects": [
+    {
+      "Text": "File: Untitled Document 2 ",
+      "PointPosition": {
+        "Left": 71.9451904296875,
+        "Top": 797.519287109375,
+        "Right": 208.60919189453125,
+        "Bottom": 789.0162963867188
+      },
+      "PixelPosition": {
+        "Left": 256,
+        "Top": 2842,
+        "Right": 743,
+        "Bottom": 2812
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "Page 1 of 1",
+      "PointPosition": {
+        "Left": 464.4881286621094,
+        "Top": 797.519287109375,
+        "Right": 523.338134765625,
+        "Bottom": 786.88232421875
+      },
+      "PixelPosition": {
+        "Left": 1655,
+        "Top": 2842,
+        "Right": 1865,
+        "Bottom": 2804
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSans",
+        "Flags": 524320
+      }
+    },
+    {
+      "Text": "This is a test PDF",
+      "PointPosition": {
+        "Left": 71.07418823242188,
+        "Top": 769.6838989257812,
+        "Right": 160.75021362304688,
+        "Bottom": 762.7268676757812
+      },
+      "PixelPosition": {
+        "Left": 253,
+        "Top": 2743,
+        "Right": 573,
+        "Bottom": 2718
+      },
+      "FontInformation": {
+        "Size": 1,
+        "SizeInPixels": 4,
+        "Weight": 0,
+        "Name": "DejaVuSansMono",
+        "Flags": 524320
+      }
+    }
+  ],
+  "PointToPixelRatio": 3.563411868266857
+}
