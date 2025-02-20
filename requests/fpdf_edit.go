@@ -91,6 +91,15 @@ type FPDFPageObj_GetType struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
+type FPDFPageObj_GetIsActive struct {
+	PageObject references.FPDF_PAGEOBJECT
+}
+
+type FPDFPageObj_SetIsActive struct {
+	PageObject references.FPDF_PAGEOBJECT
+	Active     bool
+}
+
 type FPDFPageObj_Transform struct {
 	PageObject references.FPDF_PAGEOBJECT
 	Transform  structs.FPDF_FS_MATRIX
@@ -271,6 +280,11 @@ type FPDFImageObj_GetImageMetadata struct {
 
 type FPDFImageObj_GetImagePixelSize struct {
 	ImageObject references.FPDF_PAGEOBJECT
+}
+
+type FPDFImageObj_GetIccProfileDataDecoded struct {
+	ImageObject references.FPDF_PAGEOBJECT
+	Page        Page
 }
 
 type FPDFPageObj_CreateNewPath struct {

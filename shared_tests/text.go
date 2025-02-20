@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
+
+	"github.com/onsi/gomega/types"
 
 	"github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
@@ -140,7 +143,7 @@ var _ = Describe("text", func() {
 					})
 
 					Expect(err).To(BeNil())
-					Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", pageTextStructured)))
+					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations_7019.json")...))
 				})
 
 				Context("when PixelPositions is enabled", func() {
@@ -177,7 +180,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", pageTextStructured)))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7019.json")...))
 						})
 					})
 
@@ -198,7 +201,7 @@ var _ = Describe("text", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", pageTextStructured)))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7019.json")...))
 						})
 					})
 				})
@@ -207,23 +210,32 @@ var _ = Describe("text", func() {
 	})
 })
 
-func loadStructuredText(path string, resp *responses.GetPageTextStructured) *responses.GetPageTextStructured {
-	writeStructuredText(path, resp)
-	preRender, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil
+func loadStructuredText(resp *responses.GetPageTextStructured, paths ...string) []types.GomegaMatcher {
+	result := []types.GomegaMatcher{}
+
+	for _, path := range paths {
+		writeStructuredText(path, resp)
+		preRender, err := ioutil.ReadFile(path)
+		if err != nil {
+			return nil
+		}
+
+		buf := bytes.NewBuffer(preRender)
+		dec := json.NewDecoder(buf)
+
+		var text responses.GetPageTextStructured
+		err = dec.Decode(&text)
+
+		result = append(result, Equal(&text))
 	}
 
-	buf := bytes.NewBuffer(preRender)
-	dec := json.NewDecoder(buf)
-
-	var text responses.GetPageTextStructured
-	err = dec.Decode(&text)
-	return &text
+	return result
 }
 
 func writeStructuredText(path string, resp *responses.GetPageTextStructured) error {
-	return nil // Comment this in case of updating PDFium versions and output has changed.
+	if _, err := os.Stat(path); err == nil {
+		return nil // Comment this in case of updating PDFium versions and rendering has changed.
+	}
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)

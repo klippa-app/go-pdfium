@@ -1243,6 +1243,14 @@ func (i *pdfiumInstance) FPDFImageObj_GetBitmap(request *requests.FPDFImageObj_G
 	return i.worker.plugin.FPDFImageObj_GetBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFImageObj_GetIccProfileDataDecoded(request)
+}
+
 func (i *pdfiumInstance) FPDFImageObj_GetImageDataDecoded(request *requests.FPDFImageObj_GetImageDataDecoded) (*responses.FPDFImageObj_GetImageDataDecoded, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1667,6 +1675,14 @@ func (i *pdfiumInstance) FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_
 	return i.worker.plugin.FPDFPageObj_GetFillColor(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_GetIsActive(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap) (*responses.FPDFPageObj_GetLineCap, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1801,6 +1817,14 @@ func (i *pdfiumInstance) FPDFPageObj_SetFillColor(request *requests.FPDFPageObj_
 	}
 
 	return i.worker.plugin.FPDFPageObj_SetFillColor(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_SetIsActive(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObj_SetLineCap(request *requests.FPDFPageObj_SetLineCap) (*responses.FPDFPageObj_SetLineCap, error) {

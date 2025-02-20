@@ -6,10 +6,11 @@ package shared_tests
 import (
 	"io/ioutil"
 
-	"github.com/klippa-app/go-pdfium/references"
-	"github.com/klippa-app/go-pdfium/requests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/klippa-app/go-pdfium/references"
+	"github.com/klippa-app/go-pdfium/requests"
 )
 
 var _ = Describe("text", func() {
@@ -58,7 +59,7 @@ var _ = Describe("text", func() {
 							CollectFontInformation: true,
 						})
 						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information.json", pageTextStructured)))
+						Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information.json", TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_7019.json")...))
 					})
 
 					Context("and PixelPositions is enabled", func() {
@@ -78,7 +79,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Equal(loadStructuredText(TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions.json", pageTextStructured)))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions.json", TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions_7019.json")...))
 						})
 					})
 				})

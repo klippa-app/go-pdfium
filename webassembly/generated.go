@@ -2237,6 +2237,20 @@ func (i *pdfiumInstance) FPDFImageObj_GetBitmap(request *requests.FPDFImageObj_G
 	return i.worker.Instance.FPDFImageObj_GetBitmap(request)
 }
 
+func (i *pdfiumInstance) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (resp *responses.FPDFImageObj_GetIccProfileDataDecoded, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFImageObj_GetIccProfileDataDecoded", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFImageObj_GetIccProfileDataDecoded(request)
+}
+
 func (i *pdfiumInstance) FPDFImageObj_GetImageDataDecoded(request *requests.FPDFImageObj_GetImageDataDecoded) (resp *responses.FPDFImageObj_GetImageDataDecoded, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2965,6 +2979,20 @@ func (i *pdfiumInstance) FPDFPageObj_GetFillColor(request *requests.FPDFPageObj_
 	return i.worker.Instance.FPDFPageObj_GetFillColor(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (resp *responses.FPDFPageObj_GetIsActive, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetIsActive", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPageObj_GetIsActive(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetLineCap(request *requests.FPDFPageObj_GetLineCap) (resp *responses.FPDFPageObj_GetLineCap, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3201,6 +3229,20 @@ func (i *pdfiumInstance) FPDFPageObj_SetFillColor(request *requests.FPDFPageObj_
 	}()
 
 	return i.worker.Instance.FPDFPageObj_SetFillColor(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (resp *responses.FPDFPageObj_SetIsActive, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_SetIsActive", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPageObj_SetIsActive(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObj_SetLineCap(request *requests.FPDFPageObj_SetLineCap) (resp *responses.FPDFPageObj_SetLineCap, err error) {

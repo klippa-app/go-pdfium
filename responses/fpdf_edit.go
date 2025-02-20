@@ -54,6 +54,12 @@ type FPDFPageObj_GetType struct {
 	Type enums.FPDF_PAGEOBJ
 }
 
+type FPDFPageObj_GetIsActive struct {
+	Active bool
+}
+
+type FPDFPageObj_SetIsActive struct{}
+
 type FPDFPageObj_Transform struct{}
 
 type FPDFPageObj_TransformF struct{}
@@ -163,6 +169,10 @@ type FPDFImageObj_GetImageMetadata struct {
 type FPDFImageObj_GetImagePixelSize struct {
 	Width  uint
 	Height uint
+}
+
+type FPDFImageObj_GetIccProfileDataDecoded struct {
+	Data []byte // Can be nil if the given page object is not an image or has no ICC profile.
 }
 
 type FPDFPageObj_CreateNewPath struct {

@@ -202,6 +202,24 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFPageObj_TransformF).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFPageObj_GetIsActive", func() {
+				FPDFPageObj_GetIsActive, err := PdfiumInstance.FPDFPageObj_GetIsActive(&requests.FPDFPageObj_GetIsActive{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_GetIsActive).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFPageObj_SetIsActive", func() {
+				FPDFPageObj_SetIsActive, err := PdfiumInstance.FPDFPageObj_SetIsActive(&requests.FPDFPageObj_SetIsActive{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_SetIsActive).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFImageObj_GetIccProfileDataDecoded", func() {
+				FPDFImageObj_GetIccProfileDataDecoded, err := PdfiumInstance.FPDFImageObj_GetIccProfileDataDecoded(&requests.FPDFImageObj_GetIccProfileDataDecoded{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFImageObj_GetIccProfileDataDecoded).To(BeNil())
+			})
 		})
 	})
 
@@ -1692,6 +1710,220 @@ end
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_TransformF).To(Not(BeNil()))
 					Expect(FPDFPageObj_TransformF).To(Equal(&responses.FPDFPageObj_TransformF{}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with rectangles", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when a page object is loaded", func() {
+				var page references.FPDF_PAGE
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDF_LoadPage, err := PdfiumInstance.FPDF_LoadPage(&requests.FPDF_LoadPage{
+						Document: doc,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_LoadPage).To(Not(BeNil()))
+					Expect(FPDF_LoadPage.Page).To(Not(BeEmpty()))
+					page = FPDF_LoadPage.Page
+
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+						Index: 4,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+				})
+
+				It("indicates the correct active status for the page object", func() {
+					FPDFPageObj_GetIsActive, err := PdfiumInstance.FPDFPageObj_GetIsActive(&requests.FPDFPageObj_GetIsActive{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetIsActive).To(Equal(&responses.FPDFPageObj_GetIsActive{
+						Active: true,
+					}))
+				})
+
+				It("allows us to change the active status of a page object", func() {
+					FPDFPageObj_SetIsActive, err := PdfiumInstance.FPDFPageObj_SetIsActive(&requests.FPDFPageObj_SetIsActive{
+						PageObject: pageObject,
+						Active:     false,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_SetIsActive).To(Equal(&responses.FPDFPageObj_SetIsActive{}))
+
+					FPDFPageObj_GetIsActive, err := PdfiumInstance.FPDFPageObj_GetIsActive(&requests.FPDFPageObj_GetIsActive{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetIsActive).To(Equal(&responses.FPDFPageObj_GetIsActive{
+						Active: false,
+					}))
+
+					FPDFPage_GenerateContent, err := PdfiumInstance.FPDFPage_GenerateContent(&requests.FPDFPage_GenerateContent{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GenerateContent).To(Not(BeNil()))
+					Expect(FPDFPage_GenerateContent).To(Equal(&responses.FPDFPage_GenerateContent{}))
+
+					FPDFPage_CountObjects, err := PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_CountObjects).To(Not(BeNil()))
+					Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
+						Count: 8,
+					}))
+
+					FPDFPageObj_SetIsActive, err = PdfiumInstance.FPDFPageObj_SetIsActive(&requests.FPDFPageObj_SetIsActive{
+						PageObject: pageObject,
+						Active:     true,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_SetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_SetIsActive).To(Equal(&responses.FPDFPageObj_SetIsActive{}))
+
+					FPDFPageObj_GetIsActive, err = PdfiumInstance.FPDFPageObj_GetIsActive(&requests.FPDFPageObj_GetIsActive{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetIsActive).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetIsActive).To(Equal(&responses.FPDFPageObj_GetIsActive{
+						Active: true,
+					}))
+
+					FPDFPage_GenerateContent, err = PdfiumInstance.FPDFPage_GenerateContent(&requests.FPDFPage_GenerateContent{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GenerateContent).To(Not(BeNil()))
+					Expect(FPDFPage_GenerateContent).To(Equal(&responses.FPDFPage_GenerateContent{}))
+
+					FPDFPage_CountObjects, err = PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_CountObjects).To(Not(BeNil()))
+					Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
+						Count: 8,
+					}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with ICC profile data", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bug_42270471.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when a page object is loaded", func() {
+				var page references.FPDF_PAGE
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDF_LoadPage, err := PdfiumInstance.FPDF_LoadPage(&requests.FPDF_LoadPage{
+						Document: doc,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDF_LoadPage).To(Not(BeNil()))
+					Expect(FPDF_LoadPage.Page).To(Not(BeEmpty()))
+					page = FPDF_LoadPage.Page
+
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByReference: &page,
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+				})
+
+				It("returns an error when no page is given", func() {
+					FPDFImageObj_GetIccProfileDataDecoded, err := PdfiumInstance.FPDFImageObj_GetIccProfileDataDecoded(&requests.FPDFImageObj_GetIccProfileDataDecoded{
+						ImageObject: pageObject,
+					})
+					Expect(err).To(MatchError("either page reference or index should be given"))
+					Expect(FPDFImageObj_GetIccProfileDataDecoded).To(BeNil())
+				})
+
+				It("allows us to retrieve the icc profile data", func() {
+					FPDFImageObj_GetIccProfileDataDecoded, err := PdfiumInstance.FPDFImageObj_GetIccProfileDataDecoded(&requests.FPDFImageObj_GetIccProfileDataDecoded{
+						ImageObject: pageObject,
+						Page: requests.Page{
+							ByReference: &page,
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFImageObj_GetIccProfileDataDecoded).To(Not(BeNil()))
+					Expect(FPDFImageObj_GetIccProfileDataDecoded.Data).ToNot(BeEmpty())
+					Expect(FPDFImageObj_GetIccProfileDataDecoded.Data).To(HaveLen(525))
 				})
 			})
 		})

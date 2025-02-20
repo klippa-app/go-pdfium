@@ -311,10 +311,15 @@ var _ = Describe("fpdfview", func() {
 					},
 				})
 				Expect(err).To(BeNil())
-				Expect(pageCount).To(Equal(&responses.FPDF_GetPageHeight{
-					Page:   0,
-					Height: 841.8897094726562,
-				}))
+				Expect(pageCount).To(Or(
+					Equal(&responses.FPDF_GetPageHeight{
+						Page:   0,
+						Height: 841.8897094726562,
+					}),
+					Equal(&responses.FPDF_GetPageHeight{
+						Page:   0,
+						Height: 841.8897705078125,
+					})))
 			})
 
 			It("returns an error when calling FPDF_GetPageHeight without a page", func() {
@@ -329,11 +334,17 @@ var _ = Describe("fpdfview", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(pageCount).To(Equal(&responses.FPDF_GetPageSizeByIndex{
-					Page:   0,
-					Width:  595.2755737304688,
-					Height: 841.8897094726562,
-				}))
+				Expect(pageCount).To(Or(
+					Equal(&responses.FPDF_GetPageSizeByIndex{
+						Page:   0,
+						Width:  595.2755737304688,
+						Height: 841.8897094726562,
+					}),
+					Equal(&responses.FPDF_GetPageSizeByIndex{
+						Page:   0,
+						Width:  595.2755737304688,
+						Height: 841.8897705078125,
+					})))
 			})
 
 			It("returns an error when calling FPDF_GetPageSizeByIndex with an invalid page", func() {

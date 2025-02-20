@@ -277,7 +277,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetName(request *requests.FPDFPag
 	}
 
 	charData := make([]byte, uint64(nameLength))
-	C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &nameLength)
+	C.FPDFPageObjMark_GetName(pageObjectMarkHandle.handle, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &nameLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -330,7 +330,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamKey(request *requests.FPD
 	}
 
 	charData := make([]byte, uint64(keyLength))
-	C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &keyLength)
+	C.FPDFPageObjMark_GetParamKey(pageObjectMarkHandle.handle, C.ulong(request.Index), (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &keyLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -417,7 +417,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requ
 	}
 
 	charData := make([]byte, uint64(valueLength))
-	C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&charData[0]), C.ulong(len(charData)), &valueLength)
+	C.FPDFPageObjMark_GetParamStringValue(pageObjectMarkHandle.handle, key, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)), &valueLength)
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData)
 	if err != nil {
@@ -455,7 +455,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 	}
 
 	valueData := make([]byte, uint64(valueLength))
-	C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, unsafe.Pointer(&valueData[0]), C.ulong(len(valueData)), &valueLength)
+	C.FPDFPageObjMark_GetParamBlobValue(pageObjectMarkHandle.handle, key, (*C.uchar)(unsafe.Pointer(&valueData[0])), C.ulong(len(valueData)), &valueLength)
 
 	return &responses.FPDFPageObjMark_GetParamBlobValue{
 		Value: valueData,
@@ -563,7 +563,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetBlobParam(request *requests.FP
 	key := C.CString(request.Key)
 	defer C.free(unsafe.Pointer(key))
 
-	success := C.FPDFPageObjMark_SetBlobParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, unsafe.Pointer(&request.Value[0]), C.ulong(len(request.Value)))
+	success := C.FPDFPageObjMark_SetBlobParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, (*C.uchar)(unsafe.Pointer(&request.Value[0])), C.ulong(len(request.Value)))
 	if int(success) == 0 {
 		return nil, errors.New("could not set value")
 	}
@@ -1293,6 +1293,42 @@ func (p *PdfiumImplementation) FPDFImageObj_GetImagePixelSize(request *requests.
 	}, nil
 }
 
+// FPDFImageObj_GetIccProfileDataDecoded returns the ICC profile decoded
+// data of the given image object. If the image object is not an image
+// object or if it does not have an image, then the return value will
+// be nil. It also returns nil if the image object has no ICC profile.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFImageObj_GetIccProfileDataDecoded(request *requests.FPDFImageObj_GetIccProfileDataDecoded) (*responses.FPDFImageObj_GetIccProfileDataDecoded, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	imageObjectHandle, err := p.getPageObjectHandle(request.ImageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	iccProfileDataLength := C.size_t(0)
+	result := C.FPDFImageObj_GetIccProfileDataDecoded(imageObjectHandle.handle, pageHandle.handle, nil, 0, &iccProfileDataLength)
+	if int(result) == 0 {
+		return nil, errors.New("could not get ICC Profile Data length")
+	}
+
+	valueData := make([]byte, uint64(iccProfileDataLength))
+	result = C.FPDFImageObj_GetIccProfileDataDecoded(imageObjectHandle.handle, pageHandle.handle, (*C.uint8_t)(unsafe.Pointer(&valueData[0])), C.size_t(len(valueData)), &iccProfileDataLength)
+	if int(result) == 0 {
+		return nil, errors.New("could not get ICC Profile Data")
+	}
+
+	return &responses.FPDFImageObj_GetIccProfileDataDecoded{
+		Data: valueData,
+	}, nil
+}
+
 // FPDF_MovePages Move the given pages to a new index position.
 // When this call fails, the document may be left in an indeterminate state.
 // Experimental API.
@@ -1321,4 +1357,60 @@ func (p *PdfiumImplementation) FPDF_MovePages(request *requests.FPDF_MovePages) 
 	}
 
 	return &responses.FPDF_MovePages{}, nil
+}
+
+// FPDFPageObj_GetIsActive returns the active state for the given page
+// object within the page.
+// For page objects where active is filled with false, the page object is
+// treated as if it wasn't in the document even though it is still held
+// internally.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPageObj_GetIsActive) (*responses.FPDFPageObj_GetIsActive, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	isActive := C.FPDF_BOOL(0)
+
+	result := C.FPDFPageObj_GetIsActive(pageObjectHandle.handle, &isActive)
+	if int(result) == 0 {
+		return nil, errors.New("could not get active state")
+	}
+
+	return &responses.FPDFPageObj_GetIsActive{
+		Active: int(isActive) == 1,
+	}, nil
+}
+
+// FPDFPageObj_SetIsActive sets the active state for the given page object
+// within the page.
+// Page objects all start in the active state by default, and remain in that
+// state unless this function is called.
+// When active is false, this makes the page_object be treated as if it
+// wasn't in the document even though it is still held internally.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	isActive := C.FPDF_BOOL(0)
+	if request.Active {
+		isActive = C.FPDF_BOOL(1)
+	}
+
+	result := C.FPDFPageObj_SetIsActive(pageObjectHandle.handle, isActive)
+	if int(result) == 0 {
+		return nil, errors.New("could not set active state")
+	}
+
+	return &responses.FPDFPageObj_SetIsActive{}, nil
 }
