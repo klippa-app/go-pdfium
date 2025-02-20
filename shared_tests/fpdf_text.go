@@ -261,13 +261,22 @@ var _ = Describe("fpdf_text", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDFText_GetCharBox).To(Equal(&responses.FPDFText_GetCharBox{
-					Index:  0,
-					Left:   71.9451904296875,
-					Right:  76.55418395996094,
-					Bottom: 789.1592407226562,
-					Top:    797.17822265625,
-				}))
+				Expect(FPDFText_GetCharBox).To(Or(
+					Equal(&responses.FPDFText_GetCharBox{
+						Index:  0,
+						Left:   71.9451904296875,
+						Right:  76.55418395996094,
+						Bottom: 789.1592407226562,
+						Top:    797.17822265625,
+					}),
+					Equal(&responses.FPDFText_GetCharBox{
+						Index:  0,
+						Left:   71.9451904296875,
+						Right:  76.55418395996094,
+						Bottom: 789.1593017578125,
+						Top:    797.1782836914062,
+					}),
+				))
 			})
 
 			It("returns an error when getting the char box for an invalid char", func() {
@@ -285,11 +294,18 @@ var _ = Describe("fpdf_text", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDFText_GetCharOrigin).To(Equal(&responses.FPDFText_GetCharOrigin{
-					Index: 0,
-					X:     70.8671875,
-					Y:     789.1592407226562,
-				}))
+				Expect(FPDFText_GetCharOrigin).To(Or(
+					Equal(&responses.FPDFText_GetCharOrigin{
+						Index: 0,
+						X:     70.8671875,
+						Y:     789.1592407226562,
+					}),
+					Equal(&responses.FPDFText_GetCharOrigin{
+						Index: 0,
+						X:     70.8671875,
+						Y:     789.1593017578125,
+					}),
+				))
 			})
 
 			It("returns an error when getting the char origin for an invalid char", func() {
@@ -375,12 +391,20 @@ var _ = Describe("fpdf_text", func() {
 					Index:    0,
 				})
 				Expect(err).To(BeNil())
-				Expect(FPDFText_GetRect).To(Equal(&responses.FPDFText_GetRect{
-					Left:   71.9451904296875,
-					Top:    797.5192260742188,
-					Right:  208.60919189453125,
-					Bottom: 789.0162353515625,
-				}))
+				Expect(FPDFText_GetRect).To(Or(
+					Equal(&responses.FPDFText_GetRect{
+						Left:   71.9451904296875,
+						Top:    797.5192260742188,
+						Right:  208.60919189453125,
+						Bottom: 789.0162353515625,
+					}),
+					Equal(&responses.FPDFText_GetRect{
+						Left:   71.9451904296875,
+						Top:    797.519287109375,
+						Right:  208.60919189453125,
+						Bottom: 789.0162963867188,
+					}),
+				))
 			})
 
 			It("returns the correct text within bounds", func() {
