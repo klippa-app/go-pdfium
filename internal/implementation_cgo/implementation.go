@@ -162,6 +162,8 @@ type mainPdfium struct {
 }
 
 func (p *mainPdfium) GetInstance() *PdfiumImplementation {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 	newInstance := &PdfiumImplementation{
 		logger:                          p.logger,
 		documentRefs:                    map[references.FPDF_DOCUMENT]*DocumentHandle{},
