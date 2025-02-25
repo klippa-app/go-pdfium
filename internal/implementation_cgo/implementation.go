@@ -197,6 +197,7 @@ func (p *mainPdfium) GetInstance() *PdfiumImplementation {
 		glyphPathRefs:                   map[references.FPDF_GLYPHPATH]*GlyphPathHandle{},
 		fileReaders:                     map[string]*fileReaderRef{},
 	}
+
 	newInstance.instanceRef = len(p.instanceRefs)
 	p.instanceRefs[newInstance.instanceRef] = newInstance
 
