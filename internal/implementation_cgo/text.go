@@ -122,16 +122,15 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			right := C.double(0)
 			bottom := C.double(0)
 			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &right, &bottom, &top)
-			charData := make([]byte, 4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
-			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
 
-			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : (charsWritten)*2])
-			if err != nil {
-				return nil, err
+			text := ""
+			uniChar := C.FPDFText_GetUnicode(textPage, C.int(i))
+			if uniChar != 0 {
+				text = string([]rune{rune(uniChar)})
 			}
 
 			char := &responses.GetPageTextStructuredChar{
-				Text:  transformedText,
+				Text:  text,
 				Angle: float64(angle),
 				PointPosition: responses.CharPosition{
 					Left:   float64(left),
