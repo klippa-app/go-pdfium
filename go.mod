@@ -1,8 +1,8 @@
 module github.com/klippa-app/go-pdfium
 
-go 1.22.0
+go 1.23.0
 
-toolchain go1.22.5
+toolchain go1.23.7
 
 require (
 	github.com/google/uuid v1.6.0
