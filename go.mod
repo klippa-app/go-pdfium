@@ -14,7 +14,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.9.0
 	golang.org/x/net v0.37.0
-	golang.org/x/text v0.23.0
+	golang.org/x/text v0.25.0
 )
 
 require (
