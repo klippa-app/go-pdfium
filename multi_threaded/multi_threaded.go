@@ -208,13 +208,18 @@ func (p *pdfiumPool) GetDestroyedCount() int {
 }
 
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	timeoutCtx, cancel := goctx.WithTimeout(goctx.Background(), timeout)
+	defer cancel()
+
+	return p.GetInstanceWithContext(timeoutCtx)
+}
+
+func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, error) {
 	if p.closed {
 		return nil, errors.New("pool is closed")
 	}
 
-	timeoutCtx, cancel := goctx.WithTimeout(goctx.Background(), timeout)
-	defer cancel()
-	workerObject, err := p.workerPool.BorrowObject(timeoutCtx)
+	workerObject, err := p.workerPool.BorrowObject(ctx)
 	if err != nil {
 		return nil, err
 	}

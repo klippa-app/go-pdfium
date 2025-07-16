@@ -1,6 +1,7 @@
 package single_threaded
 
 import (
+	goctx "context"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -55,6 +56,10 @@ type pdfiumPool struct {
 // own documents. When you close it, it will clean up all resources of this
 // instance.
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	return p.GetInstanceWithContext(goctx.Background())
+}
+
+func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, error) {
 	if p.closed {
 		return nil, errors.New("pool is closed")
 	}
