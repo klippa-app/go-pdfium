@@ -22,7 +22,9 @@ type Pool interface {
 	// or clear it's resources.
 	GetInstance(timeout time.Duration) (Pdfium, error)
 
-	// Same as GetInstance but with a go context
+	// Same as GetInstance but with a go context.
+	// If the context provided here does not contain any timeouts or cancellations, this function
+	// might block forever. It is the user's responsibility to handle this context
 	GetInstanceWithContext(ctx goctx.Context) (Pdfium, error)
 
 	// Close closes the pool.
