@@ -723,6 +723,22 @@ func (i *pdfiumInstance) FPDFAnnot_SetFocusableSubtypes(request *requests.FPDFAn
 	return i.worker.plugin.FPDFAnnot_SetFocusableSubtypes(request)
 }
 
+func (i *pdfiumInstance) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_SetFontColor(request)
+}
+
+func (i *pdfiumInstance) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAnnot_SetFormFieldFlags(request)
+}
+
 func (i *pdfiumInstance) FPDFAnnot_SetRect(request *requests.FPDFAnnot_SetRect) (*responses.FPDFAnnot_SetRect, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -777,6 +793,14 @@ func (i *pdfiumInstance) FPDFAttachment_GetStringValue(request *requests.FPDFAtt
 	}
 
 	return i.worker.plugin.FPDFAttachment_GetStringValue(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAttachment_GetSubtype(request)
 }
 
 func (i *pdfiumInstance) FPDFAttachment_GetValueType(request *requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error) {
@@ -1217,6 +1241,14 @@ func (i *pdfiumInstance) FPDFFormObj_GetObject(request *requests.FPDFFormObj_Get
 	}
 
 	return i.worker.plugin.FPDFFormObj_GetObject(request)
+}
+
+func (i *pdfiumInstance) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFFormObj_RemoveObject(request)
 }
 
 func (i *pdfiumInstance) FPDFGlyphPath_CountGlyphSegments(request *requests.FPDFGlyphPath_CountGlyphSegments) (*responses.FPDFGlyphPath_CountGlyphSegments, error) {
@@ -2081,6 +2113,14 @@ func (i *pdfiumInstance) FPDFPage_InsertObject(request *requests.FPDFPage_Insert
 	}
 
 	return i.worker.plugin.FPDFPage_InsertObject(request)
+}
+
+func (i *pdfiumInstance) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPage_InsertObjectAtIndex(request)
 }
 
 func (i *pdfiumInstance) FPDFPage_New(request *requests.FPDFPage_New) (*responses.FPDFPage_New, error) {

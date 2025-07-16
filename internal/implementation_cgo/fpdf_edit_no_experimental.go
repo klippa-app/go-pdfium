@@ -382,3 +382,19 @@ func (p *PdfiumImplementation) FPDFPageObj_GetIsActive(request *requests.FPDFPag
 func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPageObj_SetIsActive) (*responses.FPDFPageObj_SetIsActive, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
+// While technically this is not an experimental API function, in go-pdfium
+// this has been implemented as an experimental API function to ensure
+// backwards compatibility to older pdfium versions.
+func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFFormObj_RemoveObject removes the page object in the given form object.
+// Ownership of the removed page object is transferred to the caller, call FPDFPageObj_Destroy() on the
+// removed page_object to free it.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

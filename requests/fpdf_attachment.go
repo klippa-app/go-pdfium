@@ -53,5 +53,8 @@ type FPDFAttachment_SetFile struct {
 
 type FPDFAttachment_GetFile struct {
 	Attachment references.FPDF_ATTACHMENT
-	Contents   []byte
+}
+
+type FPDFAttachment_GetSubtype struct {
+	Attachment references.FPDF_ATTACHMENT
 }

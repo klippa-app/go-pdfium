@@ -61,6 +61,12 @@ type FPDFPage_InsertObject struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
+type FPDFPage_InsertObjectAtIndex struct {
+	Page       Page
+	PageObject references.FPDF_PAGEOBJECT
+	Index      int
+}
+
 type FPDFPage_RemoveObject struct {
 	Page       Page
 	PageObject references.FPDF_PAGEOBJECT
@@ -576,4 +582,9 @@ type FPDFFormObj_CountObjects struct {
 type FPDFFormObj_GetObject struct {
 	PageObject references.FPDF_PAGEOBJECT
 	Index      uint64
+}
+
+type FPDFFormObj_RemoveObject struct {
+	PageObject references.FPDF_PAGEOBJECT
+	FormObject references.FPDF_PAGEOBJECT
 }

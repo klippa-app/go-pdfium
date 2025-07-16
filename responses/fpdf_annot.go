@@ -152,6 +152,9 @@ type FPDFAnnot_GetFormFieldFlags struct {
 	Flags enums.FPDF_FORMFLAG
 }
 
+type FPDFAnnot_SetFormFieldFlags struct {
+}
+
 type FPDFAnnot_GetFormFieldAtPoint struct {
 	Annotation references.FPDF_ANNOTATION
 }
@@ -190,6 +193,9 @@ type FPDFAnnot_IsOptionSelected struct {
 
 type FPDFAnnot_GetFontSize struct {
 	FontSize float32
+}
+
+type FPDFAnnot_SetFontColor struct {
 }
 
 type FPDFAnnot_GetFontColor struct {
