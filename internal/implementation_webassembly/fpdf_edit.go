@@ -196,7 +196,7 @@ func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FP
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_InsertObjectAtIndex").Call(p.Context, *pageHandle.handle, *pageObjectHandle.handle, request.Index)
+	_, err = p.Module.ExportedFunction("FPDFPage_InsertObjectAtIndex").Call(p.Context, *pageHandle.handle, *pageObjectHandle.handle, uint64(request.Index))
 	if err != nil {
 		return nil, err
 	}
@@ -2205,21 +2205,22 @@ func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFFormObj_RemoveObject").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	formObjectHandle, err := p.getPageObjectHandle(request.FormObject)
 	if err != nil {
 		return nil, err
 	}
 
-	formObject := res[0]
-	if formObject == 0 {
-		return nil, errors.New("could not get form object")
+	res, err := p.Module.ExportedFunction("FPDFFormObj_RemoveObject").Call(p.Context, *pageObjectHandle.handle, *formObjectHandle.handle)
+	if err != nil {
+		return nil, err
 	}
 
-	formObjectHandle := p.registerPageObject(&formObject)
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not remove form object")
+	}
 
-	return &responses.FPDFFormObj_RemoveObject{
-		PageObject: formObjectHandle.nativeRef,
-	}, nil
+	return &responses.FPDFFormObj_RemoveObject{}, nil
 }
 
 // FPDFPage_RemoveObject removes an object from a page.

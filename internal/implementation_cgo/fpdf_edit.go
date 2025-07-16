@@ -129,26 +129,6 @@ func (p *PdfiumImplementation) FPDFPage_InsertObject(request *requests.FPDFPage_
 	return &responses.FPDFPage_InsertObject{}, nil
 }
 
-// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
-func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	pageHandle, err := p.loadPage(request.Page)
-	if err != nil {
-		return nil, err
-	}
-
-	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
-	if err != nil {
-		return nil, err
-	}
-
-	C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, request.Index)
-
-	return &responses.FPDFPage_InsertObjectAtIndex{}, nil
-}
-
 // FPDFPage_CountObjects returns the number of page objects inside the given page.
 func (p *PdfiumImplementation) FPDFPage_CountObjects(request *requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error) {
 	p.Lock()
@@ -1447,28 +1427,4 @@ func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormO
 	return &responses.FPDFFormObj_GetObject{
 		PageObject: formObjectHandle.nativeRef,
 	}, nil
-}
-
-// FPDFFormObj_RemoveObject removes the page object in the given form object.
-// Ownership of the removed page object is transferred to the caller, call FPDFPageObj_Destroy() on the
-// removed page_object to free it.
-func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
-	p.Lock()
-	defer p.Unlock()
-
-	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
-	if err != nil {
-		return nil, err
-	}
-
-	formObject := C.FPDFFormObj_RemoveObject(pageObjectHandle.handle, C.ulong(request.Index))
-	if formObject == nil {
-		return nil, errors.New("could not get form object")
-	}
-
-	formObjectHandle := p.registerPageObject(formObject)
-
-	return &responses.FPDFFormObj_RemoveObject{
-		PageObject: formObjectHandle.nativeRef,
-	}, nilFPDFFormObj_GetObject
 }

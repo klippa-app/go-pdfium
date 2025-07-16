@@ -1422,7 +1422,23 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error) {
 	p.Lock()
 	defer p.Unlock()
-	return nil, nil
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFAnnot_SetFormFieldFlags").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set form field flags")
+	}
+
+	return &responses.FPDFAnnot_SetFormFieldFlags{}, nil
 }
 
 // FPDFAnnot_GetFormFieldAtPoint returns an interactive form annotation whose rectangle contains a given
@@ -1876,7 +1892,28 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 func (p *PdfiumImplementation) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error) {
 	p.Lock()
 	defer p.Unlock()
-	return nil, nil
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFAnnot_SetFontColor").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.R)), *(*uint64)(unsafe.Pointer(&request.G)), *(*uint64)(unsafe.Pointer(&request.B)))
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set font color")
+	}
+
+	return &responses.FPDFAnnot_SetFontColor{}, nil
 }
 
 // FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.

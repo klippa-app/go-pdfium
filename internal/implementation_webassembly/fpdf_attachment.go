@@ -435,5 +435,50 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
 	p.Lock()
 	defer p.Unlock()
-	return nil, nil
+
+	attachmentHandle, err := p.getAttachmentHandle(request.Attachment)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the string value length.
+	res, err := p.Module.ExportedFunction("FPDFAttachment_GetSubtype").Call(p.Context, *attachmentHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	stringValueSize := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if stringValueSize == 0 {
+		return nil, errors.New("Could not get string value")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(stringValueSize, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.Module.ExportedFunction("FPDFAttachment_GetSubtype").Call(p.Context, *attachmentHandle.handle, charDataPointer.Pointer, stringValueSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	if transformedText == "" {
+		return &responses.FPDFAttachment_GetSubtype{
+			Subtype: nil,
+		}, nil
+	}
+
+	return &responses.FPDFAttachment_GetSubtype{
+		Subtype: &transformedText,
+	}, nil
 }

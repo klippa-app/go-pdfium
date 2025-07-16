@@ -1414,3 +1414,52 @@ func (p *PdfiumImplementation) FPDFPageObj_SetIsActive(request *requests.FPDFPag
 
 	return &responses.FPDFPageObj_SetIsActive{}, nil
 }
+
+// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
+// While technically this is not an experimental API function, in go-pdfium
+// this has been implemented as an experimental API function to ensure
+// backwards compatibility to older pdfium versions.
+func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, request.Index)
+
+	return &responses.FPDFPage_InsertObjectAtIndex{}, nil
+}
+
+// FPDFFormObj_RemoveObject removes the page object in the given form object.
+// Ownership of the removed page object is transferred to the caller, call FPDFPageObj_Destroy() on the
+// removed page_object to free it.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	formObjectHandle, err := p.getPageObjectHandle(request.FormObject)
+	if err != nil {
+		return nil, err
+	}
+
+	formObject := C.FPDFFormObj_RemoveObject(pageObjectHandle.handle, formObjectHandle.handle)
+	if formObject == nil {
+		return nil, errors.New("could not get form object")
+	}
+
+	return &responses.FPDFFormObj_RemoveObject{}, nil
+}

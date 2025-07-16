@@ -397,6 +397,9 @@ type Pdfium interface {
 	FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
 
 	// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
+	// While technically this is not an experimental API function, in go-pdfium
+	// this has been implemented as an experimental API function to ensure
+	// backwards compatibility to older pdfium versions.
 	FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error)
 
 	// FPDFPage_RemoveObject removes an object from a page.
@@ -882,6 +885,7 @@ type Pdfium interface {
 	// FPDFFormObj_RemoveObject removes the page object in the given form object.
 	// Ownership of the removed page object is transferred to the caller, call FPDFPageObj_Destroy() on the
 	// removed page_object to free it.
+	// Experimental API.
 	FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error)
 
 	// End fpdf_edit.h

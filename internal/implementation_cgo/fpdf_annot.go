@@ -11,11 +11,12 @@ package implementation_cgo
 import "C"
 import (
 	"errors"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-	"unsafe"
 )
 
 // FPDFAnnot_IsSupportedSubtype returns whether an annotation subtype is currently supported for creation.
@@ -1064,7 +1065,24 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error) {
 	p.Lock()
 	defer p.Unlock()
-	return nil, nil
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FPDFAnnot_SetFormFieldFlags(formHandle.handle, annotationHandle.handle, C.int(request.Flags))
+
+	if int(success) == 0 {
+		return nil, errors.New("could not set form field flags")
+	}
+
+	return &responses.FPDFAnnot_SetFormFieldFlags{}, nil
 }
 
 // FPDFAnnot_GetFormFieldAtPoint returns an interactive form annotation whose rectangle contains a given
@@ -1392,7 +1410,23 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 func (p *PdfiumImplementation) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error) {
 	p.Lock()
 	defer p.Unlock()
-	return nil, nil
+
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+	
+	success := C.FPDFAnnot_SetFontColor(formHandle.handle, annotationHandle.handle, C.uint(request.R), C.uint(request.G), C.uint(request.B))
+	if int(success) == 0 {
+		return nil, errors.New("could not set font color")
+	}
+
+	return &responses.FPDFAnnot_SetFontColor{}, nil
 }
 
 // FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
