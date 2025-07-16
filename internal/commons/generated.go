@@ -101,6 +101,8 @@ type Pdfium interface {
 	FPDFAnnot_SetColor(*requests.FPDFAnnot_SetColor) (*responses.FPDFAnnot_SetColor, error)
 	FPDFAnnot_SetFlags(*requests.FPDFAnnot_SetFlags) (*responses.FPDFAnnot_SetFlags, error)
 	FPDFAnnot_SetFocusableSubtypes(*requests.FPDFAnnot_SetFocusableSubtypes) (*responses.FPDFAnnot_SetFocusableSubtypes, error)
+	FPDFAnnot_SetFontColor(*requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error)
+	FPDFAnnot_SetFormFieldFlags(*requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error)
 	FPDFAnnot_SetRect(*requests.FPDFAnnot_SetRect) (*responses.FPDFAnnot_SetRect, error)
 	FPDFAnnot_SetStringValue(*requests.FPDFAnnot_SetStringValue) (*responses.FPDFAnnot_SetStringValue, error)
 	FPDFAnnot_SetURI(*requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error)
@@ -108,6 +110,7 @@ type Pdfium interface {
 	FPDFAttachment_GetFile(*requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
 	FPDFAttachment_GetName(*requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error)
 	FPDFAttachment_GetStringValue(*requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error)
+	FPDFAttachment_GetSubtype(*requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error)
 	FPDFAttachment_GetValueType(*requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error)
 	FPDFAttachment_HasKey(*requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error)
 	FPDFAttachment_SetFile(*requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error)
@@ -168,6 +171,7 @@ type Pdfium interface {
 	FPDFFont_GetWeight(*requests.FPDFFont_GetWeight) (*responses.FPDFFont_GetWeight, error)
 	FPDFFormObj_CountObjects(*requests.FPDFFormObj_CountObjects) (*responses.FPDFFormObj_CountObjects, error)
 	FPDFFormObj_GetObject(*requests.FPDFFormObj_GetObject) (*responses.FPDFFormObj_GetObject, error)
+	FPDFFormObj_RemoveObject(*requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error)
 	FPDFGlyphPath_CountGlyphSegments(*requests.FPDFGlyphPath_CountGlyphSegments) (*responses.FPDFGlyphPath_CountGlyphSegments, error)
 	FPDFGlyphPath_GetGlyphPathSegment(*requests.FPDFGlyphPath_GetGlyphPathSegment) (*responses.FPDFGlyphPath_GetGlyphPathSegment, error)
 	FPDFImageObj_GetBitmap(*requests.FPDFImageObj_GetBitmap) (*responses.FPDFImageObj_GetBitmap, error)
@@ -275,6 +279,7 @@ type Pdfium interface {
 	FPDFPage_HasTransparency(*requests.FPDFPage_HasTransparency) (*responses.FPDFPage_HasTransparency, error)
 	FPDFPage_InsertClipPath(*requests.FPDFPage_InsertClipPath) (*responses.FPDFPage_InsertClipPath, error)
 	FPDFPage_InsertObject(*requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
+	FPDFPage_InsertObjectAtIndex(*requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error)
 	FPDFPage_New(*requests.FPDFPage_New) (*responses.FPDFPage_New, error)
 	FPDFPage_RemoveAnnot(*requests.FPDFPage_RemoveAnnot) (*responses.FPDFPage_RemoveAnnot, error)
 	FPDFPage_RemoveObject(*requests.FPDFPage_RemoveObject) (*responses.FPDFPage_RemoveObject, error)
@@ -1359,6 +1364,26 @@ func (g *PdfiumRPC) FPDFAnnot_SetFocusableSubtypes(request *requests.FPDFAnnot_S
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error) {
+	resp := &responses.FPDFAnnot_SetFontColor{}
+	err := g.client.Call("Plugin.FPDFAnnot_SetFontColor", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error) {
+	resp := &responses.FPDFAnnot_SetFormFieldFlags{}
+	err := g.client.Call("Plugin.FPDFAnnot_SetFormFieldFlags", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFAnnot_SetRect(request *requests.FPDFAnnot_SetRect) (*responses.FPDFAnnot_SetRect, error) {
 	resp := &responses.FPDFAnnot_SetRect{}
 	err := g.client.Call("Plugin.FPDFAnnot_SetRect", request, resp)
@@ -1422,6 +1447,16 @@ func (g *PdfiumRPC) FPDFAttachment_GetName(request *requests.FPDFAttachment_GetN
 func (g *PdfiumRPC) FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error) {
 	resp := &responses.FPDFAttachment_GetStringValue{}
 	err := g.client.Call("Plugin.FPDFAttachment_GetStringValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
+	resp := &responses.FPDFAttachment_GetSubtype{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetSubtype", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2022,6 +2057,16 @@ func (g *PdfiumRPC) FPDFFormObj_CountObjects(request *requests.FPDFFormObj_Count
 func (g *PdfiumRPC) FPDFFormObj_GetObject(request *requests.FPDFFormObj_GetObject) (*responses.FPDFFormObj_GetObject, error) {
 	resp := &responses.FPDFFormObj_GetObject{}
 	err := g.client.Call("Plugin.FPDFFormObj_GetObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	resp := &responses.FPDFFormObj_RemoveObject{}
+	err := g.client.Call("Plugin.FPDFFormObj_RemoveObject", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3092,6 +3137,16 @@ func (g *PdfiumRPC) FPDFPage_InsertClipPath(request *requests.FPDFPage_InsertCli
 func (g *PdfiumRPC) FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error) {
 	resp := &responses.FPDFPage_InsertObject{}
 	err := g.client.Call("Plugin.FPDFPage_InsertObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
+	resp := &responses.FPDFPage_InsertObjectAtIndex{}
+	err := g.client.Call("Plugin.FPDFPage_InsertObjectAtIndex", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -6611,6 +6666,42 @@ func (s *PdfiumRPCServer) FPDFAnnot_SetFocusableSubtypes(request *requests.FPDFA
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor, resp *responses.FPDFAnnot_SetFontColor) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_SetFontColor", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_SetFontColor(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags, resp *responses.FPDFAnnot_SetFormFieldFlags) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAnnot_SetFormFieldFlags", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAnnot_SetFormFieldFlags(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFAnnot_SetRect(request *requests.FPDFAnnot_SetRect, resp *responses.FPDFAnnot_SetRect) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -6727,6 +6818,24 @@ func (s *PdfiumRPCServer) FPDFAttachment_GetStringValue(request *requests.FPDFAt
 	}()
 
 	implResp, err := s.Impl.FPDFAttachment_GetStringValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype, resp *responses.FPDFAttachment_GetSubtype) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetSubtype", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAttachment_GetSubtype(request)
 	if err != nil {
 		return err
 	}
@@ -7807,6 +7916,24 @@ func (s *PdfiumRPCServer) FPDFFormObj_GetObject(request *requests.FPDFFormObj_Ge
 	}()
 
 	implResp, err := s.Impl.FPDFFormObj_GetObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject, resp *responses.FPDFFormObj_RemoveObject) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFFormObj_RemoveObject", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFFormObj_RemoveObject(request)
 	if err != nil {
 		return err
 	}
@@ -9733,6 +9860,24 @@ func (s *PdfiumRPCServer) FPDFPage_InsertObject(request *requests.FPDFPage_Inser
 	}()
 
 	implResp, err := s.Impl.FPDFPage_InsertObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex, resp *responses.FPDFPage_InsertObjectAtIndex) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPage_InsertObjectAtIndex", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPage_InsertObjectAtIndex(request)
 	if err != nil {
 		return err
 	}
