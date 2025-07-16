@@ -11,8 +11,9 @@ package implementation_cgo
 import "C"
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/enums"
 	"unsafe"
+
+	"github.com/klippa-app/go-pdfium/enums"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -311,4 +312,12 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 	return &responses.FPDFAttachment_GetFile{
 		Contents: fileData,
 	}, nil
+}
+
+// FPDFAttachment_GetSubtype gets the MIME type (Subtype) of the embedded file attachment.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
+	p.Lock()
+	defer p.Unlock()
+	return nil, nil
 }

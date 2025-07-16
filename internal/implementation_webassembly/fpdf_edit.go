@@ -181,6 +181,29 @@ func (p *PdfiumImplementation) FPDFPage_InsertObject(request *requests.FPDFPage_
 	return &responses.FPDFPage_InsertObject{}, nil
 }
 
+// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
+func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageHandle, err := p.loadPage(request.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.Module.ExportedFunction("FPDFPage_InsertObjectAtIndex").Call(p.Context, *pageHandle.handle, *pageObjectHandle.handle, request.Index)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPage_InsertObjectAtIndex{}, nil
+}
+
 // FPDFPage_CountObjects returns the number of page objects inside the given page.
 func (p *PdfiumImplementation) FPDFPage_CountObjects(request *requests.FPDFPage_CountObjects) (*responses.FPDFPage_CountObjects, error) {
 	p.Lock()
@@ -2168,6 +2191,33 @@ func (p *PdfiumImplementation) FPDFFormObj_GetObject(request *requests.FPDFFormO
 	formObjectHandle := p.registerPageObject(&formObject)
 
 	return &responses.FPDFFormObj_GetObject{
+		PageObject: formObjectHandle.nativeRef,
+	}, nil
+}
+
+// FPDFFormObj_GetObject returns the page object in the given form object at the given index.
+func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFFormObj_RemoveObject").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	if err != nil {
+		return nil, err
+	}
+
+	formObject := res[0]
+	if formObject == 0 {
+		return nil, errors.New("could not get form object")
+	}
+
+	formObjectHandle := p.registerPageObject(&formObject)
+
+	return &responses.FPDFFormObj_RemoveObject{
 		PageObject: formObjectHandle.nativeRef,
 	}, nil
 }

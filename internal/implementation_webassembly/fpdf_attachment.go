@@ -429,3 +429,11 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 		Contents: fileData,
 	}, nil
 }
+
+// FPDFAttachment_GetSubtype gets the MIME type (Subtype) of the embedded file attachment.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
+	p.Lock()
+	defer p.Unlock()
+	return nil, nil
+}

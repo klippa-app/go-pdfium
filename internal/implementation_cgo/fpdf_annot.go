@@ -1059,6 +1059,14 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 	}, nil
 }
 
+// FPDFAnnot_SetFormFieldFlags sets the form field flags for an interactive form annotation.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error) {
+	p.Lock()
+	defer p.Unlock()
+	return nil, nil
+}
+
 // FPDFAnnot_GetFormFieldAtPoint returns an interactive form annotation whose rectangle contains a given
 // point on a page. Must call FPDFPage_CloseAnnot() when the annotation returned
 // is no longer needed.
@@ -1375,6 +1383,16 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 	return &responses.FPDFAnnot_GetFontSize{
 		FontSize: float32(fontSize),
 	}, nil
+}
+
+// FPDFAnnot_SetFontColor Set the text color of an annotation.
+// Currently supported subtypes: freetext.
+// The range for the color components is 0 to 255.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error) {
+	p.Lock()
+	defer p.Unlock()
+	return nil, nil
 }
 
 // FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
