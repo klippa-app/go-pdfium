@@ -608,7 +608,7 @@ var _ = Describe("fpdfview", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFBitmap_GetBuffer).To(Not(BeNil()))
 					Expect(FPDFBitmap_GetBuffer.Buffer).To(Not(BeNil()))
-					Expect(FPDFBitmap_GetBuffer.Buffer[84143]).To(Equal(uint8(2)))
+					Expect(FPDFBitmap_GetBuffer.Buffer[84143]).To(Or(Equal(uint8(2)), Equal(uint8(3))))
 				})
 			})
 

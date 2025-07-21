@@ -1433,7 +1433,7 @@ func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FP
 		return nil, err
 	}
 
-	C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, request.Index)
+	C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, C.size_t(request.Index))
 
 	return &responses.FPDFPage_InsertObjectAtIndex{}, nil
 }
@@ -1456,9 +1456,9 @@ func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFo
 		return nil, err
 	}
 
-	formObject := C.FPDFFormObj_RemoveObject(pageObjectHandle.handle, formObjectHandle.handle)
-	if formObject == nil {
-		return nil, errors.New("could not get form object")
+	result := C.FPDFFormObj_RemoveObject(pageObjectHandle.handle, formObjectHandle.handle)
+	if int(result) == 0 {
+		return nil, errors.New("could not remove form object")
 	}
 
 	return &responses.FPDFFormObj_RemoveObject{}, nil

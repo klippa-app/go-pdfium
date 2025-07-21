@@ -6,12 +6,13 @@ package shared_tests
 import (
 	"bytes"
 	"fmt"
-	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"image"
 	"image/jpeg"
 	"io/ioutil"
 	"time"
 	"unsafe"
+
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -509,6 +510,20 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 				It("returns an error when calling FPDFAnnot_GetFontColor", func() {
 					FPDFAnnot_GetFontColor, err := PdfiumInstance.FPDFAnnot_GetFontColor(&requests.FPDFAnnot_GetFontColor{
+						FormHandle: formHandle,
+					})
+					Expect(err).To(MatchError("annotation not given"))
+					Expect(FPDFAnnot_GetFontColor).To(BeNil())
+				})
+
+				It("returns an error when calling FPDFAnnot_SetFontColor", func() {
+					FPDFAnnot_GetFontColor, err := PdfiumInstance.FPDFAnnot_SetFontColor(&requests.FPDFAnnot_SetFontColor{})
+					Expect(err).To(MatchError("formHandle not given"))
+					Expect(FPDFAnnot_GetFontColor).To(BeNil())
+				})
+
+				It("returns an error when calling FPDFAnnot_SetFontColor", func() {
+					FPDFAnnot_GetFontColor, err := PdfiumInstance.FPDFAnnot_SetFontColor(&requests.FPDFAnnot_SetFontColor{
 						FormHandle: formHandle,
 					})
 					Expect(err).To(MatchError("annotation not given"))
