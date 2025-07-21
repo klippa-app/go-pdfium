@@ -248,6 +248,11 @@ var _ = Describe("fpdf_annot", func() {
 			Expect(err).To(MatchError("formHandle not given"))
 			Expect(FPDFAnnot_GetFormFieldFlags).To(BeNil())
 		})
+		It("returns an error when FPDFAnnot_SetFormFieldFlags is called", func() {
+			FPDFAnnot_SetFormFieldFlags, err := PdfiumInstance.FPDFAnnot_SetFormFieldFlags(&requests.FPDFAnnot_SetFormFieldFlags{})
+			Expect(err).To(MatchError("formHandle not given"))
+			Expect(FPDFAnnot_SetFormFieldFlags).To(BeNil())
+		})
 		It("returns an error when FPDFAnnot_GetFormFieldAtPoint is called", func() {
 			FPDFAnnot_GetFormFieldAtPoint, err := PdfiumInstance.FPDFAnnot_GetFormFieldAtPoint(&requests.FPDFAnnot_GetFormFieldAtPoint{})
 			Expect(err).To(MatchError("formHandle not given"))

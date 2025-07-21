@@ -1423,12 +1423,17 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
+	formHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
 	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAnnot_SetFormFieldFlags").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
+	res, err := p.Module.ExportedFunction("FPDFAnnot_SetFormFieldFlags").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
 	if err != nil {
 		return nil, err
 	}

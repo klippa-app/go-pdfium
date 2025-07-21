@@ -452,6 +452,14 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					Expect(FPDFAnnot_GetFormFieldFlags).To(BeNil())
 				})
 
+				It("returns an error when calling FPDFAnnot_SetFormFieldFlags", func() {
+					FPDFAnnot_SetFormFieldFlags, err := PdfiumInstance.FPDFAnnot_SetFormFieldFlags(&requests.FPDFAnnot_SetFormFieldFlags{
+						FormHandle: formHandle,
+					})
+					Expect(err).To(MatchError("annotation not given"))
+					Expect(FPDFAnnot_SetFormFieldFlags).To(BeNil())
+				})
+
 				It("returns an error when calling FPDFAnnot_GetFormFieldName", func() {
 					FPDFAnnot_GetFormFieldName, err := PdfiumInstance.FPDFAnnot_GetFormFieldName(&requests.FPDFAnnot_GetFormFieldName{
 						FormHandle: formHandle,
