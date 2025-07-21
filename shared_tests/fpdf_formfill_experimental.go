@@ -1469,6 +1469,17 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					B: 0,
 				}))
 
+				// FPDFAnnot_SetFontColor is not allowed for this type, check for that.
+				FPDFAnnot_SetFontColor, err := PdfiumInstance.FPDFAnnot_SetFontColor(&requests.FPDFAnnot_SetFontColor{
+					FormHandle: formHandle,
+					Annotation: FPDFPage_GetAnnot.Annotation,
+					R:          60,
+					G:          120,
+					B:          180,
+				})
+				Expect(err).To(MatchError("could not set font color"))
+				Expect(FPDFAnnot_SetFontColor).To(BeNil())
+
 				FPDFPage_CloseAnnot, err := PdfiumInstance.FPDFPage_CloseAnnot(&requests.FPDFPage_CloseAnnot{
 					Annotation: FPDFPage_GetAnnot.Annotation,
 				})
