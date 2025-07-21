@@ -1,6 +1,7 @@
 package pdfium
 
 import (
+	goctx "context"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -20,6 +21,11 @@ type Pool interface {
 	// It is important to Close instances when you are done with them. To either return them to the pool
 	// or clear it's resources.
 	GetInstance(timeout time.Duration) (Pdfium, error)
+
+	// Same as GetInstance but with a go context.
+	// If the context provided here does not contain any timeouts or cancellations, this function
+	// might block forever. It is the user's responsibility to handle this context.
+	GetInstanceWithContext(ctx goctx.Context) (Pdfium, error)
 
 	// Close closes the pool.
 	// It will close any unclosed instances.
