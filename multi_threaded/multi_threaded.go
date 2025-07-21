@@ -241,7 +241,10 @@ func (p *pdfiumPool) Close() (err error) {
 	}
 
 	p.lock.Lock()
-	defer p.lock.Unlock()
+	// Once we mark the pool as closed, the user can't do anything to change
+	// the pool, except closing instances, which has its own lock anyway.
+	p.closed = true
+	p.lock.Unlock()
 
 	defer func() {
 		if panicError := recover(); panicError != nil {

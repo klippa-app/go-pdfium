@@ -275,7 +275,10 @@ func (p *pdfiumPool) Close() (err error) {
 	}
 
 	p.lock.Lock()
-	defer p.lock.Unlock()
+	// Once we mark the pool as closed, the user can't do anything to change
+	// the pool, except closing instances, which has its own lock anyway.
+	p.closed = true
+	p.lock.Unlock()
 
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -285,10 +288,7 @@ func (p *pdfiumPool) Close() (err error) {
 
 	// Close all instances
 	for i := range p.instanceRefs {
-		p.instanceRefs[i].worker = nil
-		p.instanceRefs[i].pool = nil
-		p.instanceRefs[i].closed = true
-
+		p.instanceRefs[i].Close()
 		delete(p.instanceRefs, i)
 	}
 
