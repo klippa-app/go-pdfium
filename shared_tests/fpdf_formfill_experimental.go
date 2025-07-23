@@ -2904,4 +2904,223 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 			})
 		})
 	})
+
+	Context("a PDF file with text form annotations", func() {
+		var doc references.FPDF_DOCUMENT
+		var formHandle references.FPDF_FORMHANDLE
+		formHistory := []FormHistory{}
+		timers := map[int]*FormTicker{}
+
+		addToHistory := func(history FormHistory) {
+			formHistory = append(formHistory, history)
+			//log.Printf("New history: %s: %v", history.Name, history.Args)
+		}
+
+		BeforeEach(func() {
+			formHistory = []FormHistory{}
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+
+			FPDFDOC_InitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_InitFormFillEnvironment(&requests.FPDFDOC_InitFormFillEnvironment{
+				Document: doc,
+				FormFillInfo: structs.FPDF_FORMFILLINFO{
+					Release: func() {
+						addToHistory(FormHistory{
+							Name: "Release",
+						})
+					},
+					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
+						addToHistory(FormHistory{
+							Name: "FFI_Invalidate",
+							Args: []interface{}{page, left, top, right, bottom},
+						})
+					},
+					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
+						addToHistory(FormHistory{
+							Name: "FFI_OutputSelectedRect",
+							Args: []interface{}{page, left, top, right, bottom},
+						})
+					},
+					FFI_SetCursor: func(cursorType enums.FXCT) {
+						addToHistory(FormHistory{
+							Name: "FFI_SetCursor",
+							Args: []interface{}{cursorType},
+						})
+					},
+					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
+						addToHistory(FormHistory{
+							Name: "FFI_SetTimer",
+							Args: []interface{}{elapse},
+						})
+
+						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
+						formTicker := &FormTicker{
+							Timer: ticker,
+							Done:  make(chan bool),
+						}
+
+						id := len(timers) + 1 // ID can't be 0
+						timers[id] = formTicker
+
+						go func() {
+							for {
+								select {
+								case <-formTicker.Done:
+									return
+								case <-ticker.C:
+									timerFunc(id)
+								}
+							}
+						}()
+
+						return id
+					},
+					FFI_KillTimer: func(timerID int) {
+						addToHistory(FormHistory{
+							Name: "FFI_KillTimer",
+							Args: []interface{}{timerID},
+						})
+
+						_, ok := timers[timerID]
+						if !ok {
+							return
+						}
+
+						timers[timerID].Timer.Stop()
+						timers[timerID].Done <- true
+					},
+					FFI_GetLocalTime: func() structs.FPDF_SYSTEMTIME {
+						addToHistory(FormHistory{
+							Name: "FFI_GetLocalTime",
+						})
+						return structs.FPDF_SYSTEMTIME{}
+					},
+					FFI_OnChange: func() {
+						addToHistory(FormHistory{
+							Name: "FFI_OnChange",
+						})
+					},
+					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
+						addToHistory(FormHistory{
+							Name: "FFI_GetPage",
+							Args: []interface{}{document, index},
+						})
+
+						return nil
+					},
+					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
+						addToHistory(FormHistory{
+							Name: "FFI_GetCurrentPage",
+							Args: []interface{}{document},
+						})
+						return nil
+					},
+					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
+						addToHistory(FormHistory{
+							Name: "FFI_GetRotation",
+							Args: []interface{}{page},
+						})
+						return enums.FPDF_PAGE_ROTATION_NONE
+					},
+					FFI_ExecuteNamedAction: func(namedAction string) {
+						addToHistory(FormHistory{
+							Name: "FFI_ExecuteNamedAction",
+							Args: []interface{}{namedAction},
+						})
+					},
+					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
+						addToHistory(FormHistory{
+							Name: "FFI_SetTextFieldFocus",
+							Args: []interface{}{value, isFocus},
+						})
+					},
+					FFI_DoURIAction: func(bsURI string) {
+						addToHistory(FormHistory{
+							Name: "FFI_DoURIAction",
+							Args: []interface{}{bsURI},
+						})
+					},
+					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
+						addToHistory(FormHistory{
+							Name: "FFI_DoGoToAction",
+							Args: []interface{}{pageIndex, zoomMode, pos},
+						})
+					},
+				},
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment).ToNot(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment.FormHandle).ToNot(BeEmpty())
+			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
+		})
+
+		AfterEach(func() {
+			FPDFDOC_ExitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_ExitFormFillEnvironment(&requests.FPDFDOC_ExitFormFillEnvironment{
+				FormHandle: formHandle,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_ExitFormFillEnvironment).To(Not(BeNil()))
+
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+
+			//formattedHistory, _ := json.MarshalIndent(formHistory, "", "  ")
+
+			//log.Println(formHistory)
+			//log.Printf(string(formattedHistory))
+		})
+
+		When("is opened", func() {
+			It("allows getting and setting form field flags", func() {
+				FPDFPage_GetAnnot, err := PdfiumInstance.FPDFPage_GetAnnot(&requests.FPDFPage_GetAnnot{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					Index: 0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetAnnot).ToNot(BeNil())
+				Expect(FPDFPage_GetAnnot.Annotation).ToNot(BeEmpty())
+
+				FPDFAnnot_GetFormFieldFlags, err := PdfiumInstance.FPDFAnnot_GetFormFieldFlags(&requests.FPDFAnnot_GetFormFieldFlags{
+					FormHandle: formHandle,
+					Annotation: FPDFPage_GetAnnot.Annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetFormFieldFlags).To(Equal(&responses.FPDFAnnot_GetFormFieldFlags{
+					Flags: enums.FPDF_FORMFLAG_NONE,
+				}))
+
+				FPDFAnnot_SetFormFieldFlags, err := PdfiumInstance.FPDFAnnot_SetFormFieldFlags(&requests.FPDFAnnot_SetFormFieldFlags{
+					FormHandle: formHandle,
+					Annotation: FPDFPage_GetAnnot.Annotation,
+					Flags:      enums.FPDF_FORMFLAG_READONLY | enums.FPDF_FORMFLAG_REQUIRED,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_SetFormFieldFlags).To(Equal(&responses.FPDFAnnot_SetFormFieldFlags{}))
+
+				FPDFAnnot_GetFormFieldFlags, err = PdfiumInstance.FPDFAnnot_GetFormFieldFlags(&requests.FPDFAnnot_GetFormFieldFlags{
+					FormHandle: formHandle,
+					Annotation: FPDFPage_GetAnnot.Annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAnnot_GetFormFieldFlags).To(Equal(&responses.FPDFAnnot_GetFormFieldFlags{
+					Flags: enums.FPDF_FORMFLAG_READONLY | enums.FPDF_FORMFLAG_REQUIRED,
+				}))
+			})
+		})
+	})
 })
