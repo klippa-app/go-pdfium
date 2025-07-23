@@ -84,6 +84,11 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(err).To(MatchError("either page reference or index should be given"))
 				Expect(FPDFPage_RemoveObject).To(BeNil())
 			})
+			It("returns an error when calling FPDFFormObj_RemoveObject", func() {
+				FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFFormObj_RemoveObject).To(BeNil())
+			})
 			It("returns an error when calling FPDFPage_InsertObjectAtIndex", func() {
 				FPDFPage_InsertObjectAtIndex, err := PdfiumInstance.FPDFPage_InsertObjectAtIndex(&requests.FPDFPage_InsertObjectAtIndex{})
 				Expect(err).To(MatchError("either page reference or index should be given"))
@@ -2044,6 +2049,101 @@ end
 				Expect(FPDFPage_CountObjects).To(Equal(&responses.FPDFPage_CountObjects{
 					Count: 3,
 				}))
+			})
+		})
+	})
+
+	Context("a PDF file with form objects", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/form_object.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when an page object has been loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+
+					FPDFPageObj_GetType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetType).To(Equal(&responses.FPDFPageObj_GetType{
+						Type: enums.FPDF_PAGEOBJ_FORM,
+					}))
+				})
+
+				It("returns an error when deleting an object without giving the object", func() {
+					FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{
+						PageObject: pageObject,
+					})
+					Expect(err).To(MatchError("pageObject not given"))
+					Expect(FPDFFormObj_RemoveObject).To(BeNil())
+				})
+
+				It("allows to delete a form object", func() {
+					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
+						PageObject: pageObject,
+						Index:      0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_GetObject).To(Not(BeNil()))
+					Expect(FPDFFormObj_GetObject.PageObject).To(Not(BeEmpty()))
+
+					FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
+						Count: 2,
+					}))
+
+					FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{
+						PageObject: pageObject,
+						FormObject: FPDFFormObj_GetObject.PageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_RemoveObject).To(Not(BeNil()))
+
+					FPDFFormObj_CountObjects, err = PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
+						Count: 1,
+					}))
+				})
 			})
 		})
 	})

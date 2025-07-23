@@ -357,12 +357,6 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFFormObj_GetObject).To(BeNil())
 			})
 
-			It("returns an error when calling FPDFFormObj_GetObject", func() {
-				FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{})
-				Expect(err).To(MatchError("pageObject not given"))
-				Expect(FPDFFormObj_RemoveObject).To(BeNil())
-			})
-
 			It("returns an error when calling FPDFImageObj_SetBitmap", func() {
 				FPDFImageObj_SetBitmap, err := PdfiumInstance.FPDFImageObj_SetBitmap(&requests.FPDFImageObj_SetBitmap{})
 				Expect(err).To(MatchError("pageObject not given"))
@@ -1958,47 +1952,6 @@ var _ = Describe("fpdf_edit", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDFFormObj_GetObject).To(Not(BeNil()))
 					Expect(FPDFFormObj_GetObject.PageObject).To(Not(BeEmpty()))
-				})
-
-				It("returns an error when deleting an object without giving the object", func() {
-					FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{
-						PageObject: pageObject,
-					})
-					Expect(err).To(MatchError("pageObject not given"))
-					Expect(FPDFFormObj_RemoveObject).To(BeNil())
-				})
-
-				It("allows to delete a form object", func() {
-					FPDFFormObj_GetObject, err := PdfiumInstance.FPDFFormObj_GetObject(&requests.FPDFFormObj_GetObject{
-						PageObject: pageObject,
-						Index:      0,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFFormObj_GetObject).To(Not(BeNil()))
-					Expect(FPDFFormObj_GetObject.PageObject).To(Not(BeEmpty()))
-
-					FPDFFormObj_CountObjects, err := PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
-						PageObject: pageObject,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
-						Count: 2,
-					}))
-
-					FPDFFormObj_RemoveObject, err := PdfiumInstance.FPDFFormObj_RemoveObject(&requests.FPDFFormObj_RemoveObject{
-						PageObject: pageObject,
-						FormObject: FPDFFormObj_GetObject.PageObject,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFFormObj_RemoveObject).To(Not(BeNil()))
-
-					FPDFFormObj_CountObjects, err = PdfiumInstance.FPDFFormObj_CountObjects(&requests.FPDFFormObj_CountObjects{
-						PageObject: pageObject,
-					})
-					Expect(err).To(BeNil())
-					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
-						Count: 1,
-					}))
 				})
 			})
 		})
