@@ -32,6 +32,7 @@ type FPDF_MovePages struct{}
 
 type FPDFPage_InsertObject struct{}
 
+type FPDFPage_InsertObjectAtIndex struct{}
 type FPDFPage_RemoveObject struct{}
 
 type FPDFPage_CountObjects struct {
@@ -397,3 +398,5 @@ type FPDFFormObj_CountObjects struct {
 type FPDFFormObj_GetObject struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
+
+type FPDFFormObj_RemoveObject struct{}

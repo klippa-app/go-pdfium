@@ -11,9 +11,9 @@ package implementation_cgo
 import "C"
 import (
 	"errors"
-	"github.com/klippa-app/go-pdfium/enums"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -310,5 +310,41 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 
 	return &responses.FPDFAttachment_GetFile{
 		Contents: fileData,
+	}, nil
+}
+
+// FPDFAttachment_GetSubtype gets the MIME type (Subtype) of the embedded file attachment.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	attachmentHandle, err := p.getAttachmentHandle(request.Attachment)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the string value length.
+	stringValueSize := C.FPDFAttachment_GetSubtype(attachmentHandle.handle, nil, 0)
+	if stringValueSize == 0 {
+		return nil, errors.New("Could not get string value")
+	}
+
+	charData := make([]byte, stringValueSize)
+	C.FPDFAttachment_GetSubtype(attachmentHandle.handle, (*C.ushort)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	if transformedText == "" {
+		return &responses.FPDFAttachment_GetSubtype{
+			Subtype: nil,
+		}, nil
+	}
+
+	return &responses.FPDFAttachment_GetSubtype{
+		Subtype: &transformedText,
 	}, nil
 }

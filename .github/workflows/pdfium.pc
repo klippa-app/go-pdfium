@@ -4,7 +4,7 @@ includedir=/opt/pdfium/include
 
 Name: PDFium
 Description: PDFium
-Version: 7019
+Version: 7309
 Requires:
 
 Libs: -L${libdir} -lpdfium

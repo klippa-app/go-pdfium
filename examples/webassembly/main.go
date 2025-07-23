@@ -22,7 +22,7 @@ func init() {
 	pool, err = webassembly.Init(webassembly.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
-		MaxTotal: 1, // Maxium amount of workers in total, allows the amount of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+		MaxTotal: 1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
 	})
 	if err != nil {
 		log.Fatal(err)

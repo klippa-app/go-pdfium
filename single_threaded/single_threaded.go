@@ -4,11 +4,13 @@ import (
 	goctx "context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 )
 
 var singleThreadedMutex = &sync.Mutex{}
@@ -84,6 +86,12 @@ func (p *pdfiumPool) Close() (err error) {
 	if p.closed {
 		return errors.New("pool is already closed")
 	}
+
+	p.lock.Lock()
+	// Once we mark the pool as closed, the user can't do anything to change
+	// the pool, except closing instances, which has its own lock anyway.
+	p.closed = true
+	p.lock.Unlock()
 
 	defer func() {
 		if panicError := recover(); panicError != nil {
