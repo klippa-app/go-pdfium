@@ -65,37 +65,27 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	charsInPage := *(*int32)(unsafe.Pointer(&res[0]))
 
-	charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage+1)*2), nil) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
-	if err != nil {
-		return nil, err
-	}
-	defer charDataPointer.Free()
+	charData := make([]rune, 0, charsInPage)
+	for i := 0; i < int(charsInPage); i++ {
+		res, err = p.Module.ExportedFunction("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
+		if err != nil {
+			return nil, err
+		}
 
-	res, err = p.Module.ExportedFunction("FPDFText_GetText").Call(p.Context, textPage, 0, uint64(charsInPage), charDataPointer.Pointer)
-	if err != nil {
-		return nil, err
+		uniChar := *(*int)(unsafe.Pointer(&res[0]))
+		if uniChar != 0 {
+			charData = append(charData, rune(uniChar))
+		}
 	}
-
-	charsWritten := *(*int32)(unsafe.Pointer(&res[0]))
 
 	res, err = p.Module.ExportedFunction("FPDFText_ClosePage").Call(p.Context, textPage)
 	if err != nil {
 		return nil, err
 	}
 
-	charData, err := charDataPointer.Value(false)
-	if err != nil {
-		return nil, err
-	}
-
-	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
-	if err != nil {
-		return nil, err
-	}
-
 	return &responses.GetPageText{
 		Page: pageHandle.index,
-		Text: transformedText,
+		Text: string(charData),
 	}, nil
 }
 
@@ -185,27 +175,15 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				return nil, err
 			}
 
-			charDataPointer, err := p.ByteArrayPointer(4, nil) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
-			if err != nil {
-				return nil, err
-			}
-			defer charDataPointer.Free()
-
-			res, err = p.Module.ExportedFunction("FPDFText_GetText").Call(p.Context, textPage, uint64(i), 1, charDataPointer.Pointer)
+			res, err = p.Module.ExportedFunction("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
 			if err != nil {
 				return nil, err
 			}
 
-			charsWritten := *(*int32)(unsafe.Pointer(&res[0]))
-
-			charData, err := charDataPointer.Value(false)
-			if err != nil {
-				return nil, err
-			}
-
-			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : (charsWritten)*2])
-			if err != nil {
-				return nil, err
+			text := ""
+			uniChar := *(*int)(unsafe.Pointer(&res[0]))
+			if uniChar != 0 {
+				text = string([]rune{rune(uniChar)})
 			}
 
 			left, err := leftPointer.Value()
@@ -229,7 +207,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			}
 
 			char := &responses.GetPageTextStructuredChar{
-				Text:  transformedText,
+				Text:  text,
 				Angle: float64(angle),
 				PointPosition: responses.CharPosition{
 					Left:   float64(left),
