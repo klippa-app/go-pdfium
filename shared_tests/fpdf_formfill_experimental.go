@@ -12,9 +12,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
-
 	"github.com/klippa-app/go-pdfium/enums"
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"

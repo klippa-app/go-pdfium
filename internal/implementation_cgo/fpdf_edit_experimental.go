@@ -1433,7 +1433,10 @@ func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FP
 		return nil, err
 	}
 
-	C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, C.size_t(request.Index))
+	result := C.FPDFPage_InsertObjectAtIndex(pageHandle.handle, pageObjectHandle.handle, C.size_t(request.Index))
+	if int(result) == 0 {
+		return nil, errors.New("could not insert object")
+	}
 
 	return &responses.FPDFPage_InsertObjectAtIndex{}, nil
 }

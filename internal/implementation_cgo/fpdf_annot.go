@@ -1077,7 +1077,6 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPD
 	}
 
 	success := C.FPDFAnnot_SetFormFieldFlags(formHandle.handle, annotationHandle.handle, C.int(request.Flags))
-
 	if int(success) == 0 {
 		return nil, errors.New("could not set form field flags")
 	}
@@ -1420,7 +1419,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFontColor(request *requests.FPDFAnno
 	if err != nil {
 		return nil, err
 	}
-	
+
 	success := C.FPDFAnnot_SetFontColor(formHandle.handle, annotationHandle.handle, C.uint(request.R), C.uint(request.G), C.uint(request.B))
 	if int(success) == 0 {
 		return nil, errors.New("could not set font color")
