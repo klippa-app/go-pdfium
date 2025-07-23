@@ -242,13 +242,18 @@ func Init(config Config) (pdfium.Pool, error) {
 }
 
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	timeoutCtx, cancel := goctx.WithTimeout(goctx.Background(), timeout)
+	defer cancel()
+
+	return p.GetInstanceWithContext(timeoutCtx)
+}
+
+func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, error) {
 	if p.closed {
 		return nil, errors.New("pool is closed")
 	}
 
-	timeoutCtx, cancel := goctx.WithTimeout(goctx.Background(), timeout)
-	defer cancel()
-	workerObject, err := p.workerPool.BorrowObject(timeoutCtx)
+	workerObject, err := p.workerPool.BorrowObject(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +280,10 @@ func (p *pdfiumPool) Close() (err error) {
 	}
 
 	p.lock.Lock()
-	defer p.lock.Unlock()
+	// Once we mark the pool as closed, the user can't do anything to change
+	// the pool, except closing instances, which has its own lock anyway.
+	p.closed = true
+	p.lock.Unlock()
 
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -285,10 +293,7 @@ func (p *pdfiumPool) Close() (err error) {
 
 	// Close all instances
 	for i := range p.instanceRefs {
-		p.instanceRefs[i].worker = nil
-		p.instanceRefs[i].pool = nil
-		p.instanceRefs[i].closed = true
-
+		p.instanceRefs[i].Close()
 		delete(p.instanceRefs, i)
 	}
 

@@ -86,6 +86,12 @@ var _ = Describe("fpdf_attachment", func() {
 			Expect(err).To(MatchError("attachment not given"))
 			Expect(FPDFAttachment_GetFile).To(BeNil())
 		})
+
+		It("returns an error when FPDFAttachment_GetSubtype is called", func() {
+			FPDFAttachment_GetSubtype, err := PdfiumInstance.FPDFAttachment_GetSubtype(&requests.FPDFAttachment_GetSubtype{})
+			Expect(err).To(MatchError("attachment not given"))
+			Expect(FPDFAttachment_GetSubtype).To(BeNil())
+		})
 	})
 
 	Context("a normal PDF file without attachments", func() {
@@ -315,6 +321,17 @@ var _ = Describe("fpdf_attachment", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDFAttachment_GetName).To(Equal(&responses.FPDFAttachment_GetName{
 					Name: "1.txt",
+				}))
+			})
+
+			It("returns the correct mimetype of the attachment", func() {
+				FPDFAttachment_GetSubtype, err := PdfiumInstance.FPDFAttachment_GetSubtype(&requests.FPDFAttachment_GetSubtype{
+					Attachment: attachment,
+				})
+				Expect(err).To(BeNil())
+				expectedSubtype := "text/plain"
+				Expect(FPDFAttachment_GetSubtype).To(Equal(&responses.FPDFAttachment_GetSubtype{
+					Subtype: &expectedSubtype,
 				}))
 			})
 

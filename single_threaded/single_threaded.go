@@ -1,13 +1,16 @@
 package single_threaded
 
 import (
+	goctx "context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/klippa-app/go-pdfium"
-	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/internal/implementation_cgo"
 )
 
 var singleThreadedMutex = &sync.Mutex{}
@@ -55,6 +58,10 @@ type pdfiumPool struct {
 // own documents. When you close it, it will clean up all resources of this
 // instance.
 func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
+	return p.GetInstanceWithContext(goctx.Background())
+}
+
+func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, error) {
 	if p.closed {
 		return nil, errors.New("pool is closed")
 	}
@@ -79,6 +86,12 @@ func (p *pdfiumPool) Close() (err error) {
 	if p.closed {
 		return errors.New("pool is already closed")
 	}
+
+	p.lock.Lock()
+	// Once we mark the pool as closed, the user can't do anything to change
+	// the pool, except closing instances, which has its own lock anyway.
+	p.closed = true
+	p.lock.Unlock()
 
 	defer func() {
 		if panicError := recover(); panicError != nil {

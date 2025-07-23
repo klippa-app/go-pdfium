@@ -1,6 +1,7 @@
 package pdfium
 
 import (
+	goctx "context"
 	"time"
 
 	"github.com/klippa-app/go-pdfium/requests"
@@ -20,6 +21,11 @@ type Pool interface {
 	// It is important to Close instances when you are done with them. To either return them to the pool
 	// or clear it's resources.
 	GetInstance(timeout time.Duration) (Pdfium, error)
+
+	// Same as GetInstance but with a go context.
+	// If the context provided here does not contain any timeouts or cancellations, this function
+	// might block forever. It is the user's responsibility to handle this context.
+	GetInstanceWithContext(ctx goctx.Context) (Pdfium, error)
 
 	// Close closes the pool.
 	// It will close any unclosed instances.
@@ -395,6 +401,12 @@ type Pdfium interface {
 
 	// FPDFPage_InsertObject inserts the given object into a page.
 	FPDFPage_InsertObject(request *requests.FPDFPage_InsertObject) (*responses.FPDFPage_InsertObject, error)
+
+	// FPDFPage_InsertObjectAtIndex inserts the given object into a page at a specific index.
+	// While technically this is not an experimental API function, in go-pdfium
+	// this has been implemented as an experimental API function to ensure
+	// backwards compatibility to older pdfium versions.
+	FPDFPage_InsertObjectAtIndex(request *requests.FPDFPage_InsertObjectAtIndex) (*responses.FPDFPage_InsertObjectAtIndex, error)
 
 	// FPDFPage_RemoveObject removes an object from a page.
 	// Ownership is transferred to the caller. Call FPDFPageObj_Destroy() to free
@@ -876,6 +888,12 @@ type Pdfium interface {
 	// FPDFFormObj_GetObject returns the page object in the given form object at the given index.
 	FPDFFormObj_GetObject(request *requests.FPDFFormObj_GetObject) (*responses.FPDFFormObj_GetObject, error)
 
+	// FPDFFormObj_RemoveObject removes the page object in the given form object.
+	// Ownership of the removed page object is transferred to the caller, call FPDFPageObj_Destroy() on the
+	// removed page_object to free it.
+	// Experimental API.
+	FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error)
+
 	// End fpdf_edit.h
 
 	// Start fpdf_ppo.h
@@ -1189,6 +1207,10 @@ type Pdfium interface {
 	// FPDFAttachment_GetFile gets the file data of the given attachment.
 	// Experimental API.
 	FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
+
+	// FPDFAttachment_GetSubtype gets the MIME type (Subtype) of the embedded file attachment.
+	// Experimental API.
+	FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error)
 
 	// End fpdf_attachment.h
 
@@ -1884,6 +1906,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAnnot_GetFormFieldFlags(request *requests.FPDFAnnot_GetFormFieldFlags) (*responses.FPDFAnnot_GetFormFieldFlags, error)
 
+	// FPDFAnnot_SetFormFieldFlags sets the form field flags for an interactive form annotation.
+	// Experimental API.
+	FPDFAnnot_SetFormFieldFlags(request *requests.FPDFAnnot_SetFormFieldFlags) (*responses.FPDFAnnot_SetFormFieldFlags, error)
+
 	// FPDFAnnot_GetFormFieldAtPoint returns an interactive form annotation whose rectangle contains a given
 	// point on a page. Must call FPDFPage_CloseAnnot() when the annotation returned
 	// is no longer needed.
@@ -1931,6 +1957,12 @@ type Pdfium interface {
 	// the height of the annotation rectangle.
 	// Experimental API.
 	FPDFAnnot_GetFontSize(request *requests.FPDFAnnot_GetFontSize) (*responses.FPDFAnnot_GetFontSize, error)
+
+	// FPDFAnnot_SetFontColor Set the text color of an annotation.
+	// Currently supported subtypes: freetext.
+	// The range for the color components is 0 to 255.
+	// Experimental API.
+	FPDFAnnot_SetFontColor(request *requests.FPDFAnnot_SetFontColor) (*responses.FPDFAnnot_SetFontColor, error)
 
 	// FPDFAnnot_GetFontColor returns the RGB value of the font color for an annotation with variable text.
 	// Experimental API.

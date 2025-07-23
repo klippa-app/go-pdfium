@@ -51,3 +51,7 @@ type FPDFAttachment_SetFile struct{}
 type FPDFAttachment_GetFile struct {
 	Contents []byte // nil when not found.
 }
+
+type FPDFAttachment_GetSubtype struct {
+	Subtype *string // nil when not found.
+}

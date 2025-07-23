@@ -209,6 +209,12 @@ type FPDFAnnot_GetFormFieldFlags struct {
 	Annotation references.FPDF_ANNOTATION
 }
 
+type FPDFAnnot_SetFormFieldFlags struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+	Flags      enums.FPDF_FORMFLAG
+}
+
 type FPDFAnnot_GetFormFieldAtPoint struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page
@@ -261,6 +267,14 @@ type FPDFAnnot_IsOptionSelected struct {
 type FPDFAnnot_GetFontSize struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Annotation references.FPDF_ANNOTATION
+}
+
+type FPDFAnnot_SetFontColor struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+	R          uint
+	G          uint
+	B          uint
 }
 
 type FPDFAnnot_GetFontColor struct {

@@ -138,7 +138,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 7019
+Version: 7309
 Requires:
 
 Libs: -L${libdir} -lpdfium
@@ -678,12 +678,14 @@ Upgrades of the supported PDFium version will cause a minor version update.
 
 ### Go
 
-This project will support the last 3 version of Go, this means that if the last version of Go is 1.21, our `go.mod`
-will be set to Go 1.19, and our CI tests will be run on Go 1.19, 1.20 and 1.21. It won't mean that the library won't
-work with older versions of Go, but it will tell you what to expect of the supported  Go versions. If we change the
-supported Go versions, we will make that a minor version upgrade. This policy allows you to not be forced to the latest
-Go version for a pretty long time, but it still allows us to use new language features in a pretty reasonable
-time-frame.
+This project will support the last 2 version of Go, this means that if the last version of Go is 1.24, our `go.mod`
+will be set to Go 1.23, and our CI tests will be run on Go 1.23 and 1.24. This is in line with Go's
+[Release Policy](https://go.dev/doc/devel/release).
+
+It won't mean that the library won't work with older versions of Go, but it will tell you what to expect of the
+supported  Go versions. If we change the supported Go versions, we will make that a minor version upgrade. This policy
+allows you to not be forced to the latest Go version for a pretty long time, but it still allows us to use new language
+features in a pretty reasonable time-frame.
 
 ## About Klippa
 

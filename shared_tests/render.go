@@ -2349,7 +2349,7 @@ var _ = Describe("Render", func() {
 					PointToPixelRatio: 2.7777777777777777,
 					Width:             1653,
 					Height:            2339,
-				})), TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel", TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel_7019")
+				})), TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel", TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel_7019", TestDataPath+"/testdata/render_"+TestType+"_page_alpha_channel_7309")
 				renderedPage.Cleanup()
 			})
 		})
