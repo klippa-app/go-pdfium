@@ -208,6 +208,125 @@ var _ = Describe("text", func() {
 			})
 		})
 	})
+
+	Context("a PDF file with multibyte characters", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rect-wrong.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when the page text is requested", func() {
+				It("returns the correct text", func() {
+					pageText, err := PdfiumInstance.GetPageText(&requests.GetPageText{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(pageText).To(Equal(&responses.GetPageText{
+						Text: "File: Untitled Document 2 Page 1 of 1\r\nThis is a test PDF",
+					}))
+				})
+			})
+
+			Context("when the structured page text is requested", func() {
+				It("returns the correct structured text", func() {
+					pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+
+					Expect(err).To(BeNil())
+					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations_7019.json")...))
+				})
+
+				Context("when PixelPositions is enabled", func() {
+					Context("with no DPI and no pixels", func() {
+						It("returns an error", func() {
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+								},
+							})
+							Expect(err).To(MatchError("no DPI or resolution given to calculate pixel positions"))
+							Expect(pageTextStructured).To(BeNil())
+						})
+					})
+
+					Context("with DPI", func() {
+						It("returns the correct calculations", func() {
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									DPI:       300,
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7019.json")...))
+						})
+					})
+
+					Context("with pixels", func() {
+						It("returns the correct calculations", func() {
+							pageTextStructured, err := PdfiumInstance.GetPageTextStructured(&requests.GetPageTextStructured{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								PixelPositions: requests.GetPageTextStructuredPixelPositions{
+									Calculate: true,
+									Width:     3000,
+									Height:    3000,
+								},
+							})
+
+							Expect(err).To(BeNil())
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7019.json")...))
+						})
+					})
+				})
+			})
+		})
+	})
 })
 
 func loadStructuredText(resp *responses.GetPageTextStructured, paths ...string) []types.GomegaMatcher {
