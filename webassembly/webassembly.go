@@ -249,9 +249,14 @@ func (p *pdfiumPool) GetInstance(timeout time.Duration) (pdfium.Pdfium, error) {
 }
 
 func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, error) {
+	p.lock.Lock()
+
 	if p.closed {
+		p.lock.Unlock()
 		return nil, errors.New("pool is closed")
 	}
+
+	p.lock.Unlock()
 
 	workerObject, err := p.workerPool.BorrowObject(ctx)
 	if err != nil {
@@ -275,11 +280,13 @@ func (p *pdfiumPool) GetInstanceWithContext(ctx goctx.Context) (pdfium.Pdfium, e
 }
 
 func (p *pdfiumPool) Close() (err error) {
+	p.lock.Lock()
+
 	if p.closed {
+		p.lock.Unlock()
 		return errors.New("pool is already closed")
 	}
 
-	p.lock.Lock()
 	// Once we mark the pool as closed, the user can't do anything to change
 	// the pool, except closing instances, which has its own lock anyway.
 	p.closed = true
@@ -294,7 +301,6 @@ func (p *pdfiumPool) Close() (err error) {
 	// Close all instances
 	for i := range p.instanceRefs {
 		p.instanceRefs[i].Close()
-		delete(p.instanceRefs, i)
 	}
 
 	multiThreadedMutex.Lock()
