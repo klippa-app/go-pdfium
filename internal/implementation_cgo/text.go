@@ -61,18 +61,18 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
-	charData := make([]rune, 0, charsInPage)
-	for i := 0; i < charsInPage; i++ {
-		uniChar := C.FPDFText_GetUnicode(textPage, C.int(i))
-		if uniChar != 0 {
-			charData = append(charData, rune(uniChar))
-		}
-	}
+	charData := make([]byte, (charsInPage+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
+	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
 	C.FPDFText_ClosePage(textPage)
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
+	if err != nil {
+		return nil, err
+	}
 
 	return &responses.GetPageText{
 		Page: pageHandle.index,
-		Text: string(charData),
+		Text: transformedText,
 	}, nil
 }
 
