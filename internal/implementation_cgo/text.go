@@ -8,15 +8,15 @@ import "C"
 import (
 	"bytes"
 	"errors"
-	"github.com/google/uuid"
-	"github.com/klippa-app/go-pdfium/references"
 	"io/ioutil"
 	"math"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 
+	"github.com/google/uuid"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -61,18 +61,18 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := int(C.FPDFText_CountChars(textPage))
-	charData := make([]byte, (charsInPage+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
-	charsWritten := C.FPDFText_GetText(textPage, C.int(0), C.int(charsInPage), (*C.ushort)(unsafe.Pointer(&charData[0])))
-	C.FPDFText_ClosePage(textPage)
-
-	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
-	if err != nil {
-		return nil, err
+	charData := make([]rune, 0, charsInPage)
+	for i := 0; i < charsInPage; i++ {
+		uniChar := C.FPDFText_GetUnicode(textPage, C.int(i))
+		if uniChar != 0 {
+			charData = append(charData, rune(uniChar))
+		}
 	}
+	C.FPDFText_ClosePage(textPage)
 
 	return &responses.GetPageText{
 		Page: pageHandle.index,
-		Text: transformedText,
+		Text: string(charData),
 	}, nil
 }
 
@@ -122,16 +122,14 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			right := C.double(0)
 			bottom := C.double(0)
 			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &right, &bottom, &top)
-			charData := make([]byte, 4) // UTF16-LE max 2 bytes per char, so 1 byte for the char, and 1 char for terminator.
-			charsWritten := C.FPDFText_GetText(textPage, C.int(i), C.int(1), (*C.ushort)(unsafe.Pointer(&charData[0])))
-
-			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : (charsWritten)*2])
-			if err != nil {
-				return nil, err
+			text := ""
+			uniChar := C.FPDFText_GetUnicode(textPage, C.int(i))
+			if uniChar != 0 {
+				text = string([]rune{rune(uniChar)})
 			}
 
 			char := &responses.GetPageTextStructuredChar{
-				Text:  transformedText,
+				Text:  text,
 				Angle: float64(angle),
 				PointPosition: responses.CharPosition{
 					Left:   float64(left),
