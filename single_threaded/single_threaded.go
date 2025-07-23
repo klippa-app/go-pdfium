@@ -86,6 +86,7 @@ func (p *pdfiumPool) Close() (err error) {
 	p.lock.Lock()
 
 	if p.closed {
+		p.lock.Unlock()
 		return errors.New("pool is already closed")
 	}
 
