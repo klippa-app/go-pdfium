@@ -2857,7 +2857,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 }
 
 func writePrerenderedImage(renderedImage *image.RGBA, testNames ...string) error {
-	filename := testNames[len(testNames)-1]
+	filename := testNames[0]
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
@@ -2894,7 +2894,7 @@ func writePrerenderedImage(renderedImage *image.RGBA, testNames ...string) error
 }
 
 func writePrerenderedFile(request *requests.RenderToFile, renderedFile *responses.RenderToFile, testNames ...string) error {
-	filename := testNames[len(testNames)-1]
+	filename := testNames[0]
 
 	var fileBytes []byte
 
