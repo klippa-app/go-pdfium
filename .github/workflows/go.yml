@@ -97,6 +97,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Archive render results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: cgo-renders-${{ matrix.os }}-${{ matrix.go }}-${{ matrix.pdfium }}
           path: |
@@ -137,6 +138,7 @@ jobs:
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Archive render results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: webassembly-renders-${{ matrix.os }}-${{ matrix.go }}
           path: |
