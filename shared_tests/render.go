@@ -2580,6 +2580,100 @@ var _ = Describe("Render", func() {
 			})
 		})
 	})
+
+	Context("a PDF file that has a form", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("it is rendered", func() {
+			It("returns the right image", func() {
+				renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					DPI:        200,
+					RenderForm: true,
+				})
+
+				Expect(err).To(BeNil())
+				compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+					PointToPixelRatio: 2.7777777777777777,
+					Width:             834,
+					Height:            834,
+				})), TestDataPath+"/testdata/render_"+TestType+"_text_form")
+				renderedPage.Cleanup()
+			})
+		})
+	})
+
+	Context("a PDF file that does not have a form", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("it is rendered including any forms", func() {
+			It("returns the right image", func() {
+				renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					DPI:        200,
+					RenderForm: true,
+				})
+
+				Expect(err).To(BeNil())
+				compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+					PointToPixelRatio: 2.7777777777777777,
+					Width:             1654,
+					Height:            2339,
+				})), TestDataPath+"/testdata/render_"+TestType+"_no_form")
+				renderedPage.Cleanup()
+			})
+		})
+	})
 })
 
 func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaMatcher, testNames ...string) {

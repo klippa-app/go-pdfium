@@ -3,6 +3,7 @@ package implementation_cgo
 // #cgo pkg-config: pdfium
 // #include "fpdfview.h"
 // #include "fpdf_edit.h"
+// #include "fpdf_formfill.h"
 import "C"
 
 import (
@@ -21,6 +22,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/image/image_jpeg"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -113,6 +115,8 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
 			Flags:             request.RenderFlags,
+			RenderForm:        request.RenderForm,
+			Document:          request.Document,
 		},
 	}, 0)
 	if err != nil {
@@ -156,6 +160,8 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
 			Flags:             request.Pages[i].RenderFlags,
+			RenderForm:        request.Pages[i].RenderForm,
+			Document:          request.Pages[i].Document,
 		}
 	}
 
@@ -229,6 +235,8 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 			Height:            height,
 			PointToPixelRatio: ratio,
 			Flags:             request.RenderFlags,
+			RenderForm:        request.RenderForm,
+			Document:          request.Document,
 		},
 	}, 0)
 	if err != nil {
@@ -274,6 +282,8 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			Height:            height,
 			PointToPixelRatio: ratio,
 			Flags:             request.Pages[i].RenderFlags,
+			RenderForm:        request.Pages[i].RenderForm,
+			Document:          request.Pages[i].Document,
 		}
 	}
 
@@ -293,6 +303,8 @@ type renderPage struct {
 	Width             int
 	Height            int
 	PointToPixelRatio float64
+	RenderForm        bool
+	Document          *references.FPDF_DOCUMENT
 }
 
 // renderPages renders a list of pages, the result is an image.
@@ -331,7 +343,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
+		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm)
 		if err != nil {
 			return nil, err
 		}
@@ -353,7 +365,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, bool, error) {
+func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *references.FPDF_DOCUMENT, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG, renderForm bool) (int, bool, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, false, err
@@ -378,6 +390,30 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, page requests.Pa
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
 	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+
+	if renderForm {
+		if document == nil && page.ByIndex != nil {
+			document = &page.ByIndex.Document
+		}
+		if document == nil {
+			return 0, false, errors.New("document is required when rendering forms")
+		}
+
+		documentHandle, err := p.getDocumentHandle(*document)
+		if err != nil {
+			return 0, false, err
+		}
+
+		formInfoStruct := &C.FPDF_FORMFILLINFO{}
+		formInfoStruct.version = 1
+		formFillEnvironment := C.FPDFDOC_InitFormFillEnvironment(documentHandle.handle, formInfoStruct)
+		if formFillEnvironment == nil {
+			return 0, false, errors.New("could not init form fill environment")
+		}
+
+		C.FPDF_FFLDraw(formFillEnvironment, bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+		C.FPDFDOC_ExitFormFillEnvironment(formFillEnvironment)
+	}
 
 	return pageHandle.index, hasTransparency, nil
 }
