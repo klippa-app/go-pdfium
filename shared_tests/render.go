@@ -2585,7 +2585,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2622,7 +2622,7 @@ var _ = Describe("Render", func() {
 					PointToPixelRatio: 2.7777777777777777,
 					Width:             834,
 					Height:            834,
-				})), TestDataPath+"/testdata/render_"+TestType+"_text_form")
+				})), TestDataPath+"/testdata/render_"+TestType+"_click_form")
 				renderedPage.Cleanup()
 			})
 		})
