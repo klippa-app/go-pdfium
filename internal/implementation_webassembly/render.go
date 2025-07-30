@@ -16,6 +16,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/image/image_jpeg"
+	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 )
@@ -119,6 +120,8 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
 			Flags:             request.RenderFlags,
+			RenderForm:        request.RenderForm,
+			Document:          request.Document,
 		},
 	}, 0)
 	if err != nil {
@@ -163,6 +166,8 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			Height:            heightInPixels,
 			PointToPixelRatio: pointToPixelRatio,
 			Flags:             request.Pages[i].RenderFlags,
+			RenderForm:        request.Pages[i].RenderForm,
+			Document:          request.Pages[i].Document,
 		}
 	}
 
@@ -237,6 +242,8 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 			Height:            height,
 			PointToPixelRatio: ratio,
 			Flags:             request.RenderFlags,
+			RenderForm:        request.RenderForm,
+			Document:          request.Document,
 		},
 	}, 0)
 	if err != nil {
@@ -283,6 +290,8 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			Height:            height,
 			PointToPixelRatio: ratio,
 			Flags:             request.Pages[i].RenderFlags,
+			RenderForm:        request.Pages[i].RenderForm,
+			Document:          request.Pages[i].Document,
 		}
 	}
 
@@ -303,6 +312,8 @@ type renderPage struct {
 	Width             int
 	Height            int
 	PointToPixelRatio float64
+	RenderForm        bool
+	Document          *references.FPDF_DOCUMENT
 }
 
 // renderPages renders a list of pages, the result is an image.
@@ -357,7 +368,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags)
+		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm)
 		if err != nil {
 			releaseFunc()
 			return nil, nil, err
@@ -392,7 +403,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap uint64, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG) (int, bool, error) {
+func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FPDF_DOCUMENT, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG, renderForm bool) (int, bool, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, false, err
@@ -428,6 +439,50 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, page requests.Page, wid
 	_, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.Context, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
 	if err != nil {
 		return 0, false, err
+	}
+
+	if renderForm {
+		if document == nil && page.ByIndex != nil {
+			document = &page.ByIndex.Document
+		}
+		if document == nil {
+			return 0, false, errors.New("document is required when rendering forms")
+		}
+
+		documentHandle, err := p.getDocumentHandle(*document)
+		if err != nil {
+			return 0, false, err
+		}
+
+		res, err := p.Module.ExportedFunction("FPDF_FORMFILLINFO_Create").Call(p.Context)
+		if err != nil {
+			return 0, false, err
+		}
+
+		formInfoStruct := res[0]
+		if formInfoStruct == 0 {
+			return 0, false, errors.New("could not init form fill environment")
+		}
+
+		res, err = p.Module.ExportedFunction("FPDFDOC_InitFormFillEnvironment").Call(p.Context, *documentHandle.handle, formInfoStruct)
+		if err != nil {
+			return 0, false, err
+		}
+
+		formHandle := res[0]
+		if formHandle == 0 {
+			return 0, false, errors.New("could not init form fill environment")
+		}
+
+		_, err = p.Module.ExportedFunction("FPDF_FFLDraw").Call(p.Context, formHandle, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
+		if err != nil {
+			return 0, false, err
+		}
+
+		_, err = p.Module.ExportedFunction("FPDFDOC_ExitFormFillEnvironment").Call(p.Context, formHandle)
+		if err != nil {
+			return 0, false, err
+		}
 	}
 
 	return pageHandle.index, hasTransparency, nil

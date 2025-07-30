@@ -95,6 +95,14 @@ jobs:
         with:
           files: coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Archive render results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cgo-renders-${{ matrix.os }}-${{ matrix.go }}-${{ matrix.pdfium }}
+          path: |
+            shared_tests/testdata/*.jpg
+            shared_tests/testdata/*.png
   test-webassembly:
     strategy:
       fail-fast: false
@@ -128,3 +136,11 @@ jobs:
           $env:IS_EXPERIMENTAL = '1'
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
+      - name: Archive render results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: webassembly-renders-${{ matrix.os }}-${{ matrix.go }}
+          path: |
+            shared_tests/testdata/*.jpg
+            shared_tests/testdata/*.png
