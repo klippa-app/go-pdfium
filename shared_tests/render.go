@@ -2622,7 +2622,7 @@ var _ = Describe("Render", func() {
 					PointToPixelRatio: 2.7777777777777777,
 					Width:             834,
 					Height:            834,
-				})), TestDataPath+"/testdata/render_"+TestType+"_text_form_filled", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_macos")
+				})), TestDataPath+"/testdata/render_"+TestType+"_text_form_filled", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_macos", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_windows")
 				renderedPage.Cleanup()
 			})
 		})
@@ -2858,22 +2858,11 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 
 func writePrerenderedImage(renderedImage *image.RGBA, testNames ...string) error {
 	filename := testNames[len(testNames)-1]
-	if _, err := os.Stat(filename + ".hash"); err == nil {
-		return nil // Comment this in case of updating PDFium versions and rendering has changed.
-	}
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	if err := enc.Encode(renderedImage.Pix); err != nil {
-		return err
-	}
-
-	hasher := sha256.New()
-	hasher.Write(buf.Bytes())
-	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
-
-	if err := ioutil.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
 		return err
 	}
 
@@ -2888,21 +2877,28 @@ func writePrerenderedImage(renderedImage *image.RGBA, testNames ...string) error
 		return err
 	}
 
+	// Don't write the hash if we already have it.
+	if _, err := os.Stat(filename + ".hash"); err == nil {
+		return nil // Comment this in case of updating PDFium versions and rendering has changed.
+	}
+
+	hasher := sha256.New()
+	hasher.Write(buf.Bytes())
+	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	if err := ioutil.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func writePrerenderedFile(request *requests.RenderToFile, renderedFile *responses.RenderToFile, testNames ...string) error {
 	filename := testNames[len(testNames)-1]
-	if _, err := os.Stat(filename + ".hash"); err == nil {
-		return nil // Comment this in case of updating PDFium versions and rendering has changed.
-	}
 
 	var fileBytes []byte
 
-	hasher := sha256.New()
-
 	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
-		hasher.Write(*renderedFile.ImageBytes)
 		fileBytes = *renderedFile.ImageBytes
 	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
 		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
@@ -2910,24 +2906,32 @@ func writePrerenderedFile(request *requests.RenderToFile, renderedFile *response
 			return err
 		}
 
-		hasher.Write(fileContent)
 		fileBytes = fileContent
 	}
+
+	imagefilename := filename
+	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
+		imagefilename += ".png"
+	} else if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
+		imagefilename += ".jpg"
+	}
+
+	err := ioutil.WriteFile(imagefilename, fileBytes, 0777)
+	if err != nil {
+		return err
+	}
+
+	// Don't write the hash if we already have it.
+	if _, err := os.Stat(filename + ".hash"); err == nil {
+		return nil // Comment this in case of updating PDFium versions and rendering has changed.
+	}
+
+	hasher := sha256.New()
+	hasher.Write(fileBytes)
 
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
 
 	if err := ioutil.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
-		return err
-	}
-
-	if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
-		filename += ".png"
-	} else if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
-		filename += ".jpg"
-	}
-
-	err := ioutil.WriteFile(filename, fileBytes, 0777)
-	if err != nil {
 		return err
 	}
 
