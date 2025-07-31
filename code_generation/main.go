@@ -14,12 +14,14 @@ import (
 	"text/template"
 
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/responses"
 )
 
 type GenerateDataMethod struct {
-	Name   string
-	Input  string
-	Output string
+	Name                       string
+	Input                      string
+	Output                     string
+	ImplementsAfterUnmarshaler bool
 }
 
 func (m *GenerateDataMethod) BlockForMultiThreaded() bool {
@@ -56,6 +58,8 @@ func main() {
 	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()
 	numMethods := docType.NumMethod()
 
+	inter := reflect.TypeOf((*responses.AfterUnmarshaler)(nil)).Elem()
+
 	for i := 0; i < numMethods; i++ {
 		method := docType.Method(i)
 
@@ -64,10 +68,12 @@ func main() {
 			continue
 		}
 
+		outMethod := method.Type.Out(0)
 		dataMethod := GenerateDataMethod{
-			Name:   method.Name,
-			Input:  method.Name,
-			Output: method.Name,
+			Name:                       method.Name,
+			Input:                      method.Name,
+			Output:                     method.Name,
+			ImplementsAfterUnmarshaler: outMethod.Implements(inter),
 		}
 
 		data.Methods = append(data.Methods, dataMethod)

@@ -445,6 +445,10 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFDOC_InitFormFillEnvironment(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFDOC_InitFormFillEnvironment(request *requests.FPDFDOC_InitFormFillEnvironment) (*responses.FPDFDOC_InitFormFillEnvironment, error) {
 	documentHandle, err := p.getDocumentHandle(request.Document)
 	if err != nil {
 		return nil, err
@@ -511,7 +515,10 @@ func (p *PdfiumImplementation) FPDFDOC_InitFormFillEnvironment(request *requests
 func (p *PdfiumImplementation) FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error) {
 	p.Lock()
 	defer p.Unlock()
+	return p.internal_FPDFDOC_ExitFormFillEnvironment(request)
+}
 
+func (p *PdfiumImplementation) internal_FPDFDOC_ExitFormFillEnvironment(request *requests.FPDFDOC_ExitFormFillEnvironment) (*responses.FPDFDOC_ExitFormFillEnvironment, error) {
 	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -536,6 +543,9 @@ func (p *PdfiumImplementation) FORM_OnAfterLoadPage(request *requests.FORM_OnAft
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FORM_OnAfterLoadPage(request)
+}
+func (p *PdfiumImplementation) internal_FORM_OnAfterLoadPage(request *requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error) {
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
@@ -567,7 +577,10 @@ func (p *PdfiumImplementation) FORM_OnAfterLoadPage(request *requests.FORM_OnAft
 func (p *PdfiumImplementation) FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error) {
 	p.Lock()
 	defer p.Unlock()
+	return p.internal_FORM_OnBeforeClosePage(request)
+}
 
+func (p *PdfiumImplementation) internal_FORM_OnBeforeClosePage(request *requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error) {
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err

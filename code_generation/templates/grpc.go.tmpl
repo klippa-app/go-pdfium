@@ -24,7 +24,9 @@ func (g *PdfiumRPC) {{ $method.Name }}(request *requests.{{ $method.Input }}) (*
 	if err != nil {
 		return nil, err
 	}
-
+{{ if eq $method.ImplementsAfterUnmarshaler true }}
+	any(resp).(responses.AfterUnmarshaler).AfterUnmarshal()
+{{ end }}
 	return resp, nil
 }
 {{ end -}}

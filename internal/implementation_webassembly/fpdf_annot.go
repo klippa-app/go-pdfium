@@ -65,6 +65,10 @@ func (p *PdfiumImplementation) FPDFPage_GetAnnotCount(request *requests.FPDFPage
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFPage_GetAnnotCount(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFPage_GetAnnotCount(request *requests.FPDFPage_GetAnnotCount) (*responses.FPDFPage_GetAnnotCount, error) {
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
@@ -89,6 +93,10 @@ func (p *PdfiumImplementation) FPDFPage_GetAnnot(request *requests.FPDFPage_GetA
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFPage_GetAnnot(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFPage_GetAnnot(request *requests.FPDFPage_GetAnnot) (*responses.FPDFPage_GetAnnot, error) {
 	pageHandle, err := p.loadPage(request.Page)
 	if err != nil {
 		return nil, err
@@ -151,6 +159,10 @@ func (p *PdfiumImplementation) FPDFPage_CloseAnnot(request *requests.FPDFPage_Cl
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFPage_CloseAnnot(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFPage_CloseAnnot(request *requests.FPDFPage_CloseAnnot) (*responses.FPDFPage_CloseAnnot, error) {
 	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
 	if err != nil {
 		return nil, err
@@ -196,6 +208,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetSubtype(request *requests.FPDFAnnot_
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetSubtype(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetSubtype(request *requests.FPDFAnnot_GetSubtype) (*responses.FPDFAnnot_GetSubtype, error) {
 	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
 	if err != nil {
 		return nil, err
@@ -1395,6 +1411,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldFlags(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldFlags(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldFlags(request *requests.FPDFAnnot_GetFormFieldFlags) (*responses.FPDFAnnot_GetFormFieldFlags, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1546,6 +1566,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldName(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldName(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldName(request *requests.FPDFAnnot_GetFormFieldName) (*responses.FPDFAnnot_GetFormFieldName, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1599,6 +1623,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAlternateName(request *requ
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldAlternateName(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldAlternateName(request *requests.FPDFAnnot_GetFormFieldAlternateName) (*responses.FPDFAnnot_GetFormFieldAlternateName, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1652,6 +1680,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldType(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldType(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldType(request *requests.FPDFAnnot_GetFormFieldType) (*responses.FPDFAnnot_GetFormFieldType, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1683,6 +1715,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldValue(request *requests.FPD
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldValue(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldValue(request *requests.FPDFAnnot_GetFormFieldValue) (*responses.FPDFAnnot_GetFormFieldValue, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1737,6 +1773,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetOptionCount(request *requests.FPDFAn
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetOptionCount(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetOptionCount(request *requests.FPDFAnnot_GetOptionCount) (*responses.FPDFAnnot_GetOptionCount, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1770,6 +1810,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetOptionLabel(request *requests.FPDFAn
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetOptionLabel(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetOptionLabel(request *requests.FPDFAnnot_GetOptionLabel) (*responses.FPDFAnnot_GetOptionLabel, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1824,6 +1868,10 @@ func (p *PdfiumImplementation) FPDFAnnot_IsOptionSelected(request *requests.FPDF
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_IsOptionSelected(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_IsOptionSelected(request *requests.FPDFAnnot_IsOptionSelected) (*responses.FPDFAnnot_IsOptionSelected, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -1994,6 +2042,10 @@ func (p *PdfiumImplementation) FPDFAnnot_IsChecked(request *requests.FPDFAnnot_I
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_IsChecked(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_IsChecked(request *requests.FPDFAnnot_IsChecked) (*responses.FPDFAnnot_IsChecked, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -2177,6 +2229,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormControlCount(request *requests.F
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormControlCount(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormControlCount(request *requests.FPDFAnnot_GetFormControlCount) (*responses.FPDFAnnot_GetFormControlCount, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -2211,6 +2267,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormControlIndex(request *requests.F
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormControlIndex(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormControlIndex(request *requests.FPDFAnnot_GetFormControlIndex) (*responses.FPDFAnnot_GetFormControlIndex, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
@@ -2243,6 +2303,10 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldExportValue(request *reques
 	p.Lock()
 	defer p.Unlock()
 
+	return p.internal_FPDFAnnot_GetFormFieldExportValue(request)
+}
+
+func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldExportValue(request *requests.FPDFAnnot_GetFormFieldExportValue) (*responses.FPDFAnnot_GetFormFieldExportValue, error) {
 	formHandle, err := p.getFormHandleHandle(request.FormHandle)
 	if err != nil {
 		return nil, err
