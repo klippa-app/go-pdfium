@@ -4951,7 +4951,9 @@ func (g *PdfiumRPC) GetForm(request *requests.GetForm) (*responses.GetForm, erro
 	if err != nil {
 		return nil, err
 	}
-any(resp).(responses.AfterUnmarshaler).AfterUnmarshal()
+
+	any(resp).(responses.AfterUnmarshaler).AfterUnmarshal()
+
 	return resp, nil
 }
 
