@@ -109,6 +109,14 @@ type Pdfium interface {
 
 	// End render
 
+	// Start form: form helpers
+
+	// GetForm returns the form elements in the given page, including option values and current values.
+	// Experimental API.
+	GetForm(request *requests.GetForm) (*responses.GetForm, error)
+
+	// End form
+
 	// Start bookmark: bookmark helpers
 
 	// GetBookmarks returns all the bookmarks of a document.

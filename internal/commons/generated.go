@@ -459,6 +459,7 @@ type Pdfium interface {
 	GetAttachments(*requests.GetAttachments) (*responses.GetAttachments, error)
 	GetBookmarks(*requests.GetBookmarks) (*responses.GetBookmarks, error)
 	GetDestInfo(*requests.GetDestInfo) (*responses.GetDestInfo, error)
+	GetForm(*requests.GetForm) (*responses.GetForm, error)
 	GetJavaScriptActions(*requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error)
 	GetMetaData(*requests.GetMetaData) (*responses.GetMetaData, error)
 	GetPageSize(*requests.GetPageSize) (*responses.GetPageSize, error)
@@ -4941,6 +4942,16 @@ func (g *PdfiumRPC) GetDestInfo(request *requests.GetDestInfo) (*responses.GetDe
 		return nil, err
 	}
 
+	return resp, nil
+}
+
+func (g *PdfiumRPC) GetForm(request *requests.GetForm) (*responses.GetForm, error) {
+	resp := &responses.GetForm{}
+	err := g.client.Call("Plugin.GetForm", request, resp)
+	if err != nil {
+		return nil, err
+	}
+any(resp).(responses.AfterUnmarshaler).AfterUnmarshal()
 	return resp, nil
 }
 
@@ -13100,6 +13111,24 @@ func (s *PdfiumRPCServer) GetDestInfo(request *requests.GetDestInfo, resp *respo
 	}()
 
 	implResp, err := s.Impl.GetDestInfo(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) GetForm(request *requests.GetForm, resp *responses.GetForm) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "GetForm", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.GetForm(request)
 	if err != nil {
 		return err
 	}

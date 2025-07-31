@@ -3539,6 +3539,14 @@ func (i *pdfiumInstance) GetDestInfo(request *requests.GetDestInfo) (*responses.
 	return i.worker.plugin.GetDestInfo(request)
 }
 
+func (i *pdfiumInstance) GetForm(request *requests.GetForm) (*responses.GetForm, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.GetForm(request)
+}
+
 func (i *pdfiumInstance) GetJavaScriptActions(request *requests.GetJavaScriptActions) (*responses.GetJavaScriptActions, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

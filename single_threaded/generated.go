@@ -6269,6 +6269,20 @@ func (i *pdfiumInstance) GetDestInfo(request *requests.GetDestInfo) (resp *respo
 	return i.pdfium.GetDestInfo(request)
 }
 
+func (i *pdfiumInstance) GetForm(request *requests.GetForm) (resp *responses.GetForm, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "GetForm", panicError)
+		}
+	}()
+
+	return i.pdfium.GetForm(request)
+}
+
 func (i *pdfiumInstance) GetJavaScriptActions(request *requests.GetJavaScriptActions) (resp *responses.GetJavaScriptActions, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
