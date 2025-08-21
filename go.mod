@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
-	github.com/onsi/ginkgo/v2 v2.24.0
+	github.com/onsi/ginkgo/v2 v2.25.0
 	github.com/onsi/gomega v1.38.0
 	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.9.0
