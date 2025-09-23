@@ -1434,7 +1434,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetLineCap(request *requests.FPDFPage
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_SetLineJoin").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.LineCap)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetLineCap").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.LineCap)))
 	if err != nil {
 		return nil, err
 	}
