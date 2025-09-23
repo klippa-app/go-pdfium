@@ -906,7 +906,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetLineCap(request *requests.FPDFPage
 		return nil, err
 	}
 
-	success := C.FPDFPageObj_SetLineJoin(pageObjectHandle.handle, C.int(request.LineCap))
+	success := C.FPDFPageObj_SetLineCap(pageObjectHandle.handle, C.int(request.LineCap))
 	if int(success) == 0 {
 		return nil, errors.New("could not set page object line cap")
 	}
