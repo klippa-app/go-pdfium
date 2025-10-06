@@ -4,8 +4,9 @@ package implementation_cgo
 #cgo pkg-config: pdfium
 #include "fpdf_progressive.h"
 #include <stdlib.h>
+#include "go_pdfium_cgo_export.h"
 
-extern int go_progressive_render_pause_cb(struct _IFSDK_PAUSE *me);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_progressive_render_pause_cb(struct _IFSDK_PAUSE *me);
 
 static inline void IFSDK_PAUSE_SET_CB(IFSDK_PAUSE *p, char *id) {
 	p->NeedToPauseNow = &go_progressive_render_pause_cb;
