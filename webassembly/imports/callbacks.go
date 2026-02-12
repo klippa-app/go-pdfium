@@ -2,6 +2,8 @@ package imports
 
 import (
 	"context"
+	"errors"
+	"io"
 	"log"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -47,6 +49,14 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 	// Read the requested data into a buffer.
 	readBuffer := make([]byte, size)
 	n, err := openFile.Reader.Read(readBuffer)
+
+	// Clear out the error if we have EOF but read the requested size.
+	// This is to handle some edge case clients that return EOF as err when
+	// reading the exact amount of bytes requested until the end of the file.
+	if err != nil && errors.Is(err, io.EOF) && n == int(size) {
+		err = nil
+	}
+
 	if n == 0 || err != nil {
 		stack[0] = uint64(0)
 		return
