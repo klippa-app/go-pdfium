@@ -57,6 +57,14 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 	target := unsafe.Slice((*byte)(unsafe.Pointer(pBuf)), uint64(size))
 
 	readBytes, err := r.Read(target)
+
+	// Clear out the error if we have EOF but read the requested size.
+	// This is to handle some edge case clients that return EOF as err when
+	// reading the exact amount of bytes requested until the end of the file.
+	if err != nil && errors.Is(err, io.EOF) && readBytes == int(size) {
+		err = nil
+	}
+
 	if err != nil {
 		return C.int(0)
 	}
