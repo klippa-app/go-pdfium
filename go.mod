@@ -2,6 +2,8 @@ module github.com/klippa-app/go-pdfium
 
 go 1.25.0
 
+toolchain go1.26.0
+
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-hclog v1.6.3
