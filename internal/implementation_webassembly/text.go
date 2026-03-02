@@ -436,10 +436,29 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 		return nil, err
 	}
 
+	renderedSize := fontSize
+
+	matrixPointer, matrixValue, err := p.CStructFS_MATRIX(nil)
+	if err == nil {
+		defer p.Free(matrixPointer)
+
+		res, err = p.Module.ExportedFunction("FPDFText_GetMatrix").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), matrixPointer)
+		if err == nil {
+			success := *(*int32)(unsafe.Pointer(&res[0]))
+			if int(success) != 0 {
+				matrix, err := matrixValue()
+				if err == nil {
+					renderedSize = fontSize * math.Sqrt(float64(matrix.C)*float64(matrix.C)+float64(matrix.D)*float64(matrix.D))
+				}
+			}
+		}
+	}
+
 	return &responses.FontInformation{
-		Size:   float64(fontSize),
-		Weight: int(fontWeight),
-		Name:   fontName,
-		Flags:  int(fontFlags),
+		Size:         float64(fontSize),
+		RenderedSize: renderedSize,
+		Weight:       int(fontWeight),
+		Name:         fontName,
+		Flags:        int(fontFlags),
 	}, nil
 }
