@@ -5,13 +5,16 @@ package implementation_cgo
 #include "fpdf_ext.h"
 #include <time.h>
 #include <stdio.h>
+#include "go_pdfium_cgo_export.h"
 
-extern void go_un_sp_obj_cb(struct _UNSUPPORT_INFO *pThis, int nType);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_un_sp_obj_cb(struct _UNSUPPORT_INFO *pThis, int nType);
+
 static inline void UNSUPPORT_INFO_SET_CALLBACK(UNSUPPORT_INFO *ui) {
 	ui->FSDK_UnSupport_Handler = &go_un_sp_obj_cb;
 }
 
-extern time_t go_time_function_cb();
+extern GO_FPDF_EXPORT time_t GO_FPDF_CALLCONV go_time_function_cb();
+
 static inline void FSDK_SetTimeFunction_SET_GO_METHOD() {
 	FSDK_SetTimeFunction(&go_time_function_cb);
 }
@@ -29,7 +32,8 @@ typedef struct GoPdfiumLocalTime {
 } GoPdfiumLocalTime;
 
 typedef const time_t ctime_t;
-extern GoPdfiumLocalTime go_local_time_function_cb(ctime_t *curTime);
+
+extern GO_FPDF_EXPORT GoPdfiumLocalTime GO_FPDF_CALLCONV go_local_time_function_cb(ctime_t *curTime);
 
 static inline struct tm* local_time_function_cb(const time_t *curTime) {
 	// Initialize a tm struct.
