@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/shared_tests"
 	"github.com/klippa-app/go-pdfium/webassembly"
+	"github.com/tetratelabs/wazero"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -99,6 +101,107 @@ var _ = Describe("Webassembly", func() {
 				err := TestPool.Close()
 				Expect(err).To(BeNil())
 			}, NodeTimeout(time.Second))
+		})
+	})
+
+	Context("Kill", func() {
+		// Kill() previously set i.pool = nil before calling
+		// i.pool.workerPool.InvalidateObject(), causing a nil pointer
+		// dereference on every call. The deferred recover() caught the
+		// panic silently, but the module was never actually invalidated.
+		It("does not panic when called on an idle instance", func() {
+			pool, err := webassembly.Init(webassembly.Config{
+				MinIdle:  0,
+				MaxIdle:  1,
+				MaxTotal: 1,
+			})
+			Expect(err).To(BeNil())
+			defer pool.Close()
+
+			instance, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+
+			err = instance.Kill()
+			Expect(err).To(BeNil())
+
+			// The pool should still be usable after Kill.
+			instance2, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+			err = instance2.Close()
+			Expect(err).To(BeNil())
+		})
+
+		// bug_451265.pdf is a malformed PDF from the PDFium test corpus
+		// that causes pdfium to hang indefinitely during rendering.
+		// Kill() can interrupt stuck execution when the caller enables
+		// WithCloseOnContextDone on the RuntimeConfig. This works because
+		// Kill() cancels the worker's context, and WithCloseOnContextDone
+		// makes wazero respect that cancellation during execution.
+		It("interrupts a stuck WASM execution and recovers the pool", func() {
+			pool, err := webassembly.Init(webassembly.Config{
+				MinIdle:       0,
+				MaxIdle:       1,
+				MaxTotal:      1,
+				RuntimeConfig: wazero.NewRuntimeConfig().WithCloseOnContextDone(true),
+			})
+			Expect(err).To(BeNil())
+			defer pool.Close()
+
+			instance, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+
+			pdfData, err := os.ReadFile("../shared_tests/testdata/bug_451265.pdf")
+			Expect(err).To(BeNil())
+
+			doc, err := instance.OpenDocument(&requests.OpenDocument{
+				File: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			// Start rendering in a goroutine. This hangs indefinitely
+			// because the PDF triggers a stuck state in pdfium.
+			renderDone := make(chan error, 1)
+			go func() {
+				_, renderErr := instance.RenderToFile(&requests.RenderToFile{
+					RenderPageInDPI: &requests.RenderPageInDPI{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc.Document,
+								Index:    0,
+							},
+						},
+						DPI: 72,
+					},
+					OutputFormat:  requests.RenderToFileOutputFormatJPG,
+					OutputTarget:  requests.RenderToFileOutputTargetBytes,
+					OutputQuality: 50,
+				})
+				renderDone <- renderErr
+			}()
+
+			// Give the render a moment to get stuck.
+			time.Sleep(500 * time.Millisecond)
+
+			// Kill must complete promptly — not block forever.
+			killDone := make(chan error, 1)
+			go func() {
+				killDone <- instance.Kill()
+			}()
+
+			select {
+			case err := <-killDone:
+				// Kill may return an error (e.g. context canceled) but
+				// must not hang or panic.
+				_ = err
+			case <-time.After(5 * time.Second):
+				Fail("Kill() did not return within 5 seconds — WASM execution was not interrupted")
+			}
+
+			// The pool should still be usable: get a fresh instance.
+			instance2, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+			err = instance2.Close()
+			Expect(err).To(BeNil())
 		})
 	})
 })
