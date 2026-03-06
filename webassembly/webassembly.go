@@ -377,11 +377,13 @@ func (i *pdfiumInstance) Kill() (err error) {
 	delete(i.pool.instanceRefs, i.instanceRef)
 	i.pool.lock.Unlock()
 
+	// Invalidate will close the module.
+	err = i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+
 	i.pool = nil
 	i.closed = true
 
-	// Invalidate will close the module.
-	return i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+	return err
 }
 
 func (i *pdfiumInstance) GetImplementation() interface{} {

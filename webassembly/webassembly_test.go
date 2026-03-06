@@ -101,6 +101,34 @@ var _ = Describe("Webassembly", func() {
 			}, NodeTimeout(time.Second))
 		})
 	})
+
+	Context("Kill", func() {
+		// Kill() previously set i.pool = nil before calling
+		// i.pool.workerPool.InvalidateObject(), causing a nil pointer
+		// dereference on every call. The deferred recover() caught the
+		// panic silently, but the module was never actually invalidated.
+		It("does not panic when called on an idle instance", func() {
+			pool, err := webassembly.Init(webassembly.Config{
+				MinIdle:  0,
+				MaxIdle:  1,
+				MaxTotal: 1,
+			})
+			Expect(err).To(BeNil())
+			defer pool.Close()
+
+			instance, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+
+			err = instance.Kill()
+			Expect(err).To(BeNil())
+
+			// The pool should still be usable after Kill.
+			instance2, err := pool.GetInstance(time.Second * 30)
+			Expect(err).To(BeNil())
+			err = instance2.Close()
+			Expect(err).To(BeNil())
+		})
+	})
 })
 
 var _ = AfterEach(func() {
