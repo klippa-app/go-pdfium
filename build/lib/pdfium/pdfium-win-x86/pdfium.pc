@@ -1,0 +1,11 @@
+prefix=/Users/matrix/Code/go/projects/go-pdfium/build/lib/pdfium/pdfium-win-x86
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: PDFium
+Description: PDFium
+Version: 7323
+Requires:
+
+Libs: -L${libdir} -lpdfium
+Cflags: -I${includedir}
