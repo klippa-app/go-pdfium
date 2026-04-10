@@ -523,7 +523,14 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 	if hasTransparency {
 		imageWithWhiteBackground := image.NewRGBA(renderedImage.Bounds())
 		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
+		// PDFium's FPDFBitmap_BGRA has straight (non-premultiplied) alpha.
+		// Wrap as NRGBA so draw.Over uses the correct straight-alpha compositing formula.
+		straightAlphaSrc := &image.NRGBA{
+			Pix:    renderedImage.Pix,
+			Stride: renderedImage.Stride,
+			Rect:   renderedImage.Rect,
+		}
+		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
 		renderedImage = imageWithWhiteBackground
 	}
 
