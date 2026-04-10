@@ -590,6 +590,17 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 
 	var imgBuf bytes.Buffer
 
+	// If any of the pages have transparency, place a white background under
+	// the image like a PDF viewer would. This is also to fix transparency JPEG
+	// rendering, when you render a JPG image in Go, it will make the
+	// transparent background black.
+	if hasTransparency {
+		imageWithWhiteBackground := image.NewRGBA(renderedImage.Bounds())
+		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
+		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
+		renderedImage = imageWithWhiteBackground
+	}
+
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
 		opt := image_jpeg.Options{
 			Options: &jpeg.Options{
@@ -599,18 +610,6 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 
 		if request.OutputQuality > 0 {
 			opt.Options.Quality = request.OutputQuality
-		}
-
-		// If any of the pages have transparency, place a white background under
-		// the image. When you render a JPG image in Go, it will make the transparent
-		// background black. With the added background we make sure that the
-		// rendered PDF will look the same as in a PDF viewer, those generally
-		// have a white background on the page viewer.
-		if hasTransparency {
-			imageWithWhiteBackground := image.NewRGBA(renderedImage.Bounds())
-			draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-			draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), renderedImage, renderedImage.Bounds().Min, draw.Over)
-			renderedImage = imageWithWhiteBackground
 		}
 
 		for {
