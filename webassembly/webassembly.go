@@ -32,6 +32,7 @@ var pdfiumWasm []byte
 
 type worker struct {
 	Context   context.Context
+	Cancel    goctx.CancelFunc
 	Functions map[string]api.Function
 	Module    api.Module
 	Instance  *implementation_webassembly.PdfiumImplementation
@@ -139,8 +140,10 @@ func Init(config Config) (pdfium.Pool, error) {
 
 	factory := pool.NewPooledObjectFactory(
 		func(goctx.Context) (interface{}, error) {
+			workerCtx, cancel := goctx.WithCancel(poolContext)
 			newWorker := &worker{
-				Context: poolContext,
+				Context: workerCtx,
+				Cancel:  cancel,
 			}
 
 			moduleConfig := wazero.NewModuleConfig().
@@ -373,15 +376,22 @@ func (i *pdfiumInstance) Kill() (err error) {
 		}
 	}()
 
+	// Cancel the worker context to interrupt any in-flight WASM execution.
+	// For this to take effect, the caller must enable WithCloseOnContextDone
+	// on the RuntimeConfig passed to Init.
+	i.worker.Cancel()
+
 	i.pool.lock.Lock()
 	delete(i.pool.instanceRefs, i.instanceRef)
 	i.pool.lock.Unlock()
 
+	// Invalidate will close the module.
+	err = i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+
 	i.pool = nil
 	i.closed = true
 
-	// Invalidate will close the module.
-	return i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+	return err
 }
 
 func (i *pdfiumInstance) GetImplementation() interface{} {
