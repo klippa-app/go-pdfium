@@ -36,6 +36,12 @@ var _ = Describe("fpdf_catalog", func() {
 				Expect(err).To(MatchError("document not given"))
 				Expect(FPDFCatalog_SetLanguage).To(BeNil())
 			})
+
+			It("returns an error when getting the document language", func() {
+				FPDFCatalog_GetLanguage, err := PdfiumInstance.FPDFCatalog_GetLanguage(&requests.FPDFCatalog_GetLanguage{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFCatalog_GetLanguage).To(BeNil())
+			})
 		})
 	})
 
@@ -117,6 +123,16 @@ var _ = Describe("fpdf_catalog", func() {
 				Expect(err).To(BeNil())
 				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
 			})
+
+			It("returns the correct language", func() {
+				FPDFCatalog_GetLanguage, err := PdfiumInstance.FPDFCatalog_GetLanguage(&requests.FPDFCatalog_GetLanguage{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_GetLanguage).To(Equal(&responses.FPDFCatalog_GetLanguage{
+					Language: "en-US",
+				}))
+			})
 		})
 	})
 
@@ -146,6 +162,31 @@ var _ = Describe("fpdf_catalog", func() {
 				})
 				Expect(err).To(BeNil())
 				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
+			})
+
+			It("returns an error when getting the language of a document without a /Lang entry", func() {
+				FPDFCatalog_GetLanguage, err := PdfiumInstance.FPDFCatalog_GetLanguage(&requests.FPDFCatalog_GetLanguage{
+					Document: doc,
+				})
+				Expect(err).To(MatchError("could not get language"))
+				Expect(FPDFCatalog_GetLanguage).To(BeNil())
+			})
+
+			It("can set and get the language", func() {
+				FPDFCatalog_SetLanguage, err := PdfiumInstance.FPDFCatalog_SetLanguage(&requests.FPDFCatalog_SetLanguage{
+					Document: doc,
+					Language: "en-US",
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
+
+				FPDFCatalog_GetLanguage, err := PdfiumInstance.FPDFCatalog_GetLanguage(&requests.FPDFCatalog_GetLanguage{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_GetLanguage).To(Equal(&responses.FPDFCatalog_GetLanguage{
+					Language: "en-US",
+				}))
 			})
 		})
 	})

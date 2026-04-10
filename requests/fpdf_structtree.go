@@ -70,6 +70,10 @@ type FPDF_StructElement_GetObjType struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }
 
+type FPDF_StructElement_GetExpansion struct {
+	StructElement references.FPDF_STRUCTELEMENT
+}
+
 type FPDF_StructElement_GetParent struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }

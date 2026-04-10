@@ -139,6 +139,7 @@ type Pdfium interface {
 	FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 	FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
 	FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
+	FPDFCatalog_GetLanguage(*requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error)
 	FPDFCatalog_IsTagged(*requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
 	FPDFCatalog_SetLanguage(*requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error)
 	FPDFClipPath_CountPathSegments(*requests.FPDFClipPath_CountPathSegments) (*responses.FPDFClipPath_CountPathSegments, error)
@@ -208,12 +209,14 @@ type Pdfium interface {
 	FPDFPageObjMark_CountParams(*requests.FPDFPageObjMark_CountParams) (*responses.FPDFPageObjMark_CountParams, error)
 	FPDFPageObjMark_GetName(*requests.FPDFPageObjMark_GetName) (*responses.FPDFPageObjMark_GetName, error)
 	FPDFPageObjMark_GetParamBlobValue(*requests.FPDFPageObjMark_GetParamBlobValue) (*responses.FPDFPageObjMark_GetParamBlobValue, error)
+	FPDFPageObjMark_GetParamFloatValue(*requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error)
 	FPDFPageObjMark_GetParamIntValue(*requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error)
 	FPDFPageObjMark_GetParamKey(*requests.FPDFPageObjMark_GetParamKey) (*responses.FPDFPageObjMark_GetParamKey, error)
 	FPDFPageObjMark_GetParamStringValue(*requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error)
 	FPDFPageObjMark_GetParamValueType(*requests.FPDFPageObjMark_GetParamValueType) (*responses.FPDFPageObjMark_GetParamValueType, error)
 	FPDFPageObjMark_RemoveParam(*requests.FPDFPageObjMark_RemoveParam) (*responses.FPDFPageObjMark_RemoveParam, error)
 	FPDFPageObjMark_SetBlobParam(*requests.FPDFPageObjMark_SetBlobParam) (*responses.FPDFPageObjMark_SetBlobParam, error)
+	FPDFPageObjMark_SetFloatParam(*requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error)
 	FPDFPageObjMark_SetIntParam(*requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error)
 	FPDFPageObjMark_SetStringParam(*requests.FPDFPageObjMark_SetStringParam) (*responses.FPDFPageObjMark_SetStringParam, error)
 	FPDFPageObj_AddMark(*requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error)
@@ -431,6 +434,7 @@ type Pdfium interface {
 	FPDF_StructElement_GetAttributeCount(*requests.FPDF_StructElement_GetAttributeCount) (*responses.FPDF_StructElement_GetAttributeCount, error)
 	FPDF_StructElement_GetChildAtIndex(*requests.FPDF_StructElement_GetChildAtIndex) (*responses.FPDF_StructElement_GetChildAtIndex, error)
 	FPDF_StructElement_GetChildMarkedContentID(*requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error)
+	FPDF_StructElement_GetExpansion(*requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error)
 	FPDF_StructElement_GetID(*requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error)
 	FPDF_StructElement_GetLang(*requests.FPDF_StructElement_GetLang) (*responses.FPDF_StructElement_GetLang, error)
 	FPDF_StructElement_GetMarkedContentID(*requests.FPDF_StructElement_GetMarkedContentID) (*responses.FPDF_StructElement_GetMarkedContentID, error)
@@ -1745,6 +1749,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitl
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	resp := &responses.FPDFCatalog_GetLanguage{}
+	err := g.client.Call("Plugin.FPDFCatalog_GetLanguage", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
 	resp := &responses.FPDFCatalog_IsTagged{}
 	err := g.client.Call("Plugin.FPDFCatalog_IsTagged", request, resp)
@@ -2435,6 +2449,16 @@ func (g *PdfiumRPC) FPDFPageObjMark_GetParamBlobValue(request *requests.FPDFPage
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	resp := &responses.FPDFPageObjMark_GetParamFloatValue{}
+	err := g.client.Call("Plugin.FPDFPageObjMark_GetParamFloatValue", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error) {
 	resp := &responses.FPDFPageObjMark_GetParamIntValue{}
 	err := g.client.Call("Plugin.FPDFPageObjMark_GetParamIntValue", request, resp)
@@ -2488,6 +2512,16 @@ func (g *PdfiumRPC) FPDFPageObjMark_RemoveParam(request *requests.FPDFPageObjMar
 func (g *PdfiumRPC) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPageObjMark_SetBlobParam) (*responses.FPDFPageObjMark_SetBlobParam, error) {
 	resp := &responses.FPDFPageObjMark_SetBlobParam{}
 	err := g.client.Call("Plugin.FPDFPageObjMark_SetBlobParam", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
+	resp := &responses.FPDFPageObjMark_SetFloatParam{}
+	err := g.client.Call("Plugin.FPDFPageObjMark_SetFloatParam", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -4658,6 +4692,16 @@ func (g *PdfiumRPC) FPDF_StructElement_GetChildAtIndex(request *requests.FPDF_St
 func (g *PdfiumRPC) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error) {
 	resp := &responses.FPDF_StructElement_GetChildMarkedContentID{}
 	err := g.client.Call("Plugin.FPDF_StructElement_GetChildMarkedContentID", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error) {
+	resp := &responses.FPDF_StructElement_GetExpansion{}
+	err := g.client.Call("Plugin.FPDF_StructElement_GetExpansion", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -7363,6 +7407,24 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_G
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage, resp *responses.FPDFCatalog_GetLanguage) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFCatalog_GetLanguage", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFCatalog_GetLanguage(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged, resp *responses.FPDFCatalog_IsTagged) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -8605,6 +8667,24 @@ func (s *PdfiumRPCServer) FPDFPageObjMark_GetParamBlobValue(request *requests.FP
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue, resp *responses.FPDFPageObjMark_GetParamFloatValue) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObjMark_GetParamFloatValue", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObjMark_GetParamFloatValue(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue, resp *responses.FPDFPageObjMark_GetParamIntValue) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -8703,6 +8783,24 @@ func (s *PdfiumRPCServer) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPag
 	}()
 
 	implResp, err := s.Impl.FPDFPageObjMark_SetBlobParam(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam, resp *responses.FPDFPageObjMark_SetFloatParam) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObjMark_SetFloatParam", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObjMark_SetFloatParam(request)
 	if err != nil {
 		return err
 	}
@@ -12609,6 +12707,24 @@ func (s *PdfiumRPCServer) FPDF_StructElement_GetChildMarkedContentID(request *re
 	}()
 
 	implResp, err := s.Impl.FPDF_StructElement_GetChildMarkedContentID(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion, resp *responses.FPDF_StructElement_GetExpansion) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetExpansion", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_StructElement_GetExpansion(request)
 	if err != nil {
 		return err
 	}

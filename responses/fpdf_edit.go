@@ -115,6 +115,10 @@ type FPDFPageObjMark_GetParamIntValue struct {
 	Value int
 }
 
+type FPDFPageObjMark_GetParamFloatValue struct {
+	Value float32
+}
+
 type FPDFPageObjMark_GetParamStringValue struct {
 	Value string
 }
@@ -124,6 +128,8 @@ type FPDFPageObjMark_GetParamBlobValue struct {
 }
 
 type FPDFPageObjMark_SetIntParam struct{}
+
+type FPDFPageObjMark_SetFloatParam struct{}
 
 type FPDFPageObjMark_SetStringParam struct{}
 

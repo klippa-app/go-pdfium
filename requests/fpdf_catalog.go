@@ -10,3 +10,7 @@ type FPDFCatalog_SetLanguage struct {
 	Document references.FPDF_DOCUMENT
 	Language string
 }
+
+type FPDFCatalog_GetLanguage struct {
+	Document references.FPDF_DOCUMENT
+}

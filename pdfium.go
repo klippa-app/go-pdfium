@@ -547,6 +547,12 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error)
 
+	// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+	// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+	// for this property.
+	// Experimental API.
+	FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error)
+
 	// FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
 	// Experimental API.
 	FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error)
@@ -560,6 +566,12 @@ type Pdfium interface {
 	// a new parameter.
 	// Experimental API.
 	FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error)
+
+	// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+	// with the given key exists, its value is set to the given value. Otherwise, it is added as
+	// a new parameter.
+	// Experimental API.
+	FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error)
 
 	// FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter
 	// with the given key exists, its value is set to the given value. Otherwise, it is added as
@@ -1103,6 +1115,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error)
 
+	// FPDFCatalog_GetLanguage gets the language of a document from the catalog's /Lang entry.
+	// Experimental API.
+	FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error)
+
 	// End fpdf_catalog.h
 
 	// Start fpdf_signature.h
@@ -1603,6 +1619,10 @@ type Pdfium interface {
 
 	// FPDF_StructElement_GetTitle returns the title (/T) for a given element.
 	FPDF_StructElement_GetTitle(request *requests.FPDF_StructElement_GetTitle) (*responses.FPDF_StructElement_GetTitle, error)
+
+	// FPDF_StructElement_GetExpansion returns the expansion of an abbreviation or acronym for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error)
 
 	// FPDF_StructElement_CountChildren counts the number of children for the structure element.
 	FPDF_StructElement_CountChildren(request *requests.FPDF_StructElement_CountChildren) (*responses.FPDF_StructElement_CountChildren, error)

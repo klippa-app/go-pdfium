@@ -39,6 +39,12 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetObjType(request *requests.F
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDF_StructElement_GetExpansion returns the expansion of an abbreviation or acronym for a given element.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDF_StructElement_GetParent returns the parent of the structure element.
 // If structure element is StructTreeRoot, then this function will return an error.
 // Experimental API.

@@ -462,6 +462,34 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 	}, nil
 }
 
+// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+// for this property.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	floatValue := C.float(0)
+
+	success := C.FPDFPageObjMark_GetParamFloatValue(pageObjectMarkHandle.handle, key, &floatValue)
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	return &responses.FPDFPageObjMark_GetParamFloatValue{
+		Value: float32(floatValue),
+	}, nil
+}
+
 // FPDFPageObjMark_SetIntParam sets the value of an int property in a content mark by key. If a parameter
 // with the given key exists, its value is set to the given value. Otherwise, it is added as
 // a new parameter.
@@ -494,6 +522,40 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPD
 	}
 
 	return &responses.FPDFPageObjMark_SetIntParam{}, nil
+}
+
+// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	success := C.FPDFPageObjMark_SetFloatParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, C.float(request.Value))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_SetFloatParam{}, nil
 }
 
 // FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter

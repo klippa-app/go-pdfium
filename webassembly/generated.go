@@ -1789,6 +1789,20 @@ func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_Ge
 	return i.worker.Instance.FPDFBookmark_GetTitle(request)
 }
 
+func (i *pdfiumInstance) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (resp *responses.FPDFCatalog_GetLanguage, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFCatalog_GetLanguage", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFCatalog_GetLanguage(request)
+}
+
 func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (resp *responses.FPDFCatalog_IsTagged, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2755,6 +2769,20 @@ func (i *pdfiumInstance) FPDFPageObjMark_GetParamBlobValue(request *requests.FPD
 	return i.worker.Instance.FPDFPageObjMark_GetParamBlobValue(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (resp *responses.FPDFPageObjMark_GetParamFloatValue, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObjMark_GetParamFloatValue", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPageObjMark_GetParamFloatValue(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (resp *responses.FPDFPageObjMark_GetParamIntValue, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2837,6 +2865,20 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPage
 	}()
 
 	return i.worker.Instance.FPDFPageObjMark_SetBlobParam(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (resp *responses.FPDFPageObjMark_SetFloatParam, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObjMark_SetFloatParam", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPageObjMark_SetFloatParam(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (resp *responses.FPDFPageObjMark_SetIntParam, err error) {
@@ -5875,6 +5917,20 @@ func (i *pdfiumInstance) FPDF_StructElement_GetChildMarkedContentID(request *req
 	}()
 
 	return i.worker.Instance.FPDF_StructElement_GetChildMarkedContentID(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (resp *responses.FPDF_StructElement_GetExpansion, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetExpansion", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDF_StructElement_GetExpansion(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (resp *responses.FPDF_StructElement_GetID, err error) {

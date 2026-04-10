@@ -33,6 +33,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFPageObjMark_SetIntParam).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFPageObjMark_SetFloatParam", func() {
+				FPDFPageObjMark_SetFloatParam, err := PdfiumInstance.FPDFPageObjMark_SetFloatParam(&requests.FPDFPageObjMark_SetFloatParam{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFPageObjMark_SetFloatParam).To(BeNil())
+			})
+
 			It("returns an error when calling FPDFPageObjMark_SetIntParam", func() {
 				FPDFPageObjMark_SetStringParam, err := PdfiumInstance.FPDFPageObjMark_SetStringParam(&requests.FPDFPageObjMark_SetStringParam{})
 				Expect(err).To(MatchError("document not given"))
@@ -263,6 +269,12 @@ var _ = Describe("fpdf_edit", func() {
 				FPDFPageObjMark_GetParamIntValue, err := PdfiumInstance.FPDFPageObjMark_GetParamIntValue(&requests.FPDFPageObjMark_GetParamIntValue{})
 				Expect(err).To(MatchError("pageObjectMark not given"))
 				Expect(FPDFPageObjMark_GetParamIntValue).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFPageObjMark_GetParamFloatValue", func() {
+				FPDFPageObjMark_GetParamFloatValue, err := PdfiumInstance.FPDFPageObjMark_GetParamFloatValue(&requests.FPDFPageObjMark_GetParamFloatValue{})
+				Expect(err).To(MatchError("pageObjectMark not given"))
+				Expect(FPDFPageObjMark_GetParamFloatValue).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFPageObjMark_GetParamStringValue", func() {
@@ -1429,6 +1441,13 @@ end
 					Expect(err).To(MatchError("could not get value"))
 					Expect(FPDFPageObjMark_GetParamIntValue).To(BeNil())
 
+					FPDFPageObjMark_GetParamFloatValue, err := PdfiumInstance.FPDFPageObjMark_GetParamFloatValue(&requests.FPDFPageObjMark_GetParamFloatValue{
+						PageObjectMark: FPDFPageObj_AddMark.Mark,
+						Key:            "not-existing",
+					})
+					Expect(err).To(MatchError("could not get value"))
+					Expect(FPDFPageObjMark_GetParamFloatValue).To(BeNil())
+
 					FPDFPageObjMark_GetParamStringValue, err := PdfiumInstance.FPDFPageObjMark_GetParamStringValue(&requests.FPDFPageObjMark_GetParamStringValue{
 						PageObjectMark: FPDFPageObj_AddMark.Mark,
 						Key:            "not-existing",
@@ -1477,6 +1496,24 @@ end
 					Expect(FPDFPageObjMark_GetParamIntValue).To(Equal(&responses.FPDFPageObjMark_GetParamIntValue{
 						Value: 1,
 					}))
+
+					FPDFPageObjMark_SetFloatParam, err := PdfiumInstance.FPDFPageObjMark_SetFloatParam(&requests.FPDFPageObjMark_SetFloatParam{
+						Document:       doc,
+						PageObject:     pageObject,
+						PageObjectMark: FPDFPageObj_AddMark.Mark,
+						Key:            "TestFloat",
+						Value:          3.14,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObjMark_SetFloatParam).To(Equal(&responses.FPDFPageObjMark_SetFloatParam{}))
+
+					FPDFPageObjMark_GetParamFloatValue, err := PdfiumInstance.FPDFPageObjMark_GetParamFloatValue(&requests.FPDFPageObjMark_GetParamFloatValue{
+						PageObjectMark: FPDFPageObj_AddMark.Mark,
+						Key:            "TestFloat",
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObjMark_GetParamFloatValue).To(Not(BeNil()))
+					Expect(FPDFPageObjMark_GetParamFloatValue.Value).To(BeNumerically("~", float32(3.14), 0.001))
 
 					FPDFPageObjMark_SetStringParam, err := PdfiumInstance.FPDFPageObjMark_SetStringParam(&requests.FPDFPageObjMark_SetStringParam{
 						Document:       doc,

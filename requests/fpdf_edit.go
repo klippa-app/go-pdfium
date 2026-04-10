@@ -180,6 +180,11 @@ type FPDFPageObjMark_GetParamIntValue struct {
 	Key            string
 }
 
+type FPDFPageObjMark_GetParamFloatValue struct {
+	PageObjectMark references.FPDF_PAGEOBJECTMARK
+	Key            string
+}
+
 type FPDFPageObjMark_GetParamStringValue struct {
 	PageObjectMark references.FPDF_PAGEOBJECTMARK
 	Key            string
@@ -196,6 +201,14 @@ type FPDFPageObjMark_SetIntParam struct {
 	PageObjectMark references.FPDF_PAGEOBJECTMARK
 	Key            string
 	Value          int
+}
+
+type FPDFPageObjMark_SetFloatParam struct {
+	Document       references.FPDF_DOCUMENT
+	PageObject     references.FPDF_PAGEOBJECT
+	PageObjectMark references.FPDF_PAGEOBJECTMARK
+	Key            string
+	Value          float32
 }
 
 type FPDFPageObjMark_SetStringParam struct {

@@ -32,6 +32,53 @@ func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalo
 	}, nil
 }
 
+// FPDFCatalog_GetLanguage gets the language of a document from the catalog's /Lang entry.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.Module.ExportedFunction("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	langLength := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if langLength == 0 {
+		return nil, errors.New("could not get language")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(langLength, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, charDataPointer.Pointer, langLength)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFCatalog_GetLanguage{
+		Language: transformedText,
+	}, nil
+}
+
 // FPDFCatalog_SetLanguage sets the language of a document.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
