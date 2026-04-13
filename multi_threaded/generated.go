@@ -991,6 +991,14 @@ func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_Ge
 	return i.worker.plugin.FPDFBookmark_GetTitle(request)
 }
 
+func (i *pdfiumInstance) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFCatalog_GetLanguage(request)
+}
+
 func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1547,6 +1555,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_GetParamBlobValue(request *requests.FPD
 	return i.worker.plugin.FPDFPageObjMark_GetParamBlobValue(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObjMark_GetParamFloatValue(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1593,6 +1609,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPage
 	}
 
 	return i.worker.plugin.FPDFPageObjMark_SetBlobParam(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObjMark_SetFloatParam(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
@@ -3325,6 +3349,14 @@ func (i *pdfiumInstance) FPDF_StructElement_GetChildMarkedContentID(request *req
 	}
 
 	return i.worker.plugin.FPDF_StructElement_GetChildMarkedContentID(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_GetExpansion(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error) {

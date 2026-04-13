@@ -21,3 +21,9 @@ func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalo
 func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFCatalog_GetLanguage gets the language of a document from the catalog's /Lang entry.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

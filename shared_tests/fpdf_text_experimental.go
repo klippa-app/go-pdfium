@@ -469,10 +469,10 @@ var _ = Describe("fpdf_text", func() {
 					Equal(&responses.FPDFText_GetLooseCharBox{
 						Index: 0,
 						Rect: structs.FPDF_FS_RECTF{
-							Left:   70.8671875,
-							Top:    797.9365234375,
-							Right:  77.19218444824219,
-							Bottom: 786.9365234375,
+							Left:   70.86719512939453,
+							Top:    799.3673706054688,
+							Right:  77.19219207763672,
+							Bottom: 786.5744018554688,
 						},
 					}),
 					Equal(&responses.FPDFText_GetLooseCharBox{

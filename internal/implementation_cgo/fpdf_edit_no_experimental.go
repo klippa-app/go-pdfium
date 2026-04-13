@@ -115,6 +115,14 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamIntValue(request *request
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+// for this property.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error) {
@@ -132,6 +140,14 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 // a new parameter.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
