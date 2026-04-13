@@ -2622,7 +2622,7 @@ var _ = Describe("Render", func() {
 					PointToPixelRatio: 2.7777777777777777,
 					Width:             834,
 					Height:            834,
-				})), TestDataPath+"/testdata/render_"+TestType+"_text_form_filled", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_macos", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_windows", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_7776")
+				})), TestDataPath+"/testdata/render_"+TestType+"_text_form_filled", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_macos", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_windows", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_7776", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_macos_7776", TestDataPath+"/testdata/render_"+TestType+"_text_form_filled_windows_7776")
 				renderedPage.Cleanup()
 			})
 		})
