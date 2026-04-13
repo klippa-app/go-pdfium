@@ -90,7 +90,7 @@ func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCat
 		return nil, err
 	}
 
-	languagePointer, err := p.CString(request.Language)
+	languagePointer, err := p.CFPDF_WIDESTRING(request.Language)
 	if err != nil {
 		return nil, err
 	}

@@ -164,12 +164,14 @@ var _ = Describe("fpdf_catalog", func() {
 				Expect(FPDFCatalog_SetLanguage).To(Equal(&responses.FPDFCatalog_SetLanguage{}))
 			})
 
-			It("returns an error when getting the language of a document without a /Lang entry", func() {
+			It("returns an empty string when getting the language of a document without a /Lang entry", func() {
 				FPDFCatalog_GetLanguage, err := PdfiumInstance.FPDFCatalog_GetLanguage(&requests.FPDFCatalog_GetLanguage{
 					Document: doc,
 				})
-				Expect(err).To(MatchError("could not get language"))
-				Expect(FPDFCatalog_GetLanguage).To(BeNil())
+				Expect(err).To(BeNil())
+				Expect(FPDFCatalog_GetLanguage).To(Equal(&responses.FPDFCatalog_GetLanguage{
+					Language: "",
+				}))
 			})
 
 			It("can set and get the language", func() {
