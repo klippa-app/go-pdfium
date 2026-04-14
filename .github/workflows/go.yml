@@ -124,17 +124,37 @@ jobs:
         run: |
           go test -timeout 30m ./internal/implementation_webassembly -v
           go test -timeout 30m ./webassembly -v
+      - name: Test all packages - Interpreter (non-Windows)
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          WAZERO_INTERPRETER=1 go test -timeout 30m ./webassembly -v
+      - name: Test all packages - Interpreter (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:WAZERO_INTERPRETER = '1'
+          go test -timeout 30m ./webassembly -v
       - name: Test all packages - Experimental (non-Windows)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
           export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
+      - name: Test all packages - Experimental Interpreter (non-Windows)
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          export IS_EXPERIMENTAL="1"
+          WAZERO_INTERPRETER=1 go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Test all packages - Experimental (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:IS_EXPERIMENTAL = '1'
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
+          go test -timeout 30m ./webassembly -tags pdfium_experimental -v
+      - name: Test all packages - Experimental Interpreter (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:IS_EXPERIMENTAL = '1'
+          $env:WAZERO_INTERPRETER = '1'
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Archive render results
         uses: actions/upload-artifact@v4

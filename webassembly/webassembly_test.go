@@ -19,15 +19,30 @@ import (
 	. "github.com/onsi/gomega/gleak"
 )
 
+// interpreterMode is set at init time from the WAZERO_INTERPRETER environment
+// variable. When true the whole suite uses wazero's interpreter engine instead
+// of the default compiler engine.
+var interpreterMode = os.Getenv("WAZERO_INTERPRETER") == "1"
+
+// runtimeConfig returns the wazero RuntimeConfig that matches the current
+// mode (interpreter or compiler).
+func runtimeConfig() wazero.RuntimeConfig {
+	if interpreterMode {
+		return wazero.NewRuntimeConfigInterpreter()
+	}
+	return wazero.NewRuntimeConfig()
+}
+
 var _ = BeforeSuite(func() {
 	// Set ENV to ensure resulting values.
 	err := os.Setenv("TZ", "UTC")
 	Expect(err).To(BeNil())
 
 	pool, err := webassembly.Init(webassembly.Config{
-		MinIdle:  1, // Makes sure that at least x workers are always available
-		MaxIdle:  1, // Makes sure that at most x workers are ever available
-		MaxTotal: 1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+		MinIdle:       1, // Makes sure that at least x workers are always available
+		MaxIdle:       1, // Makes sure that at most x workers are ever available
+		MaxTotal:      1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+		RuntimeConfig: runtimeConfig(),
 	})
 	Expect(err).To(BeNil())
 
@@ -70,9 +85,10 @@ var _ = Describe("Webassembly", func() {
 
 			BeforeEach(func() {
 				pool, err := webassembly.Init(webassembly.Config{
-					MinIdle:  1, // Makes sure that at least x workers are always available
-					MaxIdle:  1, // Makes sure that at most x workers are ever available
-					MaxTotal: 1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+					MinIdle:       1, // Makes sure that at least x workers are always available
+					MaxIdle:       1, // Makes sure that at most x workers are ever available
+					MaxTotal:      1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
+					RuntimeConfig: runtimeConfig(),
 				})
 				Expect(err).To(BeNil())
 				TestPool = pool
@@ -111,9 +127,10 @@ var _ = Describe("Webassembly", func() {
 		// panic silently, but the module was never actually invalidated.
 		It("does not panic when called on an idle instance", func() {
 			pool, err := webassembly.Init(webassembly.Config{
-				MinIdle:  0,
-				MaxIdle:  1,
-				MaxTotal: 1,
+				MinIdle:       0,
+				MaxIdle:       1,
+				MaxTotal:      1,
+				RuntimeConfig: runtimeConfig(),
 			})
 			Expect(err).To(BeNil())
 			defer pool.Close()
@@ -142,7 +159,7 @@ var _ = Describe("Webassembly", func() {
 				MinIdle:       0,
 				MaxIdle:       1,
 				MaxTotal:      1,
-				RuntimeConfig: wazero.NewRuntimeConfig().WithCloseOnContextDone(true),
+				RuntimeConfig: runtimeConfig().WithCloseOnContextDone(true),
 			})
 			Expect(err).To(BeNil())
 			defer pool.Close()
