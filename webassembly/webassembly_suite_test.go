@@ -9,5 +9,9 @@ import (
 
 func TestPdfiumSingleThreaded(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Webassembly Suite")
+	suiteDescription := "Webassembly Suite"
+	if interpreterMode {
+		suiteDescription = "Webassembly Interpreter Suite"
+	}
+	RunSpecs(t, suiteDescription)
 }
