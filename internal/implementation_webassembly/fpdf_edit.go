@@ -3,6 +3,7 @@ package implementation_webassembly
 import (
 	"errors"
 	"io"
+	"math"
 	"os"
 	"unsafe"
 
@@ -3466,7 +3467,7 @@ func (p *PdfiumImplementation) FPDFText_LoadCidType2Font(request *requests.FPDFT
 
 	defer cidToGIDMapData.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFText_LoadCidType2Font").Call(p.Context, *documentHandle.handle, fontData.Pointer, *(*uint64)(unsafe.Pointer(&fontDataLength)), toUnicodeCmapPointer.Pointer, cidToGIDMapData.Pointer, *(*uint64)(unsafe.Pointer(&cidToGIDMapDataLength)))
+	res, err := p.Module.ExportedFunction("FPDFText_LoadCidType2Font").Call(p.Context, *documentHandle.handle, fontData.Pointer, uint64(fontDataLength), toUnicodeCmapPointer.Pointer, cidToGIDMapData.Pointer, uint64(cidToGIDMapDataLength))
 	if err != nil {
 		return nil, err
 	}
@@ -3973,7 +3974,7 @@ func (p *PdfiumImplementation) FPDFFont_GetGlyphWidth(request *requests.FPDFFont
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphWidth").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.Glyph)), *(*uint64)(unsafe.Pointer(&request.FontSize)), glyphWidthPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphWidth").Call(p.Context, *fontHandle.handle, uint64(request.Glyph), uint64(math.Float32bits(request.FontSize)), glyphWidthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -4004,7 +4005,7 @@ func (p *PdfiumImplementation) FPDFFont_GetGlyphPath(request *requests.FPDFFont_
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphPath").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.Glyph)), *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	res, err := p.Module.ExportedFunction("FPDFFont_GetGlyphPath").Call(p.Context, *fontHandle.handle, uint64(request.Glyph), uint64(math.Float32bits(request.FontSize)))
 	if err != nil {
 		return nil, err
 	}
@@ -4058,7 +4059,7 @@ func (p *PdfiumImplementation) FPDFGlyphPath_GetGlyphPathSegment(request *reques
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFGlyphPath_GetGlyphPathSegment").Call(p.Context, *glyphPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.Module.ExportedFunction("FPDFGlyphPath_GetGlyphPathSegment").Call(p.Context, *glyphPathHandle.handle, uint64(request.Index))
 	if err != nil {
 		return nil, err
 	}
