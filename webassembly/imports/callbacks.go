@@ -82,9 +82,11 @@ func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []ui
 
 	mem := mod.Memory()
 
+	key := implementation_webassembly.FileWriterKey{Module: mod, Pointer: fileWritePointer}
+
 	// Check if we have the file referenced in param.
 	implementation_webassembly.FileWriters.Mutex.Lock()
-	openWriter, ok := implementation_webassembly.FileWriters.Refs[fileWritePointer]
+	openWriter, ok := implementation_webassembly.FileWriters.Refs[key]
 	implementation_webassembly.FileWriters.Mutex.Unlock()
 	if !ok {
 		stack[0] = uint64(0)
