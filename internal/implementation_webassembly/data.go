@@ -12,6 +12,7 @@ import (
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/structs"
 
+	"github.com/tetratelabs/wazero/api"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -70,13 +71,16 @@ type FileWriterRef struct {
 }
 
 var FileWriters = struct {
-	Refs    map[uint32]*FileWriterRef
-	Counter uint32
-	Mutex   *sync.Mutex
+	Refs  map[FileWriterKey]*FileWriterRef
+	Mutex *sync.Mutex
 }{
-	Refs:    map[uint32]*FileWriterRef{},
-	Counter: 0,
-	Mutex:   &sync.Mutex{},
+	Refs:  map[FileWriterKey]*FileWriterRef{},
+	Mutex: &sync.Mutex{},
+}
+
+type FileWriterKey struct {
+	Module  api.Module
+	Pointer uint32
 }
 
 type CString struct {
