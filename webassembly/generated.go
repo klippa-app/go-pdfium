@@ -2909,6 +2909,20 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetStringParam(request *requests.FPDFPa
 	return i.worker.Instance.FPDFPageObjMark_SetStringParam(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (resp *responses.FPDFPageObj_AddExistingMark, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_AddExistingMark", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPageObj_AddExistingMark(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (resp *responses.FPDFPageObj_AddMark, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4267,6 +4281,20 @@ func (i *pdfiumInstance) FPDFTextObj_GetTextRenderMode(request *requests.FPDFTex
 	return i.worker.Instance.FPDFTextObj_GetTextRenderMode(request)
 }
 
+func (i *pdfiumInstance) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (resp *responses.FPDFTextObj_SetFontSize, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFTextObj_SetFontSize", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFTextObj_SetFontSize(request)
+}
+
 func (i *pdfiumInstance) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (resp *responses.FPDFTextObj_SetTextRenderMode, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4769,6 +4797,20 @@ func (i *pdfiumInstance) FPDFText_SetCharcodes(request *requests.FPDFText_SetCha
 	}()
 
 	return i.worker.Instance.FPDFText_SetCharcodes(request)
+}
+
+func (i *pdfiumInstance) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (resp *responses.FPDFText_SetPositions, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFText_SetPositions", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFText_SetPositions(request)
 }
 
 func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (resp *responses.FPDFText_SetText, err error) {

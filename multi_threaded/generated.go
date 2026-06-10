@@ -1635,6 +1635,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetStringParam(request *requests.FPDFPa
 	return i.worker.plugin.FPDFPageObjMark_SetStringParam(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_AddExistingMark(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2411,6 +2419,14 @@ func (i *pdfiumInstance) FPDFTextObj_GetTextRenderMode(request *requests.FPDFTex
 	return i.worker.plugin.FPDFTextObj_GetTextRenderMode(request)
 }
 
+func (i *pdfiumInstance) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFTextObj_SetFontSize(request)
+}
+
 func (i *pdfiumInstance) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2697,6 +2713,14 @@ func (i *pdfiumInstance) FPDFText_SetCharcodes(request *requests.FPDFText_SetCha
 	}
 
 	return i.worker.plugin.FPDFText_SetCharcodes(request)
+}
+
+func (i *pdfiumInstance) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_SetPositions(request)
 }
 
 func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error) {

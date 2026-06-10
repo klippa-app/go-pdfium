@@ -230,6 +230,30 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 	}, nil
 }
 
+// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPageObj_AddExistingMark(pageObjectHandle.handle, pageObjectMarkHandle.handle)
+	if int(result) == 0 {
+		return nil, errors.New("could not add existing mark")
+	}
+
+	return &responses.FPDFPageObj_AddExistingMark{}, nil
+}
+
 // FPDFPageObj_RemoveMark removes the given content mark from the given page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error) {
@@ -1527,4 +1551,51 @@ func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFo
 	}
 
 	return &responses.FPDFFormObj_RemoveObject{}, nil
+}
+
+// FPDFText_SetPositions sets the character positions for a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(request.Positions) == 0 {
+		return nil, errors.New("positions must not be empty")
+	}
+
+	positions := make([]C.float, len(request.Positions))
+	for i, pos := range request.Positions {
+		positions[i] = C.float(pos)
+	}
+
+	result := C.FPDFText_SetPositions(pageObjectHandle.handle, &positions[0], C.size_t(len(request.Positions)))
+	if int(result) == 0 {
+		return nil, errors.New("could not set positions")
+	}
+
+	return &responses.FPDFText_SetPositions{}, nil
+}
+
+// FPDFTextObj_SetFontSize sets the font size of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFTextObj_SetFontSize(pageObjectHandle.handle, C.float(request.FontSize))
+	if int(result) == 0 {
+		return nil, errors.New("could not set font size")
+	}
+
+	return &responses.FPDFTextObj_SetFontSize{}, nil
 }

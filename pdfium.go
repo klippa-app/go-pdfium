@@ -521,6 +521,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error)
 
+	// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+	// Experimental API.
+	FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error)
+
 	// FPDFPageObj_RemoveMark removes the given content mark from the given page object.
 	// Experimental API.
 	FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error)
@@ -788,6 +792,10 @@ type Pdfium interface {
 	// replaced.
 	FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error)
 
+	// FPDFText_SetPositions sets the character positions for a text object.
+	// Experimental API.
+	FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error)
+
 	// FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
 	// into the document. Various font data structures, such as the ToUnicode data, are auto-generated based
 	// on the inputs
@@ -810,6 +818,10 @@ type Pdfium interface {
 
 	// FPDFTextObj_GetFontSize returns the font size of a text object.
 	FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)
+
+	// FPDFTextObj_SetFontSize sets the font size of a text object.
+	// Experimental API.
+	FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error)
 
 	// FPDFFont_Close closes a loaded PDF font
 	FPDFFont_Close(request *requests.FPDFFont_Close) (*responses.FPDFFont_Close, error)

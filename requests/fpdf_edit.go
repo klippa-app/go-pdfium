@@ -152,6 +152,11 @@ type FPDFPageObj_AddMark struct {
 	Name       string
 }
 
+type FPDFPageObj_AddExistingMark struct {
+	PageObject     references.FPDF_PAGEOBJECT
+	PageObjectMark references.FPDF_PAGEOBJECTMARK
+}
+
 type FPDFPageObj_RemoveMark struct {
 	PageObject     references.FPDF_PAGEOBJECT
 	PageObjectMark references.FPDF_PAGEOBJECTMARK
@@ -471,6 +476,11 @@ type FPDFText_SetCharcodes struct {
 	CharCodes  []uint32
 }
 
+type FPDFText_SetPositions struct {
+	PageObject references.FPDF_PAGEOBJECT
+	Positions  []float32
+}
+
 type FPDFText_LoadFont struct {
 	Document references.FPDF_DOCUMENT
 	Data     []byte          // The stream of font data, which will be copied by the font object.
@@ -492,6 +502,11 @@ type FPDFText_LoadCidType2Font struct {
 
 type FPDFTextObj_GetFontSize struct {
 	PageObject references.FPDF_PAGEOBJECT
+}
+
+type FPDFTextObj_SetFontSize struct {
+	PageObject references.FPDF_PAGEOBJECT
+	FontSize   float32
 }
 
 type FPDFFont_Close struct {

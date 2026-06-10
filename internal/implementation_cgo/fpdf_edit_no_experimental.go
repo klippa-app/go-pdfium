@@ -414,3 +414,21 @@ func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FP
 func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFText_SetPositions sets the character positions for a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFTextObj_SetFontSize sets the font size of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
