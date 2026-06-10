@@ -93,6 +93,8 @@ type FPDFPageObj_AddMark struct {
 	Mark references.FPDF_PAGEOBJECTMARK
 }
 
+type FPDFPageObj_AddExistingMark struct{}
+
 type FPDFPageObj_RemoveMark struct{}
 
 type FPDFPageObjMark_GetName struct {
@@ -293,6 +295,8 @@ type FPDFText_SetText struct{}
 
 type FPDFText_SetCharcodes struct{}
 
+type FPDFText_SetPositions struct{}
+
 type FPDFText_LoadFont struct {
 	Font references.FPDF_FONT
 }
@@ -312,6 +316,8 @@ type FPDFTextObj_GetRenderedBitmap struct {
 type FPDFTextObj_GetFontSize struct {
 	FontSize float32 // The font size of the text object, measured in points (about 1/72 inch)
 }
+
+type FPDFTextObj_SetFontSize struct{}
 
 type FPDFFont_Close struct{}
 

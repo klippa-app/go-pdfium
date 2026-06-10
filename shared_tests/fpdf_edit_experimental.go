@@ -141,6 +141,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFPageObj_RemoveMark).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFPageObj_AddExistingMark", func() {
+				FPDFPageObj_AddExistingMark, err := PdfiumInstance.FPDFPageObj_AddExistingMark(&requests.FPDFPageObj_AddExistingMark{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPageObj_AddExistingMark).To(BeNil())
+			})
+
 			It("returns an error when calling FPDFPageObjMark_RemoveParam", func() {
 				FPDFPageObjMark_RemoveParam, err := PdfiumInstance.FPDFPageObjMark_RemoveParam(&requests.FPDFPageObjMark_RemoveParam{})
 				Expect(err).To(MatchError("pageObject not given"))
@@ -187,6 +193,18 @@ var _ = Describe("fpdf_edit", func() {
 				FPDFTextObj_SetTextRenderMode, err := PdfiumInstance.FPDFTextObj_SetTextRenderMode(&requests.FPDFTextObj_SetTextRenderMode{})
 				Expect(err).To(MatchError("pageObject not given"))
 				Expect(FPDFTextObj_SetTextRenderMode).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFTextObj_SetFontSize", func() {
+				FPDFTextObj_SetFontSize, err := PdfiumInstance.FPDFTextObj_SetFontSize(&requests.FPDFTextObj_SetFontSize{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFTextObj_SetFontSize).To(BeNil())
+			})
+
+			It("returns an error when calling FPDFText_SetPositions", func() {
+				FPDFText_SetPositions, err := PdfiumInstance.FPDFText_SetPositions(&requests.FPDFText_SetPositions{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFText_SetPositions).To(BeNil())
 			})
 
 			It("returns an error when calling FPDFTextObj_GetFont", func() {
@@ -620,6 +638,37 @@ end
 					Expect(err).To(BeNil())
 					Expect(FPDFTextObj_GetFont).ToNot(BeNil())
 					Expect(FPDFTextObj_GetFont.Font).ToNot(BeEmpty())
+				})
+
+				It("allows us setting the font size", func() {
+					FPDFTextObj_GetFontSize, err := PdfiumInstance.FPDFTextObj_GetFontSize(&requests.FPDFTextObj_GetFontSize{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetFontSize).ToNot(BeNil())
+					initialFontSize := FPDFTextObj_GetFontSize.FontSize
+
+					FPDFTextObj_SetFontSize, err := PdfiumInstance.FPDFTextObj_SetFontSize(&requests.FPDFTextObj_SetFontSize{
+						PageObject: pageObject,
+						FontSize:   initialFontSize + 4,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_SetFontSize).To(Equal(&responses.FPDFTextObj_SetFontSize{}))
+
+					FPDFTextObj_GetFontSize, err = PdfiumInstance.FPDFTextObj_GetFontSize(&requests.FPDFTextObj_GetFontSize{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFTextObj_GetFontSize.FontSize).To(BeNumerically("~", initialFontSize+4, float32(0.001)))
+				})
+
+				It("gives an error when setting positions with an empty list", func() {
+					FPDFText_SetPositions, err := PdfiumInstance.FPDFText_SetPositions(&requests.FPDFText_SetPositions{
+						PageObject: pageObject,
+						Positions:  []float32{},
+					})
+					Expect(err).To(MatchError("positions must not be empty"))
+					Expect(FPDFText_SetPositions).To(BeNil())
 				})
 
 				It("allows us getting the rotated bounds", func() {
@@ -1338,6 +1387,62 @@ end
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_AddMark).To(Not(BeNil()))
 					Expect(FPDFPageObj_AddMark.Mark).To(Not(BeEmpty()))
+				})
+
+				It("gives an error when trying to add an existing mark without providing the mark", func() {
+					FPDFPageObj_AddExistingMark, err := PdfiumInstance.FPDFPageObj_AddExistingMark(&requests.FPDFPageObj_AddExistingMark{
+						PageObject: pageObject,
+					})
+					Expect(err).To(MatchError("pageObjectMark not given"))
+					Expect(FPDFPageObj_AddExistingMark).To(BeNil())
+				})
+
+				It("allows adding an existing mark to another page object", func() {
+					By("getting the second page object")
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 1,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					secondPageObject := FPDFPage_GetObject.PageObject
+
+					By("getting the existing mark from the first page object")
+					FPDFPageObj_GetMark, err := PdfiumInstance.FPDFPageObj_GetMark(&requests.FPDFPageObj_GetMark{
+						PageObject: pageObject,
+						Index:      0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_GetMark).To(Not(BeNil()))
+					Expect(FPDFPageObj_GetMark.Mark).To(Not(BeEmpty()))
+
+					By("counting marks on the second page object before")
+					FPDFPageObj_CountMarks, err := PdfiumInstance.FPDFPageObj_CountMarks(&requests.FPDFPageObj_CountMarks{
+						PageObject: secondPageObject,
+					})
+					Expect(err).To(BeNil())
+					markCountBefore := FPDFPageObj_CountMarks.Count
+
+					By("adding the existing mark to the second page object")
+					FPDFPageObj_AddExistingMark, err := PdfiumInstance.FPDFPageObj_AddExistingMark(&requests.FPDFPageObj_AddExistingMark{
+						PageObject:     secondPageObject,
+						PageObjectMark: FPDFPageObj_GetMark.Mark,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_AddExistingMark).To(Equal(&responses.FPDFPageObj_AddExistingMark{}))
+
+					By("counting marks on the second page object after")
+					FPDFPageObj_CountMarks, err = PdfiumInstance.FPDFPageObj_CountMarks(&requests.FPDFPageObj_CountMarks{
+						PageObject: secondPageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPageObj_CountMarks.Count).To(Equal(markCountBefore + 1))
 				})
 
 				It("gives an error when trying to get a mark with an invalid index", func() {
@@ -2180,6 +2285,104 @@ end
 					Expect(FPDFFormObj_CountObjects).To(Equal(&responses.FPDFFormObj_CountObjects{
 						Count: 1,
 					}))
+				})
+			})
+		})
+	})
+
+	Context("a PDF file with hello world", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			Context("when a page object has been loaded", func() {
+				var pageObject references.FPDF_PAGEOBJECT
+
+				BeforeEach(func() {
+					FPDFPage_GetObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+						Index: 0,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFPage_GetObject).To(Not(BeNil()))
+					Expect(FPDFPage_GetObject.PageObject).To(Not(BeEmpty()))
+					pageObject = FPDFPage_GetObject.PageObject
+				})
+
+				It("allows setting text positions", func() {
+					// Get the text object matrix to derive expected char origin differences.
+					// charOrigin[i+1].X - charOrigin[0].X = matrix.A * positions[i]
+					matrixResp, err := PdfiumInstance.FPDFPageObj_GetMatrix(&requests.FPDFPageObj_GetMatrix{
+						PageObject: pageObject,
+					})
+					Expect(err).To(BeNil())
+					Expect(matrixResp).To(Not(BeNil()))
+
+					// "Hello, world!" has 13 characters, so we need 12 positions (N-1)
+					positions := []float32{5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60}
+					FPDFText_SetPositions, err := PdfiumInstance.FPDFText_SetPositions(&requests.FPDFText_SetPositions{
+						PageObject: pageObject,
+						Positions:  positions,
+					})
+					Expect(err).To(BeNil())
+					Expect(FPDFText_SetPositions).To(Equal(&responses.FPDFText_SetPositions{}))
+
+					// Load the text page to verify character origins reflect the new positions.
+					textPageResp, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+						Page: requests.Page{
+							ByIndex: &requests.PageByIndex{
+								Document: doc,
+								Index:    0,
+							},
+						},
+					})
+					Expect(err).To(BeNil())
+					Expect(textPageResp).To(Not(BeNil()))
+
+					char0Origin, err := PdfiumInstance.FPDFText_GetCharOrigin(&requests.FPDFText_GetCharOrigin{
+						TextPage: textPageResp.TextPage,
+						Index:    0,
+					})
+					Expect(err).To(BeNil())
+
+					char1Origin, err := PdfiumInstance.FPDFText_GetCharOrigin(&requests.FPDFText_GetCharOrigin{
+						TextPage: textPageResp.TextPage,
+						Index:    1,
+					})
+					Expect(err).To(BeNil())
+
+					_, err = PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+						TextPage: textPageResp.TextPage,
+					})
+					Expect(err).To(BeNil())
+
+					// Verify the X difference between char 1 and char 0 equals matrix.A * positions[0].
+					expectedDiff := float64(matrixResp.Matrix.A) * float64(positions[0])
+					Expect(char1Origin.X - char0Origin.X).To(BeNumerically("~", expectedDiff, 0.01))
 				})
 			})
 		})
