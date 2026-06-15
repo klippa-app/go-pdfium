@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/go-plugin v1.8.0
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.29.0
-	github.com/onsi/gomega v1.41.0
+	github.com/onsi/gomega v1.42.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/net v0.55.0
