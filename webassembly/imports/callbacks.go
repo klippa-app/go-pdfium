@@ -2,7 +2,6 @@ package imports
 
 import (
 	"context"
-	"errors"
 	"io"
 	"log"
 
@@ -46,24 +45,17 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 		return
 	}
 
-	// Read the requested data into a buffer.
-	readBuffer := make([]byte, size)
-	n, err := openFile.Reader.Read(readBuffer)
-
-	// Clear out the error if we have EOF but read the requested size.
-	// This is to handle some edge case clients that return EOF as err when
-	// reading the exact amount of bytes requested until the end of the file.
-	if err != nil && errors.Is(err, io.EOF) && n == int(size) {
-		err = nil
-	}
-
-	if n == 0 || err != nil {
+	// Memory.Read returns a write-through view of guest memory.
+	guestBuffer, ok := mem.Read(pBufPointer, size)
+	if !ok {
 		stack[0] = uint64(0)
 		return
 	}
 
-	ok = mem.Write(pBufPointer, readBuffer)
-	if !ok {
+	// m_GetBlock must fill the entire requested range. ReadFull also treats an
+	// EOF returned together with the final bytes as a successful read.
+	n, err := io.ReadFull(openFile.Reader, guestBuffer)
+	if err != nil {
 		stack[0] = uint64(0)
 		return
 	}
