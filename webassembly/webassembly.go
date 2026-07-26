@@ -21,8 +21,6 @@ import (
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/experimental"
-	"github.com/tetratelabs/wazero/experimental/logging"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
@@ -39,6 +37,10 @@ type worker struct {
 }
 
 type Config struct {
+	// Context is used to initialize the wazero runtime and as the parent
+	// context for its workers. It must remain valid for the lifetime of the
+	// pool. If nil, context.Background is used.
+	Context       goctx.Context
 	MinIdle       int
 	MaxIdle       int
 	MaxTotal      int
@@ -112,11 +114,10 @@ func Init(config Config) (pdfium.Pool, error) {
 		config.RuntimeConfig = wazero.NewRuntimeConfig()
 	}
 
-	poolContext := experimental.WithFunctionListenerFactory(context.Background(), logging.NewLoggingListenerFactory(os.Stdout))
-
-	// Uncomment the line below if you want function call logging,
-	// useful for debugging.
-	poolContext = context.Background()
+	poolContext := config.Context
+	if poolContext == nil {
+		poolContext = context.Background()
+	}
 
 	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
 
