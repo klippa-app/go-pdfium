@@ -56,20 +56,13 @@ func go_read_seeker_cb(param unsafe.Pointer, position C.ulong, pBuf *C.uchar, si
 	// We create a Go slice backed by a C array (without copying the original data).
 	target := unsafe.Slice((*byte)(unsafe.Pointer(pBuf)), uint64(size))
 
-	readBytes, err := r.Read(target)
-
-	// Clear out the error if we have EOF but read the requested size.
-	// This is to handle some edge case clients that return EOF as err when
-	// reading the exact amount of bytes requested until the end of the file.
-	if err != nil && errors.Is(err, io.EOF) && readBytes == int(size) {
-		err = nil
-	}
-
+	// m_GetBlock must fill the entire requested range. ReadFull keeps reading
+	// until the buffer is full, and it also treats an EOF returned together
+	// with the final bytes as a successful read, which some edge case clients
+	// do when reading the exact amount of bytes requested until the end of the
+	// file.
+	readBytes, err := io.ReadFull(r, target)
 	if err != nil {
-		return C.int(0)
-	}
-
-	if readBytes == 0 {
 		return C.int(0)
 	}
 
