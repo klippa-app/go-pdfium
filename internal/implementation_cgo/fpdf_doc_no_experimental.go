@@ -38,3 +38,9 @@ func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_Get
 func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFBookmark_GetColor returns the color of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

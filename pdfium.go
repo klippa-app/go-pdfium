@@ -1007,6 +1007,11 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error)
 
+	// FPDFBookmark_GetColor returns the color of a bookmark.
+	// Returns an error when the bookmark does not specify a color.
+	// Experimental API.
+	FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error)
+
 	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
 	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
 
@@ -1232,6 +1237,17 @@ type Pdfium interface {
 	// embedded file attachment.
 	// Experimental API.
 	FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error)
+
+	// FPDFAttachment_SetDescription sets the string value corresponding to "/Desc" in the file specification
+	// dictionary of the embedded file attachment, overwriting the existing value if any.
+	// Experimental API.
+	FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error)
+
+	// FPDFAttachment_GetDescription gets the string value corresponding to "/Desc" in the file specification
+	// dictionary of the embedded file attachment. Returns an empty value when the
+	// attachment has no description.
+	// Experimental API.
+	FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error)
 
 	// FPDFAttachment_SetFile set the file data of the given attachment, overwriting the existing file data if any.
 	// The creation date and checksum will be updated, while all other dictionary

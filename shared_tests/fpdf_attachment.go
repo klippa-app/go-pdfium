@@ -75,6 +75,18 @@ var _ = Describe("fpdf_attachment", func() {
 			Expect(FPDFAttachment_GetStringValue).To(BeNil())
 		})
 
+		It("returns an error when FPDFAttachment_SetDescription is called", func() {
+			FPDFAttachment_SetDescription, err := PdfiumInstance.FPDFAttachment_SetDescription(&requests.FPDFAttachment_SetDescription{})
+			Expect(err).To(MatchError("attachment not given"))
+			Expect(FPDFAttachment_SetDescription).To(BeNil())
+		})
+
+		It("returns an error when FPDFAttachment_GetDescription is called", func() {
+			FPDFAttachment_GetDescription, err := PdfiumInstance.FPDFAttachment_GetDescription(&requests.FPDFAttachment_GetDescription{})
+			Expect(err).To(MatchError("attachment not given"))
+			Expect(FPDFAttachment_GetDescription).To(BeNil())
+		})
+
 		It("returns an error when FPDFAttachment_SetFile is called", func() {
 			FPDFAttachment_SetFile, err := PdfiumInstance.FPDFAttachment_SetFile(&requests.FPDFAttachment_SetFile{})
 			Expect(err).To(MatchError("attachment not given"))
@@ -471,6 +483,35 @@ var _ = Describe("fpdf_attachment", func() {
 				Expect(FPDFAttachment_GetStringValue).To(Equal(&responses.FPDFAttachment_GetStringValue{
 					Key:   "RandomValue",
 					Value: "Test123",
+				}))
+			})
+
+			It("returns an empty description when the attachment has no description", func() {
+				FPDFAttachment_GetDescription, err := PdfiumInstance.FPDFAttachment_GetDescription(&requests.FPDFAttachment_GetDescription{
+					Attachment: attachment,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAttachment_GetDescription).To(Equal(&responses.FPDFAttachment_GetDescription{
+					Value: "",
+				}))
+			})
+
+			It("allows for a description to be set, returns the correct description", func() {
+				FPDFAttachment_SetDescription, err := PdfiumInstance.FPDFAttachment_SetDescription(&requests.FPDFAttachment_SetDescription{
+					Attachment: attachment,
+					Value:      "Test description",
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAttachment_SetDescription).To(Equal(&responses.FPDFAttachment_SetDescription{
+					Value: "Test description",
+				}))
+
+				FPDFAttachment_GetDescription, err := PdfiumInstance.FPDFAttachment_GetDescription(&requests.FPDFAttachment_GetDescription{
+					Attachment: attachment,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAttachment_GetDescription).To(Equal(&responses.FPDFAttachment_GetDescription{
+					Value: "Test description",
 				}))
 			})
 		})

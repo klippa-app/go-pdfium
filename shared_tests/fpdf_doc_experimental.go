@@ -111,6 +111,12 @@ var _ = Describe("fpdf_doc_experimental", func() {
 				Expect(err).To(MatchError("bookmark not given"))
 				Expect(FPDFBookmark_GetCount).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFBookmark_GetColor", func() {
+				FPDFBookmark_GetColor, err := PdfiumInstance.FPDFBookmark_GetColor(&requests.FPDFBookmark_GetColor{})
+				Expect(err).To(MatchError("bookmark not given"))
+				Expect(FPDFBookmark_GetColor).To(BeNil())
+			})
 		})
 	})
 
@@ -582,6 +588,86 @@ var _ = Describe("fpdf_doc_experimental", func() {
 
 				Expect(err).To(BeNil())
 				Expect(action).To(Equal(&responses.FPDFBookmark_GetAction{}))
+			})
+		})
+
+		When("FPDFBookmark_GetColor is called", func() {
+			It("returns an error because the bookmark has no color", func() {
+				bookmark, err := PdfiumInstance.FPDFBookmark_Find(&requests.FPDFBookmark_Find{
+					Document: doc,
+					Title:    "A Good Beginning",
+				})
+				Expect(err).To(BeNil())
+				Expect(bookmark).To(Not(BeNil()))
+				Expect(bookmark.Bookmark).To(Not(BeNil()))
+
+				FPDFBookmark_GetColor, err := PdfiumInstance.FPDFBookmark_GetColor(&requests.FPDFBookmark_GetColor{
+					Bookmark: *bookmark.Bookmark,
+				})
+				Expect(err).To(MatchError("could not get bookmark color"))
+				Expect(FPDFBookmark_GetColor).To(BeNil())
+			})
+		})
+	})
+
+	Context("a PDF file with colored bookmarks", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bookmarks_with_color.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDFBookmark_GetColor is called", func() {
+			It("returns the color of the bookmark that has one", func() {
+				bookmark, err := PdfiumInstance.FPDFBookmark_Find(&requests.FPDFBookmark_Find{
+					Document: doc,
+					Title:    "A Good Beginning",
+				})
+				Expect(err).To(BeNil())
+				Expect(bookmark).To(Not(BeNil()))
+				Expect(bookmark.Bookmark).To(Not(BeNil()))
+
+				FPDFBookmark_GetColor, err := PdfiumInstance.FPDFBookmark_GetColor(&requests.FPDFBookmark_GetColor{
+					Bookmark: *bookmark.Bookmark,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFBookmark_GetColor).To(Equal(&responses.FPDFBookmark_GetColor{
+					R: 1,
+					G: 0,
+					B: 0.5,
+				}))
+			})
+
+			It("returns an error for the bookmark that has no color", func() {
+				bookmark, err := PdfiumInstance.FPDFBookmark_Find(&requests.FPDFBookmark_Find{
+					Document: doc,
+					Title:    "A Good Ending",
+				})
+				Expect(err).To(BeNil())
+				Expect(bookmark).To(Not(BeNil()))
+				Expect(bookmark.Bookmark).To(Not(BeNil()))
+
+				FPDFBookmark_GetColor, err := PdfiumInstance.FPDFBookmark_GetColor(&requests.FPDFBookmark_GetColor{
+					Bookmark: *bookmark.Bookmark,
+				})
+				Expect(err).To(MatchError("could not get bookmark color"))
+				Expect(FPDFBookmark_GetColor).To(BeNil())
 			})
 		})
 	})
