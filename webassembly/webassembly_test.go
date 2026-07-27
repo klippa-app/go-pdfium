@@ -80,6 +80,14 @@ var _ = AfterSuite(func() {
 var _ = Describe("Webassembly", func() {
 	shared_tests.Import()
 
+	Context("custom WASM", func() {
+		It("requires a configured module", func() {
+			pool, err := webassembly.InitWithWASM(webassembly.Config{})
+			Expect(pool).To(BeNil())
+			Expect(err).To(MatchError("webassembly module must be provided"))
+		})
+	})
+
 	Context("pooling", func() {
 		It("uses the configured context for workers", func() {
 			ctx, cancel := context.WithCancel(context.Background())

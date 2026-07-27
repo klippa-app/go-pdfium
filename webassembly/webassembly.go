@@ -72,11 +72,23 @@ var multiThreadedMutex = &sync.Mutex{}
 // allow it. If the pool has been exhausted. It will wait until a worker becomes
 // available. So it's important that you close instances when you're done with them.
 func Init(config Config) (pdfium.Pool, error) {
-	// Set config defaults.
 	if config.WASM == nil {
 		config.WASM = pdfiumWasm
 	}
+	return initWithConfig(config)
+}
 
+// InitWithWASM will return a multithreaded webassembly pool using the module in
+// Config.WASM. Unlike Init, it does not reference the embedded default module,
+// allowing applications that provide their own module to omit it at link time.
+func InitWithWASM(config Config) (pdfium.Pool, error) {
+	if config.WASM == nil {
+		return nil, errors.New("webassembly module must be provided")
+	}
+	return initWithConfig(config)
+}
+
+func initWithConfig(config Config) (pdfium.Pool, error) {
 	// Mount the full root by default.
 	if config.FSConfig == nil {
 		config.FSConfig = wazero.NewFSConfig()
