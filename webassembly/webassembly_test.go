@@ -2,6 +2,7 @@ package webassembly_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -80,6 +81,31 @@ var _ = Describe("Webassembly", func() {
 	shared_tests.Import()
 
 	Context("pooling", func() {
+		It("uses the configured context for workers", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			pool, err := webassembly.Init(webassembly.Config{
+				Context:       ctx,
+				MinIdle:       0,
+				MaxIdle:       1,
+				MaxTotal:      1,
+				RuntimeConfig: runtimeConfig().WithCloseOnContextDone(true),
+			})
+			Expect(err).To(BeNil())
+			DeferCleanup(func() {
+				Expect(pool.Close()).To(Succeed())
+			})
+
+			cancel()
+			instance, err := pool.GetInstance(time.Second * 30)
+			if instance != nil {
+				DeferCleanup(func() {
+					Expect(instance.Close()).To(Succeed())
+				})
+			}
+			Expect(err).To(HaveOccurred())
+			Expect(errors.Is(err, context.Canceled)).To(BeTrue())
+		})
+
 		When("a pool is opened", func() {
 			var TestPool pdfium.Pool
 
