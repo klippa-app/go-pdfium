@@ -81,6 +81,8 @@ func Init(config Config) (pdfium.Pool, error) {
 // InitWithWASM will return a multithreaded webassembly pool using the module in
 // Config.WASM. Unlike Init, it does not reference the embedded default module,
 // allowing applications that provide their own module to omit it at link time.
+// This causes Go not to embed the default WASM file, saving about ~5MB in the
+// resulting binary file.
 func InitWithWASM(config Config) (pdfium.Pool, error) {
 	if config.WASM == nil {
 		return nil, errors.New("webassembly module must be provided")
