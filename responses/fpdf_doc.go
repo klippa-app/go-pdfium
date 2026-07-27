@@ -27,6 +27,12 @@ type FPDFBookmark_GetCount struct {
 	Count int
 }
 
+type FPDFBookmark_GetColor struct {
+	R float32 // The red component of the bookmark color [0.0 - 1.0].
+	G float32 // The green component of the bookmark color [0.0 - 1.0].
+	B float32 // The blue component of the bookmark color [0.0 - 1.0].
+}
+
 type FPDFBookmark_Find struct {
 	Bookmark *references.FPDF_BOOKMARK // Reference to the found bookmark. nil if the title can't be found.
 }

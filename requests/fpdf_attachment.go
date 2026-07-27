@@ -46,6 +46,15 @@ type FPDFAttachment_GetStringValue struct {
 	Key        string
 }
 
+type FPDFAttachment_SetDescription struct {
+	Attachment references.FPDF_ATTACHMENT
+	Value      string
+}
+
+type FPDFAttachment_GetDescription struct {
+	Attachment references.FPDF_ATTACHMENT
+}
+
 type FPDFAttachment_SetFile struct {
 	Attachment references.FPDF_ATTACHMENT
 	Contents   []byte

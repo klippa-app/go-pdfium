@@ -146,3 +146,30 @@ func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookm
 		Count: int(count),
 	}, nil
 }
+
+// FPDFBookmark_GetColor returns the color of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	r := C.float(0)
+	g := C.float(0)
+	b := C.float(0)
+
+	success := C.FPDFBookmark_GetColor(bookmarkHandle.handle, &r, &g, &b)
+	if int(success) == 0 {
+		return nil, errors.New("could not get bookmark color")
+	}
+
+	return &responses.FPDFBookmark_GetColor{
+		R: float32(r),
+		G: float32(g),
+		B: float32(b),
+	}, nil
+}

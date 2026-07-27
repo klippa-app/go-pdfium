@@ -46,6 +46,14 @@ type FPDFAttachment_GetStringValue struct {
 	Value string
 }
 
+type FPDFAttachment_SetDescription struct {
+	Value string
+}
+
+type FPDFAttachment_GetDescription struct {
+	Value string // The description of the attachment. Empty when the attachment has no description.
+}
+
 type FPDFAttachment_SetFile struct{}
 
 type FPDFAttachment_GetFile struct {

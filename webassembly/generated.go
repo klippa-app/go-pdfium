@@ -1341,6 +1341,20 @@ func (i *pdfiumInstance) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upda
 	return i.worker.Instance.FPDFAnnot_UpdateObject(request)
 }
 
+func (i *pdfiumInstance) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (resp *responses.FPDFAttachment_GetDescription, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetDescription", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFAttachment_GetDescription(request)
+}
+
 func (i *pdfiumInstance) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (resp *responses.FPDFAttachment_GetFile, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1423,6 +1437,20 @@ func (i *pdfiumInstance) FPDFAttachment_HasKey(request *requests.FPDFAttachment_
 	}()
 
 	return i.worker.Instance.FPDFAttachment_HasKey(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (resp *responses.FPDFAttachment_SetDescription, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_SetDescription", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFAttachment_SetDescription(request)
 }
 
 func (i *pdfiumInstance) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile) (resp *responses.FPDFAttachment_SetFile, err error) {
@@ -1717,6 +1745,20 @@ func (i *pdfiumInstance) FPDFBookmark_GetAction(request *requests.FPDFBookmark_G
 	}()
 
 	return i.worker.Instance.FPDFBookmark_GetAction(request)
+}
+
+func (i *pdfiumInstance) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (resp *responses.FPDFBookmark_GetColor, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetColor", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFBookmark_GetColor(request)
 }
 
 func (i *pdfiumInstance) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (resp *responses.FPDFBookmark_GetCount, err error) {

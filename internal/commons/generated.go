@@ -107,12 +107,14 @@ type Pdfium interface {
 	FPDFAnnot_SetStringValue(*requests.FPDFAnnot_SetStringValue) (*responses.FPDFAnnot_SetStringValue, error)
 	FPDFAnnot_SetURI(*requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error)
 	FPDFAnnot_UpdateObject(*requests.FPDFAnnot_UpdateObject) (*responses.FPDFAnnot_UpdateObject, error)
+	FPDFAttachment_GetDescription(*requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error)
 	FPDFAttachment_GetFile(*requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
 	FPDFAttachment_GetName(*requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error)
 	FPDFAttachment_GetStringValue(*requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error)
 	FPDFAttachment_GetSubtype(*requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error)
 	FPDFAttachment_GetValueType(*requests.FPDFAttachment_GetValueType) (*responses.FPDFAttachment_GetValueType, error)
 	FPDFAttachment_HasKey(*requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error)
+	FPDFAttachment_SetDescription(*requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error)
 	FPDFAttachment_SetFile(*requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error)
 	FPDFAttachment_SetStringValue(*requests.FPDFAttachment_SetStringValue) (*responses.FPDFAttachment_SetStringValue, error)
 	FPDFAvail_Create(*requests.FPDFAvail_Create) (*responses.FPDFAvail_Create, error)
@@ -134,6 +136,7 @@ type Pdfium interface {
 	FPDFBitmap_GetWidth(*requests.FPDFBitmap_GetWidth) (*responses.FPDFBitmap_GetWidth, error)
 	FPDFBookmark_Find(*requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
 	FPDFBookmark_GetAction(*requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error)
+	FPDFBookmark_GetColor(*requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error)
 	FPDFBookmark_GetCount(*requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error)
 	FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
 	FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
@@ -1432,6 +1435,16 @@ func (g *PdfiumRPC) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_UpdateObj
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error) {
+	resp := &responses.FPDFAttachment_GetDescription{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetDescription", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error) {
 	resp := &responses.FPDFAttachment_GetFile{}
 	err := g.client.Call("Plugin.FPDFAttachment_GetFile", request, resp)
@@ -1485,6 +1498,16 @@ func (g *PdfiumRPC) FPDFAttachment_GetValueType(request *requests.FPDFAttachment
 func (g *PdfiumRPC) FPDFAttachment_HasKey(request *requests.FPDFAttachment_HasKey) (*responses.FPDFAttachment_HasKey, error) {
 	resp := &responses.FPDFAttachment_HasKey{}
 	err := g.client.Call("Plugin.FPDFAttachment_HasKey", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error) {
+	resp := &responses.FPDFAttachment_SetDescription{}
+	err := g.client.Call("Plugin.FPDFAttachment_SetDescription", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -1695,6 +1718,16 @@ func (g *PdfiumRPC) FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*res
 func (g *PdfiumRPC) FPDFBookmark_GetAction(request *requests.FPDFBookmark_GetAction) (*responses.FPDFBookmark_GetAction, error) {
 	resp := &responses.FPDFBookmark_GetAction{}
 	err := g.client.Call("Plugin.FPDFBookmark_GetAction", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
+	resp := &responses.FPDFBookmark_GetColor{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetColor", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -6864,6 +6897,24 @@ func (s *PdfiumRPCServer) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upd
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription, resp *responses.FPDFAttachment_GetDescription) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetDescription", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAttachment_GetDescription(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile, resp *responses.FPDFAttachment_GetFile) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -6962,6 +7013,24 @@ func (s *PdfiumRPCServer) FPDFAttachment_HasKey(request *requests.FPDFAttachment
 	}()
 
 	implResp, err := s.Impl.FPDFAttachment_HasKey(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription, resp *responses.FPDFAttachment_SetDescription) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_SetDescription", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAttachment_SetDescription(request)
 	if err != nil {
 		return err
 	}
@@ -7340,6 +7409,24 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetAction(request *requests.FPDFBookmark_
 	}()
 
 	implResp, err := s.Impl.FPDFBookmark_GetAction(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor, resp *responses.FPDFBookmark_GetColor) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetColor", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBookmark_GetColor(request)
 	if err != nil {
 		return err
 	}

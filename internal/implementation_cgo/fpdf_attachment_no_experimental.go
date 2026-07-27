@@ -73,6 +73,20 @@ func (p *PdfiumImplementation) FPDFAttachment_GetStringValue(request *requests.F
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFAttachment_SetDescription sets the string value corresponding to "/Desc" in the file specification
+// dictionary of the embedded file attachment, overwriting the existing value if any.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFAttachment_GetDescription gets the string value corresponding to "/Desc" in the file specification
+// dictionary of the embedded file attachment.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFAttachment_SetFile set the file data of the given attachment, overwriting the existing file data if any.
 // The creation date and checksum will be updated, while all other dictionary
 // entries will be deleted. Note that only contents with a length smaller than

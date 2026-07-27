@@ -1053,7 +1053,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookm
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFLink_CountQuadPoints").Call(p.Context, *bookmarkHandle.handle)
+	res, err := p.Module.ExportedFunction("FPDFBookmark_GetCount").Call(p.Context, *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1062,5 +1062,66 @@ func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookm
 
 	return &responses.FPDFBookmark_GetCount{
 		Count: int(count),
+	}, nil
+}
+
+// FPDFBookmark_GetColor returns the color of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	rPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer rPointer.Free()
+
+	gPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer gPointer.Free()
+
+	bPointer, err := p.FloatPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer bPointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFBookmark_GetColor").Call(p.Context, *bookmarkHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get bookmark color")
+	}
+
+	r, err := rPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := gPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := bPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFBookmark_GetColor{
+		R: r,
+		G: g,
+		B: b,
 	}, nil
 }

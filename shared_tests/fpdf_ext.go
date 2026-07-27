@@ -70,6 +70,23 @@ var _ = Describe("fpdf_ext", func() {
 					Document: newDoc.Document,
 				})
 				Expect(err).To(BeNil())
+				Expect(meta).To(Not(BeNil()))
+
+				// PDFium 7961 started appending the UTC offset to the
+				// CreationDate (see FormatPDFDate() in fpdfsdk/fpdf_editpage.cpp),
+				// which makes the value end in a ±HH'MM' suffix. The suffix is
+				// matched with a regex instead of a literal for two reasons: it
+				// has to be optional because we also test against PDFium
+				// versions from before that change, and it can't be hardcoded
+				// because PDFium calculates the offset by comparing the
+				// localtime against the real gmtime of the moment that the
+				// document is created, which makes it differ per run.
+				// Normalize it afterwards so that all tags can still be
+				// compared in one go.
+				Expect(meta.Tags[6].Tag).To(Equal("CreationDate"))
+				Expect(meta.Tags[6].Value).To(MatchRegexp(`^D:19700102101736([+-]\d{2}'\d{2}')?$`))
+				meta.Tags[6].Value = "D:19700102101736"
+
 				Expect(meta).To(Equal(&responses.GetMetaData{
 					Tags: []responses.GetMetaDataTag{
 						{Tag: "Title", Value: ""},
@@ -139,6 +156,15 @@ var _ = Describe("fpdf_ext", func() {
 					Document: newDoc.Document,
 				})
 				Expect(err).To(BeNil())
+				Expect(meta).To(Not(BeNil()))
+
+				// Matched with a regex for the same reason as in the test for
+				// the overwritten time function above: PDFium 7961 and up append
+				// an optional, per-run UTC offset to the CreationDate.
+				Expect(meta.Tags[6].Tag).To(Equal("CreationDate"))
+				Expect(meta.Tags[6].Value).To(MatchRegexp(`^D:389209231123030([+-]\d{2}'\d{2}')?$`))
+				meta.Tags[6].Value = "D:389209231123030"
+
 				Expect(meta).To(Equal(&responses.GetMetaData{
 					Tags: []responses.GetMetaDataTag{
 						{Tag: "Title", Value: ""},
