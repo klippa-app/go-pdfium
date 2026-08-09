@@ -418,7 +418,7 @@ func go_formfill_FFI_DoGoToAction_cb(me *C.FPDF_FORMFILLINFO, nPageIndex C.int, 
 		return
 	}
 
-	target := (*[1<<25 - 1]float32)(unsafe.Pointer(fPosArray))[:sizeofArray:sizeofArray]
+	target := unsafe.Slice((*float32)(unsafe.Pointer(fPosArray)), sizeofArray)
 	pos := make([]float32, int(sizeofArray))
 	for i := range pos {
 		pos[i] = float32(target[i])
