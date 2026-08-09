@@ -102,7 +102,7 @@ func InitLibrary(config *pdfium.LibraryConfig) {
 			// Create array of length config.UserFontPaths + 1 for the NULL terminator.
 			cArray := C.malloc(C.size_t(len(config.UserFontPaths)+1) * C.size_t(unsafe.Sizeof(uintptr(0))))
 
-			cFonts := (*[1<<30 - 1]*C.char)(cArray)
+			cFonts := unsafe.Slice((**C.char)(cArray), len(config.UserFontPaths)+1)
 			for i := range config.UserFontPaths {
 				cFonts[i] = C.CString(config.UserFontPaths[i])
 			}
