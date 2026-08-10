@@ -176,6 +176,13 @@ type Pdfium interface {
 	// Please note that when using go-pdfium from the same instance (on single-threaded any instance)
 	// from different subroutines, FPDF_GetLastError might already be reset from
 	// executing another PDFium method.
+	// On Windows this is extra unreliable, because FPDF_GetLastError() is a direct
+	// alias for the Win32 GetLastError() API, whose value lives in thread-local
+	// storage (on other platforms PDFium tracks it itself in a plain global
+	// instead). Since calling this method is its own separate call into PDFium,
+	// it is not guaranteed to run on the same OS thread as the PDFium call whose
+	// error it's meant to report, nor is anything preventing another Win32 call
+	// from running on that thread in between and overwriting the value.
 	FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error)
 
 	// FPDF_SetSandBoxPolicy set the policy for the sandbox environment.
