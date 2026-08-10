@@ -27,6 +27,51 @@ static inline void FPDF_FILEACCESS_SET_GET_BLOCK(FPDF_FILEACCESS *fs, char *id) 
 	fs->m_GetBlock = &go_read_seeker_cb;
 	fs->m_Param = id;
 }
+
+// go_pdfium_load_result_t bundles a load call together with the error code
+// FPDF_GetLastError() reports for it.
+//
+// On Windows, FPDF_GetLastError() is a direct alias for the Win32
+// GetLastError() API, which stores its value in thread-local storage that
+// any subsequent Win32 call on that thread can overwrite (on other
+// platforms PDFium tracks it itself in a plain global instead). Go's cgo
+// runtime can make such calls (e.g. for scheduling bookkeeping) when
+// transitioning back from a cgo call into Go code, so calling the loader
+// and FPDF_GetLastError() as two separate cgo calls can intermittently read
+// back a stale/empty error on Windows. Combining them into a single C call
+// guarantees they run back-to-back with nothing able to run in between.
+typedef struct {
+	FPDF_DOCUMENT doc;
+	unsigned long error;
+} go_pdfium_load_result_t;
+
+static inline go_pdfium_load_result_t go_pdfium_load_document(const char *file_path, const char *password) {
+	go_pdfium_load_result_t result;
+	result.doc = FPDF_LoadDocument(file_path, password);
+	result.error = result.doc ? FPDF_ERR_SUCCESS : FPDF_GetLastError();
+	return result;
+}
+
+static inline go_pdfium_load_result_t go_pdfium_load_mem_document(void *data, int size, const char *password) {
+	go_pdfium_load_result_t result;
+	result.doc = FPDF_LoadMemDocument(data, size, password);
+	result.error = result.doc ? FPDF_ERR_SUCCESS : FPDF_GetLastError();
+	return result;
+}
+
+static inline go_pdfium_load_result_t go_pdfium_load_mem_document64(void *data, size_t size, const char *password) {
+	go_pdfium_load_result_t result;
+	result.doc = FPDF_LoadMemDocument64(data, size, password);
+	result.error = result.doc ? FPDF_ERR_SUCCESS : FPDF_GetLastError();
+	return result;
+}
+
+static inline go_pdfium_load_result_t go_pdfium_load_custom_document(FPDF_FILEACCESS *file_access, const char *password) {
+	go_pdfium_load_result_t result;
+	result.doc = FPDF_LoadCustomDocument(file_access, password);
+	result.error = result.doc ? FPDF_ERR_SUCCESS : FPDF_GetLastError();
+	return result;
+}
 */
 import "C"
 
@@ -287,28 +332,35 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		structElementRefs:    map[references.FPDF_STRUCTELEMENT]*StructElementHandle{},
 	}
 	var doc C.FPDF_DOCUMENT
+	var errorCode C.ulong
 
 	if request.File != nil {
 		fileData := *request.File
 
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			doc = C.FPDF_LoadMemDocument64(
+			loadResult := C.go_pdfium_load_mem_document64(
 				unsafe.Pointer(&(fileData[0])),
 				C.size_t(len(fileData)),
 				cPassword)
+			doc = loadResult.doc
+			errorCode = loadResult.error
 		} else {
-			doc = C.FPDF_LoadMemDocument(
+			loadResult := C.go_pdfium_load_mem_document(
 				unsafe.Pointer(&(fileData[0])),
 				C.int(len(fileData)),
 				cPassword)
+			doc = loadResult.doc
+			errorCode = loadResult.error
 		}
 	} else if request.FilePath != nil {
 		filePath := C.CString(*request.FilePath)
 		defer C.free(unsafe.Pointer(filePath))
-		doc = C.FPDF_LoadDocument(
+		loadResult := C.go_pdfium_load_document(
 			filePath,
 			cPassword)
+		doc = loadResult.doc
+		errorCode = loadResult.error
 	} else if request.FileReader != nil {
 		if request.FileReaderSize == 0 {
 			return nil, errors.New("FileReaderSize should be given when FileReader is set")
@@ -334,9 +386,11 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 		Pdfium.fileReaders[readerRef.String()] = fileReaderRef
 		nativeDoc.fileHandleRef = &readerRefString
 
-		doc = C.FPDF_LoadCustomDocument(
+		loadResult := C.go_pdfium_load_custom_document(
 			&readerStruct,
 			cPassword)
+		doc = loadResult.doc
+		errorCode = loadResult.error
 	} else {
 		return nil, errors.New("No file given")
 	}
@@ -344,7 +398,6 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	if doc == nil {
 		var pdfiumError error
 
-		errorCode := C.FPDF_GetLastError()
 		switch errorCode {
 		case C.FPDF_ERR_SUCCESS:
 			pdfiumError = pdfium_errors.ErrSuccess

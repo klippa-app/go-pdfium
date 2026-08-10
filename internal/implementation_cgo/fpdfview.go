@@ -104,6 +104,15 @@ func (p *PdfiumImplementation) FPDF_CloseDocument(request *requests.FPDF_CloseDo
 // Please note that when using go-pdfium from the same instance (on single-threaded any instance)
 // from different subroutines, FPDF_GetLastError might already be reset from
 // executing another PDFium method.
+// On Windows this is extra unreliable, because FPDF_GetLastError() is a direct
+// alias for the Win32 GetLastError() API, whose value lives in thread-local
+// storage (on other platforms PDFium tracks it itself in a plain global
+// instead). Since this method is called as its own separate cgo call, it is
+// not guaranteed to run on the same OS thread as the PDFium call whose error
+// it's meant to report, nor is anything preventing another Win32 call from
+// running on that thread in between and overwriting the value. Prefer
+// checking the error returned alongside the failing call directly where
+// possible instead of calling this method afterwards.
 func (p *PdfiumImplementation) FPDF_GetLastError(request *requests.FPDF_GetLastError) (*responses.FPDF_GetLastError, error) {
 	p.Lock()
 	defer p.Unlock()
