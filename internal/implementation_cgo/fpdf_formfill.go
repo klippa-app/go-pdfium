@@ -47,9 +47,10 @@ static inline void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
 import "C"
 import (
 	"errors"
+	"unsafe"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
-	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -418,7 +419,7 @@ func go_formfill_FFI_DoGoToAction_cb(me *C.FPDF_FORMFILLINFO, nPageIndex C.int, 
 		return
 	}
 
-	target := (*[1<<25 - 1]float32)(unsafe.Pointer(fPosArray))[:sizeofArray:sizeofArray]
+	target := unsafe.Slice((*float32)(unsafe.Pointer(fPosArray)), sizeofArray)
 	pos := make([]float32, int(sizeofArray))
 	for i := range pos {
 		pos[i] = float32(target[i])
