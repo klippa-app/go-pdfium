@@ -230,6 +230,30 @@ func (p *PdfiumImplementation) FPDFPageObj_AddMark(request *requests.FPDFPageObj
 	}, nil
 }
 
+// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFPageObj_AddExistingMark(pageObjectHandle.handle, pageObjectMarkHandle.handle)
+	if int(result) == 0 {
+		return nil, errors.New("could not add existing mark")
+	}
+
+	return &responses.FPDFPageObj_AddExistingMark{}, nil
+}
+
 // FPDFPageObj_RemoveMark removes the given content mark from the given page object.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error) {
@@ -462,6 +486,34 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 	}, nil
 }
 
+// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+// for this property.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	floatValue := C.float(0)
+
+	success := C.FPDFPageObjMark_GetParamFloatValue(pageObjectMarkHandle.handle, key, &floatValue)
+	if int(success) == 0 {
+		return nil, errors.New("could not get value")
+	}
+
+	return &responses.FPDFPageObjMark_GetParamFloatValue{
+		Value: float32(floatValue),
+	}, nil
+}
+
 // FPDFPageObjMark_SetIntParam sets the value of an int property in a content mark by key. If a parameter
 // with the given key exists, its value is set to the given value. Otherwise, it is added as
 // a new parameter.
@@ -494,6 +546,40 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPD
 	}
 
 	return &responses.FPDFPageObjMark_SetIntParam{}, nil
+}
+
+// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	pageObjectMarkHandle, err := p.getPageObjectMarkHandle(request.PageObjectMark)
+	if err != nil {
+		return nil, err
+	}
+
+	key := C.CString(request.Key)
+	defer C.free(unsafe.Pointer(key))
+
+	success := C.FPDFPageObjMark_SetFloatParam(documentHandle.handle, pageObjectHandle.handle, pageObjectMarkHandle.handle, key, C.float(request.Value))
+	if int(success) == 0 {
+		return nil, errors.New("could not set value")
+	}
+
+	return &responses.FPDFPageObjMark_SetFloatParam{}, nil
 }
 
 // FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter
@@ -1465,4 +1551,51 @@ func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFo
 	}
 
 	return &responses.FPDFFormObj_RemoveObject{}, nil
+}
+
+// FPDFText_SetPositions sets the character positions for a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(request.Positions) == 0 {
+		return nil, errors.New("positions must not be empty")
+	}
+
+	positions := make([]C.float, len(request.Positions))
+	for i, pos := range request.Positions {
+		positions[i] = C.float(pos)
+	}
+
+	result := C.FPDFText_SetPositions(pageObjectHandle.handle, &positions[0], C.size_t(len(request.Positions)))
+	if int(result) == 0 {
+		return nil, errors.New("could not set positions")
+	}
+
+	return &responses.FPDFText_SetPositions{}, nil
+}
+
+// FPDFTextObj_SetFontSize sets the font size of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	result := C.FPDFTextObj_SetFontSize(pageObjectHandle.handle, C.float(request.FontSize))
+	if int(result) == 0 {
+		return nil, errors.New("could not set font size")
+	}
+
+	return &responses.FPDFTextObj_SetFontSize{}, nil
 }

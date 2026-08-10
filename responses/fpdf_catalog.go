@@ -5,3 +5,7 @@ type FPDFCatalog_IsTagged struct {
 }
 
 type FPDFCatalog_SetLanguage struct{}
+
+type FPDFCatalog_GetLanguage struct {
+	Language string
+}

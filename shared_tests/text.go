@@ -142,7 +142,7 @@ var _ = Describe("text", func() {
 					})
 
 					Expect(err).To(BeNil())
-					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations_7019.json")...))
+					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_without_pixel_calculations_7776.json")...))
 				})
 
 				Context("when PixelPositions is enabled", func() {
@@ -179,7 +179,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7019.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7776.json")...))
 						})
 					})
 
@@ -200,7 +200,7 @@ var _ = Describe("text", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7019.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7776.json")...))
 						})
 					})
 				})
@@ -263,7 +263,7 @@ var _ = Describe("text", func() {
 					})
 
 					Expect(err).To(BeNil())
-					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_without_pixel_calculations_7019.json")...))
+					Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_without_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_without_pixel_calculations_7776.json")...))
 				})
 
 				Context("when PixelPositions is enabled", func() {
@@ -300,7 +300,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7019.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_dpi_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_dpi_pixel_calculations_7776.json")...))
 						})
 					})
 
@@ -321,7 +321,7 @@ var _ = Describe("text", func() {
 							})
 
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7019.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_resolution_pixel_calculations.json", TestDataPath+"/testdata/multibyte_text_"+TestType+"_testpdf_with_resolution_pixel_calculations_7776.json")...))
 						})
 					})
 				})

@@ -1401,7 +1401,7 @@ var _ = Describe("fpdf_edit", func() {
 					})
 					Expect(err).To(BeNil())
 					Expect(FPDFPageObj_GetLineCap).To(Equal(&responses.FPDFPageObj_GetLineCap{
-						LineCap: enums.FPDF_LINECAP_BUTT,
+						LineCap: enums.FPDF_LINECAP_PROJECTING_SQUAR,
 					}))
 				})
 

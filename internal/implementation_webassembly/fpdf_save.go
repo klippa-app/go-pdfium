@@ -76,8 +76,10 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 		FileWrite: &fileWriterPointer,
 	}
 
+	key := FileWriterKey{Module: p.Module, Pointer: uint32(fileWriterPointer)}
+
 	FileWriters.Mutex.Lock()
-	FileWriters.Refs[uint32(fileWriterPointer)] = fileWriterRef
+	FileWriters.Refs[key] = fileWriterRef
 	FileWriters.Mutex.Unlock()
 
 	defer func() {
@@ -85,7 +87,7 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 		currentWriter = nil
 
 		FileWriters.Mutex.Lock()
-		delete(FileWriters.Refs, uint32(fileWriterPointer))
+		delete(FileWriters.Refs, key)
 		FileWriters.Mutex.Unlock()
 
 		if curFile != nil {

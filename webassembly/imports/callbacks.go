@@ -2,6 +2,7 @@ package imports
 
 import (
 	"context"
+	"io"
 	"log"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -44,16 +45,17 @@ func (cb FPDF_FILEACCESS_CB) Call(ctx context.Context, mod api.Module, stack []u
 		return
 	}
 
-	// Read the requested data into a buffer.
-	readBuffer := make([]byte, size)
-	n, err := openFile.Reader.Read(readBuffer)
-	if n == 0 || err != nil {
+	// Memory.Read returns a write-through view of guest memory.
+	guestBuffer, ok := mem.Read(pBufPointer, size)
+	if !ok {
 		stack[0] = uint64(0)
 		return
 	}
 
-	ok = mem.Write(pBufPointer, readBuffer)
-	if !ok {
+	// m_GetBlock must fill the entire requested range. ReadFull also treats an
+	// EOF returned together with the final bytes as a successful read.
+	n, err := io.ReadFull(openFile.Reader, guestBuffer)
+	if err != nil {
 		stack[0] = uint64(0)
 		return
 	}
@@ -72,9 +74,11 @@ func (cb FPDF_FILEWRITE_CB) Call(ctx context.Context, mod api.Module, stack []ui
 
 	mem := mod.Memory()
 
+	key := implementation_webassembly.FileWriterKey{Module: mod, Pointer: fileWritePointer}
+
 	// Check if we have the file referenced in param.
 	implementation_webassembly.FileWriters.Mutex.Lock()
-	openWriter, ok := implementation_webassembly.FileWriters.Refs[fileWritePointer]
+	openWriter, ok := implementation_webassembly.FileWriters.Refs[key]
 	implementation_webassembly.FileWriters.Mutex.Unlock()
 	if !ok {
 		stack[0] = uint64(0)

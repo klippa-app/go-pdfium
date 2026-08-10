@@ -331,6 +331,88 @@ func (p *PdfiumImplementation) FPDFAttachment_GetStringValue(request *requests.F
 	}, nil
 }
 
+// FPDFAttachment_SetDescription sets the string value corresponding to "/Desc" in the file specification
+// dictionary of the embedded file attachment, overwriting the existing value if any.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	attachmentHandle, err := p.getAttachmentHandle(request.Attachment)
+	if err != nil {
+		return nil, err
+	}
+
+	valuePointer, err := p.CFPDF_WIDESTRING(request.Value)
+	if err != nil {
+		return nil, err
+	}
+	defer valuePointer.Free()
+
+	res, err := p.Module.ExportedFunction("FPDFAttachment_SetDescription").Call(p.Context, *attachmentHandle.handle, valuePointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not set attachment description")
+	}
+
+	return &responses.FPDFAttachment_SetDescription{
+		Value: request.Value,
+	}, nil
+}
+
+// FPDFAttachment_GetDescription gets the string value corresponding to "/Desc" in the file specification
+// dictionary of the embedded file attachment.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	attachmentHandle, err := p.getAttachmentHandle(request.Attachment)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the description length.
+	res, err := p.Module.ExportedFunction("FPDFAttachment_GetDescription").Call(p.Context, *attachmentHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	descriptionSize := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if descriptionSize == 0 {
+		return nil, errors.New("could not get description")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(descriptionSize, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer charDataPointer.Free()
+
+	_, err = p.Module.ExportedFunction("FPDFAttachment_GetDescription").Call(p.Context, *attachmentHandle.handle, charDataPointer.Pointer, descriptionSize)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFAttachment_GetDescription{
+		Value: transformedText,
+	}, nil
+}
+
 // FPDFAttachment_SetFile set the file data of the given attachment, overwriting the existing file data if any.
 // The creation date and checksum will be updated, while all other dictionary
 // entries will be deleted. Note that only contents with a length smaller than

@@ -521,6 +521,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error)
 
+	// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+	// Experimental API.
+	FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error)
+
 	// FPDFPageObj_RemoveMark removes the given content mark from the given page object.
 	// Experimental API.
 	FPDFPageObj_RemoveMark(request *requests.FPDFPageObj_RemoveMark) (*responses.FPDFPageObj_RemoveMark, error)
@@ -547,6 +551,12 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error)
 
+	// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+	// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+	// for this property.
+	// Experimental API.
+	FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error)
+
 	// FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
 	// Experimental API.
 	FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error)
@@ -560,6 +570,12 @@ type Pdfium interface {
 	// a new parameter.
 	// Experimental API.
 	FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error)
+
+	// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+	// with the given key exists, its value is set to the given value. Otherwise, it is added as
+	// a new parameter.
+	// Experimental API.
+	FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error)
 
 	// FPDFPageObjMark_SetStringParam sets the value of a string property in a content mark by key. If a parameter
 	// with the given key exists, its value is set to the given value. Otherwise, it is added as
@@ -776,6 +792,10 @@ type Pdfium interface {
 	// replaced.
 	FPDFText_SetCharcodes(request *requests.FPDFText_SetCharcodes) (*responses.FPDFText_SetCharcodes, error)
 
+	// FPDFText_SetPositions sets the character positions for a text object.
+	// Experimental API.
+	FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error)
+
 	// FPDFText_LoadFont returns a font object loaded from a stream of data. The font is loaded
 	// into the document. Various font data structures, such as the ToUnicode data, are auto-generated based
 	// on the inputs
@@ -798,6 +818,10 @@ type Pdfium interface {
 
 	// FPDFTextObj_GetFontSize returns the font size of a text object.
 	FPDFTextObj_GetFontSize(request *requests.FPDFTextObj_GetFontSize) (*responses.FPDFTextObj_GetFontSize, error)
+
+	// FPDFTextObj_SetFontSize sets the font size of a text object.
+	// Experimental API.
+	FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error)
 
 	// FPDFFont_Close closes a loaded PDF font
 	FPDFFont_Close(request *requests.FPDFFont_Close) (*responses.FPDFFont_Close, error)
@@ -983,6 +1007,11 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error)
 
+	// FPDFBookmark_GetColor returns the color of a bookmark.
+	// Returns an error when the bookmark does not specify a color.
+	// Experimental API.
+	FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error)
+
 	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
 	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)
 
@@ -1103,6 +1132,10 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error)
 
+	// FPDFCatalog_GetLanguage gets the language of a document from the catalog's /Lang entry.
+	// Experimental API.
+	FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error)
+
 	// End fpdf_catalog.h
 
 	// Start fpdf_signature.h
@@ -1204,6 +1237,17 @@ type Pdfium interface {
 	// embedded file attachment.
 	// Experimental API.
 	FPDFAttachment_GetStringValue(request *requests.FPDFAttachment_GetStringValue) (*responses.FPDFAttachment_GetStringValue, error)
+
+	// FPDFAttachment_SetDescription sets the string value corresponding to "/Desc" in the file specification
+	// dictionary of the embedded file attachment, overwriting the existing value if any.
+	// Experimental API.
+	FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error)
+
+	// FPDFAttachment_GetDescription gets the string value corresponding to "/Desc" in the file specification
+	// dictionary of the embedded file attachment. Returns an empty value when the
+	// attachment has no description.
+	// Experimental API.
+	FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error)
 
 	// FPDFAttachment_SetFile set the file data of the given attachment, overwriting the existing file data if any.
 	// The creation date and checksum will be updated, while all other dictionary
@@ -1603,6 +1647,10 @@ type Pdfium interface {
 
 	// FPDF_StructElement_GetTitle returns the title (/T) for a given element.
 	FPDF_StructElement_GetTitle(request *requests.FPDF_StructElement_GetTitle) (*responses.FPDF_StructElement_GetTitle, error)
+
+	// FPDF_StructElement_GetExpansion returns the expansion of an abbreviation or acronym for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error)
 
 	// FPDF_StructElement_CountChildren counts the number of children for the structure element.
 	FPDF_StructElement_CountChildren(request *requests.FPDF_StructElement_CountChildren) (*responses.FPDF_StructElement_CountChildren, error)

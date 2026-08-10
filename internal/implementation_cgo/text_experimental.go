@@ -10,6 +10,7 @@ import "C"
 
 import (
 	"bytes"
+	"math"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/responses"
@@ -35,10 +36,19 @@ func (p *PdfiumImplementation) getFontInformation(textPage C.FPDF_TEXTPAGE, char
 		fontName = string(bytes.TrimSuffix(rawFontName, []byte("\x00")))
 	}
 
+	renderedSize := float64(fontSize)
+
+	matrix := C.FS_MATRIX{}
+	success := C.FPDFText_GetMatrix(textPage, C.int(charIndex), &matrix)
+	if int(success) != 0 {
+		renderedSize = float64(fontSize) * math.Sqrt(float64(matrix.c)*float64(matrix.c)+float64(matrix.d)*float64(matrix.d))
+	}
+
 	return &responses.FontInformation{
-		Size:   float64(fontSize),
-		Weight: int(fontWeight),
-		Name:   fontName,
-		Flags:  int(fontFlags),
+		Size:         float64(fontSize),
+		RenderedSize: renderedSize,
+		Weight:       int(fontWeight),
+		Name:         fontName,
+		Flags:        int(fontFlags),
 	}
 }

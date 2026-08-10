@@ -172,7 +172,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveWithVersion).To(Not(BeNil()))
 					Expect(FPDF_SaveWithVersion.FileBytes).To(Not(BeNil()))
-					Expect(FPDF_SaveWithVersion.FileBytes).To(PointTo(HaveLen(11780)))
+					Expect(FPDF_SaveWithVersion.FileBytes).To(PointTo(Or(HaveLen(11780), HaveLen(11957)))) // Difference in size between versions of pdfium.
 				})
 			})
 		})

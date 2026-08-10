@@ -771,6 +771,14 @@ func (i *pdfiumInstance) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upda
 	return i.worker.plugin.FPDFAnnot_UpdateObject(request)
 }
 
+func (i *pdfiumInstance) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAttachment_GetDescription(request)
+}
+
 func (i *pdfiumInstance) FPDFAttachment_GetFile(request *requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -817,6 +825,14 @@ func (i *pdfiumInstance) FPDFAttachment_HasKey(request *requests.FPDFAttachment_
 	}
 
 	return i.worker.plugin.FPDFAttachment_HasKey(request)
+}
+
+func (i *pdfiumInstance) FPDFAttachment_SetDescription(request *requests.FPDFAttachment_SetDescription) (*responses.FPDFAttachment_SetDescription, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAttachment_SetDescription(request)
 }
 
 func (i *pdfiumInstance) FPDFAttachment_SetFile(request *requests.FPDFAttachment_SetFile) (*responses.FPDFAttachment_SetFile, error) {
@@ -951,6 +967,14 @@ func (i *pdfiumInstance) FPDFBookmark_GetAction(request *requests.FPDFBookmark_G
 	return i.worker.plugin.FPDFBookmark_GetAction(request)
 }
 
+func (i *pdfiumInstance) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFBookmark_GetColor(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_GetCount(request *requests.FPDFBookmark_GetCount) (*responses.FPDFBookmark_GetCount, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -989,6 +1013,14 @@ func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_Ge
 	}
 
 	return i.worker.plugin.FPDFBookmark_GetTitle(request)
+}
+
+func (i *pdfiumInstance) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFCatalog_GetLanguage(request)
 }
 
 func (i *pdfiumInstance) FPDFCatalog_IsTagged(request *requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error) {
@@ -1547,6 +1579,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_GetParamBlobValue(request *requests.FPD
 	return i.worker.plugin.FPDFPageObjMark_GetParamBlobValue(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObjMark_GetParamFloatValue(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObjMark_GetParamIntValue(request *requests.FPDFPageObjMark_GetParamIntValue) (*responses.FPDFPageObjMark_GetParamIntValue, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1595,6 +1635,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetBlobParam(request *requests.FPDFPage
 	return i.worker.plugin.FPDFPageObjMark_SetBlobParam(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObjMark_SetFloatParam(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1609,6 +1657,14 @@ func (i *pdfiumInstance) FPDFPageObjMark_SetStringParam(request *requests.FPDFPa
 	}
 
 	return i.worker.plugin.FPDFPageObjMark_SetStringParam(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_AddExistingMark(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObj_AddMark(request *requests.FPDFPageObj_AddMark) (*responses.FPDFPageObj_AddMark, error) {
@@ -2387,6 +2443,14 @@ func (i *pdfiumInstance) FPDFTextObj_GetTextRenderMode(request *requests.FPDFTex
 	return i.worker.plugin.FPDFTextObj_GetTextRenderMode(request)
 }
 
+func (i *pdfiumInstance) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFTextObj_SetFontSize(request)
+}
+
 func (i *pdfiumInstance) FPDFTextObj_SetTextRenderMode(request *requests.FPDFTextObj_SetTextRenderMode) (*responses.FPDFTextObj_SetTextRenderMode, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2673,6 +2737,14 @@ func (i *pdfiumInstance) FPDFText_SetCharcodes(request *requests.FPDFText_SetCha
 	}
 
 	return i.worker.plugin.FPDFText_SetCharcodes(request)
+}
+
+func (i *pdfiumInstance) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFText_SetPositions(request)
 }
 
 func (i *pdfiumInstance) FPDFText_SetText(request *requests.FPDFText_SetText) (*responses.FPDFText_SetText, error) {
@@ -3325,6 +3397,14 @@ func (i *pdfiumInstance) FPDF_StructElement_GetChildMarkedContentID(request *req
 	}
 
 	return i.worker.plugin.FPDF_StructElement_GetChildMarkedContentID(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetExpansion(request *requests.FPDF_StructElement_GetExpansion) (*responses.FPDF_StructElement_GetExpansion, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_GetExpansion(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetID(request *requests.FPDF_StructElement_GetID) (*responses.FPDF_StructElement_GetID, error) {

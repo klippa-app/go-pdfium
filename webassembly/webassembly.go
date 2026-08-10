@@ -21,8 +21,6 @@ import (
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/experimental"
-	"github.com/tetratelabs/wazero/experimental/logging"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
@@ -32,12 +30,17 @@ var pdfiumWasm []byte
 
 type worker struct {
 	Context   context.Context
+	Cancel    goctx.CancelFunc
 	Functions map[string]api.Function
 	Module    api.Module
 	Instance  *implementation_webassembly.PdfiumImplementation
 }
 
 type Config struct {
+	// Context is used to initialize the wazero runtime and as the parent
+	// context for its workers. It must remain valid for the lifetime of the
+	// pool. If nil, context.Background is used.
+	Context       goctx.Context
 	MinIdle       int
 	MaxIdle       int
 	MaxTotal      int
@@ -69,11 +72,25 @@ var multiThreadedMutex = &sync.Mutex{}
 // allow it. If the pool has been exhausted. It will wait until a worker becomes
 // available. So it's important that you close instances when you're done with them.
 func Init(config Config) (pdfium.Pool, error) {
-	// Set config defaults.
 	if config.WASM == nil {
 		config.WASM = pdfiumWasm
 	}
+	return initWithConfig(config)
+}
 
+// InitWithWASM will return a multithreaded webassembly pool using the module in
+// Config.WASM. Unlike Init, it does not reference the embedded default module,
+// allowing applications that provide their own module to omit it at link time.
+// This causes Go not to embed the default WASM file, saving about ~5MB in the
+// resulting binary file.
+func InitWithWASM(config Config) (pdfium.Pool, error) {
+	if config.WASM == nil {
+		return nil, errors.New("webassembly module must be provided")
+	}
+	return initWithConfig(config)
+}
+
+func initWithConfig(config Config) (pdfium.Pool, error) {
 	// Mount the full root by default.
 	if config.FSConfig == nil {
 		config.FSConfig = wazero.NewFSConfig()
@@ -111,11 +128,10 @@ func Init(config Config) (pdfium.Pool, error) {
 		config.RuntimeConfig = wazero.NewRuntimeConfig()
 	}
 
-	poolContext := experimental.WithFunctionListenerFactory(context.Background(), logging.NewLoggingListenerFactory(os.Stdout))
-
-	// Uncomment the line below if you want function call logging,
-	// useful for debugging.
-	poolContext = context.Background()
+	poolContext := config.Context
+	if poolContext == nil {
+		poolContext = context.Background()
+	}
 
 	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
 
@@ -139,8 +155,10 @@ func Init(config Config) (pdfium.Pool, error) {
 
 	factory := pool.NewPooledObjectFactory(
 		func(goctx.Context) (interface{}, error) {
+			workerCtx, cancel := goctx.WithCancel(poolContext)
 			newWorker := &worker{
-				Context: poolContext,
+				Context: workerCtx,
+				Cancel:  cancel,
 			}
 
 			moduleConfig := wazero.NewModuleConfig().
@@ -373,15 +391,22 @@ func (i *pdfiumInstance) Kill() (err error) {
 		}
 	}()
 
+	// Cancel the worker context to interrupt any in-flight WASM execution.
+	// For this to take effect, the caller must enable WithCloseOnContextDone
+	// on the RuntimeConfig passed to Init.
+	i.worker.Cancel()
+
 	i.pool.lock.Lock()
 	delete(i.pool.instanceRefs, i.instanceRef)
 	i.pool.lock.Unlock()
 
+	// Invalidate will close the module.
+	err = i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+
 	i.pool = nil
 	i.closed = true
 
-	// Invalidate will close the module.
-	return i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
+	return err
 }
 
 func (i *pdfiumInstance) GetImplementation() interface{} {

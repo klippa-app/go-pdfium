@@ -16,6 +16,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage C.FPDF_TEXTPAGE, char
 	fontSize := C.FPDFText_GetFontSize(textPage, C.int(charIndex))
 
 	return &responses.FontInformation{
-		Size: float64(fontSize),
+		Size:         float64(fontSize),
+		RenderedSize: float64(fontSize),
 	}
 }

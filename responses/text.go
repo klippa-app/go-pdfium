@@ -13,11 +13,12 @@ type CharPosition struct {
 }
 
 type FontInformation struct {
-	Size         float64 // Font size in points (also known as em).
-	SizeInPixels *int    // Font size in pixels, only available when PixelPositions is used.
-	Weight       int     // The weight of the font, can be negative for spaces and newlines. Will only be filled when compiled with experimental support.
-	Name         string  // The name of the font, can be empty for spaces and newlines. Will only be filled when compiled with experimental support.
-	Flags        int     // Font flags, should be interpreted per PDF spec 1.7, Section 5.7.1 Font Descriptor Flags. Will only be filled when compiled with experimental support.
+	Size         float64  // Font size in points (also known as em).
+	RenderedSize float64  // The effective rendered size: fontSize * sqrt(C² + D²) where C,D come from the text transformation matrix (FPDFText_GetMatrix). Falls back to Size when experimental support is not available.
+	SizeInPixels *int     // Font size in pixels, only available when PixelPositions is used.
+	Weight       int      // The weight of the font, can be negative for spaces and newlines. Will only be filled when compiled with experimental support.
+	Name         string   // The name of the font, can be empty for spaces and newlines. Will only be filled when compiled with experimental support.
+	Flags        int      // Font flags, should be interpreted per PDF spec 1.7, Section 5.7.1 Font Descriptor Flags. Will only be filled when compiled with experimental support.
 }
 
 type GetPageTextStructuredChar struct {

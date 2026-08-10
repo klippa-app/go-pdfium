@@ -36,6 +36,35 @@ func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalo
 	}, nil
 }
 
+// FPDFCatalog_GetLanguage gets the language of a document from the catalog's /Lang entry.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFCatalog_GetLanguage(request *requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	documentHandle, err := p.getDocumentHandle(request.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	langLength := C.FPDFCatalog_GetLanguage(documentHandle.handle, nil, 0)
+	if langLength == 0 {
+		return nil, errors.New("could not get language")
+	}
+
+	charData := make([]byte, langLength)
+	C.FPDFCatalog_GetLanguage(documentHandle.handle, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFCatalog_GetLanguage{
+		Language: transformedText,
+	}, nil
+}
+
 // FPDFCatalog_SetLanguage sets the language of a document.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCatalog_SetLanguage) (*responses.FPDFCatalog_SetLanguage, error) {
@@ -47,10 +76,12 @@ func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCat
 		return nil, err
 	}
 
-	languageStr := C.CString(request.Language)
-	defer C.free(unsafe.Pointer(languageStr))
+	transformedText, err := p.transformUTF8ToUTF16LE(request.Language)
+	if err != nil {
+		return nil, err
+	}
 
-	success := C.FPDFCatalog_SetLanguage(documentHandle.handle, languageStr)
+	success := C.FPDFCatalog_SetLanguage(documentHandle.handle, (C.FPDF_WIDESTRING)(unsafe.Pointer(&transformedText[0])))
 	if int(success) == 0 {
 		return nil, errors.New("could not set language")
 	}

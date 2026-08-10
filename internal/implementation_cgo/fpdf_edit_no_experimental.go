@@ -115,6 +115,14 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamIntValue(request *request
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFPageObjMark_GetParamFloatValue returns the value of a number property in a content mark by key as float.
+// FPDFPageObjMark_GetParamValueType() should have returned FPDF_OBJECT_NUMBER
+// for this property.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_GetParamFloatValue(request *requests.FPDFPageObjMark_GetParamFloatValue) (*responses.FPDFPageObjMark_GetParamFloatValue, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFPageObjMark_GetParamStringValue returns the value of a string property in a content mark by key.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObjMark_GetParamStringValue(request *requests.FPDFPageObjMark_GetParamStringValue) (*responses.FPDFPageObjMark_GetParamStringValue, error) {
@@ -132,6 +140,14 @@ func (p *PdfiumImplementation) FPDFPageObjMark_GetParamBlobValue(request *reques
 // a new parameter.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFPageObjMark_SetIntParam(request *requests.FPDFPageObjMark_SetIntParam) (*responses.FPDFPageObjMark_SetIntParam, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFPageObjMark_SetFloatParam sets the value of a float property in a content mark by key. If a parameter
+// with the given key exists, its value is set to the given value. Otherwise, it is added as
+// a new parameter.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.FPDFPageObjMark_SetFloatParam) (*responses.FPDFPageObjMark_SetFloatParam, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
@@ -396,5 +412,23 @@ func (p *PdfiumImplementation) FPDFPage_InsertObjectAtIndex(request *requests.FP
 // removed page_object to free it.
 // Experimental API.
 func (p *PdfiumImplementation) FPDFFormObj_RemoveObject(request *requests.FPDFFormObj_RemoveObject) (*responses.FPDFFormObj_RemoveObject, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFPageObj_AddExistingMark adds an existing content mark to a page object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_AddExistingMark(request *requests.FPDFPageObj_AddExistingMark) (*responses.FPDFPageObj_AddExistingMark, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFText_SetPositions sets the character positions for a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFText_SetPositions(request *requests.FPDFText_SetPositions) (*responses.FPDFText_SetPositions, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FPDFTextObj_SetFontSize sets the font size of a text object.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }

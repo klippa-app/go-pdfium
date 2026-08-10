@@ -69,7 +69,7 @@ var _ = Describe("text", func() {
 							CollectFontInformation: true,
 						})
 						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_7019.json")...))
+						Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_7776.json")...))
 					})
 
 					Context("and PixelPositions is enabled", func() {
@@ -89,7 +89,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions_7019.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions_7776.json")...))
 						})
 					})
 				})

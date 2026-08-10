@@ -56,6 +56,12 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				Expect(FPDF_StructElement_GetObjType).To(BeNil())
 			})
 
+			It("returns an error when calling FPDF_StructElement_GetExpansion", func() {
+				FPDF_StructElement_GetExpansion, err := PdfiumInstance.FPDF_StructElement_GetExpansion(&requests.FPDF_StructElement_GetExpansion{})
+				Expect(err).To(MatchError("structElement not given"))
+				Expect(FPDF_StructElement_GetExpansion).To(BeNil())
+			})
+
 			It("returns an error when calling FPDF_StructElement_GetParent", func() {
 				FPDF_StructElement_GetParent, err := PdfiumInstance.FPDF_StructElement_GetParent(&requests.FPDF_StructElement_GetParent{})
 				Expect(err).To(MatchError("structElement not given"))
@@ -1299,5 +1305,79 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				})
 			})
 		}
+	})
+
+	Context("a tagged PDF file with expansion data", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_expansion.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("is opened", func() {
+			It("returns the expansion for a struct element", func() {
+				FPDF_StructTree_GetForPage, err := PdfiumInstance.FPDF_StructTree_GetForPage(&requests.FPDF_StructTree_GetForPage{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_StructTree_GetForPage).To(Not(BeNil()))
+
+				defer PdfiumInstance.FPDF_StructTree_Close(&requests.FPDF_StructTree_Close{
+					StructTree: FPDF_StructTree_GetForPage.StructTree,
+				})
+
+				// Get the root element (Document, no /E attribute).
+				FPDF_StructTree_GetChildAtIndex, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+					StructTree: FPDF_StructTree_GetForPage.StructTree,
+					Index:      0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_StructTree_GetChildAtIndex).To(Not(BeNil()))
+
+				// The Document element has no /E attribute.
+				FPDF_StructElement_GetExpansion, err := PdfiumInstance.FPDF_StructElement_GetExpansion(&requests.FPDF_StructElement_GetExpansion{
+					StructElement: FPDF_StructTree_GetChildAtIndex.StructElement,
+				})
+				Expect(err).To(MatchError("could not get expansion"))
+				Expect(FPDF_StructElement_GetExpansion).To(BeNil())
+
+				// Get the Span child element (has /E set to "Expansion").
+				FPDF_StructElement_GetChildAtIndex, err := PdfiumInstance.FPDF_StructElement_GetChildAtIndex(&requests.FPDF_StructElement_GetChildAtIndex{
+					StructElement: FPDF_StructTree_GetChildAtIndex.StructElement,
+					Index:         0,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_StructElement_GetChildAtIndex).To(Not(BeNil()))
+
+				FPDF_StructElement_GetExpansion, err = PdfiumInstance.FPDF_StructElement_GetExpansion(&requests.FPDF_StructElement_GetExpansion{
+					StructElement: FPDF_StructElement_GetChildAtIndex.StructElement,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDF_StructElement_GetExpansion).To(Equal(&responses.FPDF_StructElement_GetExpansion{
+					Expansion: "Expansion",
+				}))
+			})
+		})
 	})
 })
