@@ -18,7 +18,16 @@ import (
 // its own process, so it has to be compiled with the same build tags as this
 // test binary, see workerBuildTags.
 func workerArgs() []string {
-	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
+	// MacOS removes the DYLD_ variables from the environment when it starts a
+	// new process, so the worker has to be told again where PDFium lives. We
+	// pass on the value of this process when it has one, so that a PDFium in
+	// another location than the one the CI uses also works.
+	libraryPath := os.Getenv("DYLD_LIBRARY_PATH")
+	if libraryPath == "" {
+		libraryPath = "/opt/pdfium/lib"
+	}
+
+	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=" + libraryPath}
 	args = append(args, workerBuildTags...)
 
 	return append(args, "../examples/multi_threaded/worker/main.go")

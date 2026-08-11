@@ -531,7 +531,7 @@ var _ = Describe("Render", func() {
 									PointToPixelRatio: 1.3888888888888888,
 									Width:             209,
 									Height:            55,
-								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop")
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_7776")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(209))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(55))
 								renderedPage.Cleanup()
@@ -557,7 +557,7 @@ var _ = Describe("Render", func() {
 									PointToPixelRatio: 4.166666666666667,
 									Width:             625,
 									Height:            166,
-								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300_crop")
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300_crop_7776")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(625))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(166))
 								renderedPage.Cleanup()
@@ -586,7 +586,7 @@ var _ = Describe("Render", func() {
 									PointToPixelRatio: 1.3888888888888888,
 									Width:             278,
 									Height:            55,
-								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_outside_page")
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_outside_page", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_outside_page_7776")
 								renderedPage.Cleanup()
 							})
 						})
@@ -612,7 +612,7 @@ var _ = Describe("Render", func() {
 									PointToPixelRatio: 1.3888888888888888,
 									Width:             167,
 									Height:            69,
-								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_negative")
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_negative", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_negative_7776")
 								renderedPage.Cleanup()
 							})
 						})
@@ -769,7 +769,7 @@ var _ = Describe("Render", func() {
 									PointToPixelRatio: 2.5,
 									Width:             500,
 									Height:            125,
-								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_500x0_crop")
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_500x0_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_500x0_crop_7776")
 								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(500))
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(125))
 								renderedPage.Cleanup()
