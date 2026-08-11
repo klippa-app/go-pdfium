@@ -61,7 +61,6 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export PKG_CONFIG_PATH="/opt/pdfium"
-          export IS_EXPERIMENTAL="1"
           go test -timeout 30m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
@@ -74,14 +73,12 @@ jobs:
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          $env:IS_EXPERIMENTAL = '1'
           go test -timeout 30m $(go list ./... | grep -v webassembly) -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export PKG_CONFIG_PATH="/opt/pdfium"
-          export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_cgo ./internal/implementation_webassembly -coverprofile=coverage.out -covermode=atomic -tags pdfium_experimental -v
       - name: Archive code coverage results
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
@@ -129,13 +126,11 @@ jobs:
       - name: Test all packages - Experimental (non-Windows)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: |
-          export IS_EXPERIMENTAL="1"
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Test all packages - Experimental (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          $env:IS_EXPERIMENTAL = '1'
           go test -timeout 30m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -timeout 30m ./webassembly -tags pdfium_experimental -v
       - name: Archive render results

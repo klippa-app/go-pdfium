@@ -14,18 +14,22 @@ import (
 	"github.com/klippa-app/go-pdfium/shared_tests"
 )
 
+// workerArgs returns the arguments to run the worker with. The worker runs in
+// its own process, so it has to be compiled with the same build tags as this
+// test binary, see workerBuildTags.
+func workerArgs() []string {
+	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
+	args = append(args, workerBuildTags...)
+
+	return append(args, "../examples/multi_threaded/worker/main.go")
+}
+
 var _ = BeforeSuite(func() {
 	// Set ENV to ensure resulting values.
 	err := os.Setenv("TZ", "UTC")
 	Expect(err).To(BeNil())
 
-	args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
-	experimental := os.Getenv("IS_EXPERIMENTAL")
-	if experimental == "1" {
-		args = append(args, []string{"-tags", "pdfium_experimental"}...)
-	}
-
-	args = append(args, "../examples/multi_threaded/worker/main.go")
+	args := workerArgs()
 
 	pool := multi_threaded.Init(multi_threaded.Config{
 		MinIdle:  1, // Makes sure that at least x workers are always available
@@ -66,13 +70,7 @@ var _ = Describe("Multi Threaded", func() {
 			var TestPool pdfium.Pool
 
 			BeforeEach(func() {
-				args := []string{"run", "-exec", "env DYLD_LIBRARY_PATH=/opt/pdfium/lib"}
-				experimental := os.Getenv("IS_EXPERIMENTAL")
-				if experimental == "1" {
-					args = append(args, []string{"-tags", "pdfium_experimental"}...)
-				}
-
-				args = append(args, "../examples/multi_threaded/worker/main.go")
+				args := workerArgs()
 
 				pool := multi_threaded.Init(multi_threaded.Config{
 					MinIdle:  1, // Makes sure that at least x workers are always available
