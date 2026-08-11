@@ -22,6 +22,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/internal/image/image_jpeg"
+	"github.com/klippa-app/go-pdfium/internal/renderutil"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -85,12 +86,123 @@ func (p *PdfiumImplementation) GetPageSizeInPixels(request *requests.GetPageSize
 		return nil, err
 	}
 
+	// When a crop is given we report the size of the region instead of the size
+	// of the full page, using the same rounding that rendering the region uses.
+	if request.Crop != nil {
+		crop, err := renderutil.CalculateCrop(*request.Crop, pointToPixelRatio)
+		if err != nil {
+			return nil, err
+		}
+
+		widthInPixels = crop.Width
+		heightInPixels = crop.Height
+	}
+
 	return &responses.GetPageSizeInPixels{
 		Page:              index,
 		Width:             widthInPixels,
 		Height:            heightInPixels,
 		PointToPixelRatio: pointToPixelRatio,
 	}, nil
+}
+
+// applyCrop changes a render page to render only the given region instead of
+// the full page. We still render the full page at the same scale, but we
+// position it so that only the region lands inside the bitmap. PDFium clips the
+// render to the bitmap, which leaves us with just the region.
+func (p *PdfiumImplementation) applyCrop(pageToRender *renderPage, crop requests.RenderPageCrop, scale float64) error {
+	_, widthInPoints, heightInPoints, err := p.getPageSize(pageToRender.Page)
+	if err != nil {
+		return err
+	}
+
+	calculatedCrop, err := renderutil.CalculateCrop(crop, scale)
+	if err != nil {
+		return err
+	}
+
+	renderWidth, renderHeight, err := renderutil.RenderSize(widthInPoints, heightInPoints, scale)
+	if err != nil {
+		return err
+	}
+
+	pageToRender.Width = calculatedCrop.Width
+	pageToRender.Height = calculatedCrop.Height
+	pageToRender.Crop = &renderCrop{
+		RenderWidth:  renderWidth,
+		RenderHeight: renderHeight,
+		OffsetX:      calculatedCrop.OffsetX,
+		OffsetY:      calculatedCrop.OffsetY,
+	}
+
+	return nil
+}
+
+// buildRenderPageInDPI builds the render page for a DPI based render.
+func (p *PdfiumImplementation) buildRenderPageInDPI(request *requests.RenderPageInDPI) (int, *renderPage, error) {
+	index, widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Page, request.DPI)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	pageToRender := &renderPage{
+		Page:              request.Page,
+		Width:             widthInPixels,
+		Height:            heightInPixels,
+		PointToPixelRatio: pointToPixelRatio,
+		Flags:             request.RenderFlags,
+		RenderForm:        request.RenderForm,
+		Document:          request.Document,
+	}
+
+	if request.Crop != nil {
+		if err := p.applyCrop(pageToRender, *request.Crop, pointToPixelRatio); err != nil {
+			return 0, nil, err
+		}
+	}
+
+	return index, pageToRender, nil
+}
+
+// buildRenderPageInPixels builds the render page for a render with a maximum
+// width and/or height. When a crop is given, those maximums apply to the region
+// instead of to the full page.
+func (p *PdfiumImplementation) buildRenderPageInPixels(request *requests.RenderPageInPixels) (int, *renderPage, error) {
+	index, widthInPoints, heightInPoints, err := p.getPageSize(request.Page)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if request.Crop != nil {
+		// The scale is calculated from the size of the region, so the region
+		// has to be valid before we can use it.
+		if err := renderutil.ValidateCrop(*request.Crop); err != nil {
+			return 0, nil, err
+		}
+
+		widthInPoints = request.Crop.Width
+		heightInPoints = request.Crop.Height
+	}
+
+	width, height, ratio := renderutil.CalculateImageSize(widthInPoints, heightInPoints, request.Width, request.Height)
+
+	pageToRender := &renderPage{
+		Page:              request.Page,
+		Width:             width,
+		Height:            height,
+		PointToPixelRatio: ratio,
+		Flags:             request.RenderFlags,
+		RenderForm:        request.RenderForm,
+		Document:          request.Document,
+	}
+
+	if request.Crop != nil {
+		if err := p.applyCrop(pageToRender, *request.Crop, ratio); err != nil {
+			return 0, nil, err
+		}
+	}
+
+	return index, pageToRender, nil
 }
 
 // RenderPageInDPI renders a specific page in a specific dpi, the result is an image.
@@ -102,23 +214,13 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 		return nil, errors.New("no DPI given")
 	}
 
-	index, widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Page, request.DPI)
+	index, pageToRender, err := p.buildRenderPageInDPI(request)
 	if err != nil {
 		return nil, err
 	}
 
 	// Render a single page.
-	result, err := p.renderPages([]renderPage{
-		{
-			Page:              request.Page,
-			Width:             widthInPixels,
-			Height:            heightInPixels,
-			PointToPixelRatio: pointToPixelRatio,
-			Flags:             request.RenderFlags,
-			RenderForm:        request.RenderForm,
-			Document:          request.Document,
-		},
-	}, 0)
+	result, err := p.renderPages([]renderPage{*pageToRender}, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -127,9 +229,10 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
-			PointToPixelRatio: pointToPixelRatio,
-			Width:             widthInPixels,
-			Height:            heightInPixels,
+			PointToPixelRatio: pageToRender.PointToPixelRatio,
+			Width:             pageToRender.Width,
+			Height:            pageToRender.Height,
+			HasTransparency:   result.Pages[0].HasTransparency,
 		},
 	}, nil
 }
@@ -149,20 +252,16 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			return nil, fmt.Errorf("no DPI given for requested page %d", i)
 		}
 
-		_, widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Pages[i].Page, request.Pages[i].DPI)
+		if len(request.Pages) > 1 && request.Pages[i].Crop != nil {
+			return nil, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
+		}
+
+		_, pageToRender, err := p.buildRenderPageInDPI(&request.Pages[i])
 		if err != nil {
 			return nil, err
 		}
 
-		pages[i] = renderPage{
-			Page:              request.Pages[i].Page,
-			Width:             widthInPixels,
-			Height:            heightInPixels,
-			PointToPixelRatio: pointToPixelRatio,
-			Flags:             request.Pages[i].RenderFlags,
-			RenderForm:        request.Pages[i].RenderForm,
-			Document:          request.Pages[i].Document,
-		}
+		pages[i] = *pageToRender
 	}
 
 	result, err := p.renderPages(pages, request.Padding)
@@ -175,40 +274,17 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 	}, nil
 }
 
+// calculateRenderImageSize calculates the pixel size of a page when it has to
+// fit inside the given maximum width and/or height.
 func (p *PdfiumImplementation) calculateRenderImageSize(page requests.Page, width, height int) (int, int, int, float64, error) {
 	index, widthInPoints, heightInPoints, err := p.getPageSize(page)
 	if err != nil {
 		return 0, 0, 0, 0, err
 	}
 
-	targetWidth := float64(width)
-	targetHeight := float64(height)
-	ratio := float64(0)
-	if height == 0 {
-		// Height not set, add ratio to height.
-		ratio = heightInPoints / widthInPoints
-		targetHeight = targetWidth * ratio
-	} else if width == 0 {
-		// Width not set, add ratio to width.
-		ratio = widthInPoints / heightInPoints
-		targetWidth = targetHeight * ratio
-	} else {
-		// Both values set, automatically pick the correct ratio.
-		ratio = heightInPoints / widthInPoints
-		if (targetWidth * ratio) < float64(height) {
-			targetHeight = targetWidth * ratio
-		} else {
-			ratio = widthInPoints / heightInPoints
-			if (targetHeight * ratio) < float64(width) {
-				targetWidth = targetHeight * ratio
-			}
-		}
-	}
+	width, height, ratio := renderutil.CalculateImageSize(widthInPoints, heightInPoints, width, height)
 
-	width = int(math.Ceil(targetWidth))
-	height = int(math.Ceil(targetHeight))
-
-	return index, width, height, targetWidth / widthInPoints, nil
+	return index, width, height, ratio, nil
 }
 
 // RenderPageInPixels renders a specific page in a specific pixel size, the result is an image.
@@ -222,23 +298,13 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 		return nil, errors.New("no width or height given")
 	}
 
-	index, width, height, ratio, err := p.calculateRenderImageSize(request.Page, request.Width, request.Height)
+	index, pageToRender, err := p.buildRenderPageInPixels(request)
 	if err != nil {
 		return nil, err
 	}
 
 	// Render a single page.
-	result, err := p.renderPages([]renderPage{
-		{
-			Page:              request.Page,
-			Width:             width,
-			Height:            height,
-			PointToPixelRatio: ratio,
-			Flags:             request.RenderFlags,
-			RenderForm:        request.RenderForm,
-			Document:          request.Document,
-		},
-	}, 0)
+	result, err := p.renderPages([]renderPage{*pageToRender}, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -247,9 +313,10 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
-			PointToPixelRatio: ratio,
-			Width:             width,
-			Height:            height,
+			PointToPixelRatio: pageToRender.PointToPixelRatio,
+			Width:             pageToRender.Width,
+			Height:            pageToRender.Height,
+			HasTransparency:   result.Pages[0].HasTransparency,
 		},
 	}, nil
 }
@@ -271,20 +338,16 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			return nil, fmt.Errorf("no width or height given for requested page %d", i)
 		}
 
-		_, width, height, ratio, err := p.calculateRenderImageSize(request.Pages[i].Page, request.Pages[i].Width, request.Pages[i].Height)
+		if len(request.Pages) > 1 && request.Pages[i].Crop != nil {
+			return nil, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
+		}
+
+		_, pageToRender, err := p.buildRenderPageInPixels(&request.Pages[i])
 		if err != nil {
 			return nil, err
 		}
 
-		pages[i] = renderPage{
-			Page:              request.Pages[i].Page,
-			Width:             width,
-			Height:            height,
-			PointToPixelRatio: ratio,
-			Flags:             request.Pages[i].RenderFlags,
-			RenderForm:        request.Pages[i].RenderForm,
-			Document:          request.Pages[i].Document,
-		}
+		pages[i] = *pageToRender
 	}
 
 	result, err := p.renderPages(pages, request.Padding)
@@ -300,11 +363,22 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 type renderPage struct {
 	Page              requests.Page
 	Flags             enums.FPDF_RENDER_FLAG
-	Width             int
-	Height            int
+	Width             int // The width of this page in the bitmap, the width of the region when cropping.
+	Height            int // The height of this page in the bitmap, the height of the region when cropping.
 	PointToPixelRatio float64
 	RenderForm        bool
 	Document          *references.FPDF_DOCUMENT
+	Crop              *renderCrop // When given, only the region is rendered instead of the full page.
+}
+
+// renderCrop contains the values that are needed to render only a region of a
+// page. We render the full page at the render scale, but positioned so that
+// only the region lands inside the bitmap.
+type renderCrop struct {
+	RenderWidth  int // The width of the full page at the render scale.
+	RenderHeight int // The height of the full page at the render scale.
+	OffsetX      int // The X offset of the region inside the full page render.
+	OffsetY      int // The Y offset of the region inside the full page render.
 }
 
 // renderPages renders a list of pages, the result is an image.
@@ -326,11 +400,22 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		}
 	}
 
+	if totalWidth < 1 || totalHeight < 1 {
+		return nil, errors.New("could not render an empty image")
+	}
+
 	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
 
 	// Create a device independent bitmap to the external buffer by passing a
 	// pointer to the first pixel, PDFium will do the rest.
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+
+	// PDFium returns a null bitmap when it could not create it, which in
+	// practice means that the image is too large to render in one go. Rendering
+	// into a null bitmap would silently give us an empty image.
+	if bitmap == nil {
+		return nil, errors.New("could not create a bitmap to render into, the image to render is most likely too large")
+	}
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
@@ -343,7 +428,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm)
+		index, hasTransparency, err := p.renderPage(bitmap, pages[i], currentOffset)
 		if err != nil {
 			return nil, err
 		}
@@ -365,11 +450,15 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *references.FPDF_DOCUMENT, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG, renderForm bool) (int, bool, error) {
-	pageHandle, err := p.loadPage(page)
+func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, pageToRender renderPage, offset int) (int, bool, error) {
+	pageHandle, err := p.loadPage(pageToRender.Page)
 	if err != nil {
 		return 0, false, err
 	}
+
+	width := pageToRender.Width
+	height := pageToRender.Height
+	flags := pageToRender.Flags
 
 	alpha := C.FPDFPage_HasTransparency(pageHandle.handle)
 
@@ -384,16 +473,37 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *refere
 		fillColor = uint64(0x00000000)
 	}
 
-	// Fill the page rect with the specified color.
+	// Fill the area of the bitmap that belongs to this page with the specified
+	// color. This is always the area of the page in the bitmap, also when
+	// cropping, so that the part of a region that falls outside of the page
+	// keeps the background color.
 	C.FPDFBitmap_FillRect(bitmap, 0, C.int(offset), C.int(width), C.int(height), C.ulong(fillColor))
+
+	// By default we render the full page onto the area of the bitmap that
+	// belongs to this page.
+	startX := 0
+	startY := offset
+	sizeX := width
+	sizeY := height
+
+	// When cropping we render the full page at the same scale, but we move it
+	// (partly) outside of the bitmap. PDFium clips the render to the bitmap,
+	// which leaves us with just the region that we want.
+	if pageToRender.Crop != nil {
+		startX = -pageToRender.Crop.OffsetX
+		startY = offset - pageToRender.Crop.OffsetY
+		sizeX = pageToRender.Crop.RenderWidth
+		sizeY = pageToRender.Crop.RenderHeight
+	}
 
 	// Render the bitmap into the given external bitmap, write the bytes
 	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, C.int(startX), C.int(startY), C.int(sizeX), C.int(sizeY), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
 
-	if renderForm {
-		if document == nil && page.ByIndex != nil {
-			document = &page.ByIndex.Document
+	if pageToRender.RenderForm {
+		document := pageToRender.Document
+		if document == nil && pageToRender.Page.ByIndex != nil {
+			document = &pageToRender.Page.ByIndex.Document
 		}
 		if document == nil {
 			return 0, false, errors.New("document is required when rendering forms")
@@ -411,7 +521,10 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *refere
 			return 0, false, errors.New("could not init form fill environment")
 		}
 
-		C.FPDF_FFLDraw(formFillEnvironment, bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+		// The form has to be drawn with the exact same position and size as the
+		// page render, otherwise the form fields end up somewhere else than the
+		// content of the page when cropping.
+		C.FPDF_FFLDraw(formFillEnvironment, bitmap, pageHandle.handle, C.int(startX), C.int(startY), C.int(sizeX), C.int(sizeY), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
 		C.FPDFDOC_ExitFormFillEnvironment(formFillEnvironment)
 	}
 

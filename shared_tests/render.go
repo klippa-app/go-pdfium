@@ -357,6 +357,29 @@ var _ = Describe("Render", func() {
 							}))
 						})
 					})
+
+					// This has to give the same size as actually rendering the
+					// region does, so that a caller can size its buffers up front.
+					Context("with a crop", func() {
+						It("returns the size of the region instead of the size of the page", func() {
+							pageSize, err := PdfiumInstance.GetPageSizeInPixels(&requests.GetPageSizeInPixels{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								DPI:  100,
+								Crop: &requests.RenderPageCrop{X: 60, Y: 40, Width: 150, Height: 40},
+							})
+							Expect(err).To(BeNil())
+							Expect(pageSize).To(Equal(&responses.GetPageSizeInPixels{
+								Width:             209,
+								Height:            55,
+								PointToPixelRatio: 1.3888888888888888,
+							}))
+						})
+					})
 				})
 			})
 
@@ -377,6 +400,30 @@ var _ = Describe("Render", func() {
 							Expect(renderedPage).To(BeNil())
 						})
 					})
+
+					// PDFium runs in a 32 bit environment in the WebAssembly
+					// implementation, so a bitmap can never be bigger than what a
+					// 32 bit integer can address. This has to give a clear error,
+					// because the size of the bitmap wraps around when we read the
+					// buffer back, which used to leave us with a far too small
+					// view of it and a panic further down the line.
+					if TestType == "webassembly" {
+						Context("with a DPI that is too large to render", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 4000,
+								})
+								Expect(err).To(MatchError("the image to render is too large"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+					}
 
 					Context("width DPI 100", func() {
 						It("returns the right image, point to pixel ratio and resolution", func() {
@@ -426,6 +473,243 @@ var _ = Describe("Render", func() {
 							renderedPage.Cleanup()
 						})
 					})
+
+					Context("with a crop", func() {
+						Context("with no width or height", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  100,
+									Crop: &requests.RenderPageCrop{X: 100, Y: 200, Width: 0, Height: 120},
+								})
+								Expect(err).To(MatchError("crop width and height must be larger than 0"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+
+						Context("that is smaller than a pixel", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  1,
+									Crop: &requests.RenderPageCrop{X: 0, Y: 0, Width: 0.1, Height: 0.1},
+								})
+								Expect(err).To(MatchError("crop is too small to render"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+
+						// The content of the test PDF is a header in the top left
+						// corner of the page, so all of these regions are picked
+						// to actually contain some of it.
+						Context("with DPI 100", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  100,
+									Crop: &requests.RenderPageCrop{X: 60, Y: 40, Width: 150, Height: 40},
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								expectImageHasContent(renderedPage.Result.Image)
+								compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+									PointToPixelRatio: 1.3888888888888888,
+									Width:             209,
+									Height:            55,
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_7776")
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(209))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(55))
+								renderedPage.Cleanup()
+							})
+						})
+
+						Context("with DPI 300", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  300,
+									Crop: &requests.RenderPageCrop{X: 60, Y: 40, Width: 150, Height: 40},
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								expectImageHasContent(renderedPage.Result.Image)
+								compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+									PointToPixelRatio: 4.166666666666667,
+									Width:             625,
+									Height:            166,
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_300_crop_7776")
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(625))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(166))
+								renderedPage.Cleanup()
+							})
+						})
+
+						// This region covers the "Page 1 of 1" text on the right
+						// of the header and then runs past the right edge of the
+						// page, so it has both content and background in it.
+						Context("that runs past the edge of the page", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  100,
+									Crop: &requests.RenderPageCrop{X: 450, Y: 40, Width: 200, Height: 40},
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								expectImageHasContent(renderedPage.Result.Image)
+								compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+									PointToPixelRatio: 1.3888888888888888,
+									Width:             278,
+									Height:            55,
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_outside_page", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_outside_page_7776")
+								renderedPage.Cleanup()
+							})
+						})
+
+						// This region starts to the left of the page and runs into
+						// the start of the header text.
+						Context("that starts before the top left of the page", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI:  100,
+									Crop: &requests.RenderPageCrop{X: -20, Y: 35, Width: 120, Height: 50},
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								expectImageHasContent(renderedPage.Result.Image)
+								compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+									PointToPixelRatio: 1.3888888888888888,
+									Width:             167,
+									Height:            69,
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_negative", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_crop_negative_7776")
+								renderedPage.Cleanup()
+							})
+						})
+
+						// Rendering a page as tiles has to give exactly the same
+						// pixels as rendering the whole page in one go, otherwise
+						// the tiles do not line up when they are put back together.
+						It("gives the same pixels as the matching region of a full page render", func() {
+							pageSize, err := PdfiumInstance.GetPageSize(&requests.GetPageSize{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+							})
+							Expect(err).To(BeNil())
+
+							fullPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								DPI: 100,
+							})
+							Expect(err).To(BeNil())
+							defer fullPage.Cleanup()
+
+							halfWidth := pageSize.Width / 2
+							halfHeight := pageSize.Height / 2
+
+							// Render the page as four tiles and put them back
+							// together into one image.
+							tiles := [2][2]*responses.RenderPage{}
+							for column, x := range []float64{0, halfWidth} {
+								for row, y := range []float64{0, halfHeight} {
+									tile, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
+										DPI: 100,
+										Crop: &requests.RenderPageCrop{
+											X:      x,
+											Y:      y,
+											Width:  halfWidth,
+											Height: halfHeight,
+										},
+									})
+									Expect(err).To(BeNil())
+									defer tile.Cleanup()
+
+									tiles[column][row] = &tile.Result
+								}
+							}
+
+							// Neighbouring tiles have to have matching sizes,
+							// otherwise they can not be put back together at all.
+							Expect(tiles[0][0].Width).To(Equal(tiles[0][1].Width))
+							Expect(tiles[1][0].Width).To(Equal(tiles[1][1].Width))
+							Expect(tiles[0][0].Height).To(Equal(tiles[1][0].Height))
+							Expect(tiles[0][1].Height).To(Equal(tiles[1][1].Height))
+
+							mosaicWidth := tiles[0][0].Width + tiles[1][0].Width
+							mosaicHeight := tiles[0][0].Height + tiles[0][1].Height
+
+							// The tiles cover the page itself, while a full page
+							// render rounds its size up to whole pixels, so the
+							// mosaic can be up to one pixel smaller in each
+							// direction. It can never be larger.
+							Expect(mosaicWidth).To(BeNumerically("<=", fullPage.Result.Width))
+							Expect(mosaicWidth).To(BeNumerically(">=", fullPage.Result.Width-1))
+							Expect(mosaicHeight).To(BeNumerically("<=", fullPage.Result.Height))
+							Expect(mosaicHeight).To(BeNumerically(">=", fullPage.Result.Height-1))
+
+							mosaic := image.NewRGBA(image.Rect(0, 0, mosaicWidth, mosaicHeight))
+							copyTileIntoMosaic(mosaic, tiles[0][0].Image, 0, 0)
+							copyTileIntoMosaic(mosaic, tiles[0][1].Image, 0, tiles[0][0].Height)
+							copyTileIntoMosaic(mosaic, tiles[1][0].Image, tiles[0][0].Width, 0)
+							copyTileIntoMosaic(mosaic, tiles[1][1].Image, tiles[0][0].Width, tiles[0][0].Height)
+
+							// Every row of the mosaic has to be identical to the
+							// same row of the full page render. Comparing row by
+							// row keeps the failure readable and skips the padding
+							// that the full render rounded up to.
+							fullImage := fullPage.Result.Image
+							for y := 0; y < mosaicHeight; y++ {
+								mosaicRow := mosaic.Pix[y*mosaic.Stride : y*mosaic.Stride+mosaicWidth*4]
+								fullRow := fullImage.Pix[y*fullImage.Stride : y*fullImage.Stride+mosaicWidth*4]
+								Expect(mosaicRow).To(Equal(fullRow), "row %d of the tiled render is different from the full page render", y)
+							}
+						})
+					})
 				})
 
 				Context("in pixels", func() {
@@ -442,6 +726,54 @@ var _ = Describe("Render", func() {
 							})
 							Expect(err).To(MatchError("no width or height given"))
 							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with a crop", func() {
+						Context("with no width or height", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInPixels(&requests.RenderPageInPixels{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width: 500,
+									Crop:  &requests.RenderPageCrop{X: 100, Y: 100, Width: 200, Height: 0},
+								})
+								Expect(err).To(MatchError("crop width and height must be larger than 0"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+
+						// The maximum width applies to the region and not to the
+						// full page, so this gives a region of exactly 500 pixels
+						// wide instead of a 500 pixel wide page.
+						Context("with only the width given", func() {
+							It("returns the right image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInPixels(&requests.RenderPageInPixels{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width: 500,
+									Crop:  &requests.RenderPageCrop{X: 60, Y: 40, Width: 200, Height: 50},
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								expectImageHasContent(renderedPage.Result.Image)
+								compareRenderHash(&renderedPage.Result, Or(Equal(&responses.RenderPage{
+									PointToPixelRatio: 2.5,
+									Width:             500,
+									Height:            125,
+								})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_500x0_crop", TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_500x0_crop_7776")
+								Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(500))
+								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(125))
+								renderedPage.Cleanup()
+							})
 						})
 					})
 
@@ -640,6 +972,38 @@ var _ = Describe("Render", func() {
 								},
 							})
 							Expect(err).To(MatchError("no DPI given for requested page 0"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("with a crop", func() {
+						It("returns an error", func() {
+							renderedPage, err := PdfiumInstance.RenderPagesInDPI(&requests.RenderPagesInDPI{
+								Pages: []requests.RenderPageInDPI{
+									{
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
+										DPI: 100,
+									},
+									{
+
+										Page: requests.Page{
+											ByIndex: &requests.PageByIndex{
+												Document: doc,
+												Index:    0,
+											},
+										},
+										DPI:  100,
+										Crop: &requests.RenderPageCrop{X: 0, Y: 0, Width: 100, Height: 100},
+									},
+								},
+							})
+							Expect(err).To(MatchError("crop is not supported for requested page 1 when rendering multiple pages"))
 							Expect(renderedPage).To(BeNil())
 						})
 					})
@@ -2675,6 +3039,36 @@ var _ = Describe("Render", func() {
 		})
 	})
 })
+
+// expectImageHasContent fails when an image is a single flat color. The content
+// of the test PDF sits in the top left corner of the page, so a crop that is
+// calculated wrongly very easily ends up on an empty part of the page, where a
+// hash comparison would happily keep passing for a completely broken render.
+func expectImageHasContent(renderedImage *image.RGBA) {
+	GinkgoHelper()
+
+	for i := 0; i+4 <= len(renderedImage.Pix); i += 4 {
+		if renderedImage.Pix[i] != renderedImage.Pix[0] ||
+			renderedImage.Pix[i+1] != renderedImage.Pix[1] ||
+			renderedImage.Pix[i+2] != renderedImage.Pix[2] {
+			return
+		}
+	}
+
+	Fail("the rendered image is a single flat color, the crop is most likely on an empty part of the page")
+}
+
+// copyTileIntoMosaic copies the pixels of a rendered tile into a larger image
+// at the given offset. We copy the raw bytes instead of using image/draw so
+// that the comparison against a full page render is on the exact pixels that
+// PDFium produced, without any alpha compositing in between.
+func copyTileIntoMosaic(mosaic *image.RGBA, tile *image.RGBA, offsetX, offsetY int) {
+	for y := 0; y < tile.Bounds().Dy(); y++ {
+		sourceStart := y * tile.Stride
+		targetStart := (offsetY+y)*mosaic.Stride + offsetX*4
+		copy(mosaic.Pix[targetStart:targetStart+tile.Bounds().Dx()*4], tile.Pix[sourceStart:sourceStart+tile.Bounds().Dx()*4])
+	}
+}
 
 func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaMatcher, testNames ...string) {
 	err := writePrerenderedImage(renderedPage.Image, testNames...)

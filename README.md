@@ -438,8 +438,42 @@ Of course there are also some disadvantages:
   close the instance, this could be solved by not re-using instances
 - Some platform specific quirks that have been implemented in PDFium (for example for Windows and MacOS) won't work
   because the WebAssembly build is compiled as Linux
+- There is a hard limit on the size of a render, see below
 
 Please be aware that Wazero comes with the `Apache License 2.0` license.
+
+#### Render size limits (WebAssembly)
+
+PDFium is compiled to 32 bit WebAssembly, which puts a ceiling on how large a single render can be. This limit does not
+exist in the cgo implementation, which is 64 bit.
+
+The bitmap that a render writes into has to be allocated in one block inside the WebAssembly instance, and that
+allocation can not be larger than 2 GB (the maximum of a signed 32 bit integer). A bitmap is always 4 bytes per pixel,
+so the ceiling works out to around 536 megapixels:
+
+| Aspect ratio  | Roughly the largest render |
+|---------------|----------------------------|
+| Square        | 23000 x 23000              |
+| A4 (portrait) | 19400 x 27500              |
+| 16:9          | 30900 x 17400              |
+
+In practice you will hit the limit a bit earlier, because the document, the fonts and the images that PDFium loads share
+the same memory. The instance as a whole is also limited to 4 GB, which is the maximum that Wazero allows for a 32 bit
+WebAssembly module.
+
+A render that does not fit returns an error, it never returns a partial or an empty image:
+
+- `could not create a bitmap to render into, the image to render is most likely too large` when the allocation failed
+- `the image to render is too large` when the size of the bitmap does not fit in a 32 bit integer at all
+
+If you need a higher resolution than this allows, you have a few options:
+
+- Render only the part of the page that you need, by setting `Crop` on the render request. The limit then applies to the
+  region you asked for instead of to the full page, which makes the resolution of that region effectively unbounded. It
+  is also much faster and uses far less memory, because the bitmap only has to hold the region.
+- Render the page in tiles using `Crop` and stitch them together. Regions that share an edge in points also share that
+  edge in pixels, so the tiles fit together without a seam.
+- Use the cgo implementation, which does not have the 32 bit limit.
 
 #### Path handling (WebAssembly)
 
