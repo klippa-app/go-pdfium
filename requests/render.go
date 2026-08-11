@@ -5,12 +5,20 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 )
 
+type RenderImageFormat string // The pixel format of the rendered image.
+
+const (
+	RenderImageFormatRGBA      RenderImageFormat = "rgba"      // Render into an *image.RGBA (the RenderedImage field in the response). This is the default when no format is given.
+	RenderImageFormatGrayscale RenderImageFormat = "grayscale" // Render into an *image.Gray (the RenderedImage field in the response). Implies render flag FPDF_RENDER_FLAG_GRAYSCALE.
+)
+
 type RenderPageInDPI struct {
 	Page        Page
 	DPI         int                       // The DPI to render the page in.
-	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
+	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image, except when ImageFormat is RenderImageFormatGrayscale.
 	RenderForm  bool                      // Whether to render form elements.
 	Document    *references.FPDF_DOCUMENT // The document to render if not passed through the page by index, required when RenderForm is true.
+	ImageFormat RenderImageFormat         // The pixel format to render in, an empty value means RenderImageFormatRGBA. When rendering multiple pages into one image, all pages must have the same ImageFormat.
 }
 
 type RenderPagesInDPI struct {
@@ -22,16 +30,16 @@ type RenderPageInPixels struct {
 	Page        Page
 	Width       int                       // The maximum width of the image.
 	Height      int                       // The maximum height of the image.
-	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
+	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image, except when ImageFormat is RenderImageFormatGrayscale.
 	RenderForm  bool                      // Whether to render form elements.
 	Document    *references.FPDF_DOCUMENT // The document to render if not passed through the page by index, required when RenderForm is true.
+	ImageFormat RenderImageFormat         // The pixel format to render in, an empty value means RenderImageFormatRGBA. When rendering multiple pages into one image, all pages must have the same ImageFormat.
 }
 
 type RenderPagesInPixels struct {
 	Pages   []RenderPageInPixels // The pages
 	Padding int                  // The amount of padding (in pixels) between the images
 }
-
 type RenderToFileOutputFormat string // The file format to render output as.
 
 const (
