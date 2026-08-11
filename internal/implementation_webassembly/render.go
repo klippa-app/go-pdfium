@@ -424,7 +424,17 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		Rect:   rect,
 	}
 
-	size := img.Stride * totalHeight
+	// PDFium runs in a 32 bit environment here, so a bitmap can never be bigger
+	// than what a 32 bit integer can address. We have to check that ourselves
+	// before asking PDFium for the bitmap, because the size wraps around when we
+	// read the buffer back, which would leave us with a much too small view of
+	// the bitmap instead of an error.
+	imageSize := int64(img.Stride) * int64(totalHeight)
+	if imageSize > math.MaxUint32 {
+		return nil, nil, errors.New("the image to render is too large")
+	}
+
+	size := uint32(imageSize)
 
 	res, err := p.Module.ExportedFunction("FPDFBitmap_Create").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(1))
 	if err != nil {
@@ -432,6 +442,12 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	}
 
 	bitmap := res[0]
+
+	// PDFium returns a null bitmap when it could not allocate the buffer, which
+	// in practice means that the image is too large to render in one go.
+	if bitmap == 0 {
+		return nil, nil, errors.New("could not create a bitmap to render into, the image to render is most likely too large")
+	}
 
 	releaseFunc := func() {
 		// Release bitmap resources and buffers.
@@ -467,7 +483,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	}
 
 	// Create a view of the underlying memory, not a copy.
-	data, success := p.Module.Memory().Read(uint32(res[0]), uint32(size))
+	data, success := p.Module.Memory().Read(uint32(res[0]), size)
 	if !success {
 		releaseFunc()
 		return nil, nil, errors.New("could not get bitmap buffer")

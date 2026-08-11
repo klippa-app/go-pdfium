@@ -410,6 +410,13 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	// pointer to the first pixel, PDFium will do the rest.
 	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
 
+	// PDFium returns a null bitmap when it could not create it, which in
+	// practice means that the image is too large to render in one go. Rendering
+	// into a null bitmap would silently give us an empty image.
+	if bitmap == nil {
+		return nil, errors.New("could not create a bitmap to render into, the image to render is most likely too large")
+	}
+
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
 	for i := range pages {

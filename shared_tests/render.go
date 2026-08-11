@@ -401,6 +401,30 @@ var _ = Describe("Render", func() {
 						})
 					})
 
+					// PDFium runs in a 32 bit environment in the WebAssembly
+					// implementation, so a bitmap can never be bigger than what a
+					// 32 bit integer can address. This has to give a clear error,
+					// because the size of the bitmap wraps around when we read the
+					// buffer back, which used to leave us with a far too small
+					// view of it and a panic further down the line.
+					if TestType == "webassembly" {
+						Context("with a DPI that is too large to render", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									DPI: 4000,
+								})
+								Expect(err).To(MatchError("the image to render is too large"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+					}
+
 					Context("width DPI 100", func() {
 						It("returns the right image, point to pixel ratio and resolution", func() {
 							renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
