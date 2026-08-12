@@ -112,7 +112,7 @@ func Compress(img *Image, params CompressParams) ([]byte, error) {
 	return enc, nil
 }
 
-func Encode(w io.Writer, m *image.RGBA, o Options) error {
+func Encode(w io.Writer, m image.Image, o Options) error {
 	imageWriter := bufio.NewWriter(w)
 
 	// Clip quality to [1, 100].
@@ -128,11 +128,32 @@ func Encode(w io.Writer, m *image.RGBA, o Options) error {
 
 	dimensions := m.Bounds().Size()
 
-	raw := Image{
-		Width:  dimensions.X,
-		Height: dimensions.Y,
-		Stride: m.Stride,
-		Pixels: m.Pix,
+	var raw Image
+	var pixelFormat PixelFormat
+	var sampling Sampling
+	switch img := m.(type) {
+	case *image.RGBA:
+		raw = Image{
+			Width:  dimensions.X,
+			Height: dimensions.Y,
+			Stride: img.Stride,
+			Pixels: img.Pix,
+		}
+		pixelFormat = PixelFormatRGBA
+		sampling = Sampling420
+	case *image.Gray:
+		raw = Image{
+			Width:  dimensions.X,
+			Height: dimensions.Y,
+			Stride: img.Stride,
+			Pixels: img.Pix,
+		}
+		pixelFormat = PixelFormatGRAY
+		sampling = SamplingGray
+	default:
+		// Fall back to the Go standard library encoder for image types
+		// that turbojpeg can't encode directly from their pixel buffer.
+		return jpeg.Encode(w, m, o.Options)
 	}
 
 	flags := Flags(0)
@@ -140,7 +161,7 @@ func Encode(w io.Writer, m *image.RGBA, o Options) error {
 		flags |= FlagProgressive
 	}
 
-	params := MakeCompressParams(PixelFormatRGBA, Sampling420, quality, flags)
+	params := MakeCompressParams(pixelFormat, sampling, quality, flags)
 	jpg, err := Compress(&raw, params)
 	if err != nil {
 		return err

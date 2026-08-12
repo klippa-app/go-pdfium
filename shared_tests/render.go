@@ -398,6 +398,9 @@ var _ = Describe("Render", func() {
 							})), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_7776")
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(827))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(1170))
+							// RenderedImage should contain the same image as Image, also
+							// when transported between processes in multi-threaded mode.
+							Expect(renderedPage.Result.RenderedImage).To(Equal(renderedPage.Result.Image))
 							renderedPage.Cleanup()
 						})
 					})
@@ -598,6 +601,86 @@ var _ = Describe("Render", func() {
 								Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(2829))
 								renderedPage.Cleanup()
 							})
+						})
+					})
+				})
+
+				Context("in grayscale", func() {
+					Context("with an invalid image format", func() {
+						It("returns an error", func() {
+							renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								DPI:         100,
+								ImageFormat: requests.RenderImageFormat("invalid"),
+							})
+							Expect(err).To(MatchError("invalid ImageFormat given"))
+							Expect(renderedPage).To(BeNil())
+						})
+					})
+
+					Context("width DPI 100", func() {
+						It("returns the right grayscale image, point to pixel ratio and resolution", func() {
+							renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								DPI:         100,
+								ImageFormat: requests.RenderImageFormatGrayscale,
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Not(BeNil()))
+							Expect(renderedPage.Result.Image).To(BeNil())
+							// The rendered image should be an *image.Gray, also when
+							// transported between processes in multi-threaded mode.
+							imageGray, isGray := renderedPage.Result.RenderedImage.(*image.Gray)
+							Expect(isGray).To(BeTrue())
+							compareRenderHash(&renderedPage.Result, Equal(&responses.RenderPage{
+								PointToPixelRatio: 1.3888888888888888,
+								Width:             827,
+								Height:            1170,
+							}), TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_grayscale", TestDataPath+"/testdata/render_"+TestType+"_testpdf_dpi_100_grayscale_7776")
+							Expect(imageGray.Bounds().Size().X).To(Equal(827))
+							Expect(imageGray.Bounds().Size().Y).To(Equal(1170))
+							Expect(imageGray.Stride).To(BeNumerically(">=", 827))
+							Expect(len(imageGray.Pix)).To(Equal(imageGray.Stride * 1170))
+							renderedPage.Cleanup()
+						})
+					})
+
+					Context("with only the width given in pixels", func() {
+						It("returns the right grayscale image, point to pixel ratio and resolution", func() {
+							renderedPage, err := PdfiumInstance.RenderPageInPixels(&requests.RenderPageInPixels{
+								Page: requests.Page{
+									ByIndex: &requests.PageByIndex{
+										Document: doc,
+										Index:    0,
+									},
+								},
+								Width:       2000,
+								ImageFormat: requests.RenderImageFormatGrayscale,
+							})
+
+							Expect(err).To(BeNil())
+							Expect(renderedPage).To(Not(BeNil()))
+							Expect(renderedPage.Result.Image).To(BeNil())
+							imageGray, isGray := renderedPage.Result.RenderedImage.(*image.Gray)
+							Expect(isGray).To(BeTrue())
+							compareRenderHash(&renderedPage.Result, Equal(&responses.RenderPage{
+								PointToPixelRatio: 3.3597884547259587,
+								Width:             2000,
+								Height:            2829,
+							}), TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_2000x0_grayscale", TestDataPath+"/testdata/render_"+TestType+"_testpdf_pixels_2000x0_grayscale_7776")
+							Expect(imageGray.Bounds().Size().X).To(Equal(2000))
+							Expect(imageGray.Bounds().Size().Y).To(Equal(2829))
+							renderedPage.Cleanup()
 						})
 					})
 				})
@@ -858,6 +941,96 @@ var _ = Describe("Render", func() {
 							Expect(renderedPage.Result.Image.Bounds().Size().X).To(Equal(2481))
 							Expect(renderedPage.Result.Image.Bounds().Size().Y).To(Equal(7066))
 							renderedPage.Cleanup()
+						})
+					})
+
+					Context("in grayscale", func() {
+						Context("with mixed image formats between pages", func() {
+							It("returns an error", func() {
+								renderedPage, err := PdfiumInstance.RenderPagesInDPI(&requests.RenderPagesInDPI{
+									Pages: []requests.RenderPageInDPI{
+										{
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI:         100,
+											ImageFormat: requests.RenderImageFormatGrayscale,
+										},
+										{
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI: 100,
+										},
+									},
+								})
+								Expect(err).To(MatchError("all pages must have the same ImageFormat when rendering multiple pages into one image"))
+								Expect(renderedPage).To(BeNil())
+							})
+						})
+
+						Context("with DPI 100 and padding between pages", func() {
+							It("returns the right grayscale image, point to pixel ratio and resolution", func() {
+								renderedPage, err := PdfiumInstance.RenderPagesInDPI(&requests.RenderPagesInDPI{
+									Pages: []requests.RenderPageInDPI{
+										{
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI:         100,
+											ImageFormat: requests.RenderImageFormatGrayscale,
+										},
+										{
+											Page: requests.Page{
+												ByIndex: &requests.PageByIndex{
+													Document: doc,
+													Index:    0,
+												},
+											},
+											DPI:         100,
+											ImageFormat: requests.RenderImageFormatGrayscale,
+										},
+									},
+									Padding: 50,
+								})
+								Expect(err).To(BeNil())
+								Expect(renderedPage).To(Not(BeNil()))
+								Expect(renderedPage.Result.Image).To(BeNil())
+								imageGray, isGray := renderedPage.Result.RenderedImage.(*image.Gray)
+								Expect(isGray).To(BeTrue())
+								compareRenderHashForPages(&renderedPage.Result, Equal(&responses.RenderPages{
+									Width:  827,
+									Height: 2390,
+									Pages: []responses.RenderPagesPage{
+										{
+											PointToPixelRatio: 1.3888888888888888,
+											Width:             827,
+											Height:            1170,
+											X:                 0,
+											Y:                 0,
+										},
+										{
+											PointToPixelRatio: 1.3888888888888888,
+											Width:             827,
+											Height:            1170,
+											X:                 0,
+											Y:                 1220,
+										},
+									},
+								}), TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_100_padding_50_grayscale", TestDataPath+"/testdata/render_"+TestType+"_pages_testpdf_dpi_100_padding_50_grayscale_7776")
+								Expect(imageGray.Bounds().Size().X).To(Equal(827))
+								Expect(imageGray.Bounds().Size().Y).To(Equal(2390))
+								renderedPage.Cleanup()
+							})
 						})
 					})
 				})
@@ -1991,6 +2164,116 @@ var _ = Describe("Render", func() {
 						})
 					})
 
+					Context("to png in grayscale", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							request := &requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatPNG,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width:       2000,
+									Height:      2000,
+									ImageFormat: requests.RenderImageFormatGrayscale,
+								},
+							}
+							renderedFile, err := PdfiumInstance.RenderToFile(request)
+
+							Expect(err).To(BeNil())
+							compareFileHash(request, renderedFile, Or(
+								Equal(&responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375608084404265,
+								}),
+								Equal(&responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375607912177905,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375607912177905,
+								}),
+							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale_7776")
+						})
+					})
+
+					Context("to jpeg in grayscale", func() {
+						It("returns the right image, point to pixel ratio and resolution", func() {
+							request := &requests.RenderToFile{
+								OutputTarget: requests.RenderToFileOutputTargetBytes,
+								OutputFormat: requests.RenderToFileOutputFormatJPG,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width:       2000,
+									Height:      2000,
+									ImageFormat: requests.RenderImageFormatGrayscale,
+								},
+							}
+							renderedFile, err := PdfiumInstance.RenderToFile(request)
+
+							Expect(err).To(BeNil())
+							compareFileHash(request, renderedFile, Or(
+								Equal(&responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375608084404265,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375608084404265,
+								}),
+								Equal(&responses.RenderToFile{
+									Pages: []responses.RenderPagesPage{
+										{
+											Page:              0,
+											PointToPixelRatio: 2.375607912177905,
+											Width:             1415,
+											Height:            2000,
+											X:                 0,
+											Y:                 0,
+										},
+									},
+									Width:             1415,
+									Height:            2000,
+									PointToPixelRatio: 2.375607912177905,
+								}),
+							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_jpg_grayscale", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_jpg_grayscale_7776", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_jpg_grayscale_go126", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_jpg_grayscale_7776_go126")
+						})
+					})
+
 					Context("to bytes", func() {
 						It("returns the right image, point to pixel ratio and resolution", func() {
 							request := &requests.RenderToFile{
@@ -2355,6 +2638,64 @@ var _ = Describe("Render", func() {
 		})
 	})
 
+	Context("a PDF file with colored rectangles", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("it is rendered in grayscale", func() {
+			It("converts the colors to the right gray levels", func() {
+				renderedPage, err := PdfiumInstance.RenderPageInDPI(&requests.RenderPageInDPI{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: doc,
+							Index:    0,
+						},
+					},
+					DPI:         72,
+					ImageFormat: requests.RenderImageFormatGrayscale,
+				})
+
+				Expect(err).To(BeNil())
+				Expect(renderedPage.Result.Image).To(BeNil())
+				img, isGray := renderedPage.Result.RenderedImage.(*image.Gray)
+				Expect(isGray).To(BeTrue())
+				Expect(renderedPage.Result.Width).To(Equal(200))
+				Expect(renderedPage.Result.Height).To(Equal(300))
+
+				// The colors should be converted to gray with a proper
+				// luminance formula (ITU-R 601, ~0.30R + 0.59G + 0.11B),
+				// not by just dropping color channels. A small tolerance
+				// is allowed for rounding differences between PDFium versions.
+				Expect(img.GrayAt(95, 135).Y).To(Equal(uint8(255)), "background should be white")
+				Expect(img.GrayAt(30, 135).Y).To(Equal(uint8(0)), "black rectangle should be black")
+				Expect(img.GrayAt(95, 55).Y).To(BeNumerically("~", 28, 3), "blue rectangle should be dark gray")
+				Expect(img.GrayAt(95, 215).Y).To(BeNumerically("~", 76, 3), "red rectangle should be medium dark gray")
+				Expect(img.GrayAt(150, 135).Y).To(BeNumerically("~", 150, 3), "green rectangle should be medium light gray")
+
+				renderedPage.Cleanup()
+			})
+		})
+	})
+
 	// This test is only here to test the closing of an opened page.
 	Context("a multipage PDF file", func() {
 		var doc references.FPDF_DOCUMENT
@@ -2677,10 +3018,19 @@ var _ = Describe("Render", func() {
 })
 
 func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaMatcher, testNames ...string) {
-	err := writePrerenderedImage(renderedPage.Image, testNames...)
+	renderedImage := renderedPage.RenderedImage
+	var renderedPix []uint8
+	switch img := renderedImage.(type) {
+	case *image.RGBA:
+		renderedPix = img.Pix
+	case *image.Gray:
+		renderedPix = img.Pix
+	}
+
+	err := writePrerenderedImage(renderedImage, renderedPix, testNames...)
 	Expect(err).To(BeNil())
 
-	// Copy object so we can skip Image.
+	// Copy object so we can skip the image fields.
 	// For the image we compare the file hash.
 	copiedPage := &responses.RenderPage{
 		Page:              renderedPage.Page,
@@ -2701,7 +3051,7 @@ func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaM
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	err = enc.Encode(renderedPage.Image.Pix)
+	err = enc.Encode(renderedPix)
 	Expect(err).To(BeNil())
 
 	hasher.Write(buf.Bytes())
@@ -2711,10 +3061,19 @@ func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaM
 }
 
 func compareRenderHashForPages(renderedPages *responses.RenderPages, matcher types.GomegaMatcher, testNames ...string) {
-	err := writePrerenderedImage(renderedPages.Image, testNames...)
+	renderedImage := renderedPages.RenderedImage
+	var renderedPix []uint8
+	switch img := renderedImage.(type) {
+	case *image.RGBA:
+		renderedPix = img.Pix
+	case *image.Gray:
+		renderedPix = img.Pix
+	}
+
+	err := writePrerenderedImage(renderedImage, renderedPix, testNames...)
 	Expect(err).To(BeNil())
 
-	// Copy object so we can skip Image.
+	// Copy object so we can skip the image fields.
 	// For the image we compare the file hash.
 	copiedPage := &responses.RenderPages{
 		Pages:  renderedPages.Pages,
@@ -2734,7 +3093,7 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, matcher typ
 
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	err = enc.Encode(renderedPages.Image.Pix)
+	err = enc.Encode(renderedPix)
 	Expect(err).To(BeNil())
 
 	hasher := sha256.New()
@@ -2856,13 +3215,13 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	}
 }
 
-func writePrerenderedImage(renderedImage *image.RGBA, testNames ...string) error {
+func writePrerenderedImage(renderedImage image.Image, renderedPix []uint8, testNames ...string) error {
 	filename := testNames[len(testNames)-1]
 
 	// Be sure to validate the difference in image to ensure rendering has not been broken.
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(renderedImage.Pix); err != nil {
+	if err := enc.Encode(renderedPix); err != nil {
 		return err
 	}
 

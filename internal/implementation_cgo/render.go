@@ -102,6 +102,11 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 		return nil, errors.New("no DPI given")
 	}
 
+	err := validateRenderImageFormat(request.ImageFormat)
+	if err != nil {
+		return nil, err
+	}
+
 	index, widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Page, request.DPI)
 	if err != nil {
 		return nil, err
@@ -117,6 +122,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 			Flags:             request.RenderFlags,
 			RenderForm:        request.RenderForm,
 			Document:          request.Document,
+			ImageFormat:       request.ImageFormat,
 		},
 	}, 0)
 	if err != nil {
@@ -127,6 +133,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
+			RenderedImage:     result.RenderedImage,
 			PointToPixelRatio: pointToPixelRatio,
 			Width:             widthInPixels,
 			Height:            heightInPixels,
@@ -149,6 +156,17 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			return nil, fmt.Errorf("no DPI given for requested page %d", i)
 		}
 
+		err := validateRenderImageFormat(request.Pages[i].ImageFormat)
+		if err != nil {
+			return nil, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
+		}
+
+		// All pages are rendered into one image, which can only have one
+		// pixel format and one output field.
+		if i > 0 && request.Pages[i].ImageFormat != pages[0].ImageFormat {
+			return nil, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
+		}
+
 		_, widthInPixels, heightInPixels, pointToPixelRatio, err := p.getPageSizeInPixels(request.Pages[i].Page, request.Pages[i].DPI)
 		if err != nil {
 			return nil, err
@@ -162,6 +180,7 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 			Flags:             request.Pages[i].RenderFlags,
 			RenderForm:        request.Pages[i].RenderForm,
 			Document:          request.Pages[i].Document,
+			ImageFormat:       request.Pages[i].ImageFormat,
 		}
 	}
 
@@ -222,6 +241,11 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 		return nil, errors.New("no width or height given")
 	}
 
+	err := validateRenderImageFormat(request.ImageFormat)
+	if err != nil {
+		return nil, err
+	}
+
 	index, width, height, ratio, err := p.calculateRenderImageSize(request.Page, request.Width, request.Height)
 	if err != nil {
 		return nil, err
@@ -237,6 +261,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 			Flags:             request.RenderFlags,
 			RenderForm:        request.RenderForm,
 			Document:          request.Document,
+			ImageFormat:       request.ImageFormat,
 		},
 	}, 0)
 	if err != nil {
@@ -247,6 +272,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
+			RenderedImage:     result.RenderedImage,
 			PointToPixelRatio: ratio,
 			Width:             width,
 			Height:            height,
@@ -271,6 +297,17 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			return nil, fmt.Errorf("no width or height given for requested page %d", i)
 		}
 
+		err := validateRenderImageFormat(request.Pages[i].ImageFormat)
+		if err != nil {
+			return nil, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
+		}
+
+		// All pages are rendered into one image, which can only have one
+		// pixel format and one output field.
+		if i > 0 && request.Pages[i].ImageFormat != pages[0].ImageFormat {
+			return nil, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
+		}
+
 		_, width, height, ratio, err := p.calculateRenderImageSize(request.Pages[i].Page, request.Pages[i].Width, request.Pages[i].Height)
 		if err != nil {
 			return nil, err
@@ -284,6 +321,7 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 			Flags:             request.Pages[i].RenderFlags,
 			RenderForm:        request.Pages[i].RenderForm,
 			Document:          request.Pages[i].Document,
+			ImageFormat:       request.Pages[i].ImageFormat,
 		}
 	}
 
@@ -305,6 +343,18 @@ type renderPage struct {
 	PointToPixelRatio float64
 	RenderForm        bool
 	Document          *references.FPDF_DOCUMENT
+	ImageFormat       requests.RenderImageFormat
+}
+
+// validateRenderImageFormat validates the given image format. An empty
+// value is valid and renders as RGBA.
+func validateRenderImageFormat(imageFormat requests.RenderImageFormat) error {
+	switch imageFormat {
+	case "", requests.RenderImageFormatRGBA, requests.RenderImageFormatGrayscale:
+		return nil
+	}
+
+	return errors.New("invalid ImageFormat given")
 }
 
 // renderPages renders a list of pages, the result is an image.
@@ -326,11 +376,28 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		}
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
+	// The image format has been validated by the caller, all pages are
+	// guaranteed to have the same format here. An empty format renders as
+	// RGBA.
+	imageFormat := requests.RenderImageFormatRGBA
+	if len(pages) > 0 && pages[0].ImageFormat != "" {
+		imageFormat = pages[0].ImageFormat
+	}
 
 	// Create a device independent bitmap to the external buffer by passing a
 	// pointer to the first pixel, PDFium will do the rest.
-	bitmap := C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+	var img *image.RGBA
+	var renderedImage image.Image
+	var bitmap C.FPDF_BITMAP
+	if imageFormat == requests.RenderImageFormatGrayscale {
+		imgGray := image.NewGray(image.Rect(0, 0, totalWidth, totalHeight))
+		renderedImage = imgGray
+		bitmap = C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_Gray, unsafe.Pointer(&imgGray.Pix[0]), C.int(imgGray.Stride))
+	} else {
+		img = image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
+		renderedImage = img
+		bitmap = C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
+	}
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
@@ -343,7 +410,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			X:                 0,
 			Y:                 currentOffset,
 		}
-		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm)
+		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm, imageFormat)
 		if err != nil {
 			return nil, err
 		}
@@ -357,15 +424,16 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	C.FPDFBitmap_Destroy(bitmap)
 
 	return &responses.RenderPages{
-		Image:  img,
-		Pages:  pagesInfo,
-		Width:  totalWidth,
-		Height: totalHeight,
+		Image:         img,
+		RenderedImage: renderedImage,
+		Pages:         pagesInfo,
+		Width:         totalWidth,
+		Height:        totalHeight,
 	}, nil
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
-func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *references.FPDF_DOCUMENT, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG, renderForm bool) (int, bool, error) {
+func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *references.FPDF_DOCUMENT, page requests.Page, width, height, offset int, flags enums.FPDF_RENDER_FLAG, renderForm bool, imageFormat requests.RenderImageFormat) (int, bool, error) {
 	pageHandle, err := p.loadPage(page)
 	if err != nil {
 		return 0, false, err
@@ -378,18 +446,29 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *refere
 
 	hasTransparency := int(alpha) == 1
 
-	// When the page has transparency, fill with black, not white.
-	if hasTransparency {
-		// Black
-		fillColor = uint64(0x00000000)
+	renderFlags := C.int(flags)
+	if imageFormat == requests.RenderImageFormatGrayscale {
+		// A grayscale bitmap has no alpha channel, so the transparent black
+		// fill can't be represented, always fill white like a PDF viewer.
+		// Byte order is meaningless for a 1 byte per pixel format, so
+		// FPDF_REVERSE_BYTE_ORDER is not set here.
+		renderFlags |= C.int(enums.FPDF_RENDER_FLAG_GRAYSCALE)
+	} else {
+		// When the page has transparency, fill with black, not white.
+		if hasTransparency {
+			// Black
+			fillColor = uint64(0x00000000)
+		}
+
+		// Write the bytes in reverse order so that BGRA becomes RGBA.
+		renderFlags |= C.FPDF_REVERSE_BYTE_ORDER
 	}
 
 	// Fill the page rect with the specified color.
 	C.FPDFBitmap_FillRect(bitmap, 0, C.int(offset), C.int(width), C.int(height), C.ulong(fillColor))
 
-	// Render the bitmap into the given external bitmap, write the bytes
-	// in reverse order so that BGRA becomes RGBA.
-	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+	// Render the bitmap into the given external bitmap.
+	C.FPDF_RenderPageBitmap(bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, renderFlags)
 
 	if renderForm {
 		if document == nil && page.ByIndex != nil {
@@ -411,7 +490,7 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *refere
 			return 0, false, errors.New("could not init form fill environment")
 		}
 
-		C.FPDF_FFLDraw(formFillEnvironment, bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, C.int(flags)|C.FPDF_REVERSE_BYTE_ORDER)
+		C.FPDF_FFLDraw(formFillEnvironment, bitmap, pageHandle.handle, 0, C.int(offset), C.int(width), C.int(height), 0, renderFlags)
 		C.FPDFDOC_ExitFormFillEnvironment(formFillEnvironment)
 	}
 
@@ -419,7 +498,7 @@ func (p *PdfiumImplementation) renderPage(bitmap C.FPDF_BITMAP, document *refere
 }
 
 func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
-	var renderedImage *image.RGBA
+	var renderedImage image.Image
 
 	var myResp *responses.RenderToFile
 	hasTransparency := false
@@ -430,7 +509,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Result.Image
+		renderedImage = resp.Result.RenderedImage
 		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
@@ -440,8 +519,8 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 				{
 					Page:              resp.Result.Page,
 					PointToPixelRatio: resp.Result.PointToPixelRatio,
-					Width:             resp.Result.Image.Bounds().Max.X,
-					Height:            resp.Result.Image.Bounds().Max.Y,
+					Width:             resp.Result.Width,
+					Height:            resp.Result.Height,
 					X:                 0,
 					Y:                 0,
 					HasTransparency:   resp.Result.HasTransparency,
@@ -454,7 +533,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Result.Image
+		renderedImage = resp.Result.RenderedImage
 
 		for _, page := range resp.Result.Pages {
 			if page.HasTransparency {
@@ -473,7 +552,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Result.Image
+		renderedImage = resp.Result.RenderedImage
 		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
@@ -483,8 +562,8 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 				{
 					Page:              resp.Result.Page,
 					PointToPixelRatio: resp.Result.PointToPixelRatio,
-					Width:             resp.Result.Image.Bounds().Max.X,
-					Height:            resp.Result.Image.Bounds().Max.Y,
+					Width:             resp.Result.Width,
+					Height:            resp.Result.Height,
 					X:                 0,
 					Y:                 0,
 					HasTransparency:   resp.Result.HasTransparency,
@@ -497,7 +576,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			return nil, err
 		}
 
-		renderedImage = resp.Result.Image
+		renderedImage = resp.Result.RenderedImage
 
 		for _, page := range resp.Result.Pages {
 			if page.HasTransparency {
@@ -520,15 +599,17 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 	// the image like a PDF viewer would. This is also to fix transparency JPEG
 	// rendering, when you render a JPG image in Go, it will make the
 	// transparent background black.
-	if hasTransparency {
-		imageWithWhiteBackground := image.NewRGBA(renderedImage.Bounds())
+	// Grayscale images have no alpha channel and are always rendered on a
+	// white background, so they don't need this.
+	if renderedImageRGBA, isRGBA := renderedImage.(*image.RGBA); hasTransparency && isRGBA {
+		imageWithWhiteBackground := image.NewRGBA(renderedImageRGBA.Bounds())
 		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
 		// PDFium's FPDFBitmap_BGRA has straight (non-premultiplied) alpha.
 		// Wrap as NRGBA so draw.Over uses the correct straight-alpha compositing formula.
 		straightAlphaSrc := &image.NRGBA{
-			Pix:    renderedImage.Pix,
-			Stride: renderedImage.Stride,
-			Rect:   renderedImage.Rect,
+			Pix:    renderedImageRGBA.Pix,
+			Stride: renderedImageRGBA.Stride,
+			Rect:   renderedImageRGBA.Rect,
 		}
 		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
 		renderedImage = imageWithWhiteBackground
