@@ -18,8 +18,9 @@ type RenderPage struct {
 	Page              int     // The rendered page number (0-index based).
 	PointToPixelRatio float64 // The point to pixel ratio for the rendered image. How many points is 1 pixel in this image.
 
-	// Deprecated: use RenderedImage instead, this field will be removed in the next major version.
 	// The rendered image. Nil when the requested ImageFormat was RenderImageFormatGrayscale.
+	//
+	// Deprecated: use RenderedImage instead, this field will be removed in the next major version.
 	Image *image.RGBA
 
 	RenderedImage   image.Image // The rendered image regardless of the requested ImageFormat, the concrete type is *image.RGBA or *image.Gray depending on the request. In WebAssembly mode the pixel buffer is only valid until Cleanup() is called.
@@ -73,8 +74,9 @@ type RenderPagesPage struct {
 type RenderPages struct {
 	Pages []RenderPagesPage // Information about the rendered pages inside this image.
 
-	// Deprecated: use RenderedImage instead, this field will be removed in the next major version.
 	// The rendered image. Nil when the requested ImageFormat was RenderImageFormatGrayscale.
+	//
+	// Deprecated: use RenderedImage instead, this field will be removed in the next major version.
 	Image *image.RGBA
 
 	RenderedImage image.Image // The rendered image regardless of the requested ImageFormat, the concrete type is *image.RGBA or *image.Gray depending on the request. In WebAssembly mode the pixel buffer is only valid until Cleanup() is called.
