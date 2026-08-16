@@ -14,7 +14,7 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/google/uuid"
-	"github.com/tetratelabs/wazero/api"
+	"github.com/samyfodil/wazy/api"
 )
 
 func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {

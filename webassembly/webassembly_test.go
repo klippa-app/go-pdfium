@@ -13,7 +13,7 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/shared_tests"
 	"github.com/klippa-app/go-pdfium/webassembly"
-	"github.com/tetratelabs/wazero"
+	"github.com/samyfodil/wazy"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -27,11 +27,11 @@ var interpreterMode = os.Getenv("WAZERO_INTERPRETER") == "1"
 
 // runtimeConfig returns the wazero RuntimeConfig that matches the current
 // mode (interpreter or compiler).
-func runtimeConfig() wazero.RuntimeConfig {
+func runtimeConfig() wazy.RuntimeConfig {
 	if interpreterMode {
-		return wazero.NewRuntimeConfigInterpreter()
+		return wazy.NewRuntimeConfigInterpreter()
 	}
-	return wazero.NewRuntimeConfig()
+	return wazy.NewRuntimeConfig()
 }
 
 var _ = BeforeSuite(func() {

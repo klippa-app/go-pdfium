@@ -9,7 +9,7 @@ import (
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/klippa-app/go-pdfium/references"
 
-	"github.com/tetratelabs/wazero/api"
+	"github.com/samyfodil/wazy/api"
 )
 
 type FPDF_FILEACCESS_CB struct {

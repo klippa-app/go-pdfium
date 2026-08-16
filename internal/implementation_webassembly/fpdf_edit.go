@@ -12,7 +12,7 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
 
-	"github.com/tetratelabs/wazero/api"
+	"github.com/samyfodil/wazy/api"
 )
 
 // FPDF_CreateNewDocument returns a new document.
