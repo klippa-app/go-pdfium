@@ -57,7 +57,7 @@ func (f *FormFillInfo) FFI_SetCursor(cursor uint32) {
 
 func (f *FormFillInfo) FFI_SetTimer(uElapse, lpTimerFunc uint32) int {
 	timerFunc := func(idEvent int) {
-		f.Instance.Module.ExportedFunction("FPDF_FORMFILLINFO_CALL_TIMER").Call(f.Instance.Context, *(*uint64)(unsafe.Pointer(&lpTimerFunc)), *(*uint64)(unsafe.Pointer(&idEvent)))
+		f.Instance.Module.ExportedFunction("FPDF_FORMFILLINFO_CALL_TIMER").Call(f.Instance.Context, uint64(lpTimerFunc), *(*uint64)(unsafe.Pointer(&idEvent)))
 	}
 
 	return f.FormFillInfo.FFI_SetTimer(int(uElapse), timerFunc)
@@ -1104,7 +1104,7 @@ func (p *PdfiumImplementation) FPDF_SetFormFieldHighlightAlpha(request *requests
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_SetFormFieldHighlightAlpha").Call(p.Context, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.Alpha)))
+	_, err = p.Module.ExportedFunction("FPDF_SetFormFieldHighlightAlpha").Call(p.Context, *formHandleHandle.handle, uint64(request.Alpha))
 	if err != nil {
 		return nil, err
 	}

@@ -1069,7 +1069,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewPath(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewPath").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewPath").Call(p.Context, api.EncodeF32(request.X), api.EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1087,7 +1087,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewRect(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewRect").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)), *(*uint64)(unsafe.Pointer(&request.W)), *(*uint64)(unsafe.Pointer(&request.H)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateNewRect").Call(p.Context, api.EncodeF32(request.X), api.EncodeF32(request.Y), api.EncodeF32(request.W), api.EncodeF32(request.H))
 	if err != nil {
 		return nil, err
 	}
@@ -1303,7 +1303,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetStrokeWidth(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_SetStrokeWidth").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.StrokeWidth)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetStrokeWidth").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.StrokeWidth))
 	if err != nil {
 		return nil, err
 	}
@@ -1703,7 +1703,7 @@ func (p *PdfiumImplementation) FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPath_MoveTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	res, err := p.Module.ExportedFunction("FPDFPath_MoveTo").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.X), api.EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1726,7 +1726,7 @@ func (p *PdfiumImplementation) FPDFPath_LineTo(request *requests.FPDFPath_LineTo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPath_LineTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	res, err := p.Module.ExportedFunction("FPDFPath_LineTo").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.X), api.EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1749,7 +1749,7 @@ func (p *PdfiumImplementation) FPDFPath_BezierTo(request *requests.FPDFPath_Bezi
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPath_BezierTo").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.X1)), *(*uint64)(unsafe.Pointer(&request.Y1)), *(*uint64)(unsafe.Pointer(&request.X2)), *(*uint64)(unsafe.Pointer(&request.Y2)), *(*uint64)(unsafe.Pointer(&request.X3)), *(*uint64)(unsafe.Pointer(&request.Y3)))
+	res, err := p.Module.ExportedFunction("FPDFPath_BezierTo").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.X1), api.EncodeF32(request.Y1), api.EncodeF32(request.X2), api.EncodeF32(request.Y2), api.EncodeF32(request.X3), api.EncodeF32(request.Y3))
 	if err != nil {
 		return nil, err
 	}
@@ -1874,7 +1874,7 @@ func (p *PdfiumImplementation) FPDFPageObj_NewTextObj(request *requests.FPDFPage
 	font, err := p.CString(request.Font)
 	defer font.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_NewTextObj").Call(p.Context, *documentHandle.handle, font.Pointer, *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_NewTextObj").Call(p.Context, *documentHandle.handle, font.Pointer, api.EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}
@@ -2065,7 +2065,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateTextObj(request *requests.FPDFP
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateTextObj").Call(p.Context, *documentHandle.handle, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_CreateTextObj").Call(p.Context, *documentHandle.handle, *fontHandle.handle, api.EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}
@@ -2132,7 +2132,7 @@ func (p *PdfiumImplementation) FPDFTextObj_GetText(request *requests.FPDFTextObj
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDFTextObj_GetText").Call(p.Context, *pageObjectHandle.handle, *textPageHandle.handle, charDataPointer.Pointer, *(*uint64)(unsafe.Pointer(&textSize)))
+	res, err = p.Module.ExportedFunction("FPDFTextObj_GetText").Call(p.Context, *pageObjectHandle.handle, *textPageHandle.handle, charDataPointer.Pointer, api.EncodeI32(textSize))
 	if err != nil {
 		return nil, err
 	}
@@ -3021,7 +3021,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.F
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPageObjMark_SetFloatParam").Call(p.Context, *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.Value)))
+	res, err := p.Module.ExportedFunction("FPDFPageObjMark_SetFloatParam").Call(p.Context, *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, api.EncodeF32(request.Value))
 	if err != nil {
 		return nil, err
 	}
@@ -3306,7 +3306,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashPhase(request *requests.FPDFPa
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_SetDashPhase").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.DashPhase)))
+	res, err := p.Module.ExportedFunction("FPDFPageObj_SetDashPhase").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.DashPhase))
 	if err != nil {
 		return nil, err
 	}
@@ -3414,7 +3414,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPa
 		p.Module.Memory().WriteFloat32Le(uint32(valueDataPointer.Pointer+(p.CSizeFloat()*uint64(i))), request.DashArray[i])
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPageObj_SetDashArray").Call(p.Context, *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize, *(*uint64)(unsafe.Pointer(&request.DashPhase)))
+	_, err = p.Module.ExportedFunction("FPDFPageObj_SetDashArray").Call(p.Context, *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize, api.EncodeF32(request.DashPhase))
 	if err != nil {
 		return nil, err
 	}
@@ -3567,7 +3567,7 @@ func (p *PdfiumImplementation) FPDFTextObj_GetRenderedBitmap(request *requests.F
 		pageHandle = *pageHandleReference.handle
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFTextObj_GetRenderedBitmap").Call(p.Context, *documentHandle.handle, pageHandle, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.Scale)))
+	res, err := p.Module.ExportedFunction("FPDFTextObj_GetRenderedBitmap").Call(p.Context, *documentHandle.handle, pageHandle, *pageObjectHandle.handle, api.EncodeF32(request.Scale))
 	if err != nil {
 		return nil, err
 	}
@@ -3927,7 +3927,7 @@ func (p *PdfiumImplementation) FPDFFont_GetAscent(request *requests.FPDFFont_Get
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFFont_GetAscent").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)), ascentPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDFFont_GetAscent").Call(p.Context, *fontHandle.handle, api.EncodeF32(request.FontSize), ascentPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -3965,7 +3965,7 @@ func (p *PdfiumImplementation) FPDFFont_GetDescent(request *requests.FPDFFont_Ge
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFFont_GetDescent").Call(p.Context, *fontHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)), descentPointer.Pointer)
+	res, err := p.Module.ExportedFunction("FPDFFont_GetDescent").Call(p.Context, *fontHandle.handle, api.EncodeF32(request.FontSize), descentPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -4156,7 +4156,7 @@ func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTex
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFTextObj_SetFontSize").Call(p.Context, *pageObjectHandle.handle, *(*uint64)(unsafe.Pointer(&request.FontSize)))
+	res, err := p.Module.ExportedFunction("FPDFTextObj_SetFontSize").Call(p.Context, *pageObjectHandle.handle, api.EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}
