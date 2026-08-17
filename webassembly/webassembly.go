@@ -19,9 +19,9 @@ import (
 
 	"github.com/google/uuid"
 	pool "github.com/jolestar/go-commons-pool/v2"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"github.com/samyfodil/wazy"
+	"github.com/samyfodil/wazy/api"
+	"github.com/samyfodil/wazy/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
 
@@ -45,8 +45,8 @@ type Config struct {
 	MaxIdle       int
 	MaxTotal      int
 	WASM          []byte
-	FSConfig      wazero.FSConfig
-	RuntimeConfig wazero.RuntimeConfig
+	FSConfig      wazy.FSConfig
+	RuntimeConfig wazy.RuntimeConfig
 	Stdout        io.Writer
 	Stderr        io.Writer
 	RandomSource  io.Reader
@@ -54,8 +54,8 @@ type Config struct {
 }
 
 type pdfiumPool struct {
-	runtime        wazero.Runtime
-	compiledModule wazero.CompiledModule
+	runtime        wazy.Runtime
+	compiledModule wazy.CompiledModule
 	workerPool     *pool.ObjectPool
 	instanceRefs   map[string]*pdfiumInstance
 	poolRef        string
@@ -93,7 +93,7 @@ func InitWithWASM(config Config) (pdfium.Pool, error) {
 func initWithConfig(config Config) (pdfium.Pool, error) {
 	// Mount the full root by default.
 	if config.FSConfig == nil {
-		config.FSConfig = wazero.NewFSConfig()
+		config.FSConfig = wazy.NewFSConfig()
 
 		// On Windows we mount the volume of the current working directory as
 		// root. On Linux we mount / as root.
@@ -125,7 +125,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 	}
 
 	if config.RuntimeConfig == nil {
-		config.RuntimeConfig = wazero.NewRuntimeConfig()
+		config.RuntimeConfig = wazy.NewRuntimeConfig()
 	}
 
 	poolContext := config.Context
@@ -133,7 +133,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 		poolContext = context.Background()
 	}
 
-	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
+	runtime := wazy.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
 
 	// Import WASI features.
 	if _, err := wasi_snapshot_preview1.Instantiate(poolContext, runtime); err != nil {
@@ -161,7 +161,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 				Cancel:  cancel,
 			}
 
-			moduleConfig := wazero.NewModuleConfig().
+			moduleConfig := wazy.NewModuleConfig().
 				WithStartFunctions("_initialize").
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
