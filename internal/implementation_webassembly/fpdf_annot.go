@@ -8,6 +8,8 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
+
+	"github.com/tetratelabs/wazero/api"
 )
 
 // FPDFAnnot_IsSupportedSubtype returns whether an annotation subtype is currently supported for creation.
@@ -963,7 +965,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetBorder(request *requests.FPDFAnnot_S
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAnnot_SetBorder").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.HorizontalRadius)), *(*uint64)(unsafe.Pointer(&request.VerticalRadius)), *(*uint64)(unsafe.Pointer(&request.BorderWidth)))
+	res, err := p.Module.ExportedFunction("FPDFAnnot_SetBorder").Call(p.Context, *annotationHandle.handle, api.EncodeF32(request.HorizontalRadius), api.EncodeF32(request.VerticalRadius), api.EncodeF32(request.BorderWidth))
 	if err != nil {
 		return nil, err
 	}
