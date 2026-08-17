@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.42.1
 	github.com/stretchr/testify v1.11.1
 	github.com/tetratelabs/wazero v1.12.0
-	golang.org/x/net v0.57.0
+	golang.org/x/net v0.58.0
 	golang.org/x/text v0.41.0
 )
 
