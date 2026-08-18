@@ -59,6 +59,29 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 	return newInstance
 }
 
+// callFn invokes fn through CallWithStack using a scratch buffer from the
+// ring, avoiding wazero's per-Call result-slice allocation. The result is
+// returned by value (PDFium's C ABI has at most one result), so it never
+// aliases the scratch buffer and stays valid indefinitely; res[0] and
+// &res[0] work as they did with wazero's Call. Nested calls (host callbacks
+// re-entering the instance) are safe: parameters are consumed when a call
+// starts and the result is copied out here before any later call can reuse
+// the buffer.
+func (p *PdfiumImplementation) callFn(fn api.Function, params ...uint64) ([1]uint64, error) {
+	buf := p.callScratch[p.callScratchIdx&7][:]
+	p.callScratchIdx++
+	copy(buf, params)
+	if err := fn.CallWithStack(p.Context, buf); err != nil {
+		return [1]uint64{}, err
+	}
+	return [1]uint64{buf[0]}, nil
+}
+
+// call invokes the exported function with the given name via callFn.
+func (p *PdfiumImplementation) call(name string, params ...uint64) ([1]uint64, error) {
+	return p.callFn(p.Fn(name), params...)
+}
+
 // Fn returns the exported function with the given name, memoized per
 // instance. wazero's Module.ExportedFunction allocates a new call engine on
 // every lookup, so hot paths must not resolve by name per call.
@@ -112,6 +135,16 @@ type PdfiumImplementation struct {
 	// (e.g. form-fill timers) run outside the instance mutex.
 	fnCache      map[string]api.Function
 	fnCacheMutex sync.RWMutex
+
+	// callScratch is a small ring of reusable parameter/result buffers for
+	// call/callFn, so guest calls go through CallWithStack without a heap
+	// allocation per call (wazero's Call allocates a fresh result slice on
+	// every invocation to guarantee result-slice independence; PDFium's C
+	// ABI has at most one result and go-pdfium consumes it immediately).
+	// The ring keeps a returned slice valid across the next few calls; all
+	// users run under the instance mutex.
+	callScratch    [8][32]uint64
+	callScratchIdx uint8
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
@@ -212,7 +245,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			res, err := p.Fn("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.call("FPDF_LoadMemDocument64", dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -222,7 +255,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 				doc = &res[0]
 			}
 		} else {
-			res, err := p.Fn("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.call("FPDF_LoadMemDocument", dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -258,7 +291,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		defer cFilePathPointer.Free()
 
-		res, err := p.Fn("FPDF_LoadDocument").Call(p.Context, cFilePathPointer.Pointer, cPasswordPointer)
+		res, err := p.call("FPDF_LoadDocument", cFilePathPointer.Pointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +312,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		nativeDoc.fileHandleRef = fileReaderIndex
 
-		res, err := p.Fn("FPDF_LoadCustomDocument").Call(p.Context, *fileAccessPointer, cPasswordPointer)
+		res, err := p.call("FPDF_LoadCustomDocument", *fileAccessPointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
@@ -293,7 +326,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}
 
 	if doc == nil {
-		errorCode, err := p.Fn("FPDF_GetLastError").Call(p.Context)
+		errorCode, err := p.call("FPDF_GetLastError")
 		if err != nil {
 			return nil, err
 		}

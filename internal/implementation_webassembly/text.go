@@ -51,14 +51,14 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFText_LoadPage").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFText_LoadPage", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	textPage := res[0]
 
-	res, err = p.Fn("FPDFText_CountChars").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_CountChars", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	charData := make([]rune, 0, charsInPage)
 	for i := 0; i < int(charsInPage); i++ {
-		res, err = p.Fn("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
+		res, err = p.call("FPDFText_GetUnicode", textPage, uint64(i))
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 		}
 	}
 
-	res, err = p.Fn("FPDFText_ClosePage").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_ClosePage", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -124,14 +124,14 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		PointToPixelRatio: pointToPixelRatio,
 	}
 
-	res, err := p.Fn("FPDFText_LoadPage").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFText_LoadPage", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	textPage := res[0]
 
-	res, err = p.Fn("FPDFText_CountChars").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_CountChars", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
 		for i := 0; i < int(charsInPage); i++ {
-			res, err = p.Fn("FPDFText_GetCharAngle").Call(p.Context, textPage, uint64(i))
+			res, err = p.call("FPDFText_GetCharAngle", textPage, uint64(i))
 			if err != nil {
 				return nil, err
 			}
@@ -170,12 +170,12 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			}
 			defer bottomPointer.Free()
 
-			_, err = p.Fn("FPDFText_GetCharBox").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
+			_, err = p.call("FPDFText_GetCharBox", textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
 			if err != nil {
 				return nil, err
 			}
 
-			res, err = p.Fn("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
+			res, err = p.call("FPDFText_GetUnicode", textPage, uint64(i))
 			if err != nil {
 				return nil, err
 			}
@@ -239,7 +239,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	}
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth {
-		res, err = p.Fn("FPDFText_CountRects").Call(p.Context, textPage, 0, uint64(charsInPage))
+		res, err = p.call("FPDFText_CountRects", textPage, 0, uint64(charsInPage))
 		if err != nil {
 			return nil, err
 		}
@@ -281,7 +281,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		defer bottomPointer.Free()
 
 		for i := 0; i < int(rectsCount); i++ {
-			_, err = p.Fn("FPDFText_GetRect").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
+			_, err = p.call("FPDFText_GetRect", textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
 			if err != nil {
 				return nil, err
 			}
@@ -306,7 +306,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				return nil, err
 			}
 
-			res, err = p.Fn("FPDFText_GetBoundedText").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, uint64((charsInPage+1)*2))
+			res, err = p.call("FPDFText_GetBoundedText", textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, uint64((charsInPage+1)*2))
 			if err != nil {
 				return nil, err
 			}
@@ -337,7 +337,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				// Find index of the first letter of the rect.
 				// @todo: is 5 a "valid" tolerance?
 				tolerance := float64(5)
-				res, err = p.Fn("FPDFText_GetCharIndexAtPos").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&char.PointPosition.Left)), *(*uint64)(unsafe.Pointer(&char.PointPosition.Top)), *(*uint64)(unsafe.Pointer(&tolerance)), *(*uint64)(unsafe.Pointer(&tolerance)))
+				res, err = p.call("FPDFText_GetCharIndexAtPos", textPage, *(*uint64)(unsafe.Pointer(&char.PointPosition.Left)), *(*uint64)(unsafe.Pointer(&char.PointPosition.Top)), *(*uint64)(unsafe.Pointer(&tolerance)), *(*uint64)(unsafe.Pointer(&tolerance)))
 				if err != nil {
 					return nil, err
 				}
@@ -363,7 +363,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		}
 	}
 
-	res, err = p.Fn("FPDFText_ClosePage").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_ClosePage", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -381,14 +381,14 @@ func convertPointPositions(pointPositions responses.CharPosition, ratio float64)
 }
 
 func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int) (*responses.FontInformation, error) {
-	res, err := p.Fn("FPDFText_GetFontSize").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
+	res, err := p.call("FPDFText_GetFontSize", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
 	if err != nil {
 		return nil, err
 	}
 
 	fontSize := *(*float64)(unsafe.Pointer(&res[0]))
 
-	res, err = p.Fn("FPDFText_GetFontSize").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
+	res, err = p.call("FPDFText_GetFontSize", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
 	if err != nil {
 		return nil, err
 	}
@@ -401,7 +401,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	defer fontFlagsPointer.Free()
 
 	// First get the length of the font name.
-	res, err = p.Fn("FPDFText_GetFontInfo").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), 0, 0, fontFlagsPointer.Pointer)
+	res, err = p.call("FPDFText_GetFontInfo", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), 0, 0, fontFlagsPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -417,7 +417,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 
 		// Get the actual font name.
 		// For some reason, the font name is UTF-8.
-		_, err = p.Fn("FPDFText_GetFontInfo").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), rawFontNamePointer.Pointer, uint64(fontNameLength), fontFlagsPointer.Pointer)
+		_, err = p.call("FPDFText_GetFontInfo", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), rawFontNamePointer.Pointer, uint64(fontNameLength), fontFlagsPointer.Pointer)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +442,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	if err == nil {
 		defer p.Free(matrixPointer)
 
-		res, err = p.Fn("FPDFText_GetMatrix").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), matrixPointer)
+		res, err = p.call("FPDFText_GetMatrix", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), matrixPointer)
 		if err == nil {
 			success := *(*int32)(unsafe.Pointer(&res[0]))
 			if int(success) != 0 {

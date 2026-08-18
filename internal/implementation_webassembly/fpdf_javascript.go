@@ -19,7 +19,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetJavaScriptActionCount(request *request
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_GetJavaScriptActionCount").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFDoc_GetJavaScriptActionCount", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetJavaScriptAction(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_GetJavaScriptAction").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFDoc_GetJavaScriptAction", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (p *PdfiumImplementation) FPDFDoc_CloseJavaScriptAction(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDFDoc_CloseJavaScriptAction").Call(p.Context, *javaScriptActionHandle.handle)
+	_, err = p.call("FPDFDoc_CloseJavaScriptAction", *javaScriptActionHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (p *PdfiumImplementation) FPDFJavaScriptAction_GetName(request *requests.FP
 	}
 
 	// First get the name value length.
-	res, err := p.Fn("FPDFJavaScriptAction_GetName").Call(p.Context, *javaScriptActionHandle.handle, 0, 0)
+	res, err := p.call("FPDFJavaScriptAction_GetName", *javaScriptActionHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (p *PdfiumImplementation) FPDFJavaScriptAction_GetName(request *requests.FP
 
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDFJavaScriptAction_GetName").Call(p.Context, *javaScriptActionHandle.handle, charDataPointer.Pointer, nameSize)
+	res, err = p.call("FPDFJavaScriptAction_GetName", *javaScriptActionHandle.handle, charDataPointer.Pointer, nameSize)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (p *PdfiumImplementation) FPDFJavaScriptAction_GetScript(request *requests.
 	}
 
 	// First get the script value length.
-	res, err := p.Fn("FPDFJavaScriptAction_GetScript").Call(p.Context, *javaScriptActionHandle.handle, 0, 0)
+	res, err := p.call("FPDFJavaScriptAction_GetScript", *javaScriptActionHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (p *PdfiumImplementation) FPDFJavaScriptAction_GetScript(request *requests.
 
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDFJavaScriptAction_GetScript").Call(p.Context, *javaScriptActionHandle.handle, charDataPointer.Pointer, scriptSize)
+	res, err = p.call("FPDFJavaScriptAction_GetScript", *javaScriptActionHandle.handle, charDataPointer.Pointer, scriptSize)
 	if err != nil {
 		return nil, err
 	}

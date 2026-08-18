@@ -46,7 +46,7 @@ func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.
 
 	p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
 
-	res, err := p.Fn("FPDF_FILEACCESS_Create").Call(p.Context, uint64(fileSize), paramPointer)
+	res, err := p.call("FPDF_FILEACCESS_Create", uint64(fileSize), paramPointer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -643,7 +643,7 @@ func (p *PdfiumImplementation) ULongPointer() (*ULongPointer, error) {
 }
 
 func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
-	results, err := p.Functions["malloc"].Call(p.Context, size)
+	results, err := p.callFn(p.Functions["malloc"], size)
 	if err != nil {
 		return 0, err
 	}
@@ -663,7 +663,7 @@ func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
 }
 
 func (p *PdfiumImplementation) Free(pointer uint64) error {
-	_, err := p.Functions["free"].Call(p.Context, pointer)
+	_, err := p.callFn(p.Functions["free"], pointer)
 	if err != nil {
 		return err
 	}

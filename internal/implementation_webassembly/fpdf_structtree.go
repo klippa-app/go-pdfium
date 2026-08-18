@@ -24,7 +24,7 @@ func (p *PdfiumImplementation) FPDF_StructTree_GetForPage(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructTree_GetForPage").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDF_StructTree_GetForPage", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (p *PdfiumImplementation) FPDF_StructTree_Close(request *requests.FPDF_Stru
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructTree_Close").Call(p.Context, *structTreeHandle.handle)
+	_, err = p.call("FPDF_StructTree_Close", *structTreeHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (p *PdfiumImplementation) FPDF_StructTree_CountChildren(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructTree_CountChildren").Call(p.Context, *structTreeHandle.handle)
+	res, err := p.call("FPDF_StructTree_CountChildren", *structTreeHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (p *PdfiumImplementation) FPDF_StructTree_GetChildAtIndex(request *requests
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructTree_GetChildAtIndex").Call(p.Context, *structTreeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructTree_GetChildAtIndex", *structTreeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetAltText(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetAltText").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetAltText", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetAltText(request *requests.F
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDF_StructElement_GetAltText").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, altTextLength)
+	_, err = p.call("FPDF_StructElement_GetAltText", *structElementHandle.handle, charDataPointer.Pointer, altTextLength)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentID(request *re
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetMarkedContentID").Call(p.Context, *structElementHandle.handle)
+	res, err := p.call("FPDF_StructElement_GetMarkedContentID", *structElementHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetType(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetType").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetType", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetType(request *requests.FPDF
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetType").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, typeLength)
+	_, err = p.call("FPDF_StructElement_GetType", *structElementHandle.handle, charDataPointer.Pointer, typeLength)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +245,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetTitle(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetTitle").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetTitle", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetTitle(request *requests.FPD
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetTitle").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, titleLength)
+	_, err = p.call("FPDF_StructElement_GetTitle", *structElementHandle.handle, charDataPointer.Pointer, titleLength)
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +290,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_CountChildren(request *request
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_CountChildren").Call(p.Context, *structElementHandle.handle)
+	res, err := p.call("FPDF_StructElement_CountChildren", *structElementHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +314,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetChildAtIndex(request *reque
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetChildAtIndex").Call(p.Context, *parentStructElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructElement_GetChildAtIndex", *parentStructElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +347,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetID(request *requests.FPDF_S
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetID").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetID", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetID(request *requests.FPDF_S
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetID").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, idLength)
+	_, err = p.call("FPDF_StructElement_GetID", *structElementHandle.handle, charDataPointer.Pointer, idLength)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetLang(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetLang").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetLang", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +408,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetLang(request *requests.FPDF
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetLang").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, langLength)
+	_, err = p.call("FPDF_StructElement_GetLang", *structElementHandle.handle, charDataPointer.Pointer, langLength)
 	if err != nil {
 		return nil, err
 	}
@@ -445,7 +445,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetStringAttribute(request *re
 	}
 	defer attributeName.Free()
 
-	res, err := p.Fn("FPDF_StructElement_GetStringAttribute").Call(p.Context, *structElementHandle.handle, attributeName.Pointer, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetStringAttribute", *structElementHandle.handle, attributeName.Pointer, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +460,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetStringAttribute(request *re
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetStringAttribute").Call(p.Context, *structElementHandle.handle, attributeName.Pointer, charDataPointer.Pointer, attributeLength)
+	_, err = p.call("FPDF_StructElement_GetStringAttribute", *structElementHandle.handle, attributeName.Pointer, charDataPointer.Pointer, attributeLength)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +492,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetActualText(request *request
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetActualText").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetActualText", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -507,7 +507,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetActualText(request *request
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetActualText").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, textLength)
+	_, err = p.call("FPDF_StructElement_GetActualText", *structElementHandle.handle, charDataPointer.Pointer, textLength)
 	if err != nil {
 		return nil, err
 	}
@@ -538,7 +538,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetObjType(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetObjType").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetObjType", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -553,7 +553,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetObjType(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDF_StructElement_GetObjType").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, objTypeLength)
+	_, err = p.call("FPDF_StructElement_GetObjType", *structElementHandle.handle, charDataPointer.Pointer, objTypeLength)
 	if err != nil {
 		return nil, err
 	}
@@ -584,7 +584,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetExpansion(request *requests
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetExpansion").Call(p.Context, *structElementHandle.handle, 0, 0)
+	res, err := p.call("FPDF_StructElement_GetExpansion", *structElementHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -600,7 +600,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetExpansion(request *requests
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDF_StructElement_GetExpansion").Call(p.Context, *structElementHandle.handle, charDataPointer.Pointer, expansionLength)
+	_, err = p.call("FPDF_StructElement_GetExpansion", *structElementHandle.handle, charDataPointer.Pointer, expansionLength)
 	if err != nil {
 		return nil, err
 	}
@@ -632,7 +632,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetParent(request *requests.FP
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetParent").Call(p.Context, *structElementHandle.handle)
+	res, err := p.call("FPDF_StructElement_GetParent", *structElementHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -660,7 +660,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetAttributeCount(request *req
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetAttributeCount").Call(p.Context, *structElementHandle.handle)
+	res, err := p.call("FPDF_StructElement_GetAttributeCount", *structElementHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -689,7 +689,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetAttributeAtIndex(request *r
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetAttributeAtIndex").Call(p.Context, *structElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructElement_GetAttributeAtIndex", *structElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -717,7 +717,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetCount(request *request
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetCount").Call(p.Context, *structElementAttributeHandle.handle)
+	res, err := p.call("FPDF_StructElement_Attr_GetCount", *structElementAttributeHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -757,7 +757,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetName(request *requests
 	}
 	defer objTypeLengthPointer.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetName").Call(p.Context, *structElementAttributeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, 1, objTypeLengthPointer.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetName", *structElementAttributeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, 1, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -778,7 +778,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetName(request *requests
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDF_StructElement_Attr_GetName").Call(p.Context, *structElementAttributeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
+	res, err = p.call("FPDF_StructElement_Attr_GetName", *structElementAttributeHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -817,7 +817,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetValue(request *request
 	}
 	defer attributeName.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetValue").Call(p.Context, *structElementAttributeHandle.handle, attributeName.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetValue", *structElementAttributeHandle.handle, attributeName.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -845,7 +845,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetType(request *requests
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetType").Call(p.Context, *structElementAttributeValueHandle.handle)
+	res, err := p.call("FPDF_StructElement_Attr_GetType", *structElementAttributeValueHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -876,7 +876,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBooleanValue(request *
 	}
 	defer outValuePointer.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetBooleanValue").Call(p.Context, *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetBooleanValue", *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -915,7 +915,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetNumberValue(request *r
 	}
 	defer outValuePointer.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetNumberValue").Call(p.Context, *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetNumberValue", *structElementAttributeValueHandle.handle, outValuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -954,7 +954,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 	}
 	defer objTypeLengthPointer.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, 0, 0, objTypeLengthPointer.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetStringValue", *structElementAttributeValueHandle.handle, 0, 0, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -974,7 +974,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetStringValue(request *r
 		return nil, err
 	}
 
-	res, err = p.Fn("FPDF_StructElement_Attr_GetStringValue").Call(p.Context, *structElementAttributeValueHandle.handle, charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
+	res, err = p.call("FPDF_StructElement_Attr_GetStringValue", *structElementAttributeValueHandle.handle, charDataPointer.Pointer, objTypeLength, objTypeLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1017,7 +1017,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 	}
 	defer blobLengthPointer.Free()
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, 0, 0, blobLengthPointer.Pointer)
+	res, err := p.call("FPDF_StructElement_Attr_GetBlobValue", *structElementAttributeValueHandle.handle, 0, 0, blobLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1037,7 +1037,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetBlobValue(request *req
 		return nil, err
 	}
 
-	res, err = p.Fn("FPDF_StructElement_Attr_GetBlobValue").Call(p.Context, *structElementAttributeValueHandle.handle, charDataPointer.Pointer, blobLength, blobLengthPointer.Pointer)
+	res, err = p.call("FPDF_StructElement_Attr_GetBlobValue", *structElementAttributeValueHandle.handle, charDataPointer.Pointer, blobLength, blobLengthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1068,7 +1068,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_CountChildren(request *re
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_Attr_CountChildren").Call(p.Context, *structElementAttributeHandle.handle)
+	res, err := p.call("FPDF_StructElement_Attr_CountChildren", *structElementAttributeHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1095,7 +1095,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_Attr_GetChildAtIndex(request *
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_Attr_GetChildAtIndex").Call(p.Context, *structElementAttributeValueHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructElement_Attr_GetChildAtIndex", *structElementAttributeValueHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -1123,7 +1123,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentIdCount(reques
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetMarkedContentIdCount").Call(p.Context, *structElementHandle.handle)
+	res, err := p.call("FPDF_StructElement_GetMarkedContentIdCount", *structElementHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1149,7 +1149,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentIdAtIndex(requ
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetMarkedContentIdAtIndex").Call(p.Context, *structElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructElement_GetMarkedContentIdAtIndex", *structElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -1179,7 +1179,7 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(reques
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_StructElement_GetChildMarkedContentID").Call(p.Context, *parentStructElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_StructElement_GetChildMarkedContentID", *parentStructElementHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}

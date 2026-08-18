@@ -17,7 +17,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetPageMode(request *requests.FPDFDoc_Get
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_GetPageMode").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFDoc_GetPageMode", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (p *PdfiumImplementation) FSDK_SetUnSpObjProcessHandler(request *requests.F
 	defer p.Unlock()
 
 	if currentUnsupportedObjectHandlerPointer == nil {
-		res, err := p.Fn("UNSUPPORT_INFO_Create").Call(p.Context)
+		res, err := p.call("UNSUPPORT_INFO_Create")
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +52,7 @@ func (p *PdfiumImplementation) FSDK_SetUnSpObjProcessHandler(request *requests.F
 	CurrentUnsupportedObjectHandler = request.UnSpObjProcessHandler
 
 	// Set the Go callback through cgo.
-	_, err := p.Fn("FSDK_SetUnSpObjProcessHandler").Call(p.Context, *currentUnsupportedObjectHandlerPointer)
+	_, err := p.call("FSDK_SetUnSpObjProcessHandler", *currentUnsupportedObjectHandlerPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +71,13 @@ func (p *PdfiumImplementation) FSDK_SetTimeFunction(request *requests.FSDK_SetTi
 
 	if request.Function == nil {
 		CurrentTimeHandler = nil
-		_, err := p.Fn("FSDK_SetTimeFunction").Call(p.Context, 0)
+		_, err := p.call("FSDK_SetTimeFunction", 0)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		CurrentTimeHandler = request.Function
-		_, err := p.Fn("FSDK_SetTimeFunction_SET_CB").Call(p.Context)
+		_, err := p.call("FSDK_SetTimeFunction_SET_CB")
 		if err != nil {
 			return nil, err
 		}
@@ -97,13 +97,13 @@ func (p *PdfiumImplementation) FSDK_SetLocaltimeFunction(request *requests.FSDK_
 
 	if request.Function == nil {
 		CurrentLocalTimeHandler = nil
-		_, err := p.Fn("FSDK_SetLocaltimeFunction").Call(p.Context, 0)
+		_, err := p.call("FSDK_SetLocaltimeFunction", 0)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		CurrentLocalTimeHandler = request.Function
-		_, err := p.Fn("FSDK_SetLocaltimeFunction_SET_CB").Call(p.Context)
+		_, err := p.call("FSDK_SetLocaltimeFunction_SET_CB")
 		if err != nil {
 			return nil, err
 		}

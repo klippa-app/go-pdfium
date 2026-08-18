@@ -125,7 +125,7 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 		delete(d.structElementRefs, i)
 	}
 
-	pi.Fn("FPDF_CloseDocument").Call(pi.Context, *d.handle)
+	pi.call("FPDF_CloseDocument", *d.handle)
 	d.handle = nil
 
 	// Remove reference to data.
@@ -164,7 +164,7 @@ type PageHandle struct {
 // Close closes the internal references in FPDF
 func (p *PageHandle) Close(pi *PdfiumImplementation) {
 	if p.handle != nil {
-		pi.Fn("FPDF_ClosePage").Call(pi.Context, *p.handle)
+		pi.call("FPDF_ClosePage", *p.handle)
 		p.handle = nil
 	}
 }

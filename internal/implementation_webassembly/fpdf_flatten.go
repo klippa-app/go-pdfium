@@ -16,7 +16,7 @@ func (p *PdfiumImplementation) FPDFPage_Flatten(request *requests.FPDFPage_Flatt
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_Flatten").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Usage)))
+	res, err := p.call("FPDFPage_Flatten", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Usage)))
 	if err != nil {
 		return nil, err
 	}

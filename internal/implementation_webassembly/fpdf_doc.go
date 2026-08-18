@@ -33,7 +33,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetFirstChild(request *requests.FPDF
 		parentBookMark = *bookmarkHandle.handle
 	}
 
-	res, err := p.Fn("FPDFBookmark_GetFirstChild").Call(p.Context, *documentHandle.handle, parentBookMark)
+	res, err := p.call("FPDFBookmark_GetFirstChild", *documentHandle.handle, parentBookMark)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetNextSibling(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFBookmark_GetNextSibling").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
+	res, err := p.call("FPDFBookmark_GetNextSibling", *documentHandle.handle, *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetTitle(request *requests.FPDFBookm
 	}
 
 	// First get the title length.
-	res, err := p.Fn("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, 0, 0)
+	res, err := p.call("FPDFBookmark_GetTitle", *bookmarkHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetTitle(request *requests.FPDFBookm
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, charDataPointer.Pointer, titleSize)
+	res, err = p.call("FPDFBookmark_GetTitle", *bookmarkHandle.handle, charDataPointer.Pointer, titleSize)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (p *PdfiumImplementation) FPDFBookmark_Find(request *requests.FPDFBookmark_
 	}
 	defer titlePointer.Free()
 
-	res, err := p.Fn("FPDFBookmark_Find").Call(p.Context, *documentHandle.handle, titlePointer.Pointer)
+	res, err := p.call("FPDFBookmark_Find", *documentHandle.handle, titlePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetDest(request *requests.FPDFBookma
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFBookmark_Find").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
+	res, err := p.call("FPDFBookmark_Find", *documentHandle.handle, *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetAction(request *requests.FPDFBook
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFBookmark_GetAction").Call(p.Context, *bookmarkHandle.handle)
+	res, err := p.call("FPDFBookmark_GetAction", *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (p *PdfiumImplementation) FPDFAction_GetType(request *requests.FPDFAction_G
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAction_GetType").Call(p.Context, *actionHandle.handle)
+	res, err := p.call("FPDFAction_GetType", *actionHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (p *PdfiumImplementation) FPDFAction_GetDest(request *requests.FPDFAction_G
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAction_GetDest").Call(p.Context, *documentHandle.handle, *actionHandle.handle)
+	res, err := p.call("FPDFAction_GetDest", *documentHandle.handle, *actionHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +299,7 @@ func (p *PdfiumImplementation) FPDFAction_GetFilePath(request *requests.FPDFActi
 	}
 
 	// First get the file path length.
-	res, err := p.Fn("FPDFAction_GetFilePath").Call(p.Context, *actionHandle.handle, 0, 0)
+	res, err := p.call("FPDFAction_GetFilePath", *actionHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +315,7 @@ func (p *PdfiumImplementation) FPDFAction_GetFilePath(request *requests.FPDFActi
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDFAction_GetFilePath").Call(p.Context, *actionHandle.handle, charDataPointer.Pointer, filePathLength)
+	res, err = p.call("FPDFAction_GetFilePath", *actionHandle.handle, charDataPointer.Pointer, filePathLength)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (p *PdfiumImplementation) FPDFAction_GetURIPath(request *requests.FPDFActio
 	}
 
 	// First get the uri path length.
-	res, err := p.Fn("FPDFAction_GetURIPath").Call(p.Context, *documentHandle.handle, *actionHandle.handle, 0, 0)
+	res, err := p.call("FPDFAction_GetURIPath", *documentHandle.handle, *actionHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -365,7 +365,7 @@ func (p *PdfiumImplementation) FPDFAction_GetURIPath(request *requests.FPDFActio
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDFAction_GetURIPath").Call(p.Context, *documentHandle.handle, *actionHandle.handle, charDataPointer.Pointer, uriPathLength)
+	res, err = p.call("FPDFAction_GetURIPath", *documentHandle.handle, *actionHandle.handle, charDataPointer.Pointer, uriPathLength)
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +398,7 @@ func (p *PdfiumImplementation) FPDFDest_GetDestPageIndex(request *requests.FPDFD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDest_GetDestPageIndex").Call(p.Context, *documentHandle.handle, *destHandle.handle)
+	res, err := p.call("FPDFDest_GetDestPageIndex", *documentHandle.handle, *destHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -426,7 +426,7 @@ func (p *PdfiumImplementation) FPDF_GetMetaText(request *requests.FPDF_GetMetaTe
 	defer cstr.Free()
 
 	// First get the metadata length.
-	res, err := p.Fn("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, 0, 0)
+	res, err := p.call("FPDF_GetMetaText", *documentHandle.handle, cstr.Pointer, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -442,7 +442,7 @@ func (p *PdfiumImplementation) FPDF_GetMetaText(request *requests.FPDF_GetMetaTe
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, metaSize)
+	res, err = p.call("FPDF_GetMetaText", *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, metaSize)
 	if err != nil {
 		return nil, err
 	}
@@ -474,7 +474,7 @@ func (p *PdfiumImplementation) FPDF_GetPageLabel(request *requests.FPDF_GetPageL
 	}
 
 	// First get the label length.
-	res, err := p.Fn("FPDF_GetPageLabel").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Page)), 0, 0)
+	res, err := p.call("FPDF_GetPageLabel", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Page)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -490,7 +490,7 @@ func (p *PdfiumImplementation) FPDF_GetPageLabel(request *requests.FPDF_GetPageL
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDF_GetPageLabel").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Page)), charDataPointer.Pointer, labelSize)
+	res, err = p.call("FPDF_GetPageLabel", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Page)), charDataPointer.Pointer, labelSize)
 	if err != nil {
 		return nil, err
 	}
@@ -558,7 +558,7 @@ func (p *PdfiumImplementation) FPDFDest_GetLocationInPage(request *requests.FPDF
 	}
 	defer zoomPointer.Free()
 
-	res, err := p.Fn("FPDFDest_GetLocationInPage").Call(p.Context, *destHandle.handle, hasXValPointer.Pointer, hasYValPointer.Pointer, hasZoomValPointer.Pointer, xPointer.Pointer, yPointer.Pointer, zoomPointer.Pointer)
+	res, err := p.call("FPDFDest_GetLocationInPage", *destHandle.handle, hasXValPointer.Pointer, hasYValPointer.Pointer, hasZoomValPointer.Pointer, xPointer.Pointer, yPointer.Pointer, zoomPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -627,7 +627,7 @@ func (p *PdfiumImplementation) FPDFLink_GetLinkAtPoint(request *requests.FPDFLin
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetLinkAtPoint").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	res, err := p.call("FPDFLink_GetLinkAtPoint", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
 	if err != nil {
 		return nil, err
 	}
@@ -653,7 +653,7 @@ func (p *PdfiumImplementation) FPDFLink_GetLinkZOrderAtPoint(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetLinkZOrderAtPoint").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
+	res, err := p.call("FPDFLink_GetLinkZOrderAtPoint", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.X)), *(*uint64)(unsafe.Pointer(&request.Y)))
 	if err != nil {
 		return nil, err
 	}
@@ -680,7 +680,7 @@ func (p *PdfiumImplementation) FPDFLink_GetDest(request *requests.FPDFLink_GetDe
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetDest").Call(p.Context, *documentHandle.handle, *linkHandle.handle)
+	res, err := p.call("FPDFLink_GetDest", *documentHandle.handle, *linkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -709,7 +709,7 @@ func (p *PdfiumImplementation) FPDFLink_GetAction(request *requests.FPDFLink_Get
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetAction").Call(p.Context, *linkHandle.handle)
+	res, err := p.call("FPDFLink_GetAction", *linkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -750,7 +750,7 @@ func (p *PdfiumImplementation) FPDFLink_Enumerate(request *requests.FPDFLink_Enu
 	}
 	defer linkPointer.Free()
 
-	res, err := p.Fn("FPDFLink_Enumerate").Call(p.Context, *pageHandle.handle, startPosPointer.Pointer, linkPointer.Pointer)
+	res, err := p.call("FPDFLink_Enumerate", *pageHandle.handle, startPosPointer.Pointer, linkPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -792,7 +792,7 @@ func (p *PdfiumImplementation) FPDFLink_GetAnnotRect(request *requests.FPDFLink_
 	}
 	defer p.Free(rectPointer)
 
-	res, err := p.Fn("FPDFLink_GetAnnotRect").Call(p.Context, *linkHandle.handle, rectPointer)
+	res, err := p.call("FPDFLink_GetAnnotRect", *linkHandle.handle, rectPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -824,7 +824,7 @@ func (p *PdfiumImplementation) FPDFLink_CountQuadPoints(request *requests.FPDFLi
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_CountQuadPoints").Call(p.Context, *linkHandle.handle)
+	res, err := p.call("FPDFLink_CountQuadPoints", *linkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -848,7 +848,7 @@ func (p *PdfiumImplementation) FPDFLink_GetQuadPoints(request *requests.FPDFLink
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetQuadPoints").Call(p.Context, *linkHandle.handle, *(*uint64)(unsafe.Pointer(&request.QuadIndex)), quadPointsPointer)
+	res, err := p.call("FPDFLink_GetQuadPoints", *linkHandle.handle, *(*uint64)(unsafe.Pointer(&request.QuadIndex)), quadPointsPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -900,7 +900,7 @@ func (p *PdfiumImplementation) FPDFDest_GetView(request *requests.FPDFDest_GetVi
 	}
 	defer paramsPointer.Free()
 
-	res, err := p.Fn("FPDFDest_GetView").Call(p.Context, *destHandle.handle, numParamsPointer.Pointer, paramsPointer.Pointer)
+	res, err := p.call("FPDFDest_GetView", *destHandle.handle, numParamsPointer.Pointer, paramsPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -943,7 +943,7 @@ func (p *PdfiumImplementation) FPDFLink_GetAnnot(request *requests.FPDFLink_GetA
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFLink_GetAnnot").Call(p.Context, *pageHandle.handle, *linkHandle.handle)
+	res, err := p.call("FPDFLink_GetAnnot", *pageHandle.handle, *linkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -970,7 +970,7 @@ func (p *PdfiumImplementation) FPDF_GetPageAAction(request *requests.FPDF_GetPag
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDF_GetPageAAction").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
+	res, err := p.call("FPDF_GetPageAAction", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
 	if err != nil {
 		return nil, err
 	}
@@ -1004,7 +1004,7 @@ func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_Get
 	}
 
 	// First get the identifier length.
-	res, err := p.Fn("FPDF_GetFileIdentifier").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), 0, 0)
+	res, err := p.call("FPDF_GetFileIdentifier", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1023,7 +1023,7 @@ func (p *PdfiumImplementation) FPDF_GetFileIdentifier(request *requests.FPDF_Get
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Fn("FPDF_GetFileIdentifier").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), charDataPointer.Pointer, identifierSize)
+	res, err = p.call("FPDF_GetFileIdentifier", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.FileIdType)), charDataPointer.Pointer, identifierSize)
 	if err != nil {
 		return nil, err
 	}
@@ -1053,7 +1053,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookm
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFBookmark_GetCount").Call(p.Context, *bookmarkHandle.handle)
+	res, err := p.call("FPDFBookmark_GetCount", *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1094,7 +1094,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookm
 	}
 	defer bPointer.Free()
 
-	res, err := p.Fn("FPDFBookmark_GetColor").Call(p.Context, *bookmarkHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
+	res, err := p.call("FPDFBookmark_GetColor", *bookmarkHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

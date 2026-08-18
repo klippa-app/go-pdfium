@@ -18,7 +18,7 @@ func (p *PdfiumImplementation) FPDFAnnot_IsSupportedSubtype(request *requests.FP
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.Fn("FPDFAnnot_IsSupportedSubtype").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.Subtype)))
+	res, err := p.call("FPDFAnnot_IsSupportedSubtype", *(*uint64)(unsafe.Pointer(&request.Subtype)))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (p *PdfiumImplementation) FPDFPage_CreateAnnot(request *requests.FPDFPage_C
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_CreateAnnot").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Subtype)))
+	res, err := p.call("FPDFPage_CreateAnnot", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Subtype)))
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (p *PdfiumImplementation) internal_FPDFPage_GetAnnotCount(request *requests
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_GetAnnotCount").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFPage_GetAnnotCount", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (p *PdfiumImplementation) internal_FPDFPage_GetAnnot(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_GetAnnot").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFPage_GetAnnot", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (p *PdfiumImplementation) FPDFPage_GetAnnotIndex(request *requests.FPDFPage
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_GetAnnotIndex").Call(p.Context, *pageHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFPage_GetAnnotIndex", *pageHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (p *PdfiumImplementation) internal_FPDFPage_CloseAnnot(request *requests.FP
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDFPage_CloseAnnot").Call(p.Context, *annotationHandle.handle)
+	_, err = p.call("FPDFPage_CloseAnnot", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (p *PdfiumImplementation) FPDFPage_RemoveAnnot(request *requests.FPDFPage_R
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFPage_RemoveAnnot").Call(p.Context, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFPage_RemoveAnnot", *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetSubtype(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetSubtype").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetSubtype", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (p *PdfiumImplementation) FPDFAnnot_IsObjectSupportedSubtype(request *reque
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.Fn("FPDFAnnot_IsObjectSupportedSubtype").Call(p.Context, *(*uint64)(unsafe.Pointer(&request.Subtype)))
+	res, err := p.call("FPDFAnnot_IsObjectSupportedSubtype", *(*uint64)(unsafe.Pointer(&request.Subtype)))
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (p *PdfiumImplementation) FPDFAnnot_UpdateObject(request *requests.FPDFAnno
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_UpdateObject").Call(p.Context, *annotationHandle.handle, *pageObjectHandle.handle)
+	res, err := p.call("FPDFAnnot_UpdateObject", *annotationHandle.handle, *pageObjectHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +308,7 @@ func (p *PdfiumImplementation) FPDFAnnot_AddInkStroke(request *requests.FPDFAnno
 	}
 	defer pointArray.Free()
 
-	res, err := p.Fn("FPDFAnnot_AddInkStroke").Call(p.Context, *annotationHandle.handle, pointArray.Pointer, pointSize)
+	res, err := p.call("FPDFAnnot_AddInkStroke", *annotationHandle.handle, pointArray.Pointer, pointSize)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +335,7 @@ func (p *PdfiumImplementation) FPDFAnnot_RemoveInkList(request *requests.FPDFAnn
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_RemoveInkList").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_RemoveInkList", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +368,7 @@ func (p *PdfiumImplementation) FPDFAnnot_AppendObject(request *requests.FPDFAnno
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_AppendObject").Call(p.Context, *annotationHandle.handle, *pageObjectHandle.handle)
+	res, err := p.call("FPDFAnnot_AppendObject", *annotationHandle.handle, *pageObjectHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetObjectCount(request *requests.FPDFAn
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetObjectCount").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetObjectCount", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +415,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetObject(request *requests.FPDFAnnot_G
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetObject").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFAnnot_GetObject", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +443,7 @@ func (p *PdfiumImplementation) FPDFAnnot_RemoveObject(request *requests.FPDFAnno
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_RemoveObject").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFAnnot_RemoveObject", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -469,7 +469,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetColor(request *requests.FPDFAnnot_Se
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetColor").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.ColorType)), *(*uint64)(unsafe.Pointer(&request.R)), *(*uint64)(unsafe.Pointer(&request.G)), *(*uint64)(unsafe.Pointer(&request.B)), *(*uint64)(unsafe.Pointer(&request.A)))
+	res, err := p.call("FPDFAnnot_SetColor", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.ColorType)), *(*uint64)(unsafe.Pointer(&request.R)), *(*uint64)(unsafe.Pointer(&request.G)), *(*uint64)(unsafe.Pointer(&request.B)), *(*uint64)(unsafe.Pointer(&request.A)))
 	if err != nil {
 		return nil, err
 	}
@@ -520,7 +520,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetColor(request *requests.FPDFAnnot_Ge
 	}
 	defer aPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetColor").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.ColorType)), rPointer.Pointer, gPointer.Pointer, bPointer.Pointer, aPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetColor", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.ColorType)), rPointer.Pointer, gPointer.Pointer, bPointer.Pointer, aPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -574,7 +574,7 @@ func (p *PdfiumImplementation) FPDFAnnot_HasAttachmentPoints(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_HasAttachmentPoints").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_HasAttachmentPoints", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -608,7 +608,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetAttachmentPoints(request *requests.F
 	}
 	defer p.Free(attachmentPointsPointer)
 
-	res, err := p.Fn("FPDFAnnot_SetAttachmentPoints").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), attachmentPointsPointer)
+	res, err := p.call("FPDFAnnot_SetAttachmentPoints", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), attachmentPointsPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -641,7 +641,7 @@ func (p *PdfiumImplementation) FPDFAnnot_AppendAttachmentPoints(request *request
 	}
 	defer p.Free(attachmentPointsPointer)
 
-	res, err := p.Fn("FPDFAnnot_AppendAttachmentPoints").Call(p.Context, *annotationHandle.handle, attachmentPointsPointer)
+	res, err := p.call("FPDFAnnot_AppendAttachmentPoints", *annotationHandle.handle, attachmentPointsPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -665,7 +665,7 @@ func (p *PdfiumImplementation) FPDFAnnot_CountAttachmentPoints(request *requests
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_CountAttachmentPoints").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_CountAttachmentPoints", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -694,7 +694,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAttachmentPoints(request *requests.F
 	}
 	defer p.Free(attachmentPointsPointer)
 
-	res, err := p.Fn("FPDFAnnot_GetAttachmentPoints").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), attachmentPointsPointer)
+	res, err := p.call("FPDFAnnot_GetAttachmentPoints", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), attachmentPointsPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -743,7 +743,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetRect(request *requests.FPDFAnnot_Set
 	}
 	defer p.Free(rectPointer)
 
-	res, err := p.Fn("FPDFAnnot_SetRect").Call(p.Context, *annotationHandle.handle, rectPointer)
+	res, err := p.call("FPDFAnnot_SetRect", *annotationHandle.handle, rectPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -773,7 +773,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetRect(request *requests.FPDFAnnot_Get
 	}
 	defer p.Free(rectPointer)
 
-	res, err := p.Fn("FPDFAnnot_GetRect").Call(p.Context, *annotationHandle.handle, rectPointer)
+	res, err := p.call("FPDFAnnot_GetRect", *annotationHandle.handle, rectPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -810,7 +810,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetVertices(request *requests.FPDFAnnot
 	}
 
 	// First get the vertices array size.
-	res, err := p.Fn("FPDFAnnot_GetVertices").Call(p.Context, *annotationHandle.handle, 0, 0)
+	res, err := p.call("FPDFAnnot_GetVertices", *annotationHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -824,7 +824,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetVertices(request *requests.FPDFAnnot
 
 	if length > 0 {
 		// Actually fill the array
-		_, err := p.Fn("FPDFAnnot_GetVertices").Call(p.Context, *annotationHandle.handle, cVerticesPointer.Pointer, length)
+		_, err := p.call("FPDFAnnot_GetVertices", *annotationHandle.handle, cVerticesPointer.Pointer, length)
 		if err != nil {
 			return nil, err
 		}
@@ -851,7 +851,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetInkListCount(request *requests.FPDFA
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetInkListCount").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetInkListCount", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -875,7 +875,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetInkListPath(request *requests.FPDFAn
 	}
 
 	// First get the path array size.
-	res, err := p.Fn("FPDFAnnot_GetInkListPath").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), 0, 0)
+	res, err := p.call("FPDFAnnot_GetInkListPath", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -889,7 +889,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetInkListPath(request *requests.FPDFAn
 
 	if length > 0 {
 		// Actually fill the array
-		_, err = p.Fn("FPDFAnnot_GetInkListPath").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), cPathPointer.Pointer, length)
+		_, err = p.call("FPDFAnnot_GetInkListPath", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), cPathPointer.Pointer, length)
 		if err != nil {
 			return nil, err
 		}
@@ -928,7 +928,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetLine(request *requests.FPDFAnnot_Get
 	}
 	defer endPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetLine").Call(p.Context, *annotationHandle.handle, startPointer.Pointer, endPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetLine", *annotationHandle.handle, startPointer.Pointer, endPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -965,7 +965,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetBorder(request *requests.FPDFAnnot_S
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetBorder").Call(p.Context, *annotationHandle.handle, api.EncodeF32(request.HorizontalRadius), api.EncodeF32(request.VerticalRadius), api.EncodeF32(request.BorderWidth))
+	res, err := p.call("FPDFAnnot_SetBorder", *annotationHandle.handle, api.EncodeF32(request.HorizontalRadius), api.EncodeF32(request.VerticalRadius), api.EncodeF32(request.BorderWidth))
 	if err != nil {
 		return nil, err
 	}
@@ -1007,7 +1007,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetBorder(request *requests.FPDFAnnot_G
 	}
 	defer horizontalRadiusPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetBorder").Call(p.Context, *annotationHandle.handle, horizontalRadiusPointer.Pointer, verticalRadiusPointer.Pointer, borderWidthPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetBorder", *annotationHandle.handle, horizontalRadiusPointer.Pointer, verticalRadiusPointer.Pointer, borderWidthPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1056,7 +1056,7 @@ func (p *PdfiumImplementation) FPDFAnnot_HasKey(request *requests.FPDFAnnot_HasK
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_HasKey").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer)
+	res, err := p.call("FPDFAnnot_HasKey", *annotationHandle.handle, keyPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1085,7 +1085,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetValueType(request *requests.FPDFAnno
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetValueType").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetValueType", *annotationHandle.handle, keyPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1122,7 +1122,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetStringValue(request *requests.FPDFAn
 	}
 	defer valuePointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_SetStringValue").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
+	res, err := p.call("FPDFAnnot_SetStringValue", *annotationHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1153,7 +1153,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetStringValue(request *requests.FPDFAn
 	defer keyPointer.Free()
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetStringValue").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer, 0, 0)
+	res, err := p.call("FPDFAnnot_GetStringValue", *annotationHandle.handle, keyPointer.Pointer, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1169,7 +1169,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetStringValue(request *requests.FPDFAn
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetStringValue").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer, charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetStringValue", *annotationHandle.handle, keyPointer.Pointer, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1212,7 +1212,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetNumberValue(request *requests.FPDFAn
 	}
 	defer valuePointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetNumberValue").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetNumberValue", *annotationHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1250,7 +1250,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetAP(request *requests.FPDFAnnot_SetAP
 		}
 		defer valuePointer.Free()
 
-		res, err := p.Fn("FPDFAnnot_SetAP").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), valuePointer.Pointer)
+		res, err := p.call("FPDFAnnot_SetAP", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), valuePointer.Pointer)
 		if err != nil {
 			return nil, err
 		}
@@ -1260,7 +1260,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetAP(request *requests.FPDFAnnot_SetAP
 			return nil, errors.New("could not set appearance mode")
 		}
 	} else {
-		res, err := p.Fn("FPDFAnnot_SetAP").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), 0)
+		res, err := p.call("FPDFAnnot_SetAP", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), 0)
 		if err != nil {
 			return nil, err
 		}
@@ -1287,7 +1287,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAP(request *requests.FPDFAnnot_GetAP
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetAP").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), 0, 0)
+	res, err := p.call("FPDFAnnot_GetAP", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1303,7 +1303,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetAP(request *requests.FPDFAnnot_GetAP
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetAP").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetAP", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.AppearanceMode)), charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1343,7 +1343,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetLinkedAnnot(request *requests.FPDFAn
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetLinkedAnnot").Call(p.Context, *annotationHandle.handle, keyPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetLinkedAnnot", *annotationHandle.handle, keyPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1371,7 +1371,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFlags(request *requests.FPDFAnnot_Ge
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFlags").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFlags", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1394,7 +1394,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFlags(request *requests.FPDFAnnot_Se
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetFlags").Call(p.Context, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
+	res, err := p.call("FPDFAnnot_SetFlags", *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
 	if err != nil {
 		return nil, err
 	}
@@ -1427,7 +1427,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldFlags(request *req
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFormFieldFlags").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFormFieldFlags", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1455,7 +1455,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFormFieldFlags(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetFormFieldFlags").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
+	res, err := p.call("FPDFAnnot_SetFormFieldFlags", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Flags)))
 	if err != nil {
 		return nil, err
 	}
@@ -1492,7 +1492,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormFieldAtPoint(request *requests.F
 	}
 	defer pointPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetFormFieldAtPoint").Call(p.Context, *formHandle.handle, *pageHandle.handle, pointPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetFormFieldAtPoint", *formHandle.handle, *pageHandle.handle, pointPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1526,7 +1526,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormAdditionalActionJavaScript(reque
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetFormAdditionalActionJavaScript").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Event)), 0, 0)
+	res, err := p.call("FPDFAnnot_GetFormAdditionalActionJavaScript", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Event)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1542,7 +1542,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFormAdditionalActionJavaScript(reque
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetFormAdditionalActionJavaScript").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Event)), charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetFormAdditionalActionJavaScript", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Event)), charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1583,7 +1583,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldName(request *requ
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetFormFieldName").Call(p.Context, *formHandle.handle, *annotationHandle.handle, 0, 0)
+	res, err := p.call("FPDFAnnot_GetFormFieldName", *formHandle.handle, *annotationHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1599,7 +1599,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldName(request *requ
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetFormFieldName").Call(p.Context, *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetFormFieldName", *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1640,7 +1640,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldAlternateName(requ
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetFormFieldAlternateName").Call(p.Context, *formHandle.handle, *annotationHandle.handle, 0, 0)
+	res, err := p.call("FPDFAnnot_GetFormFieldAlternateName", *formHandle.handle, *annotationHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1656,7 +1656,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldAlternateName(requ
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetFormFieldAlternateName").Call(p.Context, *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetFormFieldAlternateName", *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1696,7 +1696,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldType(request *requ
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFormFieldType").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFormFieldType", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1732,7 +1732,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldValue(request *req
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetFormFieldValue").Call(p.Context, *formHandle.handle, *annotationHandle.handle, 0, 0)
+	res, err := p.call("FPDFAnnot_GetFormFieldValue", *formHandle.handle, *annotationHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1748,7 +1748,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldValue(request *req
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetFormFieldValue").Call(p.Context, *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetFormFieldValue", *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1789,7 +1789,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetOptionCount(request *reques
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetOptionCount").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetOptionCount", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1827,7 +1827,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetOptionLabel(request *reques
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetOptionLabel").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), 0, 0)
+	res, err := p.call("FPDFAnnot_GetOptionLabel", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1843,7 +1843,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetOptionLabel(request *reques
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetOptionLabel").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetOptionLabel", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1884,7 +1884,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_IsOptionSelected(request *requ
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_IsOptionSelected").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFAnnot_IsOptionSelected", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -1920,7 +1920,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontSize(request *requests.FPDFAnnot
 	}
 	defer fontSizePointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetFontSize").Call(p.Context, *formHandle.handle, *annotationHandle.handle, fontSizePointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetFontSize", *formHandle.handle, *annotationHandle.handle, fontSizePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1958,7 +1958,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFontColor(request *requests.FPDFAnno
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetFontColor").Call(p.Context, *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.R)), *(*uint64)(unsafe.Pointer(&request.G)), *(*uint64)(unsafe.Pointer(&request.B)))
+	res, err := p.call("FPDFAnnot_SetFontColor", *formHandle.handle, *annotationHandle.handle, *(*uint64)(unsafe.Pointer(&request.R)), *(*uint64)(unsafe.Pointer(&request.G)), *(*uint64)(unsafe.Pointer(&request.B)))
 	if err != nil {
 		return nil, err
 	}
@@ -2005,7 +2005,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFontColor(request *requests.FPDFAnno
 	}
 	defer bPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_GetFontColor").Call(p.Context, *formHandle.handle, *annotationHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
+	res, err := p.call("FPDFAnnot_GetFontColor", *formHandle.handle, *annotationHandle.handle, rPointer.Pointer, gPointer.Pointer, bPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -2058,7 +2058,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_IsChecked(request *requests.FP
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_IsChecked").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_IsChecked", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2101,7 +2101,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetFocusableSubtypes(request *requests.
 		}
 	}
 
-	res, err := p.Fn("FPDFAnnot_SetFocusableSubtypes").Call(p.Context, *formHandle.handle, focusableSubtypesPointer.Pointer, subtypesSize)
+	res, err := p.call("FPDFAnnot_SetFocusableSubtypes", *formHandle.handle, focusableSubtypesPointer.Pointer, subtypesSize)
 	if err != nil {
 		return nil, err
 	}
@@ -2125,7 +2125,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypesCount(request *requ
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFocusableSubtypesCount").Call(p.Context, *formHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFocusableSubtypesCount", *formHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2151,7 +2151,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypes(request *requests.
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFocusableSubtypesCount").Call(p.Context, *formHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFocusableSubtypesCount", *formHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2169,7 +2169,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFocusableSubtypes(request *requests.
 	goFocusableSubtypes := make([]enums.FPDF_ANNOTATION_SUBTYPE, int(count))
 
 	if int(count) > 0 {
-		res, err = p.Fn("FPDFAnnot_GetFocusableSubtypes").Call(p.Context, *formHandle.handle, focusableSubtypesPointer.Pointer, count)
+		res, err = p.call("FPDFAnnot_GetFocusableSubtypes", *formHandle.handle, focusableSubtypesPointer.Pointer, count)
 		if err != nil {
 			return nil, err
 		}
@@ -2205,7 +2205,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetLink(request *requests.FPDFAnnot_Get
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetLink").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetLink", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2245,7 +2245,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormControlCount(request *r
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFormControlCount").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFormControlCount", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2283,7 +2283,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormControlIndex(request *r
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFormControlIndex").Call(p.Context, *formHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFormControlIndex", *formHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2320,7 +2320,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldExportValue(reques
 	}
 
 	// First get the value length
-	res, err := p.Fn("FPDFAnnot_GetFormFieldExportValue").Call(p.Context, *formHandle.handle, *annotationHandle.handle, 0, 0)
+	res, err := p.call("FPDFAnnot_GetFormFieldExportValue", *formHandle.handle, *annotationHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -2336,7 +2336,7 @@ func (p *PdfiumImplementation) internal_FPDFAnnot_GetFormFieldExportValue(reques
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAnnot_GetFormFieldExportValue").Call(p.Context, *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
+	_, err = p.call("FPDFAnnot_GetFormFieldExportValue", *formHandle.handle, *annotationHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -2373,7 +2373,7 @@ func (p *PdfiumImplementation) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetU
 	}
 	defer uriStrPointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_SetURI").Call(p.Context, *annotationHandle.handle, uriStrPointer.Pointer)
+	res, err := p.call("FPDFAnnot_SetURI", *annotationHandle.handle, uriStrPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -2402,7 +2402,7 @@ func (p *PdfiumImplementation) FPDFAnnot_GetFileAttachment(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFAnnot_GetFileAttachment").Call(p.Context, *annotationHandle.handle)
+	res, err := p.call("FPDFAnnot_GetFileAttachment", *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -2441,7 +2441,7 @@ func (p *PdfiumImplementation) FPDFAnnot_AddFileAttachment(request *requests.FPD
 	}
 	defer namePointer.Free()
 
-	res, err := p.Fn("FPDFAnnot_AddFileAttachment").Call(p.Context, *annotationHandle.handle, namePointer.Pointer)
+	res, err := p.call("FPDFAnnot_AddFileAttachment", *annotationHandle.handle, namePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

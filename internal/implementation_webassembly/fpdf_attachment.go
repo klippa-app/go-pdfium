@@ -20,7 +20,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetAttachmentCount(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_GetAttachmentCount").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFDoc_GetAttachmentCount", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (p *PdfiumImplementation) FPDFDoc_AddAttachment(request *requests.FPDFDoc_A
 	}
 	defer namePointer.Free()
 
-	res, err := p.Fn("FPDFDoc_AddAttachment").Call(p.Context, *documentHandle.handle, namePointer.Pointer)
+	res, err := p.call("FPDFDoc_AddAttachment", *documentHandle.handle, namePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (p *PdfiumImplementation) FPDFDoc_GetAttachment(request *requests.FPDFDoc_G
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_GetAttachment").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFDoc_GetAttachment", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (p *PdfiumImplementation) FPDFDoc_DeleteAttachment(request *requests.FPDFDo
 		return nil, err
 	}
 
-	res, err := p.Fn("FPDFDoc_DeleteAttachment").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDFDoc_DeleteAttachment", *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetName(request *requests.FPDFAtta
 	}
 
 	// First get the title length.
-	res, err := p.Fn("FPDFAttachment_GetName").Call(p.Context, *attachmentHandle.handle, 0, 0)
+	res, err := p.call("FPDFAttachment_GetName", *attachmentHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetName(request *requests.FPDFAtta
 		return nil, err
 	}
 
-	res, err = p.Fn("FPDFAttachment_GetName").Call(p.Context, *attachmentHandle.handle, charDataPointer.Pointer, nameSize)
+	res, err = p.call("FPDFAttachment_GetName", *attachmentHandle.handle, charDataPointer.Pointer, nameSize)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (p *PdfiumImplementation) FPDFAttachment_HasKey(request *requests.FPDFAttac
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_HasKey").Call(p.Context, *attachmentHandle.handle, keyPointer.Pointer)
+	res, err := p.call("FPDFAttachment_HasKey", *attachmentHandle.handle, keyPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetValueType(request *requests.FPD
 	}
 	defer keyPointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_GetValueType").Call(p.Context, *attachmentHandle.handle, keyPointer.Pointer)
+	res, err := p.call("FPDFAttachment_GetValueType", *attachmentHandle.handle, keyPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (p *PdfiumImplementation) FPDFAttachment_SetStringValue(request *requests.F
 	}
 	defer valuePointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_SetStringValue").Call(p.Context, *attachmentHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
+	res, err := p.call("FPDFAttachment_SetStringValue", *attachmentHandle.handle, keyPointer.Pointer, valuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetStringValue(request *requests.F
 	defer keyPointer.Free()
 
 	// First get the string value length.
-	res, err := p.Fn("FPDFAttachment_GetStringValue").Call(p.Context, *attachmentHandle.handle, keyPointer.Pointer, 0, 0)
+	res, err := p.call("FPDFAttachment_GetStringValue", *attachmentHandle.handle, keyPointer.Pointer, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetStringValue(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDFAttachment_GetStringValue").Call(p.Context, *attachmentHandle.handle, keyPointer.Pointer, charDataPointer.Pointer, stringValueSize)
+	_, err = p.call("FPDFAttachment_GetStringValue", *attachmentHandle.handle, keyPointer.Pointer, charDataPointer.Pointer, stringValueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (p *PdfiumImplementation) FPDFAttachment_SetDescription(request *requests.F
 	}
 	defer valuePointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_SetDescription").Call(p.Context, *attachmentHandle.handle, valuePointer.Pointer)
+	res, err := p.call("FPDFAttachment_SetDescription", *attachmentHandle.handle, valuePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +377,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetDescription(request *requests.F
 	}
 
 	// First get the description length.
-	res, err := p.Fn("FPDFAttachment_GetDescription").Call(p.Context, *attachmentHandle.handle, 0, 0)
+	res, err := p.call("FPDFAttachment_GetDescription", *attachmentHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetDescription(request *requests.F
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Fn("FPDFAttachment_GetDescription").Call(p.Context, *attachmentHandle.handle, charDataPointer.Pointer, descriptionSize)
+	_, err = p.call("FPDFAttachment_GetDescription", *attachmentHandle.handle, charDataPointer.Pointer, descriptionSize)
 	if err != nil {
 		return nil, err
 	}
@@ -439,7 +439,7 @@ func (p *PdfiumImplementation) FPDFAttachment_SetFile(request *requests.FPDFAtta
 	}
 	defer fileDataPointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_SetFile").Call(p.Context, *attachmentHandle.handle, *documentHandle.handle, fileDataPointer.Pointer, fileSize)
+	res, err := p.call("FPDFAttachment_SetFile", *attachmentHandle.handle, *documentHandle.handle, fileDataPointer.Pointer, fileSize)
 	if err != nil {
 		return nil, err
 	}
@@ -469,7 +469,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 	}
 	defer bufLenPointer.Free()
 
-	res, err := p.Fn("FPDFAttachment_GetFile").Call(p.Context, *attachmentHandle.handle, 0, 0, bufLenPointer.Pointer)
+	res, err := p.call("FPDFAttachment_GetFile", *attachmentHandle.handle, 0, 0, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +492,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 	}
 	defer fileDataPointer.Free()
 
-	res, err = p.Fn("FPDFAttachment_GetFile").Call(p.Context, *attachmentHandle.handle, fileDataPointer.Pointer, bufLen, bufLenPointer.Pointer)
+	res, err = p.call("FPDFAttachment_GetFile", *attachmentHandle.handle, fileDataPointer.Pointer, bufLen, bufLenPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -524,7 +524,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFA
 	}
 
 	// First get the string value length.
-	res, err := p.Fn("FPDFAttachment_GetSubtype").Call(p.Context, *attachmentHandle.handle, 0, 0)
+	res, err := p.call("FPDFAttachment_GetSubtype", *attachmentHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -539,7 +539,7 @@ func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFA
 		return nil, err
 	}
 
-	_, err = p.Fn("FPDFAttachment_GetSubtype").Call(p.Context, *attachmentHandle.handle, charDataPointer.Pointer, stringValueSize)
+	_, err = p.call("FPDFAttachment_GetSubtype", *attachmentHandle.handle, charDataPointer.Pointer, stringValueSize)
 	if err != nil {
 		return nil, err
 	}

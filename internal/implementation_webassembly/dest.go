@@ -25,7 +25,7 @@ func (p *PdfiumImplementation) registerDest(dest *uint64, documentHandle *Docume
 }
 
 func (p *PdfiumImplementation) getDestInfo(destHandle *DestHandle, documentHandle *DocumentHandle) (*responses.DestInfo, error) {
-	res, err := p.Fn("FPDFDest_GetDestPageIndex").Call(p.Context, *documentHandle.handle, *destHandle.handle)
+	res, err := p.call("FPDFDest_GetDestPageIndex", *documentHandle.handle, *destHandle.handle)
 	if err != nil {
 		return nil, err
 	}
