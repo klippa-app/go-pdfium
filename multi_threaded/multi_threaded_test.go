@@ -59,7 +59,12 @@ var _ = AfterSuite(func() {
 	err = shared_tests.PdfiumPool.Close()
 	Expect(err).To(BeNil())
 
-	Eventually(Goroutines).ShouldNot(HaveLeaked())
+	// The worker runs in a separate process (via go run, so even two processes
+	// deep); after pool.Close() it takes a moment for the process to exit and
+	// the plugin client's pipe-reader goroutines to finish, especially on slow
+	// CI runners with -race. Gomega's default 1s timeout regularly loses that
+	// race on Windows.
+	Eventually(Goroutines).WithTimeout(30 * time.Second).WithPolling(500 * time.Millisecond).ShouldNot(HaveLeaked())
 })
 
 var _ = Describe("Multi Threaded", func() {
