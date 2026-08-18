@@ -431,6 +431,14 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		bitmap = res[0]
 	}
 
+	// A NULL bitmap means PDFium could not allocate it (e.g. the instance ran
+	// out of WebAssembly memory, or the dimensions overflow). Without this
+	// check the render calls below silently become no-ops on a NULL handle
+	// and the returned image would contain garbage.
+	if bitmap == 0 {
+		return nil, nil, errors.New("could not create bitmap")
+	}
+
 	releaseFunc := func() {
 		// Release bitmap resources and buffers.
 		p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, bitmap)

@@ -649,6 +649,10 @@ func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
 	}
 
 	pointer := results[0]
+	if pointer == 0 && size > 0 {
+		// malloc returned NULL: the instance is out of WebAssembly memory.
+		return 0, errors.New("could not allocate memory")
+	}
 
 	ok := p.Module.Memory().Write(uint32(results[0]), make([]byte, size))
 	if !ok {

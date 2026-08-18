@@ -399,6 +399,14 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		bitmap = C.FPDFBitmap_CreateEx(C.int(totalWidth), C.int(totalHeight), C.FPDFBitmap_BGRA, unsafe.Pointer(&img.Pix[0]), C.int(img.Stride))
 	}
 
+	// A NULL bitmap means PDFium rejected the parameters (e.g. the dimensions
+	// overflow the pitch calculation). Without this check the render calls
+	// below silently become no-ops on a NULL handle and the returned image
+	// would stay blank.
+	if bitmap == nil {
+		return nil, errors.New("could not create bitmap")
+	}
+
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
 	currentOffset := 0
 	for i := range pages {
@@ -412,6 +420,9 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		}
 		index, hasTransparency, err := p.renderPage(bitmap, pages[i].Document, pages[i].Page, pages[i].Width, pages[i].Height, currentOffset, pages[i].Flags, pages[i].RenderForm, imageFormat)
 		if err != nil {
+			// Release the bitmap handle, it would otherwise leak on render
+			// errors. This does not touch the Go image pixel buffer.
+			C.FPDFBitmap_Destroy(bitmap)
 			return nil, err
 		}
 		pagesInfo[i].Page = index
