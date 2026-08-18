@@ -5,8 +5,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
-	"io/ioutil"
 	"sync"
+	"unicode/utf16"
+	"unicode/utf8"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -110,19 +111,42 @@ func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 }
 
 func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
-	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
-	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
+	// BOM handling, matching the previous unicode.BOMOverride behavior.
+	if bytes.HasPrefix(charData, []byte{0xEF, 0xBB, 0xBF}) {
+		// Data is already UTF-8.
+		return string(bytes.TrimSuffix(charData[3:], []byte("\x00"))), nil
+	}
 
-	decoded, err := ioutil.ReadAll(unicodeReader)
-	if err != nil {
-		return "", err
+	bigEndian := false
+	if bytes.HasPrefix(charData, []byte{0xFF, 0xFE}) {
+		charData = charData[2:]
+	} else if bytes.HasPrefix(charData, []byte{0xFE, 0xFF}) {
+		bigEndian = true
+		charData = charData[2:]
+	}
+
+	u16 := make([]uint16, 0, len(charData)/2)
+	for i := 0; i+1 < len(charData); i += 2 {
+		if bigEndian {
+			u16 = append(u16, uint16(charData[i])<<8|uint16(charData[i+1]))
+		} else {
+			u16 = append(u16, uint16(charData[i])|uint16(charData[i+1])<<8)
+		}
+	}
+
+	runes := utf16.Decode(u16)
+
+	// A dangling single byte can't be decoded.
+	if len(charData)%2 != 0 {
+		runes = append(runes, utf8.RuneError)
 	}
 
 	// Remove NULL terminator.
-	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
+	if len(runes) > 0 && runes[len(runes)-1] == 0 {
+		runes = runes[:len(runes)-1]
+	}
 
-	return string(decoded), nil
+	return string(runes), nil
 }
 
 func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {

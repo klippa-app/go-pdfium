@@ -139,36 +139,36 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	charsInPage := *(*int32)(unsafe.Pointer(&res[0]))
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
+		leftPointer, err := p.DoublePointer(nil)
+		if err != nil {
+			return nil, err
+		}
+		defer leftPointer.Free()
+
+		topPointer, err := p.DoublePointer(nil)
+		if err != nil {
+			return nil, err
+		}
+		defer topPointer.Free()
+
+		rightPointer, err := p.DoublePointer(nil)
+		if err != nil {
+			return nil, err
+		}
+		defer rightPointer.Free()
+
+		bottomPointer, err := p.DoublePointer(nil)
+		if err != nil {
+			return nil, err
+		}
+		defer bottomPointer.Free()
+
 		for i := 0; i < int(charsInPage); i++ {
 			res, err = p.call("FPDFText_GetCharAngle", textPage, uint64(i))
 			if err != nil {
 				return nil, err
 			}
 			angle := *(*float32)(unsafe.Pointer(&res[0]))
-
-			leftPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer leftPointer.Free()
-
-			topPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer topPointer.Free()
-
-			rightPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer rightPointer.Free()
-
-			bottomPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer bottomPointer.Free()
 
 			_, err = p.call("FPDFText_GetCharBox", textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
 			if err != nil {
@@ -183,7 +183,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			text := ""
 			uniChar := *(*int)(unsafe.Pointer(&res[0]))
 			if uniChar != 0 {
-				text = string([]rune{rune(uniChar)})
+				text = string(rune(uniChar))
 			}
 
 			left, err := leftPointer.Value()
@@ -246,15 +246,18 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 		rectsCount := *(*int32)(unsafe.Pointer(&res[0]))
 
-		// Create a buffer that has room for all chars in this page, since
-		// we don't know the amount of chars in the section.
-		// We need to clear this every time, because we don't know how much bytes every char is.
-		charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage+1)*2), nil) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
+		// Reusable buffer for the bounded text of each rect, grown when a
+		// rect needs more room. Sized in UTF-16 code units; characters
+		// outside the Basic Multilingual Plane need a surrogate pair (2 units).
+		bufferUnits := uint64(charsInPage + 1)
+		charDataPointer, err := p.ByteArrayPointer(bufferUnits*2, nil) // UTF16-LE, 2 bytes per unit, add 1 unit for terminator.
 		if err != nil {
 			return nil, err
 		}
 
-		defer charDataPointer.Free()
+		defer func() {
+			charDataPointer.Free()
+		}()
 
 		leftPointer, err := p.DoublePointer(nil)
 		if err != nil {
@@ -306,12 +309,41 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				return nil, err
 			}
 
-			res, err = p.call("FPDFText_GetBoundedText", textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, uint64((charsInPage+1)*2))
+			res, err = p.call("FPDFText_GetBoundedText", textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, bufferUnits)
 			if err != nil {
 				return nil, err
 			}
 
 			charsWritten := *(*int32)(unsafe.Pointer(&res[0]))
+
+			// The result may have been truncated when the buffer was full:
+			// characters outside the Basic Multilingual Plane need a
+			// surrogate pair (2 units) while the buffer is sized at 1 unit
+			// per char on the page. Measure the exact size for this rect,
+			// grow the buffer and retry.
+			if uint64(charsWritten) >= bufferUnits {
+				res, err = p.call("FPDFText_GetBoundedText", textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), 0, 0)
+				if err != nil {
+					return nil, err
+				}
+
+				boundedTextUnits := *(*int32)(unsafe.Pointer(&res[0]))
+				if uint64(boundedTextUnits+1) > bufferUnits {
+					charDataPointer.Free()
+					bufferUnits = uint64(boundedTextUnits + 1)
+					charDataPointer, err = p.ByteArrayPointer(bufferUnits*2, nil)
+					if err != nil {
+						return nil, err
+					}
+				}
+
+				res, err = p.call("FPDFText_GetBoundedText", textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, bufferUnits)
+				if err != nil {
+					return nil, err
+				}
+
+				charsWritten = *(*int32)(unsafe.Pointer(&res[0]))
+			}
 
 			charData, err := charDataPointer.Value(false)
 			if err != nil {
@@ -388,7 +420,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 
 	fontSize := *(*float64)(unsafe.Pointer(&res[0]))
 
-	res, err = p.call("FPDFText_GetFontSize", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
+	res, err = p.call("FPDFText_GetFontWeight", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
 	if err != nil {
 		return nil, err
 	}

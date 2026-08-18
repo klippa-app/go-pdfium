@@ -158,11 +158,12 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth {
 		rectsCount := C.FPDFText_CountRects(textPage, C.int(0), C.int(charsInPage))
+
+		// Reusable buffer for the bounded text of each rect, grown when a
+		// rect needs more room. Sized in UTF-16 code units, 2 bytes per unit,
+		// add 1 unit for the terminator.
+		charData := make([]byte, (int(charsInPage)+1)*2)
 		for i := 0; i < int(rectsCount); i++ {
-			// Create a buffer that has room for all chars in this page, since
-			// we don't know the amount of chars in the section.
-			// We need to clear this every time, because we don't know how much bytes every char is.
-			charData := make([]byte, (charsInPage+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
 			left := C.double(0)
 			top := C.double(0)
 			right := C.double(0)
@@ -170,7 +171,20 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 			C.FPDFText_GetRect(textPage, C.int(i), &left, &top, &right, &bottom)
 
-			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
+			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
+
+			// The result may have been truncated when the buffer was full:
+			// characters outside the Basic Multilingual Plane need a
+			// surrogate pair (2 units) while the buffer is sized at 1 unit
+			// per char on the page. Measure the exact size for this rect,
+			// grow the buffer and retry.
+			if int(charsWritten)*2 >= len(charData) {
+				charCount := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, nil, C.int(0))
+				if needed := (int(charCount) + 1) * 2; needed > len(charData) {
+					charData = make([]byte, needed)
+				}
+				charsWritten = C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
+			}
 
 			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 			if err != nil {
