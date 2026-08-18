@@ -25,7 +25,7 @@ func (p *PdfiumImplementation) registerAction(action *uint64) *ActionHandle {
 }
 
 func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documentHandle *DocumentHandle) (*responses.ActionInfo, error) {
-	res, err := p.Module.ExportedFunction("FPDFAction_GetType").Call(p.Context, *actionHandle.handle)
+	res, err := p.call("FPDFAction_GetType", *actionHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 	}
 
 	if actionInfo.Type == enums.FPDF_ACTION_ACTION_GOTO {
-		res, err = p.Module.ExportedFunction("FPDFAction_GetDest").Call(p.Context, *documentHandle.handle, *actionHandle.handle)
+		res, err = p.call("FPDFAction_GetDest", *documentHandle.handle, *actionHandle.handle)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 		}
 	} else if actionInfo.Type == enums.FPDF_ACTION_ACTION_LAUNCH || actionInfo.Type == enums.FPDF_ACTION_ACTION_REMOTEGOTO {
 		// First get the file path length.
-		res, err = p.Module.ExportedFunction("FPDFAction_GetFilePath").Call(p.Context, *actionHandle.handle, 0, 0)
+		res, err = p.call("FPDFAction_GetFilePath", *actionHandle.handle, 0, 0)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 		charDataPointer, err := p.ByteArrayPointer(uint64(filePathLength), nil)
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDFAction_GetFilePath").Call(p.Context, *actionHandle.handle, charDataPointer.Pointer, uint64(filePathLength))
+		_, err = p.call("FPDFAction_GetFilePath", *actionHandle.handle, charDataPointer.Pointer, uint64(filePathLength))
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 		actionInfo.FilePath = &filePathString
 	} else if actionInfo.Type == enums.FPDF_ACTION_ACTION_URI {
 		// First get the uri path length.
-		res, err = p.Module.ExportedFunction("FPDFAction_GetURIPath").Call(p.Context, *documentHandle.handle, *actionHandle.handle, 0, 0)
+		res, err = p.call("FPDFAction_GetURIPath", *documentHandle.handle, *actionHandle.handle, 0, 0)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +96,7 @@ func (p *PdfiumImplementation) getActionInfo(actionHandle *ActionHandle, documen
 		charDataPointer, err := p.ByteArrayPointer(uint64(uriPathLength), nil)
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDFAction_GetURIPath").Call(p.Context, *documentHandle.handle, *actionHandle.handle, charDataPointer.Pointer, uint64(uriPathLength))
+		_, err = p.call("FPDFAction_GetURIPath", *documentHandle.handle, *actionHandle.handle, charDataPointer.Pointer, uint64(uriPathLength))
 		if err != nil {
 			return nil, err
 		}

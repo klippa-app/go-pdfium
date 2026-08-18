@@ -21,6 +21,7 @@ import (
 	pool "github.com/jolestar/go-commons-pool/v2"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
+	"github.com/tetratelabs/wazero/experimental"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"golang.org/x/net/context"
 )
@@ -125,7 +126,12 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 	}
 
 	if config.RuntimeConfig == nil {
-		config.RuntimeConfig = wazero.NewRuntimeConfig()
+		// The bundled PDFium module lowers setjmp/longjmp to WebAssembly
+		// exception handling instructions, so the exception handling core
+		// feature is required. When passing a custom RuntimeConfig, include
+		// this feature in the same way.
+		config.RuntimeConfig = wazero.NewRuntimeConfig().WithCoreFeatures(
+			api.CoreFeaturesV2 | experimental.CoreFeaturesExceptionHandling)
 	}
 
 	poolContext := config.Context

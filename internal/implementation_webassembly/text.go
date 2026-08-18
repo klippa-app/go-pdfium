@@ -6,6 +6,7 @@ import (
 	"math"
 	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/internal/textextract"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -51,14 +52,14 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFText_LoadPage").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFText_LoadPage", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	textPage := res[0]
 
-	res, err = p.Module.ExportedFunction("FPDFText_CountChars").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_CountChars", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 
 	charData := make([]rune, 0, charsInPage)
 	for i := 0; i < int(charsInPage); i++ {
-		res, err = p.Module.ExportedFunction("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
+		res, err = p.call("FPDFText_GetUnicode", textPage, uint64(i))
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +79,7 @@ func (p *PdfiumImplementation) GetPageText(request *requests.GetPageText) (*resp
 		}
 	}
 
-	res, err = p.Module.ExportedFunction("FPDFText_ClosePage").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_ClosePage", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -124,66 +125,60 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		PointToPixelRatio: pointToPixelRatio,
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFText_LoadPage").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFText_LoadPage", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
 
 	textPage := res[0]
 
-	res, err = p.Module.ExportedFunction("FPDFText_CountChars").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_CountChars", textPage)
 	if err != nil {
 		return nil, err
 	}
 
 	charsInPage := *(*int32)(unsafe.Pointer(&res[0]))
 
-	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
+	collectChars := request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth
+	collectRects := request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth
+
+	leftPointer, err := p.DoublePointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer leftPointer.Free()
+
+	topPointer, err := p.DoublePointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer topPointer.Free()
+
+	rightPointer, err := p.DoublePointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer rightPointer.Free()
+
+	bottomPointer, err := p.DoublePointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer bottomPointer.Free()
+
+	// Rect text is computed on the Go side from the per-char data (see
+	// internal/textextract): FPDFText_GetBoundedText re-scans every char on
+	// the page per call, which makes extracting all rects O(chars × rects).
+	var extractChars []textextract.Char
+	if collectRects {
+		extractChars = make([]textextract.Char, 0, charsInPage)
+	}
+
+	if collectChars || collectRects {
 		for i := 0; i < int(charsInPage); i++ {
-			res, err = p.Module.ExportedFunction("FPDFText_GetCharAngle").Call(p.Context, textPage, uint64(i))
+			_, err = p.call("FPDFText_GetCharBox", textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
 			if err != nil {
 				return nil, err
-			}
-			angle := *(*float32)(unsafe.Pointer(&res[0]))
-
-			leftPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer leftPointer.Free()
-
-			topPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer topPointer.Free()
-
-			rightPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer rightPointer.Free()
-
-			bottomPointer, err := p.DoublePointer(nil)
-			if err != nil {
-				return nil, err
-			}
-			defer bottomPointer.Free()
-
-			_, err = p.Module.ExportedFunction("FPDFText_GetCharBox").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer, topPointer.Pointer)
-			if err != nil {
-				return nil, err
-			}
-
-			res, err = p.Module.ExportedFunction("FPDFText_GetUnicode").Call(p.Context, textPage, uint64(i))
-			if err != nil {
-				return nil, err
-			}
-
-			text := ""
-			uniChar := *(*int)(unsafe.Pointer(&res[0]))
-			if uniChar != 0 {
-				text = string([]rune{rune(uniChar)})
 			}
 
 			left, err := leftPointer.Value()
@@ -204,6 +199,48 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 			bottom, err := bottomPointer.Value()
 			if err != nil {
 				return nil, err
+			}
+
+			res, err = p.call("FPDFText_GetUnicode", textPage, uint64(i))
+			if err != nil {
+				return nil, err
+			}
+			uniChar := *(*int)(unsafe.Pointer(&res[0]))
+
+			if collectRects {
+				_, err = p.call("FPDFText_GetCharOrigin", textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer)
+				if err != nil {
+					return nil, err
+				}
+
+				originY, err := topPointer.Value()
+				if err != nil {
+					return nil, err
+				}
+
+				extractChars = append(extractChars, textextract.Char{
+					Left:    float32(left),
+					Bottom:  float32(bottom),
+					Right:   float32(right),
+					Top:     float32(top),
+					OriginY: float32(originY),
+					Unicode: rune(uniChar),
+				})
+			}
+
+			if !collectChars {
+				continue
+			}
+
+			res, err = p.call("FPDFText_GetCharAngle", textPage, uint64(i))
+			if err != nil {
+				return nil, err
+			}
+			angle := *(*float32)(unsafe.Pointer(&res[0]))
+
+			text := ""
+			if uniChar != 0 {
+				text = string(rune(uniChar))
 			}
 
 			char := &responses.GetPageTextStructuredChar{
@@ -238,50 +275,18 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		}
 	}
 
-	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth {
-		res, err = p.Module.ExportedFunction("FPDFText_CountRects").Call(p.Context, textPage, 0, uint64(charsInPage))
+	if collectRects {
+		res, err = p.call("FPDFText_CountRects", textPage, 0, uint64(charsInPage))
 		if err != nil {
 			return nil, err
 		}
 
 		rectsCount := *(*int32)(unsafe.Pointer(&res[0]))
 
-		// Create a buffer that has room for all chars in this page, since
-		// we don't know the amount of chars in the section.
-		// We need to clear this every time, because we don't know how much bytes every char is.
-		charDataPointer, err := p.ByteArrayPointer(uint64((charsInPage+1)*2), nil) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
-		if err != nil {
-			return nil, err
-		}
-
-		defer charDataPointer.Free()
-
-		leftPointer, err := p.DoublePointer(nil)
-		if err != nil {
-			return nil, err
-		}
-		defer leftPointer.Free()
-
-		topPointer, err := p.DoublePointer(nil)
-		if err != nil {
-			return nil, err
-		}
-		defer topPointer.Free()
-
-		rightPointer, err := p.DoublePointer(nil)
-		if err != nil {
-			return nil, err
-		}
-		defer rightPointer.Free()
-
-		bottomPointer, err := p.DoublePointer(nil)
-		if err != nil {
-			return nil, err
-		}
-		defer bottomPointer.Free()
+		extractor := textextract.New(extractChars)
 
 		for i := 0; i < int(rectsCount); i++ {
-			_, err = p.Module.ExportedFunction("FPDFText_GetRect").Call(p.Context, textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
+			_, err = p.call("FPDFText_GetRect", textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
 			if err != nil {
 				return nil, err
 			}
@@ -306,25 +311,8 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				return nil, err
 			}
 
-			res, err = p.Module.ExportedFunction("FPDFText_GetBoundedText").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&left)), *(*uint64)(unsafe.Pointer(&top)), *(*uint64)(unsafe.Pointer(&right)), *(*uint64)(unsafe.Pointer(&bottom)), charDataPointer.Pointer, uint64((charsInPage+1)*2))
-			if err != nil {
-				return nil, err
-			}
-
-			charsWritten := *(*int32)(unsafe.Pointer(&res[0]))
-
-			charData, err := charDataPointer.Value(false)
-			if err != nil {
-				return nil, err
-			}
-
-			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
-			if err != nil {
-				return nil, err
-			}
-
 			char := &responses.GetPageTextStructuredRect{
-				Text: transformedText,
+				Text: extractor.TextInRect(float32(left), float32(top), float32(right), float32(bottom)),
 				PointPosition: responses.CharPosition{
 					Left:   float64(left),
 					Top:    float64(top),
@@ -337,7 +325,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				// Find index of the first letter of the rect.
 				// @todo: is 5 a "valid" tolerance?
 				tolerance := float64(5)
-				res, err = p.Module.ExportedFunction("FPDFText_GetCharIndexAtPos").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&char.PointPosition.Left)), *(*uint64)(unsafe.Pointer(&char.PointPosition.Top)), *(*uint64)(unsafe.Pointer(&tolerance)), *(*uint64)(unsafe.Pointer(&tolerance)))
+				res, err = p.call("FPDFText_GetCharIndexAtPos", textPage, *(*uint64)(unsafe.Pointer(&char.PointPosition.Left)), *(*uint64)(unsafe.Pointer(&char.PointPosition.Top)), *(*uint64)(unsafe.Pointer(&tolerance)), *(*uint64)(unsafe.Pointer(&tolerance)))
 				if err != nil {
 					return nil, err
 				}
@@ -363,7 +351,7 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		}
 	}
 
-	res, err = p.Module.ExportedFunction("FPDFText_ClosePage").Call(p.Context, textPage)
+	res, err = p.call("FPDFText_ClosePage", textPage)
 	if err != nil {
 		return nil, err
 	}
@@ -381,14 +369,14 @@ func convertPointPositions(pointPositions responses.CharPosition, ratio float64)
 }
 
 func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int) (*responses.FontInformation, error) {
-	res, err := p.Module.ExportedFunction("FPDFText_GetFontSize").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
+	res, err := p.call("FPDFText_GetFontSize", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
 	if err != nil {
 		return nil, err
 	}
 
 	fontSize := *(*float64)(unsafe.Pointer(&res[0]))
 
-	res, err = p.Module.ExportedFunction("FPDFText_GetFontSize").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
+	res, err = p.call("FPDFText_GetFontWeight", textPage, *(*uint64)(unsafe.Pointer(&charIndex)))
 	if err != nil {
 		return nil, err
 	}
@@ -401,7 +389,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	defer fontFlagsPointer.Free()
 
 	// First get the length of the font name.
-	res, err = p.Module.ExportedFunction("FPDFText_GetFontInfo").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), 0, 0, fontFlagsPointer.Pointer)
+	res, err = p.call("FPDFText_GetFontInfo", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), 0, 0, fontFlagsPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -417,7 +405,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 
 		// Get the actual font name.
 		// For some reason, the font name is UTF-8.
-		_, err = p.Module.ExportedFunction("FPDFText_GetFontInfo").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), rawFontNamePointer.Pointer, uint64(fontNameLength), fontFlagsPointer.Pointer)
+		_, err = p.call("FPDFText_GetFontInfo", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), rawFontNamePointer.Pointer, uint64(fontNameLength), fontFlagsPointer.Pointer)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +430,7 @@ func (p *PdfiumImplementation) getFontInformation(textPage uint64, charIndex int
 	if err == nil {
 		defer p.Free(matrixPointer)
 
-		res, err = p.Module.ExportedFunction("FPDFText_GetMatrix").Call(p.Context, textPage, *(*uint64)(unsafe.Pointer(&charIndex)), matrixPointer)
+		res, err = p.call("FPDFText_GetMatrix", textPage, *(*uint64)(unsafe.Pointer(&charIndex)), matrixPointer)
 		if err == nil {
 			success := *(*int32)(unsafe.Pointer(&res[0]))
 			if int(success) != 0 {

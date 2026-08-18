@@ -49,14 +49,14 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FX_FILEAVAIL_Create").Call(p.Context)
+	res, err := p.call("FX_FILEAVAIL_Create")
 	if err != nil {
 		return nil, err
 	}
 
 	fXFileAvail := res[0]
 
-	res, err = p.Module.ExportedFunction("FPDFAvail_Create").Call(p.Context, fXFileAvail, *fileReaderPointer)
+	res, err = p.call("FPDFAvail_Create", fXFileAvail, *fileReaderPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 
 	hints := uint64(0)
 	if request.AddSegmentCallback != nil {
-		res, err = p.Module.ExportedFunction("FX_DOWNLOADHINTS_Create").Call(p.Context)
+		res, err = p.call("FX_DOWNLOADHINTS_Create")
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +100,7 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFAvail_Destroy").Call(p.Context, *dataAvailHandler.handle)
+	_, err = p.call("FPDFAvail_Destroy", *dataAvailHandler.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsDocAvail").Call(p.Context, *dataAvailHandler.handle, hints)
+	res, err := p.call("FPDFAvail_IsDocAvail", *dataAvailHandler.handle, hints)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (p *PdfiumImplementation) FPDFAvail_GetDocument(request *requests.FPDFAvail
 		cPassword = cPasswordPointer.Pointer
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_GetDocument").Call(p.Context, *dataAvailHandler.handle, cPassword)
+	res, err := p.call("FPDFAvail_GetDocument", *dataAvailHandler.handle, cPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (p *PdfiumImplementation) FPDFAvail_GetFirstPageNum(request *requests.FPDFA
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_GetFirstPageNum").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFAvail_GetFirstPageNum", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsPageAvail(request *requests.FPDFAvail
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsPageAvail").Call(p.Context, *dataAvailHandler.handle, *(*uint64)(unsafe.Pointer(&request.PageIndex)), hints)
+	res, err := p.call("FPDFAvail_IsPageAvail", *dataAvailHandler.handle, *(*uint64)(unsafe.Pointer(&request.PageIndex)), hints)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsFormAvail(request *requests.FPDFAvail
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsFormAvail").Call(p.Context, *dataAvailHandler.handle, hints)
+	res, err := p.call("FPDFAvail_IsFormAvail", *dataAvailHandler.handle, hints)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +300,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsLinearized(request *requests.FPDFAvai
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsLinearized").Call(p.Context, *dataAvailHandler.handle)
+	res, err := p.call("FPDFAvail_IsLinearized", *dataAvailHandler.handle)
 	if err != nil {
 		return nil, err
 	}

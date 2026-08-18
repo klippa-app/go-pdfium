@@ -513,6 +513,11 @@ func (p *PdfiumImplementation) FPDFBitmap_CreateEx(request *requests.FPDFBitmap_
 	bitmap := C.FPDFBitmap_CreateEx(C.int(request.Width), C.int(request.Height), C.int(request.Format), pointer, C.int(request.Stride))
 	bitmapHandle := p.registerBitmap(bitmap)
 
+	// PDFium keeps the raw buffer pointer for the lifetime of the bitmap;
+	// keep the Go buffer reachable for at least as long, otherwise the
+	// garbage collector may free it while PDFium still writes into it.
+	bitmapHandle.externalBuffer = request.Buffer
+
 	return &responses.FPDFBitmap_CreateEx{
 		Bitmap: bitmapHandle.nativeRef,
 	}, nil

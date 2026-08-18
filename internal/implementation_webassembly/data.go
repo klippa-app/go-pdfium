@@ -5,8 +5,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
-	"io/ioutil"
 	"sync"
+	"unicode/utf16"
+	"unicode/utf8"
 	"unsafe"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -46,7 +47,7 @@ func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.
 
 	p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
 
-	res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(fileSize), paramPointer)
+	res, err := p.call("FPDF_FILEACCESS_Create", uint64(fileSize), paramPointer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -91,7 +92,8 @@ type CString struct {
 func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	inputLength := uint64(len(input)) + 1
 
-	pointer, err := p.Malloc(inputLength)
+	// The whole buffer is overwritten right below.
+	pointer, err := p.MallocNoZero(inputLength)
 	if err != nil {
 		return nil, err
 	}
@@ -110,19 +112,42 @@ func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 }
 
 func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
-	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
-	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
+	// BOM handling, matching the previous unicode.BOMOverride behavior.
+	if bytes.HasPrefix(charData, []byte{0xEF, 0xBB, 0xBF}) {
+		// Data is already UTF-8.
+		return string(bytes.TrimSuffix(charData[3:], []byte("\x00"))), nil
+	}
 
-	decoded, err := ioutil.ReadAll(unicodeReader)
-	if err != nil {
-		return "", err
+	bigEndian := false
+	if bytes.HasPrefix(charData, []byte{0xFF, 0xFE}) {
+		charData = charData[2:]
+	} else if bytes.HasPrefix(charData, []byte{0xFE, 0xFF}) {
+		bigEndian = true
+		charData = charData[2:]
+	}
+
+	u16 := make([]uint16, 0, len(charData)/2)
+	for i := 0; i+1 < len(charData); i += 2 {
+		if bigEndian {
+			u16 = append(u16, uint16(charData[i])<<8|uint16(charData[i+1]))
+		} else {
+			u16 = append(u16, uint16(charData[i])|uint16(charData[i+1])<<8)
+		}
+	}
+
+	runes := utf16.Decode(u16)
+
+	// A dangling single byte can't be decoded.
+	if len(charData)%2 != 0 {
+		runes = append(runes, utf8.RuneError)
 	}
 
 	// Remove NULL terminator.
-	decoded = bytes.TrimSuffix(decoded, []byte("\x00"))
+	if len(runes) > 0 && runes[len(runes)-1] == 0 {
+		runes = runes[:len(runes)-1]
+	}
 
-	return string(decoded), nil
+	return string(runes), nil
 }
 
 func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
@@ -150,7 +175,8 @@ func (p *PdfiumImplementation) CFPDF_WIDESTRING(input string) (*CFPDF_WIDESTRING
 
 	inputLength := uint64(len(transformedText)) + 2
 
-	pointer, err := p.Malloc(inputLength)
+	// The whole buffer is overwritten right below.
+	pointer, err := p.MallocNoZero(inputLength)
 	if err != nil {
 		return nil, err
 	}
@@ -546,7 +572,14 @@ type ByteArrayPointer struct {
 }
 
 func (p *PdfiumImplementation) ByteArrayPointer(size uint64, in []byte) (*ByteArrayPointer, error) {
-	pointer, err := p.Malloc(size)
+	var pointer uint64
+	var err error
+	if uint64(len(in)) >= size {
+		// The whole buffer is overwritten right below.
+		pointer, err = p.MallocNoZero(size)
+	} else {
+		pointer, err = p.Malloc(size)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -643,14 +676,25 @@ func (p *PdfiumImplementation) ULongPointer() (*ULongPointer, error) {
 }
 
 func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
-	results, err := p.Functions["malloc"].Call(p.Context, size)
+	pointer, err := p.MallocNoZero(size)
 	if err != nil {
 		return 0, err
 	}
 
-	pointer := results[0]
+	// Zero the buffer inside the guest (a single memory.fill) instead of
+	// writing size zero bytes through the host, which costs a Go allocation
+	// and a host-to-guest copy of the full buffer.
+	if memset := p.Fn("memset"); memset != nil {
+		_, err = p.callFn(memset, pointer, 0, size)
+		if err != nil {
+			return 0, err
+		}
 
-	ok := p.Module.Memory().Write(uint32(results[0]), make([]byte, size))
+		return pointer, nil
+	}
+
+	// Fallback for modules that don't export memset.
+	ok := p.Module.Memory().Write(uint32(pointer), make([]byte, size))
 	if !ok {
 		return 0, errors.New("could not write nulls to memory")
 	}
@@ -658,8 +702,25 @@ func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
 	return pointer, nil
 }
 
+// MallocNoZero allocates guest memory without zeroing it. Only use this when
+// the whole buffer is immediately overwritten.
+func (p *PdfiumImplementation) MallocNoZero(size uint64) (uint64, error) {
+	results, err := p.callFn(p.Functions["malloc"], size)
+	if err != nil {
+		return 0, err
+	}
+
+	pointer := results[0]
+	if pointer == 0 && size > 0 {
+		// malloc returned NULL: the instance is out of WebAssembly memory.
+		return 0, errors.New("could not allocate memory")
+	}
+
+	return pointer, nil
+}
+
 func (p *PdfiumImplementation) Free(pointer uint64) error {
-	_, err := p.Functions["free"].Call(p.Context, pointer)
+	_, err := p.callFn(p.Functions["free"], pointer)
 	if err != nil {
 		return err
 	}
