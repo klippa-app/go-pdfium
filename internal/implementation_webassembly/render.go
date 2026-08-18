@@ -742,7 +742,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		for {
-			err := image_jpeg.Encode(&imgBuf, renderedImage, opt)
+			err := p.encodeJPEG(&imgBuf, renderedImage, opt)
 			if err != nil {
 				return nil, err
 			}
