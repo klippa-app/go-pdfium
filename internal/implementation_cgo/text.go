@@ -10,8 +10,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"math"
-	"unsafe"
 
+	"github.com/klippa-app/go-pdfium/internal/textextract"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -114,16 +114,47 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 	textPage := C.FPDFText_LoadPage(pageHandle.handle)
 	charsInPage := C.FPDFText_CountChars(textPage)
 
-	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth {
+	collectChars := request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeChars || request.Mode == requests.GetPageTextStructuredModeBoth
+	collectRects := request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth
+
+	// Rect text is computed on the Go side from the per-char data (see
+	// internal/textextract): FPDFText_GetBoundedText re-scans every char on
+	// the page per call, which makes extracting all rects O(chars × rects).
+	var extractChars []textextract.Char
+	if collectRects {
+		extractChars = make([]textextract.Char, 0, charsInPage)
+	}
+
+	if collectChars || collectRects {
 		for i := 0; i < int(charsInPage); i++ {
-			angle := C.FPDFText_GetCharAngle(textPage, C.int(i))
 			left := C.double(0)
 			top := C.double(0)
 			right := C.double(0)
 			bottom := C.double(0)
 			C.FPDFText_GetCharBox(textPage, C.int(i), &left, &right, &bottom, &top)
-			text := ""
 			uniChar := C.FPDFText_GetUnicode(textPage, C.int(i))
+
+			if collectRects {
+				originX := C.double(0)
+				originY := C.double(0)
+				C.FPDFText_GetCharOrigin(textPage, C.int(i), &originX, &originY)
+
+				extractChars = append(extractChars, textextract.Char{
+					Left:    float32(left),
+					Bottom:  float32(bottom),
+					Right:   float32(right),
+					Top:     float32(top),
+					OriginY: float32(originY),
+					Unicode: rune(uniChar),
+				})
+			}
+
+			if !collectChars {
+				continue
+			}
+
+			angle := C.FPDFText_GetCharAngle(textPage, C.int(i))
+			text := ""
 			if uniChar != 0 {
 				text = string([]rune{rune(uniChar)})
 			}
@@ -156,13 +187,11 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 		}
 	}
 
-	if request.Mode == "" || request.Mode == requests.GetPageTextStructuredModeRects || request.Mode == requests.GetPageTextStructuredModeBoth {
+	if collectRects {
 		rectsCount := C.FPDFText_CountRects(textPage, C.int(0), C.int(charsInPage))
 
-		// Reusable buffer for the bounded text of each rect, grown when a
-		// rect needs more room. Sized in UTF-16 code units, 2 bytes per unit,
-		// add 1 unit for the terminator.
-		charData := make([]byte, (int(charsInPage)+1)*2)
+		extractor := textextract.New(extractChars)
+
 		for i := 0; i < int(rectsCount); i++ {
 			left := C.double(0)
 			top := C.double(0)
@@ -171,28 +200,8 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 			C.FPDFText_GetRect(textPage, C.int(i), &left, &top, &right, &bottom)
 
-			charsWritten := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
-
-			// The result may have been truncated when the buffer was full:
-			// characters outside the Basic Multilingual Plane need a
-			// surrogate pair (2 units) while the buffer is sized at 1 unit
-			// per char on the page. Measure the exact size for this rect,
-			// grow the buffer and retry.
-			if int(charsWritten)*2 >= len(charData) {
-				charCount := C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, nil, C.int(0))
-				if needed := (int(charCount) + 1) * 2; needed > len(charData) {
-					charData = make([]byte, needed)
-				}
-				charsWritten = C.FPDFText_GetBoundedText(textPage, left, top, right, bottom, (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
-			}
-
-			transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
-			if err != nil {
-				return nil, err
-			}
-
 			char := &responses.GetPageTextStructuredRect{
-				Text: transformedText,
+				Text: extractor.TextInRect(float32(left), float32(top), float32(right), float32(bottom)),
 				PointPosition: responses.CharPosition{
 					Left:   float64(left),
 					Top:    float64(top),
