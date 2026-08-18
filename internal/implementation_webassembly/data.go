@@ -92,7 +92,8 @@ type CString struct {
 func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 	inputLength := uint64(len(input)) + 1
 
-	pointer, err := p.Malloc(inputLength)
+	// The whole buffer is overwritten right below.
+	pointer, err := p.MallocNoZero(inputLength)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +175,8 @@ func (p *PdfiumImplementation) CFPDF_WIDESTRING(input string) (*CFPDF_WIDESTRING
 
 	inputLength := uint64(len(transformedText)) + 2
 
-	pointer, err := p.Malloc(inputLength)
+	// The whole buffer is overwritten right below.
+	pointer, err := p.MallocNoZero(inputLength)
 	if err != nil {
 		return nil, err
 	}
@@ -570,7 +572,14 @@ type ByteArrayPointer struct {
 }
 
 func (p *PdfiumImplementation) ByteArrayPointer(size uint64, in []byte) (*ByteArrayPointer, error) {
-	pointer, err := p.Malloc(size)
+	var pointer uint64
+	var err error
+	if uint64(len(in)) >= size {
+		// The whole buffer is overwritten right below.
+		pointer, err = p.MallocNoZero(size)
+	} else {
+		pointer, err = p.Malloc(size)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -667,6 +676,35 @@ func (p *PdfiumImplementation) ULongPointer() (*ULongPointer, error) {
 }
 
 func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
+	pointer, err := p.MallocNoZero(size)
+	if err != nil {
+		return 0, err
+	}
+
+	// Zero the buffer inside the guest (a single memory.fill) instead of
+	// writing size zero bytes through the host, which costs a Go allocation
+	// and a host-to-guest copy of the full buffer.
+	if memset := p.Fn("memset"); memset != nil {
+		_, err = p.callFn(memset, pointer, 0, size)
+		if err != nil {
+			return 0, err
+		}
+
+		return pointer, nil
+	}
+
+	// Fallback for modules that don't export memset.
+	ok := p.Module.Memory().Write(uint32(pointer), make([]byte, size))
+	if !ok {
+		return 0, errors.New("could not write nulls to memory")
+	}
+
+	return pointer, nil
+}
+
+// MallocNoZero allocates guest memory without zeroing it. Only use this when
+// the whole buffer is immediately overwritten.
+func (p *PdfiumImplementation) MallocNoZero(size uint64) (uint64, error) {
 	results, err := p.callFn(p.Functions["malloc"], size)
 	if err != nil {
 		return 0, err
@@ -676,11 +714,6 @@ func (p *PdfiumImplementation) Malloc(size uint64) (uint64, error) {
 	if pointer == 0 && size > 0 {
 		// malloc returned NULL: the instance is out of WebAssembly memory.
 		return 0, errors.New("could not allocate memory")
-	}
-
-	ok := p.Module.Memory().Write(uint32(results[0]), make([]byte, size))
-	if !ok {
-		return 0, errors.New("could not write nulls to memory")
 	}
 
 	return pointer, nil

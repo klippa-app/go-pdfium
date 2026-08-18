@@ -232,7 +232,9 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	if request.File != nil {
 		fileData := *request.File
 
-		dataPtr, err := p.Malloc(uint64(len(fileData)))
+		// The whole buffer is overwritten with the file data right below, so
+		// it does not have to be zeroed.
+		dataPtr, err := p.MallocNoZero(uint64(len(fileData)))
 		if err != nil {
 			return nil, err
 		}
