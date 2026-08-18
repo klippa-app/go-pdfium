@@ -735,6 +735,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			Options: &jpeg.Options{
 				Quality: 95,
 			},
+			Progressive: request.Progressive,
 		}
 
 		if request.OutputQuality > 0 {

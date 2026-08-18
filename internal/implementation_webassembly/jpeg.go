@@ -16,13 +16,17 @@ const (
 	jpegEncodeFormatGray = 3
 )
 
-// encodeJPEG encodes m to baseline JPEG. When the loaded pdfium module
-// exports libjpeg-turbo's encoder (gopdfium_jpeg_encode) and the image is a
-// type it can consume directly, the encode runs inside the guest (with the
-// SIMD kernels); otherwise it falls back to image_jpeg.Encode.
+// encodeJPEG encodes m to JPEG (baseline, or progressive when
+// opt.Progressive is set). When the loaded pdfium module exports
+// libjpeg-turbo's encoder (gopdfium_jpeg_encode) and the image is a type it
+// can consume directly, the encode runs inside the guest (with the SIMD
+// kernels); otherwise it falls back to image_jpeg.Encode.
 func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, opt image_jpeg.Options) error {
 	encode := p.Fn("gopdfium_jpeg_encode")
-	if encode == nil || opt.Progressive {
+	// Guard against custom wasm binaries with an older/newer shim signature:
+	// (data, width, height, stride, format, quality, progressive, out_buf,
+	// out_size).
+	if encode == nil || len(encode.Definition().ParamTypes()) != 9 {
 		return image_jpeg.Encode(w, m, opt)
 	}
 
@@ -73,9 +77,14 @@ func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, opt image_
 		return errors.New("could not write pixel data to guest memory")
 	}
 
+	progressive := uint64(0)
+	if opt.Progressive {
+		progressive = 1
+	}
+
 	res, err := p.callFn(encode, inPtr, uint64(dimensions.X),
 		uint64(dimensions.Y), uint64(stride), uint64(format),
-		uint64(quality), outParams, outParams+8)
+		uint64(quality), progressive, outParams, outParams+8)
 	if err != nil {
 		return err
 	}
