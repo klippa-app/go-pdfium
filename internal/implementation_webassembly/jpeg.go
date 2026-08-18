@@ -8,7 +8,7 @@ import (
 	"github.com/klippa-app/go-pdfium/internal/image/image_jpeg"
 )
 
-// Input pixel formats of gopdfium_jpeg_encode.
+// Input pixel formats of pdfium_jpeg_encode.
 const (
 	jpegEncodeFormatRGB  = 0
 	jpegEncodeFormatRGBA = 1
@@ -18,11 +18,11 @@ const (
 
 // encodeJPEG encodes m to JPEG (baseline, or progressive when
 // opt.Progressive is set). When the loaded pdfium module exports
-// libjpeg-turbo's encoder (gopdfium_jpeg_encode) and the image is a type it
+// libjpeg-turbo's encoder (pdfium_jpeg_encode) and the image is a type it
 // can consume directly, the encode runs inside the guest (with the SIMD
 // kernels); otherwise it falls back to image_jpeg.Encode.
 func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, opt image_jpeg.Options) error {
-	encode := p.Fn("gopdfium_jpeg_encode")
+	encode := p.Fn("pdfium_jpeg_encode")
 	// Guard against custom wasm binaries with an older/newer shim signature:
 	// (data, width, height, stride, format, quality, progressive, out_buf,
 	// out_size).
@@ -96,7 +96,7 @@ func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, opt image_
 	if !ok {
 		return errors.New("could not read JPEG output pointer")
 	}
-	defer p.call("gopdfium_jpeg_free", uint64(bufPtr))
+	defer p.call("pdfium_jpeg_free", uint64(bufPtr))
 
 	size, ok := p.Module.Memory().ReadUint32Le(uint32(outParams + 8))
 	if !ok {
