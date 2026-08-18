@@ -51,7 +51,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap_Start(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
+	res, err := p.Fn("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmap_Start(request *requests.FPD
 	PauseHandles.Refs[pageHandle.nativeRef] = pauseHandle
 	PauseHandles.Mutex.Unlock()
 
-	res, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap_Start").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), pausePointer)
+	res, err = p.Fn("FPDF_RenderPageBitmap_Start").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), pausePointer)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_R
 			return nil, err
 		}
 
-		res, err := p.Module.ExportedFunction("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
+		res, err := p.Fn("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +125,7 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Continue(request *requests.FPDF_R
 		pausePointer = newPausePointer
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_RenderPage_Continue").Call(p.Context, *pageHandle.handle, pausePointer)
+	res, err := p.Fn("FPDF_RenderPage_Continue").Call(p.Context, *pageHandle.handle, pausePointer)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (p *PdfiumImplementation) FPDF_RenderPage_Close(request *requests.FPDF_Rend
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_RenderPage_Close").Call(p.Context, *pageHandle.handle)
+	_, err = p.Fn("FPDF_RenderPage_Close").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithColorScheme_Start(reques
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
+	res, err := p.Fn("IFSDK_PAUSE_Create").Call(p.Context, refPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithColorScheme_Start(reques
 		p.Module.Memory().WriteUint64Le(uint32(colorScheme+12), api.EncodeU32(uint32(request.ColorScheme.TextStrokeColor)))
 	}
 
-	res, err = p.Module.ExportedFunction("FPDF_RenderPageBitmapWithColorScheme_Start").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), colorScheme, pausePointer)
+	res, err = p.Fn("FPDF_RenderPageBitmapWithColorScheme_Start").Call(p.Context, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), colorScheme, pausePointer)
 	if err != nil {
 		return nil, err
 	}

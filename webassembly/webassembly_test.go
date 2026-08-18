@@ -14,6 +14,8 @@ import (
 	"github.com/klippa-app/go-pdfium/shared_tests"
 	"github.com/klippa-app/go-pdfium/webassembly"
 	"github.com/tetratelabs/wazero"
+	wazeroapi "github.com/tetratelabs/wazero/api"
+	"github.com/tetratelabs/wazero/experimental"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,10 +30,12 @@ var interpreterMode = os.Getenv("WAZERO_INTERPRETER") == "1"
 // runtimeConfig returns the wazero RuntimeConfig that matches the current
 // mode (interpreter or compiler).
 func runtimeConfig() wazero.RuntimeConfig {
+	// The bundled PDFium module requires the exception handling core feature.
+	features := wazeroapi.CoreFeaturesV2 | experimental.CoreFeaturesExceptionHandling
 	if interpreterMode {
-		return wazero.NewRuntimeConfigInterpreter()
+		return wazero.NewRuntimeConfigInterpreter().WithCoreFeatures(features)
 	}
-	return wazero.NewRuntimeConfig()
+	return wazero.NewRuntimeConfig().WithCoreFeatures(features)
 }
 
 var _ = BeforeSuite(func() {

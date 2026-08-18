@@ -35,7 +35,7 @@ func (p *PdfiumImplementation) GetBookmarks(request *requests.GetBookmarks) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFBookmark_GetFirstChild").Call(p.Context, *documentHandle.handle, 0)
+	res, err := p.Fn("FPDFBookmark_GetFirstChild").Call(p.Context, *documentHandle.handle, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 
 	currentSibling := bookmark
 	for {
-		res, err := p.Module.ExportedFunction("FPDFBookmark_GetNextSibling").Call(p.Context, *documentHandle.handle, currentSibling)
+		res, err := p.Fn("FPDFBookmark_GetNextSibling").Call(p.Context, *documentHandle.handle, currentSibling)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 		respBookmark := responses.GetBookmarksBookmark{
 			Children: []responses.GetBookmarksBookmark{},
 		}
-		res, err := p.Module.ExportedFunction("FPDFBookmark_GetFirstChild").Call(p.Context, *documentHandle.handle, bookmarks[i])
+		res, err := p.Fn("FPDFBookmark_GetFirstChild").Call(p.Context, *documentHandle.handle, bookmarks[i])
 		if err != nil {
 			return nil, err
 		}
@@ -95,7 +95,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 		bookmarkHandle := p.registerBookmark(&bookmarks[i], documentHandle)
 
 		// First get the title length.
-		res, err = p.Module.ExportedFunction("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, 0, 0)
+		res, err = p.Fn("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, 0, 0)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 		charDataPointer, err := p.ByteArrayPointer(uint64(titleSize), nil)
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, charDataPointer.Pointer, uint64(titleSize))
+		_, err = p.Fn("FPDFBookmark_GetTitle").Call(p.Context, *bookmarkHandle.handle, charDataPointer.Pointer, uint64(titleSize))
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +123,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 			return nil, err
 		}
 
-		res, err = p.Module.ExportedFunction("FPDFBookmark_GetAction").Call(p.Context, *bookmarkHandle.handle)
+		res, err = p.Fn("FPDFBookmark_GetAction").Call(p.Context, *bookmarkHandle.handle)
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +138,7 @@ func (p *PdfiumImplementation) getBookMarkChildren(documentHandle *DocumentHandl
 			respBookmark.ActionInfo = actionInfo
 		}
 
-		res, err = p.Module.ExportedFunction("FPDFBookmark_GetDest").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
+		res, err = p.Fn("FPDFBookmark_GetDest").Call(p.Context, *documentHandle.handle, *bookmarkHandle.handle)
 		if err != nil {
 			return nil, err
 		}

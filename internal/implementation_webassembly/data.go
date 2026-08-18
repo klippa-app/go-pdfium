@@ -46,7 +46,7 @@ func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.
 
 	p.Module.Memory().WriteUint32Le(uint32(paramPointer), fileReaderIndex)
 
-	res, err := p.Module.ExportedFunction("FPDF_FILEACCESS_Create").Call(p.Context, uint64(fileSize), paramPointer)
+	res, err := p.Fn("FPDF_FILEACCESS_Create").Call(p.Context, uint64(fileSize), paramPointer)
 	if err != nil {
 		return nil, nil, err
 	}

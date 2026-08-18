@@ -19,7 +19,7 @@ func (p *PdfiumImplementation) FPDFText_GetCharIndexFromTextIndex(request *reque
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFText_GetCharIndexFromTextIndex").Call(p.Context, *textPageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NTextIndex)))
+	res, err := p.Fn("FPDFText_GetCharIndexFromTextIndex").Call(p.Context, *textPageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NTextIndex)))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (p *PdfiumImplementation) FPDFText_GetTextIndexFromCharIndex(request *reque
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFText_GetTextIndexFromCharIndex").Call(p.Context, *textPageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NCharIndex)))
+	res, err := p.Fn("FPDFText_GetTextIndexFromCharIndex").Call(p.Context, *textPageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NCharIndex)))
 	if err != nil {
 		return nil, err
 	}

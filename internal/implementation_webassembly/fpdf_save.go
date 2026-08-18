@@ -44,7 +44,7 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_FILEWRITE_Create").Call(p.Context)
+	res, err := p.Fn("FPDF_FILEWRITE_Create").Call(p.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +97,13 @@ func (p *PdfiumImplementation) FPDF_SaveWithVersion(request *requests.FPDF_SaveW
 
 	var success int32
 	if request.FileVersion == 0 {
-		res, err = p.Module.ExportedFunction("FPDF_SaveAsCopy").Call(p.Context, *documentHandle.handle, fileWriterPointer, uint64(request.Flags))
+		res, err = p.Fn("FPDF_SaveAsCopy").Call(p.Context, *documentHandle.handle, fileWriterPointer, uint64(request.Flags))
 		if err != nil {
 			return nil, err
 		}
 		success = *(*int32)(unsafe.Pointer(&res[0]))
 	} else {
-		res, err = p.Module.ExportedFunction("FPDF_SaveWithVersion").Call(p.Context, *documentHandle.handle, fileWriterPointer, uint64(request.Flags), *(*uint64)(unsafe.Pointer(&request.FileVersion)))
+		res, err = p.Fn("FPDF_SaveWithVersion").Call(p.Context, *documentHandle.handle, fileWriterPointer, uint64(request.Flags), *(*uint64)(unsafe.Pointer(&request.FileVersion)))
 		if err != nil {
 			return nil, err
 		}

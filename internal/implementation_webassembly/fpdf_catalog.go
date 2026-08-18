@@ -20,7 +20,7 @@ func (p *PdfiumImplementation) FPDFCatalog_IsTagged(request *requests.FPDFCatalo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFCatalog_IsTagged").Call(p.Context, *documentHandle.handle)
+	res, err := p.Fn("FPDFCatalog_IsTagged").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (p *PdfiumImplementation) FPDFCatalog_GetLanguage(request *requests.FPDFCat
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (p *PdfiumImplementation) FPDFCatalog_GetLanguage(request *requests.FPDFCat
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, charDataPointer.Pointer, langLength)
+	_, err = p.Fn("FPDFCatalog_GetLanguage").Call(p.Context, *documentHandle.handle, charDataPointer.Pointer, langLength)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (p *PdfiumImplementation) FPDFCatalog_SetLanguage(request *requests.FPDFCat
 	}
 	defer languagePointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFCatalog_SetLanguage").Call(p.Context, *documentHandle.handle, languagePointer.Pointer)
+	res, err := p.Fn("FPDFCatalog_SetLanguage").Call(p.Context, *documentHandle.handle, languagePointer.Pointer)
 	if err != nil {
 		return nil, err
 	}

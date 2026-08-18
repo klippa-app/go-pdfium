@@ -23,6 +23,7 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 		Context:                         ctx,
 		Functions:                       functions,
 		Module:                          module,
+		fnCache:                         map[string]api.Function{},
 		documentRefs:                    map[references.FPDF_DOCUMENT]*DocumentHandle{},
 		pageRefs:                        map[references.FPDF_PAGE]*PageHandle{},
 		bookmarkRefs:                    map[references.FPDF_BOOKMARK]*BookmarkHandle{},
@@ -58,6 +59,23 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 	return newInstance
 }
 
+// Fn returns the exported function with the given name, memoized per
+// instance. wazero's Module.ExportedFunction allocates a new call engine on
+// every lookup, so hot paths must not resolve by name per call.
+func (p *PdfiumImplementation) Fn(name string) api.Function {
+	p.fnCacheMutex.RLock()
+	fn, ok := p.fnCache[name]
+	p.fnCacheMutex.RUnlock()
+	if ok {
+		return fn
+	}
+	fn = p.Module.ExportedFunction(name)
+	p.fnCacheMutex.Lock()
+	p.fnCache[name] = fn
+	p.fnCacheMutex.Unlock()
+	return fn
+}
+
 type FunctionWrapper struct {
 	function api.Function
 	mutex    *sync.Mutex
@@ -87,6 +105,13 @@ type PdfiumImplementation struct {
 	Context   context.Context
 	Functions map[string]api.Function
 	Module    api.Module
+
+	// fnCache memoizes Module.ExportedFunction lookups: every lookup
+	// allocates a fresh call engine (~12 KB), so resolving each export once
+	// per instance matters. Guarded by fnCacheMutex because some callers
+	// (e.g. form-fill timers) run outside the instance mutex.
+	fnCache      map[string]api.Function
+	fnCacheMutex sync.RWMutex
 
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the instance
@@ -187,7 +212,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// If larger than INT_MAX, use FPDF_LoadMemDocument64
 		if len(fileData) > 2147483647 {
-			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.Fn("FPDF_LoadMemDocument64").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -197,7 +222,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 				doc = &res[0]
 			}
 		} else {
-			res, err := p.Module.ExportedFunction("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
+			res, err := p.Fn("FPDF_LoadMemDocument").Call(p.Context, dataPtr, uint64(len(fileData)), cPasswordPointer)
 			if err != nil {
 				return nil, err
 			}
@@ -233,7 +258,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		defer cFilePathPointer.Free()
 
-		res, err := p.Module.ExportedFunction("FPDF_LoadDocument").Call(p.Context, cFilePathPointer.Pointer, cPasswordPointer)
+		res, err := p.Fn("FPDF_LoadDocument").Call(p.Context, cFilePathPointer.Pointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
@@ -254,7 +279,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		nativeDoc.fileHandleRef = fileReaderIndex
 
-		res, err := p.Module.ExportedFunction("FPDF_LoadCustomDocument").Call(p.Context, *fileAccessPointer, cPasswordPointer)
+		res, err := p.Fn("FPDF_LoadCustomDocument").Call(p.Context, *fileAccessPointer, cPasswordPointer)
 		if err != nil {
 			return nil, err
 		}
@@ -268,7 +293,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 	}
 
 	if doc == nil {
-		errorCode, err := p.Module.ExportedFunction("FPDF_GetLastError").Call(p.Context)
+		errorCode, err := p.Fn("FPDF_GetLastError").Call(p.Context)
 		if err != nil {
 			return nil, err
 		}

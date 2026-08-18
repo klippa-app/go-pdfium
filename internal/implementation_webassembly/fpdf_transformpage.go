@@ -20,7 +20,7 @@ func (p *PdfiumImplementation) FPDFPage_SetMediaBox(request *requests.FPDFPage_S
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_SetMediaBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	_, err = p.Fn("FPDFPage_SetMediaBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (p *PdfiumImplementation) FPDFPage_SetCropBox(request *requests.FPDFPage_Se
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_SetCropBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	_, err = p.Fn("FPDFPage_SetCropBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (p *PdfiumImplementation) FPDFPage_SetBleedBox(request *requests.FPDFPage_S
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_SetBleedBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	_, err = p.Fn("FPDFPage_SetBleedBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (p *PdfiumImplementation) FPDFPage_SetTrimBox(request *requests.FPDFPage_Se
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_SetTrimBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	_, err = p.Fn("FPDFPage_SetTrimBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (p *PdfiumImplementation) FPDFPage_SetArtBox(request *requests.FPDFPage_Set
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_SetArtBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	_, err = p.Fn("FPDFPage_SetArtBox").Call(p.Context, *pageHandle.handle, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (p *PdfiumImplementation) FPDFPage_GetMediaBox(request *requests.FPDFPage_G
 	}
 	defer topPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetMediaBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	res, err := p.Fn("FPDFPage_GetMediaBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +206,7 @@ func (p *PdfiumImplementation) FPDFPage_GetCropBox(request *requests.FPDFPage_Ge
 	}
 	defer topPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetCropBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	res, err := p.Fn("FPDFPage_GetCropBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +278,7 @@ func (p *PdfiumImplementation) FPDFPage_GetBleedBox(request *requests.FPDFPage_G
 	}
 	defer topPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetBleedBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	res, err := p.Fn("FPDFPage_GetBleedBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -350,7 +350,7 @@ func (p *PdfiumImplementation) FPDFPage_GetTrimBox(request *requests.FPDFPage_Ge
 	}
 	defer topPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetTrimBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	res, err := p.Fn("FPDFPage_GetTrimBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -422,7 +422,7 @@ func (p *PdfiumImplementation) FPDFPage_GetArtBox(request *requests.FPDFPage_Get
 	}
 	defer topPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetArtBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
+	res, err := p.Fn("FPDFPage_GetArtBox").Call(p.Context, *pageHandle.handle, leftPointer.Pointer, bottomPointer.Pointer, rightPointer.Pointer, topPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -490,7 +490,7 @@ func (p *PdfiumImplementation) FPDFPage_TransFormWithClip(request *requests.FPDF
 		clipRect = clipRectPointer
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPage_TransFormWithClip").Call(p.Context, *pageHandle.handle, matrix, clipRect)
+	res, err := p.Fn("FPDFPage_TransFormWithClip").Call(p.Context, *pageHandle.handle, matrix, clipRect)
 	if err != nil {
 		return nil, err
 	}
@@ -513,7 +513,7 @@ func (p *PdfiumImplementation) FPDFPageObj_TransformClipPath(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPageObj_TransformClipPath").Call(p.Context, *pageObjectHandle.handle, api.EncodeF64(request.A), api.EncodeF64(request.B), api.EncodeF64(request.C), api.EncodeF64(request.D), api.EncodeF64(request.E), api.EncodeF64(request.F))
+	_, err = p.Fn("FPDFPageObj_TransformClipPath").Call(p.Context, *pageObjectHandle.handle, api.EncodeF64(request.A), api.EncodeF64(request.B), api.EncodeF64(request.C), api.EncodeF64(request.D), api.EncodeF64(request.E), api.EncodeF64(request.F))
 	if err != nil {
 		return nil, err
 	}
@@ -526,7 +526,7 @@ func (p *PdfiumImplementation) FPDF_CreateClipPath(request *requests.FPDF_Create
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.Module.ExportedFunction("FPDF_CreateClipPath").Call(p.Context, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
+	res, err := p.Fn("FPDF_CreateClipPath").Call(p.Context, api.EncodeF32(request.Left), api.EncodeF32(request.Bottom), api.EncodeF32(request.Right), api.EncodeF32(request.Top))
 	if err != nil {
 		return nil, err
 	}
@@ -552,7 +552,7 @@ func (p *PdfiumImplementation) FPDF_DestroyClipPath(request *requests.FPDF_Destr
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_DestroyClipPath").Call(p.Context, *clipPathHandle.handle)
+	_, err = p.Fn("FPDF_DestroyClipPath").Call(p.Context, *clipPathHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -577,7 +577,7 @@ func (p *PdfiumImplementation) FPDFPage_InsertClipPath(request *requests.FPDFPag
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFPage_InsertClipPath").Call(p.Context, *pageHandle.handle, *clipPathHandle.handle)
+	_, err = p.Fn("FPDFPage_InsertClipPath").Call(p.Context, *pageHandle.handle, *clipPathHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -596,7 +596,7 @@ func (p *PdfiumImplementation) FPDFPageObj_GetClipPath(request *requests.FPDFPag
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPageObj_GetClipPath").Call(p.Context, *pageObjectHandle.handle)
+	res, err := p.Fn("FPDFPageObj_GetClipPath").Call(p.Context, *pageObjectHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -619,7 +619,7 @@ func (p *PdfiumImplementation) FPDFClipPath_CountPaths(request *requests.FPDFCli
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFClipPath_CountPaths").Call(p.Context, *clipPathHandle.handle)
+	res, err := p.Fn("FPDFClipPath_CountPaths").Call(p.Context, *clipPathHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -645,7 +645,7 @@ func (p *PdfiumImplementation) FPDFClipPath_CountPathSegments(request *requests.
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFClipPath_CountPathSegments").Call(p.Context, *clipPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.PathIndex)))
+	res, err := p.Fn("FPDFClipPath_CountPathSegments").Call(p.Context, *clipPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.PathIndex)))
 	if err != nil {
 		return nil, err
 	}
@@ -671,7 +671,7 @@ func (p *PdfiumImplementation) FPDFClipPath_GetPathSegment(request *requests.FPD
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFClipPath_GetPathSegment").Call(p.Context, *clipPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.PathIndex)), *(*uint64)(unsafe.Pointer(&request.SegmentIndex)))
+	res, err := p.Fn("FPDFClipPath_GetPathSegment").Call(p.Context, *clipPathHandle.handle, *(*uint64)(unsafe.Pointer(&request.PathIndex)), *(*uint64)(unsafe.Pointer(&request.SegmentIndex)))
 	if err != nil {
 		return nil, err
 	}

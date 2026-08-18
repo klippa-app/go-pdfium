@@ -29,14 +29,14 @@ func (p *PdfiumImplementation) getPageSize(page requests.Page) (int, float64, fl
 		return 0, 0, 0, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_GetPageWidth").Call(p.Context, *pageHandle.handle)
+	res, err := p.Fn("FPDF_GetPageWidth").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return 0, 0, 0, err
 	}
 
 	imgWidth := *(*float64)(unsafe.Pointer(&res[0]))
 
-	res, err = p.Module.ExportedFunction("FPDF_GetPageHeight").Call(p.Context, *pageHandle.handle)
+	res, err = p.Fn("FPDF_GetPageHeight").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return 0, 0, 0, err
 	}
@@ -410,7 +410,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		// by FPDFBitmap_Destroy. The stride is calculated by PDFium and
 		// fetched with FPDFBitmap_GetStride below, it may be larger than the
 		// width due to alignment.
-		res, err := p.Module.ExportedFunction("FPDFBitmap_CreateEx").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(enums.FPDF_BITMAP_FORMAT_GRAY), 0, 0)
+		res, err := p.Fn("FPDFBitmap_CreateEx").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(enums.FPDF_BITMAP_FORMAT_GRAY), 0, 0)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -423,7 +423,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 			Rect:   rect,
 		}
 
-		res, err := p.Module.ExportedFunction("FPDFBitmap_Create").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(1))
+		res, err := p.Fn("FPDFBitmap_Create").Call(p.Context, uint64(totalWidth), uint64(totalHeight), uint64(1))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -441,7 +441,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 
 	releaseFunc := func() {
 		// Release bitmap resources and buffers.
-		p.Module.ExportedFunction("FPDFBitmap_Destroy").Call(p.Context, bitmap)
+		p.Fn("FPDFBitmap_Destroy").Call(p.Context, bitmap)
 	}
 
 	pagesInfo := make([]responses.RenderPagesPage, len(pages))
@@ -469,7 +469,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	if imgGray != nil {
 		// The stride is decided by PDFium, it may be larger than the width
 		// due to alignment.
-		res, err := p.Module.ExportedFunction("FPDFBitmap_GetStride").Call(p.Context, bitmap)
+		res, err := p.Fn("FPDFBitmap_GetStride").Call(p.Context, bitmap)
 		if err != nil {
 			releaseFunc()
 			return nil, nil, err
@@ -482,7 +482,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	}
 
 	// The pointer to the first byte of the bitmap buffer.
-	res, err := p.Module.ExportedFunction("FPDFBitmap_GetBuffer").Call(p.Context, bitmap)
+	res, err := p.Fn("FPDFBitmap_GetBuffer").Call(p.Context, bitmap)
 	if err != nil {
 		releaseFunc()
 		return nil, nil, err
@@ -520,7 +520,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FP
 		return 0, false, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPage_HasTransparency").Call(p.Context, *pageHandle.handle)
+	res, err := p.Fn("FPDFPage_HasTransparency").Call(p.Context, *pageHandle.handle)
 	if err != nil {
 		return 0, false, err
 	}
@@ -550,13 +550,13 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FP
 	}
 
 	// Fill the page rect with the specified color.
-	_, err = p.Module.ExportedFunction("FPDFBitmap_FillRect").Call(p.Context, bitmap, uint64(0), uint64(offset), uint64(width), uint64(height), fillColor)
+	_, err = p.Fn("FPDFBitmap_FillRect").Call(p.Context, bitmap, uint64(0), uint64(offset), uint64(width), uint64(height), fillColor)
 	if err != nil {
 		return 0, false, err
 	}
 
 	// Render the bitmap into the given external bitmap.
-	_, err = p.Module.ExportedFunction("FPDF_RenderPageBitmap").Call(p.Context, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
+	_, err = p.Fn("FPDF_RenderPageBitmap").Call(p.Context, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
 	if err != nil {
 		return 0, false, err
 	}
@@ -574,7 +574,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FP
 			return 0, false, err
 		}
 
-		res, err := p.Module.ExportedFunction("FPDF_FORMFILLINFO_Create").Call(p.Context)
+		res, err := p.Fn("FPDF_FORMFILLINFO_Create").Call(p.Context)
 		if err != nil {
 			return 0, false, err
 		}
@@ -584,7 +584,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FP
 			return 0, false, errors.New("could not init form fill environment")
 		}
 
-		res, err = p.Module.ExportedFunction("FPDFDOC_InitFormFillEnvironment").Call(p.Context, *documentHandle.handle, formInfoStruct)
+		res, err = p.Fn("FPDFDOC_InitFormFillEnvironment").Call(p.Context, *documentHandle.handle, formInfoStruct)
 		if err != nil {
 			return 0, false, err
 		}
@@ -594,12 +594,12 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, document *references.FP
 			return 0, false, errors.New("could not init form fill environment")
 		}
 
-		_, err = p.Module.ExportedFunction("FPDF_FFLDraw").Call(p.Context, formHandle, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
+		_, err = p.Fn("FPDF_FFLDraw").Call(p.Context, formHandle, bitmap, *pageHandle.handle, uint64(0), uint64(offset), uint64(width), uint64(height), uint64(0), *(*uint64)(unsafe.Pointer(&flags)))
 		if err != nil {
 			return 0, false, err
 		}
 
-		_, err = p.Module.ExportedFunction("FPDFDOC_ExitFormFillEnvironment").Call(p.Context, formHandle)
+		_, err = p.Fn("FPDFDOC_ExitFormFillEnvironment").Call(p.Context, formHandle)
 		if err != nil {
 			return 0, false, err
 		}

@@ -27,7 +27,7 @@ func (p *PdfiumImplementation) GetMetaData(request *requests.GetMetaData) (*resp
 		defer cstr.Free()
 
 		// First get the metadata length.
-		res, err := p.Module.ExportedFunction("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, 0, 0)
+		res, err := p.Fn("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, 0, 0)
 		if err != nil {
 			return "", err
 		}
@@ -40,7 +40,7 @@ func (p *PdfiumImplementation) GetMetaData(request *requests.GetMetaData) (*resp
 		charDataPointer, err := p.ByteArrayPointer(uint64(metaSize), nil)
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, uint64(metaSize))
+		_, err = p.Fn("FPDF_GetMetaText").Call(p.Context, *documentHandle.handle, cstr.Pointer, charDataPointer.Pointer, uint64(metaSize))
 		if err != nil {
 			return "", err
 		}

@@ -19,7 +19,7 @@ func (p *PdfiumImplementation) FPDF_GetSignatureCount(request *requests.FPDF_Get
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_GetSignatureCount").Call(p.Context, *documentHandle.handle)
+	res, err := p.Fn("FPDF_GetSignatureCount").Call(p.Context, *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (p *PdfiumImplementation) FPDF_GetSignatureObject(request *requests.FPDF_Ge
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_GetSignatureObject").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.Fn("FPDF_GetSignatureObject").Call(p.Context, *documentHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetContents(request *requests.FP
 	}
 
 	// First get the signature length.
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetContents").Call(p.Context, *signatureHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFSignatureObj_GetContents").Call(p.Context, *signatureHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetContents(request *requests.FP
 	}
 	defer signatureDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDFSignatureObj_GetContents").Call(p.Context, *signatureHandle.handle, signatureDataPointer.Pointer, signatureSize)
+	res, err = p.Fn("FPDFSignatureObj_GetContents").Call(p.Context, *signatureHandle.handle, signatureDataPointer.Pointer, signatureSize)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetByteRange(request *requests.F
 	}
 
 	// First get the signature length.
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetByteRange").Call(p.Context, *signatureHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFSignatureObj_GetByteRange").Call(p.Context, *signatureHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetByteRange(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFSignatureObj_GetByteRange").Call(p.Context, *signatureHandle.handle, intArrayPointer.Pointer, byteRangeSize)
+	_, err = p.Fn("FPDFSignatureObj_GetByteRange").Call(p.Context, *signatureHandle.handle, intArrayPointer.Pointer, byteRangeSize)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetSubFilter(request *requests.F
 	}
 
 	// First get the signature length.
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetSubFilter").Call(p.Context, *signatureHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFSignatureObj_GetSubFilter").Call(p.Context, *signatureHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetSubFilter(request *requests.F
 	}
 	defer subFilterDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDFSignatureObj_GetSubFilter").Call(p.Context, *signatureHandle.handle, subFilterDataPointer.Pointer, subFilterLength)
+	res, err = p.Fn("FPDFSignatureObj_GetSubFilter").Call(p.Context, *signatureHandle.handle, subFilterDataPointer.Pointer, subFilterLength)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetReason(request *requests.FPDF
 	}
 
 	// First get the reason length.
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetReason").Call(p.Context, *signatureHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFSignatureObj_GetReason").Call(p.Context, *signatureHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetReason(request *requests.FPDF
 	}
 	defer reasonDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDFSignatureObj_GetReason").Call(p.Context, *signatureHandle.handle, reasonDataPointer.Pointer, reasonLength)
+	res, err = p.Fn("FPDFSignatureObj_GetReason").Call(p.Context, *signatureHandle.handle, reasonDataPointer.Pointer, reasonLength)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetTime(request *requests.FPDFSi
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetTime").Call(p.Context, *signatureHandle.handle, 0, 0)
+	res, err := p.Fn("FPDFSignatureObj_GetTime").Call(p.Context, *signatureHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetTime(request *requests.FPDFSi
 	}
 	defer timeDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FPDFSignatureObj_GetTime").Call(p.Context, *signatureHandle.handle, timeDataPointer.Pointer, timeLength)
+	res, err = p.Fn("FPDFSignatureObj_GetTime").Call(p.Context, *signatureHandle.handle, timeDataPointer.Pointer, timeLength)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +291,7 @@ func (p *PdfiumImplementation) FPDFSignatureObj_GetDocMDPPermission(request *req
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFSignatureObj_GetDocMDPPermission").Call(p.Context, *signatureHandle.handle)
+	res, err := p.Fn("FPDFSignatureObj_GetDocMDPPermission").Call(p.Context, *signatureHandle.handle)
 	if err != nil {
 		return nil, err
 	}
