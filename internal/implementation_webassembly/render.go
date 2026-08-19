@@ -735,6 +735,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			Options: &jpeg.Options{
 				Quality: 95,
 			},
+			Progressive: request.Progressive,
 		}
 
 		if request.OutputQuality > 0 {
@@ -742,7 +743,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		for {
-			err := image_jpeg.Encode(&imgBuf, renderedImage, opt)
+			err := p.encodeJPEG(&imgBuf, renderedImage, opt)
 			if err != nil {
 				return nil, err
 			}
