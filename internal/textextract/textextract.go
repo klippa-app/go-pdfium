@@ -120,6 +120,12 @@ func (e *Extractor) bucketRange(b, t float32) (int, int) {
 	if lo < 0 {
 		lo = 0
 	}
+	// Both ends must be clamped: for a rect entirely above the page content lo
+	// alone can land past the last bucket, and the hi < lo fixup below would
+	// then hand that out-of-range index straight to the bucket loop.
+	if lo >= len(e.buckets) {
+		lo = len(e.buckets) - 1
+	}
 	if hi >= len(e.buckets) {
 		hi = len(e.buckets) - 1
 	}

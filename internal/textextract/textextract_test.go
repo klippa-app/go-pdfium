@@ -80,3 +80,37 @@ func TestEmptyPage(t *testing.T) {
 		t.Errorf("got %q, want empty", got)
 	}
 }
+
+// A query rect that lies entirely outside the page content must return "" and
+// must not panic. Rects entirely above the content used to index one bucket
+// past the end: bucketRange clamped hi but not lo, and its hi < lo fixup then
+// handed lo straight to the bucket loop. Not reachable through
+// GetPageTextStructured (PDFium's own rects always sit inside the char bounds),
+// so only reachable by calling TextInRect directly.
+func TestQueryRectOutsideContent(t *testing.T) {
+	// Enough chars that New() allocates more than one y-bucket.
+	chars := make([]Char, 0, 64)
+	for i := 0; i < 16; i++ {
+		for line := 0; line < 4; line++ {
+			chars = append(chars, box(i, float32(100-line*20), 'A'+rune(i%26)))
+		}
+	}
+	e := New(chars)
+
+	cases := []struct {
+		name                     string
+		left, top, right, bottom float32
+	}{
+		{"far above content", 0, 10000, 1000, 9000},
+		{"just above content", 0, 200, 1000, 111},
+		{"far below content", 0, -9000, 1000, -10000},
+		{"just below content", 0, 39, 1000, -100},
+		{"left of content", -1000, 120, -500, 0},
+		{"right of content", 5000, 120, 6000, 0},
+	}
+	for _, c := range cases {
+		if got := e.TextInRect(c.left, c.top, c.right, c.bottom); got != "" {
+			t.Errorf("%s: got %q, want empty", c.name, got)
+		}
+	}
+}
