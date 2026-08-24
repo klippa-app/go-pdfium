@@ -365,9 +365,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandleRef != nil {
-			p.Free(*p.fileReaders[*nativeDoc.fileHandleRef].FileAccess)
-			p.Free(*p.fileReaders[*nativeDoc.fileHandleRef].ParamPointer)
-			delete(p.fileReaders, *nativeDoc.fileHandleRef)
+			p.releaseFileReader(*nativeDoc.fileHandleRef)
 		}
 
 		if dataPointer != nil {
@@ -485,18 +483,13 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.dataAvailRefs {
-		FileAvailables.Mutex.Lock()
-		delete(FileAvailables.Refs, uint32(*p.dataAvailRefs[i].fileAvail))
-		FileAvailables.Mutex.Unlock()
-
-		p.Free(*p.dataAvailRefs[i].fileAvail)
-		p.Free(*p.dataAvailRefs[i].handle)
-		if *p.dataAvailRefs[i].hints != 0 {
-			FileHints.Mutex.Lock()
-			delete(FileHints.Refs, uint32(*p.dataAvailRefs[i].hints))
-			FileHints.Mutex.Unlock()
-			p.Free(*p.dataAvailRefs[i].hints)
+		// The documents parsed from these providers were closed above, so
+		// there is nothing reading through them anymore.
+		p.dataAvailRefs[i].destroyRequested = true
+		if err := p.dataAvailRefs[i].destroyIfUnused(p); err != nil {
+			return err
 		}
+
 		delete(p.dataAvailRefs, i)
 	}
 
@@ -529,17 +522,8 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.fileReaders {
-		p.Free(*p.fileReaders[i].FileAccess)
-		p.Free(*p.fileReaders[i].ParamPointer)
-
 		// Cleanup file handle.
-		p.fileReaders[i].FileAccess = nil
-
-		delete(p.fileReaders, i)
-
-		FileReaders.Mutex.Lock()
-		delete(FileReaders.Refs, i)
-		FileReaders.Mutex.Unlock()
+		p.releaseFileReader(i)
 	}
 
 	return nil

@@ -22,6 +22,14 @@ type DataAvailHandle struct {
 	nativeRef     references.FPDF_AVAIL // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 	fileHandleRef string
 	hints         *C.FX_DOWNLOADHINTS
+
+	// openDocuments counts the documents FPDFAvail_GetDocument handed out
+	// that have not been closed yet, and destroyRequested records that the
+	// caller is done with the provider. PDFium requires the provider to
+	// outlive those documents, so the two together decide when it can
+	// really be destroyed, see destroyIfUnused.
+	openDocuments    int
+	destroyRequested bool
 }
 
 func (p *PdfiumImplementation) registerDataAvail(dataAvail C.FPDF_AVAIL, fileHandleRef string, fileAvailHandle *C.FX_FILEAVAIL, hints *C.FX_DOWNLOADHINTS) *DataAvailHandle {

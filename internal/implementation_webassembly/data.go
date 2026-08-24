@@ -34,6 +34,33 @@ var FileReaders = struct {
 	Mutex:   &sync.Mutex{},
 }
 
+// releaseFileReader frees the file reader registered under ref. PDFium reads
+// through the FPDF_FILEACCESS struct, and the identifier it points at, for as
+// long as it has anything built on top of them, so this may only be called
+// once that is gone. Call it with the lock held.
+func (p *PdfiumImplementation) releaseFileReader(ref uint32) {
+	fileReader, ok := p.fileReaders[ref]
+	if !ok {
+		return
+	}
+
+	if fileReader.FileAccess != nil {
+		p.Free(*fileReader.FileAccess)
+		fileReader.FileAccess = nil
+	}
+
+	if fileReader.ParamPointer != nil {
+		p.Free(*fileReader.ParamPointer)
+		fileReader.ParamPointer = nil
+	}
+
+	delete(p.fileReaders, ref)
+
+	FileReaders.Mutex.Lock()
+	delete(FileReaders.Refs, ref)
+	FileReaders.Mutex.Unlock()
+}
+
 func (p *PdfiumImplementation) CreateFileAccessReader(fileSize int64, reader io.ReadSeeker) (*uint64, *uint32, error) {
 	FileReaders.Mutex.Lock()
 	defer FileReaders.Mutex.Unlock()

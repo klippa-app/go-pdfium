@@ -133,7 +133,40 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 	}, nil
 }
 
+// destroyIfUnused destroys the PDFium availability provider once the caller
+// has asked for it to be destroyed and every document that was parsed from it
+// has been closed.
+//
+// PDFium needs that order. FPDFAvail_GetDocument gives the document's parser a
+// CPDF_ReadValidator that holds an unowned pointer to the provider's
+// FX_FILEAVAIL wrapper and calls into it on every availability check, so
+// destroying the provider while a document is still open leaves that document
+// calling a destroyed C++ object on its next read. The provider's file reader
+// is used by both and is released here as well.
+//
+// Call it with the lock held.
+func (d *DataAvailHandle) destroyIfUnused() {
+	if !d.destroyRequested || d.openDocuments > 0 || d.handle == nil {
+		return
+	}
+
+	C.FPDFAvail_Destroy(d.handle)
+	d.handle = nil
+
+	releaseFileReader(d.fileHandleRef)
+
+	delete(dataAvailAbilityCallbacks, unsafe.Pointer(d.fileAvailHandle))
+	if d.hints != nil {
+		delete(addSegmentCallbacks, unsafe.Pointer(d.hints))
+	}
+}
+
 // FPDFAvail_Destroy destroys the given document availability provider.
+//
+// Documents returned by FPDFAvail_GetDocument keep reading through the
+// provider, so when one of them is still open the provider is only released
+// for real once the last of them is closed. The availability provider itself
+// can not be used anymore either way.
 func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error) {
 	p.Lock()
 	defer p.Unlock()
@@ -143,16 +176,10 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 		return nil, err
 	}
 
-	C.FPDFAvail_Destroy(dataAvailHandler.handle)
-
 	delete(p.dataAvailRefs, dataAvailHandler.nativeRef)
-	C.free(Pdfium.fileReaders[dataAvailHandler.fileHandleRef].stringRef)
-	delete(Pdfium.fileReaders, dataAvailHandler.fileHandleRef)
 
-	delete(dataAvailAbilityCallbacks, unsafe.Pointer(dataAvailHandler.fileAvailHandle))
-	if dataAvailHandler.hints != nil {
-		delete(addSegmentCallbacks, unsafe.Pointer(dataAvailHandler.hints))
-	}
+	dataAvailHandler.destroyRequested = true
+	dataAvailHandler.destroyIfUnused()
 
 	return &responses.FPDFAvail_Destroy{}, nil
 }
@@ -201,6 +228,13 @@ func (p *PdfiumImplementation) FPDFAvail_GetDocument(request *requests.FPDFAvail
 
 	doc := C.FPDFAvail_GetDocument(dataAvailHandler.handle, cPassword)
 	documentHandle := p.registerDocument(doc)
+
+	if doc != nil {
+		// The provider has to outlive this document, see
+		// DataAvailHandle.destroyIfUnused.
+		dataAvailHandler.openDocuments++
+		documentHandle.dataAvail = dataAvailHandler
+	}
 
 	return &responses.FPDFAvail_GetDocument{
 		Document: documentHandle.nativeRef,

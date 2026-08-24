@@ -20,6 +20,12 @@ type DocumentHandle struct {
 	nativeRef     references.FPDF_DOCUMENT // A string that is our reference inside the process. We need this to close the documents in DestroyLibrary.
 	fileHandleRef *string
 
+	// dataAvail is the availability provider this document was parsed from,
+	// when it came from FPDFAvail_GetDocument. PDFium requires the provider
+	// to outlive the document, so closing the document is what releases it
+	// when the caller destroyed it first.
+	dataAvail *DataAvailHandle
+
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the document
 
@@ -142,9 +148,15 @@ func (d *DocumentHandle) Close() error {
 
 	// Cleanup file handle.
 	if d.fileHandleRef != nil {
-		Pdfium.fileReaders[*d.fileHandleRef].fileAccess = nil
-		C.free(Pdfium.fileReaders[*d.fileHandleRef].stringRef)
-		delete(Pdfium.fileReaders, *d.fileHandleRef)
+		releaseFileReader(*d.fileHandleRef)
+	}
+
+	// Release the availability provider this document was parsed from. When
+	// the caller already destroyed it, this is what actually destroys it.
+	if d.dataAvail != nil {
+		d.dataAvail.openDocuments--
+		d.dataAvail.destroyIfUnused()
+		d.dataAvail = nil
 	}
 
 	delete(Pdfium.documentRefs, d.nativeRef)

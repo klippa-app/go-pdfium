@@ -187,6 +187,21 @@ type fileReaderRef struct {
 	fileAccess *C.FPDF_FILEACCESS
 }
 
+// releaseFileReader frees the file reader registered under ref. PDFium reads
+// through the FPDF_FILEACCESS struct, and the identifier in its m_Param, for
+// as long as it has anything built on top of them, so this may only be called
+// once that is gone. Call it with the lock held.
+func releaseFileReader(ref string) {
+	fileReader, ok := Pdfium.fileReaders[ref]
+	if !ok {
+		return
+	}
+
+	fileReader.fileAccess = nil
+	C.free(fileReader.stringRef)
+	delete(Pdfium.fileReaders, ref)
+}
+
 // Here is the real implementation of Pdfium
 type mainPdfium struct {
 	// logger is for communication with the plugin.
@@ -428,8 +443,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandleRef != nil {
-			C.free(Pdfium.fileReaders[*nativeDoc.fileHandleRef].stringRef)
-			delete(Pdfium.fileReaders, *nativeDoc.fileHandleRef)
+			releaseFileReader(*nativeDoc.fileHandleRef)
 		}
 
 		return nil, pdfiumError
@@ -543,6 +557,10 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.dataAvailRefs {
+		// The documents parsed from these providers were closed above, so
+		// there is nothing reading through them anymore.
+		p.dataAvailRefs[i].destroyRequested = true
+		p.dataAvailRefs[i].destroyIfUnused()
 		delete(p.dataAvailRefs, i)
 	}
 
@@ -576,9 +594,7 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.fileReaders {
 		// Cleanup file handle.
-		Pdfium.fileReaders[i].fileAccess = nil
-		C.free(Pdfium.fileReaders[i].stringRef)
-		delete(Pdfium.fileReaders, i)
+		releaseFileReader(i)
 		delete(p.fileReaders, i)
 	}
 
