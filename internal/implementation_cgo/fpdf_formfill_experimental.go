@@ -171,6 +171,60 @@ func (p *PdfiumImplementation) FORM_SetFocusedAnnot(request *requests.FORM_SetFo
 	return &responses.FORM_SetFocusedAnnot{}, nil
 }
 
+// FORM_GetTextDirection
+// Returns the text direction of the given form field annotation.
+// If the operation fails (e.g., invalid handle), returns
+// FPDF_TEXTDIR_UNKNOWN.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	direction := C.FORM_GetTextDirection(formHandleHandle.handle, annotationHandle.handle)
+
+	return &responses.FORM_GetTextDirection{
+		Direction: enums.FPDF_TEXT_DIRECTION(direction),
+	}, nil
+}
+
+// FORM_SetTextDirection
+// Sets the text direction of the given form field annotation.
+// Passing FPDF_TEXTDIR_UNKNOWN will fail.
+// Note: This only alters the in-memory state of the form field and does
+// not modify the PDF document.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	success := C.FORM_SetTextDirection(formHandleHandle.handle, annotationHandle.handle, C.FPDF_TEXT_DIRECTION(request.Direction))
+	if int(success) == 0 {
+		return nil, errors.New("could not set text direction")
+	}
+
+	return &responses.FORM_SetTextDirection{}, nil
+}
+
 // FPDF_GetFormType returns the type of form contained in the PDF document.
 // If document is nil, then the return value is FORMTYPE_NONE.
 // Experimental API

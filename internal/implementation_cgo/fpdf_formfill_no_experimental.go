@@ -54,6 +54,25 @@ func (p *PdfiumImplementation) FORM_SetFocusedAnnot(request *requests.FORM_SetFo
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FORM_GetTextDirection
+// Returns the text direction of the given form field annotation.
+// If the operation fails (e.g., invalid handle), returns
+// FPDF_TEXTDIR_UNKNOWN.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
+// FORM_SetTextDirection
+// Sets the text direction of the given form field annotation.
+// Passing FPDF_TEXTDIR_UNKNOWN will fail.
+// Note: This only alters the in-memory state of the form field and does
+// not modify the PDF document.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDF_GetFormType returns the type of form contained in the PDF document.
 // If document is nil, then the return value is FORMTYPE_NONE.
 // Experimental API

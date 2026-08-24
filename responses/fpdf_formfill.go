@@ -82,6 +82,12 @@ type FORM_GetFocusedAnnot struct {
 
 type FORM_SetFocusedAnnot struct{}
 
+type FORM_GetTextDirection struct {
+	Direction enums.FPDF_TEXT_DIRECTION
+}
+
+type FORM_SetTextDirection struct{}
+
 type FPDFPage_HasFormFieldAtPoint struct {
 	FieldType enums.FPDF_FORMFIELD // The type of the form field; -1 indicates no field.
 }

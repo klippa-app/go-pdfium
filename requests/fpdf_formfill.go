@@ -191,6 +191,17 @@ type FORM_SetFocusedAnnot struct {
 	Annotation references.FPDF_ANNOTATION
 }
 
+type FORM_GetTextDirection struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+}
+
+type FORM_SetTextDirection struct {
+	FormHandle references.FPDF_FORMHANDLE
+	Annotation references.FPDF_ANNOTATION
+	Direction  enums.FPDF_TEXT_DIRECTION
+}
+
 type FPDFPage_HasFormFieldAtPoint struct {
 	FormHandle references.FPDF_FORMHANDLE
 	Page       Page
