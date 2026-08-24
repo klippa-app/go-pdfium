@@ -10,14 +10,21 @@ import (
 )
 
 type DataAvailHandle struct {
-	handle          C.FPDF_AVAIL
-	fileAvailHandle C.FX_FILEAVAIL
-	nativeRef       references.FPDF_AVAIL // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
-	fileHandleRef   string
-	hints           *C.FX_DOWNLOADHINTS
+	handle C.FPDF_AVAIL
+
+	// fileAvailHandle is the FX_FILEAVAIL that was handed to
+	// FPDFAvail_Create. PDFium keeps the pointer for the lifetime of the
+	// availability provider, and it is the key of this provider's entry in
+	// dataAvailAbilityCallbacks, so it has to be the same struct rather than
+	// a copy of it.
+	fileAvailHandle *C.FX_FILEAVAIL
+
+	nativeRef     references.FPDF_AVAIL // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+	fileHandleRef string
+	hints         *C.FX_DOWNLOADHINTS
 }
 
-func (p *PdfiumImplementation) registerDataAvail(dataAvail C.FPDF_AVAIL, fileHandleRef string, fileAvailHandle C.FX_FILEAVAIL, hints *C.FX_DOWNLOADHINTS) *DataAvailHandle {
+func (p *PdfiumImplementation) registerDataAvail(dataAvail C.FPDF_AVAIL, fileHandleRef string, fileAvailHandle *C.FX_FILEAVAIL, hints *C.FX_DOWNLOADHINTS) *DataAvailHandle {
 	ref := uuid.New()
 	handle := &DataAvailHandle{
 		handle:          dataAvail,

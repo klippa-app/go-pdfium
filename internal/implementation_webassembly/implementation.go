@@ -131,8 +131,9 @@ type PdfiumImplementation struct {
 
 	// fnCache memoizes Module.ExportedFunction lookups: every lookup
 	// allocates a fresh call engine (~12 KB), so resolving each export once
-	// per instance matters. Guarded by fnCacheMutex because some callers
-	// (e.g. form-fill timers) run outside the instance mutex.
+	// per instance matters. Guarded by fnCacheMutex so that a lookup from a
+	// caller-owned goroutine (the form fill timer) can never tear the map,
+	// independently of the instance mutex.
 	fnCache      map[string]api.Function
 	fnCacheMutex sync.RWMutex
 
@@ -193,6 +194,15 @@ func (p *PdfiumImplementation) Lock() {
 
 func (p *PdfiumImplementation) Unlock() {
 	p.mutex.Unlock()
+}
+
+// TryLock is Lock for callers that must not block: it reports whether the
+// lock was taken, and only then must the caller Unlock. It exists for the
+// form fill timer callback, which runs on a goroutine of the caller's
+// choosing and can therefore not wait for PDFium to become free without
+// risking a deadlock, see FormFillInfo.FFI_SetTimer.
+func (p *PdfiumImplementation) TryLock() bool {
+	return p.mutex.TryLock()
 }
 
 func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {

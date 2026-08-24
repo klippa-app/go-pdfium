@@ -305,6 +305,15 @@ func (p *PdfiumImplementation) Unlock() {
 	Pdfium.mutex.Unlock()
 }
 
+// TryLock is Lock for callers that must not block: it reports whether the
+// lock was taken, and only then must the caller Unlock. It exists for the
+// form fill timer callback, which runs on a goroutine of the caller's
+// choosing and can therefore not wait for PDFium to become free without
+// risking a deadlock, see go_formfill_FFI_SetTimer_cb.
+func (p *PdfiumImplementation) TryLock() bool {
+	return Pdfium.mutex.TryLock()
+}
+
 func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()

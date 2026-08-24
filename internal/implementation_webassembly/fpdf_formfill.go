@@ -56,7 +56,34 @@ func (f *FormFillInfo) FFI_SetCursor(cursor uint32) {
 }
 
 func (f *FormFillInfo) FFI_SetTimer(uElapse, lpTimerFunc uint32) int {
+	// Every other callback here runs inside one of our API calls, so it is
+	// already serialized against the rest of PDFium. This one is not: the
+	// caller fires it from a timer on a goroutine of its own, so it has to
+	// take the instance lock itself, otherwise it runs PDFium code while
+	// another goroutine is already running PDFium code in the same module.
+	//
+	// It must not wait for that lock. PDFium kills timers from inside API
+	// calls, and the natural way to implement FFI_KillTimer is to stop the
+	// timer goroutine and wait for it, which would deadlock against a timer
+	// tick blocked on this lock. PDFium timers repeat until they are killed,
+	// so a tick dropped because the instance was busy simply comes back on
+	// the next interval.
 	timerFunc := func(idEvent int) {
+		if !f.Instance.TryLock() {
+			return
+		}
+		defer f.Instance.Unlock()
+
+		// The form fill environment may have been destroyed since the timer
+		// was handed out, taking the PDFium object behind lpTimerFunc with
+		// it. Its handle is removed by FPDFDOC_ExitFormFillEnvironment.
+		FormFillInfoHandles.Mutex.Lock()
+		_, ok := FormFillInfoHandles.Refs[uint32(*f.Struct)]
+		FormFillInfoHandles.Mutex.Unlock()
+		if !ok {
+			return
+		}
+
 		f.Instance.Fn("FPDF_FORMFILLINFO_CALL_TIMER").Call(f.Instance.Context, uint64(lpTimerFunc), *(*uint64)(unsafe.Pointer(&idEvent)))
 	}
 
