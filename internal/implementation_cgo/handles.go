@@ -206,11 +206,18 @@ type BitmapHandle struct {
 	handle    C.FPDF_BITMAP
 	nativeRef references.FPDF_BITMAP // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
 
-	// externalBuffer keeps the Go buffer of FPDFBitmap_CreateEx reachable:
-	// PDFium holds a raw pointer into it for the lifetime of the bitmap, so
-	// without this reference the garbage collector could free (and reuse) the
-	// memory while PDFium still writes into it, corrupting the Go heap.
-	externalBuffer []byte
+	// externalBuffer and externalPointer keep the external buffer of
+	// FPDFBitmap_CreateEx reachable: PDFium holds a raw pointer into it for
+	// the lifetime of the bitmap, so without these references the garbage
+	// collector could free (and reuse) the memory while PDFium still writes
+	// into it, corrupting the Go heap.
+	//
+	// externalPointer covers the request.Pointer variant of the API, where
+	// the buffer only reaches us as a raw unsafe.Pointer: the garbage
+	// collector treats it as a live reference to whatever Go allocation it
+	// points into, and ignores it when it points into C memory.
+	externalBuffer  []byte
+	externalPointer unsafe.Pointer
 }
 
 type TextPageHandle struct {
