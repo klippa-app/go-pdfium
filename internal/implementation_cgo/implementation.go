@@ -152,6 +152,11 @@ func InitLibrary(config *pdfium.LibraryConfig) {
 				cFonts[i] = C.CString(config.UserFontPaths[i])
 			}
 
+			// malloc does not zero its result, so write the NULL terminator
+			// explicitly. PDFium walks the array until it reads a NULL entry,
+			// nothing communicates the length to it.
+			cFonts[len(config.UserFontPaths)] = nil
+
 			libraryConfig.m_pUserFontPaths = (**C.char)(cArray)
 		}
 
