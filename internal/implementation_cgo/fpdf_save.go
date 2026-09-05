@@ -15,9 +15,10 @@ import (
 #cgo pkg-config: pdfium
 #include "fpdf_save.h"
 #include <stdlib.h>
+#include "go_pdfium_cgo_export.h"
 
 typedef const void cvoid_t;
-extern int go_writer_cb(struct FPDF_FILEWRITE_ *pThis, cvoid_t *pData, unsigned long size);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_writer_cb(struct FPDF_FILEWRITE_ *pThis, cvoid_t *pData, unsigned long size);
 
 static inline void FPDF_FILEWRITE_SET_WRITE_BLOCK(FPDF_FILEWRITE *fs) {
 	fs->WriteBlock = &go_writer_cb;

@@ -4,11 +4,12 @@ package implementation_cgo
 #cgo pkg-config: pdfium
 #include "fpdf_dataavail.h"
 #include <stdlib.h>
+#include "go_pdfium_cgo_export.h"
 
-extern int go_dataavail_is_data_avail_cb(struct _FX_FILEAVAIL *me, size_t offset, size_t size);
-extern void go_dataavail_add_segment_cb(struct _FX_DOWNLOADHINTS *me, size_t offset, size_t size);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_dataavail_is_data_avail_cb(struct _FX_FILEAVAIL *me, size_t offset, size_t size);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_dataavail_add_segment_cb(struct _FX_DOWNLOADHINTS *me, size_t offset, size_t size);
 
-extern int go_read_seeker_cb(void *param, unsigned long position, unsigned char *pBuf, unsigned long size);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_read_seeker_cb(void *param, unsigned long position, unsigned char *pBuf, unsigned long size);
 
 static inline void FPDF_FX_FILEAVAIL_CB(FX_FILEAVAIL *p) {
 	p->IsDataAvail = &go_dataavail_is_data_avail_cb;
