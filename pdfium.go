@@ -61,7 +61,7 @@ type Pdfium interface {
 	Kill() error
 
 	// GetImplementation returns the specific runtime implementation.
-	GetImplementation() interface{}
+	GetImplementation() any
 
 	// End instance functions.
 
