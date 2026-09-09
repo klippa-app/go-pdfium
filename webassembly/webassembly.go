@@ -23,14 +23,13 @@ import (
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/experimental"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-	"golang.org/x/net/context"
 )
 
 //go:embed pdfium.wasm
 var pdfiumWasm []byte
 
 type worker struct {
-	Context   context.Context
+	Context   goctx.Context
 	Cancel    goctx.CancelFunc
 	Functions map[string]api.Function
 	Module    api.Module
@@ -136,7 +135,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 
 	poolContext := config.Context
 	if poolContext == nil {
-		poolContext = context.Background()
+		poolContext = goctx.Background()
 	}
 
 	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
@@ -160,7 +159,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 	}
 
 	factory := pool.NewPooledObjectFactory(
-		func(goctx.Context) (interface{}, error) {
+		func(goctx.Context) (any, error) {
 			workerCtx, cancel := goctx.WithCancel(poolContext)
 			newWorker := &worker{
 				Context: workerCtx,
@@ -415,6 +414,6 @@ func (i *pdfiumInstance) Kill() (err error) {
 	return err
 }
 
-func (i *pdfiumInstance) GetImplementation() interface{} {
+func (i *pdfiumInstance) GetImplementation() any {
 	return i.worker.Instance
 }
