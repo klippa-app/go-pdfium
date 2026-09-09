@@ -267,7 +267,7 @@ func init() {
 package renderer
 
 import (
-	"io/ioutil"
+	"os"
 	"log"
 
 	"github.com/klippa-app/go-pdfium"
@@ -288,7 +288,7 @@ func main() {
 
 func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return 0, err
 	}
@@ -324,7 +324,6 @@ package renderer
 
 import (
 	"image/png"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -345,7 +344,7 @@ func main() {
 
 func renderPage(filePath string, page int, output string) error {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -506,7 +505,7 @@ func init() {
 package renderer
 
 import (
-	"io/ioutil"
+	"os"
 	"log"
 
 	"github.com/klippa-app/go-pdfium"
@@ -527,7 +526,7 @@ func main() {
 
 func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return 0, err
 	}
@@ -563,7 +562,6 @@ package renderer
 
 import (
 	"image/png"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -584,7 +582,7 @@ func main() {
 
 func renderPage(filePath string, page int, output string) error {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
