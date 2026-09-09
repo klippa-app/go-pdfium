@@ -82,7 +82,7 @@ func Init(config Config) pdfium.Pool {
 	}
 
 	factory := pool.NewPooledObjectFactory(
-		func(goctx.Context) (interface{}, error) {
+		func(goctx.Context) (any, error) {
 			newWorker := &worker{}
 
 			client := plugin.NewClient(&plugin.ClientConfig{
@@ -346,6 +346,6 @@ func (i *pdfiumInstance) Kill() (err error) {
 	return
 }
 
-func (i *pdfiumInstance) GetImplementation() interface{} {
+func (i *pdfiumInstance) GetImplementation() any {
 	return i.worker.plugin
 }
