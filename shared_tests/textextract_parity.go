@@ -105,7 +105,7 @@ type textExtractQuery struct {
 // from, using only the public API, mirroring what each backend's text.go does.
 func textExtractPageChars(textPage references.FPDF_TEXTPAGE, count int) []textextract.Char {
 	chars := make([]textextract.Char, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		box, err := PdfiumInstance.FPDFText_GetCharBox(&requests.FPDFText_GetCharBox{TextPage: textPage, Index: i})
 		Expect(err).To(BeNil())
 		origin, err := PdfiumInstance.FPDFText_GetCharOrigin(&requests.FPDFText_GetCharOrigin{TextPage: textPage, Index: i})

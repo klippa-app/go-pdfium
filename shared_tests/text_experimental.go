@@ -1,5 +1,4 @@
-//go:build pdfium_experimental
-// +build pdfium_experimental
+//go:build !pdfium_experimental
 
 package shared_tests
 
@@ -16,10 +15,20 @@ import (
 var _ = Describe("text", func() {
 	BeforeEach(func() {
 		Locker.Lock()
+
+		if TestType == "webassembly" {
+			// Webassembly has all the experimental things implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	AfterEach(func() {
 		Locker.Unlock()
+
+		if TestType == "webassembly" {
+			// Webassembly has all the experimental things implemented.
+			Skip("This test is skipped on Webassembly")
+		}
 	})
 
 	Context("a normal PDF file", func() {
@@ -59,7 +68,7 @@ var _ = Describe("text", func() {
 							CollectFontInformation: true,
 						})
 						Expect(err).To(BeNil())
-						Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information.json", TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_7776.json")...))
+						Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_7776.json")...))
 					})
 
 					Context("and PixelPositions is enabled", func() {
@@ -79,7 +88,7 @@ var _ = Describe("text", func() {
 								},
 							})
 							Expect(err).To(BeNil())
-							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions.json", TestDataPath+"/testdata/text_experimental_"+TestType+"_testpdf_experimental_with_font_information_and_pixel_positions_7776.json")...))
+							Expect(pageTextStructured).To(Or(loadStructuredText(pageTextStructured, TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions.json", TestDataPath+"/testdata/text_"+TestType+"_testpdf_with_font_information_and_pixel_positions_7776.json")...))
 						})
 					})
 				})

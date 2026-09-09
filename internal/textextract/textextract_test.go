@@ -90,8 +90,8 @@ func TestEmptyPage(t *testing.T) {
 func TestQueryRectOutsideContent(t *testing.T) {
 	// Enough chars that New() allocates more than one y-bucket.
 	chars := make([]Char, 0, 64)
-	for i := 0; i < 16; i++ {
-		for line := 0; line < 4; line++ {
+	for i := range 16 {
+		for line := range 4 {
 			chars = append(chars, box(i, float32(100-line*20), 'A'+rune(i%26)))
 		}
 	}

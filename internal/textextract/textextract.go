@@ -84,10 +84,7 @@ func New(chars []Char) *Extractor {
 		}
 	}
 
-	numBuckets := len(chars) / 4
-	if numBuckets < 1 {
-		numBuckets = 1
-	}
+	numBuckets := max(len(chars)/4, 1)
 	if numBuckets > maxBuckets {
 		numBuckets = maxBuckets
 	}
