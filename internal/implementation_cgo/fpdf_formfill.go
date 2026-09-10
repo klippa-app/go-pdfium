@@ -4,22 +4,23 @@ package implementation_cgo
 #cgo pkg-config: pdfium
 #include "fpdf_formfill.h"
 #include <stdlib.h>
+#include "go_pdfium_cgo_export.h"
 
-extern void go_formfill_Release_cb(struct _FPDF_FORMFILLINFO *this);
-extern void go_formfill_FFI_Invalidate_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
-extern void go_formfill_FFI_OutputSelectedRect_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
-extern void go_formfill_FFI_SetCursor_cb(struct _FPDF_FORMFILLINFO *this, int nCursorType);
-extern int go_formfill_FFI_SetTimer_cb(struct _FPDF_FORMFILLINFO *this, int uElapse, TimerCallback lpTimerFunc);
-extern void go_formfill_FFI_KillTimer_cb(struct _FPDF_FORMFILLINFO *this, int nTimerID);
-extern FPDF_SYSTEMTIME go_formfill_FFI_GetLocalTime_cb(struct _FPDF_FORMFILLINFO *this);
-extern void go_formfill_FFI_OnChange_cb(struct _FPDF_FORMFILLINFO *this);
-extern FPDF_PAGE go_formfill_FFI_GetPage_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, int nPageIndex);
-extern FPDF_PAGE go_formfill_FFI_GetCurrentPage_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document);
-extern int go_formfill_FFI_GetRotation_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page);
-extern void go_formfill_FFI_ExecuteNamedAction_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING namedAction);
-extern void go_formfill_FFI_SetTextFieldFocus_cb(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING value, FPDF_DWORD valueLen, FPDF_BOOL is_focus);
-extern void go_formfill_FFI_DoURIAction_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING bsURI);
-extern void go_formfill_FFI_DoGoToAction_cb(struct _FPDF_FORMFILLINFO *this, int nPageIndex, int zoomMode, float* fPosArray, int sizeofArray);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_Release_cb(struct _FPDF_FORMFILLINFO *this);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_Invalidate_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_OutputSelectedRect_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_SetCursor_cb(struct _FPDF_FORMFILLINFO *this, int nCursorType);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_formfill_FFI_SetTimer_cb(struct _FPDF_FORMFILLINFO *this, int uElapse, TimerCallback lpTimerFunc);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_KillTimer_cb(struct _FPDF_FORMFILLINFO *this, int nTimerID);
+extern GO_FPDF_EXPORT FPDF_SYSTEMTIME GO_FPDF_CALLCONV go_formfill_FFI_GetLocalTime_cb(struct _FPDF_FORMFILLINFO *this);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_OnChange_cb(struct _FPDF_FORMFILLINFO *this);
+extern GO_FPDF_EXPORT FPDF_PAGE GO_FPDF_CALLCONV go_formfill_FFI_GetPage_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, int nPageIndex);
+extern GO_FPDF_EXPORT FPDF_PAGE GO_FPDF_CALLCONV go_formfill_FFI_GetCurrentPage_cb(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document);
+extern GO_FPDF_EXPORT int GO_FPDF_CALLCONV go_formfill_FFI_GetRotation_cb(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_ExecuteNamedAction_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING namedAction);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_SetTextFieldFocus_cb(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING value, FPDF_DWORD valueLen, FPDF_BOOL is_focus);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_DoURIAction_cb(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING bsURI);
+extern GO_FPDF_EXPORT void GO_FPDF_CALLCONV go_formfill_FFI_DoGoToAction_cb(struct _FPDF_FORMFILLINFO *this, int nPageIndex, int zoomMode, float* fPosArray, int sizeofArray);
 
 static inline void FPDF_FORMFILLINFO_SET_CB(FPDF_FORMFILLINFO *f) {
 	f->Release = &go_formfill_Release_cb;
