@@ -39,5 +39,6 @@ type GetPageSize struct {
 
 type GetPageSizeInPixels struct {
 	Page Page
-	DPI  int // The DPI to calculate the size for.
+	DPI  int             // The DPI to calculate the size for.
+	Crop *RenderPageCrop // When given, the size of this region of the page is returned instead of the size of the full page. It uses the same rounding as rendering the region does, which makes it possible to calculate the size of a tile up front.
 }
