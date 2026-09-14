@@ -761,7 +761,11 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			imgBuf.Reset()
 		}
 	} else if request.OutputFormat == requests.RenderToFileOutputFormatPNG {
-		err := png.Encode(&imgBuf, renderedImage)
+		// The zero value of PNGCompressionLevel is png.DefaultCompression, so
+		// callers that don't set it keep the encoder's default behaviour.
+		encoder := png.Encoder{CompressionLevel: request.PNGCompressionLevel}
+
+		err := encoder.Encode(&imgBuf, renderedImage)
 		if err != nil {
 			return nil, err
 		}

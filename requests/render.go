@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"image/png"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 )
@@ -87,6 +89,12 @@ type RenderToFile struct {
 	OutputTarget        RenderToFileOutputTarget // Where to output the image
 	OutputQuality       int                      // Only used when OutputFormat RenderToFileOutputFormatJPG. Ranges from 1 to 100 inclusive, higher is better. The default is 95.
 	Progressive         bool                     // Only used when OutputFormat RenderToFileOutputFormatJPG. Will render a progressive jpeg. Requires build tag pdfium_use_turbojpeg on the cgo backend; supported natively on the webassembly backend.
-	MaxFileSize         int64                    // The maximum file size, when OutputFormat RenderToFileOutputFormatJPG, it will try to lower the quality it until it fits.
-	TargetFilePath      string                   // When OutputTarget is file, the path to write it to, if not given, a temp file is created
+	// Only used when OutputFormat is RenderToFileOutputFormatPNG. The zero
+	// value is png.DefaultCompression. Note that Go 1.27 replaced
+	// compress/flate's encoder for levels 1-6, which makes the default level
+	// produce considerably larger output than it did on older Go versions for a
+	// typical page render; png.BestCompression keeps the size down.
+	PNGCompressionLevel png.CompressionLevel
+	MaxFileSize         int64  // The maximum file size, when OutputFormat RenderToFileOutputFormatJPG, it will try to lower the quality it until it fits.
+	TargetFilePath      string // When OutputTarget is file, the path to write it to, if not given, a temp file is created
 }

@@ -2524,7 +2524,7 @@ var _ = Describe("Render", func() {
 									Height:            2000,
 									PointToPixelRatio: 2.375607912177905,
 								}),
-							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_7776")
+							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_7776", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_go127", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_7776_go127")
 						})
 					})
 
@@ -2579,7 +2579,43 @@ var _ = Describe("Render", func() {
 									Height:            2000,
 									PointToPixelRatio: 2.375607912177905,
 								}),
-							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale_7776")
+							), TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale_7776", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale_go127", TestDataPath+"/testdata/render_"+TestType+"_file_testpdf_png_grayscale_7776_go127")
+						})
+					})
+
+					Context("to png with a compression level", func() {
+						renderPNG := func(level png.CompressionLevel) int {
+							renderedFile, err := PdfiumInstance.RenderToFile(&requests.RenderToFile{
+								OutputTarget:        requests.RenderToFileOutputTargetBytes,
+								OutputFormat:        requests.RenderToFileOutputFormatPNG,
+								PNGCompressionLevel: level,
+								RenderPageInPixels: &requests.RenderPageInPixels{
+									Page: requests.Page{
+										ByIndex: &requests.PageByIndex{
+											Document: doc,
+											Index:    0,
+										},
+									},
+									Width:  2000,
+									Height: 2000,
+								},
+							})
+							Expect(err).To(BeNil())
+							Expect(renderedFile).To(Not(BeNil()))
+							Expect(renderedFile.ImageBytes).To(Not(BeNil()))
+
+							return len(*renderedFile.ImageBytes)
+						}
+
+						It("returns a smaller image for BestCompression than for the default", func() {
+							// The exact bytes that image/png emits are not
+							// covered by the Go 1 compatibility promise, so this
+							// compares sizes rather than hashes.
+							Expect(renderPNG(png.BestCompression)).To(BeNumerically("<", renderPNG(png.DefaultCompression)))
+						})
+
+						It("returns a much larger image for NoCompression than for BestCompression", func() {
+							Expect(renderPNG(png.NoCompression)).To(BeNumerically(">", renderPNG(png.BestCompression)))
 						})
 					})
 
