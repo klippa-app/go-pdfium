@@ -8,6 +8,6 @@ import (
 	"io"
 )
 
-func Encode(w io.Writer, m *image.RGBA, o Options) error {
+func Encode(w io.Writer, m image.Image, o Options) error {
 	return jpeg.Encode(w, m, o.Options)
 }

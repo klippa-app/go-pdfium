@@ -58,6 +58,8 @@
     * Get plain text of a page
     * Get structured text of a page (text, angle, position, size, font information)
     * Render 1 or multiple pages from 1 or multiple documents into a Go `image.Image` using either DPI or pixel size
+    * Render in RGBA (`image.RGBA`, the default) or in grayscale (`image.Gray`, using
+      `ImageFormat: requests.RenderImageFormatGrayscale`), the result is in the `RenderedImage` response field
     * Use the same render instructions to render the image directly as a jpeg or png into a file path or byte array
     * Get page size in either points or pixel size (when rendered in a specific DPI)
     * Get the point to pixel ratio when rendering or extracting text (to determine the positions when rendering into an
@@ -138,7 +140,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 7961
+Version: 8009
 Requires:
 
 Libs: -L${libdir} -lpdfium
@@ -265,7 +267,7 @@ func init() {
 package renderer
 
 import (
-	"io/ioutil"
+	"os"
 	"log"
 
 	"github.com/klippa-app/go-pdfium"
@@ -286,7 +288,7 @@ func main() {
 
 func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return 0, err
 	}
@@ -322,7 +324,6 @@ package renderer
 
 import (
 	"image/png"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -343,7 +344,7 @@ func main() {
 
 func renderPage(filePath string, page int, output string) error {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -538,7 +539,7 @@ func init() {
 package renderer
 
 import (
-	"io/ioutil"
+	"os"
 	"log"
 
 	"github.com/klippa-app/go-pdfium"
@@ -559,7 +560,7 @@ func main() {
 
 func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return 0, err
 	}
@@ -595,7 +596,6 @@ package renderer
 
 import (
 	"image/png"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -616,7 +616,7 @@ func main() {
 
 func renderPage(filePath string, page int, output string) error {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}

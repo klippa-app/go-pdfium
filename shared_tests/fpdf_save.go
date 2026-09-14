@@ -71,7 +71,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(Not(BeNil()))
-					Expect(FPDF_SaveAsCopy.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
+					Expect(FPDF_SaveAsCopy.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)), PointTo(HaveLen(11186)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721, 11186 => Pdfium main e2fba6a92 (2026-08)
 				})
 			})
 
@@ -93,7 +93,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(BeNil())
-					Expect(fileStat.Size()).To(SatisfyAny(Equal(int64(11375)), Equal(int64(11183)), Equal(int64(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
+					Expect(fileStat.Size()).To(SatisfyAny(Equal(int64(11375)), Equal(int64(11183)), Equal(int64(11188)), Equal(int64(11186)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721, 11186 => Pdfium main e2fba6a92 (2026-08)
 				})
 			})
 
@@ -126,7 +126,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveAsCopy).To(Not(BeNil()))
 					Expect(FPDF_SaveAsCopy.FileBytes).To(BeNil())
-					Expect(buffer.Len()).To(SatisfyAny(Equal(11375), Equal(11183), Equal(11188))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
+					Expect(buffer.Len()).To(SatisfyAny(Equal(11375), Equal(11183), Equal(11188), Equal(11186))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721, 11186 => Pdfium main e2fba6a92 (2026-08)
 				})
 			})
 
@@ -139,7 +139,7 @@ var _ = Describe("fpdf_save", func() {
 					Expect(err).To(BeNil())
 					Expect(FPDF_SaveWithVersion).To(Not(BeNil()))
 					Expect(FPDF_SaveWithVersion.FileBytes).To(Not(BeNil()))
-					Expect(FPDF_SaveWithVersion.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721
+					Expect(FPDF_SaveWithVersion.FileBytes).To(SatisfyAny(PointTo(HaveLen(11375)), PointTo(HaveLen(11183)), PointTo(HaveLen(11188)), PointTo(HaveLen(11186)))) // 11375 < Pdfium 5854, 11183 >= Pdfium 5854, 11188 => Pdfium 6721, 11186 => Pdfium main e2fba6a92 (2026-08)
 
 					savedDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
 						Data: FPDF_SaveWithVersion.FileBytes,

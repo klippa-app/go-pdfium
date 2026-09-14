@@ -288,7 +288,7 @@ func (p *PdfiumImplementation) FPDFText_GetBoundedText(request *requests.FPDFTex
 	}
 
 	charData := make([]byte, (int(charCount)+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
-	charsWritten := C.FPDFText_GetBoundedText(textPageHandle.handle, C.double(request.Left), C.double(request.Top), C.double(request.Right), C.double(request.Bottom), (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
+	charsWritten := C.FPDFText_GetBoundedText(textPageHandle.handle, C.double(request.Left), C.double(request.Top), C.double(request.Right), C.double(request.Bottom), (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 	if err != nil {
@@ -489,7 +489,7 @@ func (p *PdfiumImplementation) FPDFLink_GetURL(request *requests.FPDFLink_GetURL
 	}
 
 	charData := make([]byte, (int(charCount)+1)*2) // UTF16-LE max 2 bytes per char, add 1 char for terminator.
-	charsWritten := C.FPDFLink_GetURL(pageLinkhandle.handle, C.int(request.Index), (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)))
+	charsWritten := C.FPDFLink_GetURL(pageLinkhandle.handle, C.int(request.Index), (*C.ushort)(unsafe.Pointer(&charData[0])), C.int(len(charData)/2))
 
 	transformedText, err := p.transformUTF16LEToUTF8(charData[0 : charsWritten*2])
 	if err != nil {

@@ -172,6 +172,91 @@ var _ = Describe("fpdf_dataavail", func() {
 		})
 	})
 
+	// PDFium parses the document of FPDFAvail_GetDocument on top of the
+	// availability provider and keeps reading through it, so the provider has
+	// to outlive the document: its parser holds a CPDF_ReadValidator that
+	// points at the provider's FX_FILEAVAIL wrapper and calls into it on
+	// every availability check.
+	Context("a PDF file that is available in full", func() {
+		var avail references.FPDF_AVAIL
+		var document references.FPDF_DOCUMENT
+		var pdfFile *os.File
+
+		BeforeEach(func() {
+			openedFile, err := os.Open(TestDataPath + "/testdata/test_multipage.pdf")
+			Expect(err).To(BeNil())
+			pdfFile = openedFile
+
+			stat, err := pdfFile.Stat()
+			Expect(err).To(BeNil())
+
+			FPDFAvail_Create, err := PdfiumInstance.FPDFAvail_Create(&requests.FPDFAvail_Create{
+				Reader: pdfFile,
+				Size:   stat.Size(),
+				IsDataAvailableCallback: func(offset, size uint64) bool {
+					return true
+				},
+			})
+			Expect(err).To(BeNil())
+			avail = FPDFAvail_Create.AvailabilityProvider
+
+			// Availability is a state machine, it may need a few rounds to
+			// walk through the document even when every byte is available.
+			isDocAvail := enums.PDF_FILEAVAIL_DATA_NOTAVAIL
+			for i := 0; i < 50 && isDocAvail == enums.PDF_FILEAVAIL_DATA_NOTAVAIL; i++ {
+				FPDFAvail_IsDocAvail, err := PdfiumInstance.FPDFAvail_IsDocAvail(&requests.FPDFAvail_IsDocAvail{
+					AvailabilityProvider: avail,
+				})
+				Expect(err).To(BeNil())
+				isDocAvail = FPDFAvail_IsDocAvail.IsDocAvail
+			}
+			Expect(isDocAvail).To(Equal(enums.PDF_FILEAVAIL_DATA_AVAIL))
+
+			FPDFAvail_GetDocument, err := PdfiumInstance.FPDFAvail_GetDocument(&requests.FPDFAvail_GetDocument{
+				AvailabilityProvider: avail,
+			})
+			Expect(err).To(BeNil())
+			document = FPDFAvail_GetDocument.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: document,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+
+			Expect(pdfFile.Close()).To(BeNil())
+		})
+
+		When("the availability provider is destroyed while the document is still open", func() {
+			It("can still read from the document", func() {
+				FPDFAvail_Destroy, err := PdfiumInstance.FPDFAvail_Destroy(&requests.FPDFAvail_Destroy{
+					AvailabilityProvider: avail,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFAvail_Destroy).To(Not(BeNil()))
+
+				// Loading a page reads parts of the file that parsing the
+				// document did not need yet, so this goes through the reader
+				// again after the provider is gone.
+				FPDFPage_GetRotation, err := PdfiumInstance.FPDFPage_GetRotation(&requests.FPDFPage_GetRotation{
+					Page: requests.Page{
+						ByIndex: &requests.PageByIndex{
+							Document: document,
+							Index:    1,
+						},
+					},
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPage_GetRotation).To(Equal(&responses.FPDFPage_GetRotation{
+					Page:         1,
+					PageRotation: enums.FPDF_PAGE_ROTATION_NONE,
+				}))
+			})
+		})
+	})
+
 	Context("a normal PDF file", func() {
 		var avail references.FPDF_AVAIL
 		var fakeReadSeeker *FakeReadSeeker

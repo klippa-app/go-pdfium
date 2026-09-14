@@ -19,7 +19,7 @@ func (p *PdfiumImplementation) FPDFPage_GetDecodedThumbnailData(request *request
 	}
 
 	// First get the thumbnail length.
-	res, err := p.Module.ExportedFunction("FPDFPage_GetDecodedThumbnailData").Call(p.Context, *pageHandle.handle, 0, 0)
+	res, err := p.call("FPDFPage_GetDecodedThumbnailData", *pageHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (p *PdfiumImplementation) FPDFPage_GetDecodedThumbnailData(request *request
 	}
 	defer thumbnailDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FPDFPage_GetDecodedThumbnailData").Call(p.Context, *pageHandle.handle, thumbnailDataPointer.Pointer, thumbnailLength)
+	_, err = p.call("FPDFPage_GetDecodedThumbnailData", *pageHandle.handle, thumbnailDataPointer.Pointer, thumbnailLength)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (p *PdfiumImplementation) FPDFPage_GetRawThumbnailData(request *requests.FP
 	}
 
 	// First get the thumbnail length.
-	res, err := p.Module.ExportedFunction("FPDFPage_GetRawThumbnailData").Call(p.Context, *pageHandle.handle, 0, 0)
+	res, err := p.call("FPDFPage_GetRawThumbnailData", *pageHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (p *PdfiumImplementation) FPDFPage_GetRawThumbnailData(request *requests.FP
 	}
 	defer rawThumbnailDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FPDFPage_GetRawThumbnailData").Call(p.Context, *pageHandle.handle, rawThumbnailDataPointer.Pointer, rawThumbnailLength)
+	_, err = p.call("FPDFPage_GetRawThumbnailData", *pageHandle.handle, rawThumbnailDataPointer.Pointer, rawThumbnailLength)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (p *PdfiumImplementation) FPDFPage_GetThumbnailAsBitmap(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPage_GetThumbnailAsBitmap").Call(p.Context, *pageHandle.handle)
+	res, err := p.call("FPDFPage_GetThumbnailAsBitmap", *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}

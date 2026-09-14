@@ -114,6 +114,14 @@ type FPDF_FORMFILLINFO struct {
 	// and every time that interval elapses, the system must call into the
 	// callback function with the timer ID as returned by this function.
 	//
+	// timerFunc may be called from any goroutine: it takes the instance lock
+	// itself. It does not wait for that lock though, so a tick that arrives
+	// while the instance is busy is dropped rather than delayed - keep
+	// calling it every interval until FFI_KillTimer, which is what PDFium
+	// expects anyway. Ticks after the form fill environment has been
+	// destroyed are ignored, so a timer goroutine that outlives it is
+	// harmless.
+	//
 	// Should return the timer identifier of the new timer if the function is successful.
 	// An application passes this value to the FFI_KillTimer method to kill
 	// the timer. Nonzero if it is successful; otherwise, it is zero.

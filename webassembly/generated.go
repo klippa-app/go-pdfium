@@ -151,6 +151,20 @@ func (i *pdfiumInstance) FORM_GetSelectedText(request *requests.FORM_GetSelected
 	return i.worker.Instance.FORM_GetSelectedText(request)
 }
 
+func (i *pdfiumInstance) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (resp *responses.FORM_GetTextDirection, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetTextDirection", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FORM_GetTextDirection(request)
+}
+
 func (i *pdfiumInstance) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (resp *responses.FORM_IsIndexSelected, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -429,6 +443,20 @@ func (i *pdfiumInstance) FORM_SetIndexSelected(request *requests.FORM_SetIndexSe
 	}()
 
 	return i.worker.Instance.FORM_SetIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (resp *responses.FORM_SetTextDirection, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetTextDirection", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FORM_SetTextDirection(request)
 }
 
 func (i *pdfiumInstance) FORM_Undo(request *requests.FORM_Undo) (resp *responses.FORM_Undo, err error) {

@@ -2271,6 +2271,21 @@ type Pdfium interface {
 	// Experimental API.
 	FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error)
 
+	// FORM_GetTextDirection
+	// Returns the text direction of the given form field annotation.
+	// If the operation fails (e.g., invalid handle), returns
+	// FPDF_TEXTDIR_UNKNOWN.
+	// Experimental API.
+	FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error)
+
+	// FORM_SetTextDirection
+	// Sets the text direction of the given form field annotation.
+	// Passing FPDF_TEXTDIR_UNKNOWN will fail.
+	// Note: This only alters the in-memory state of the form field and does
+	// not modify the PDF document.
+	// Experimental API.
+	FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error)
+
 	// FPDFPage_HasFormFieldAtPoint returns the form field type by point.
 	FPDFPage_HasFormFieldAtPoint(request *requests.FPDFPage_HasFormFieldAtPoint) (*responses.FPDFPage_HasFormFieldAtPoint, error)
 

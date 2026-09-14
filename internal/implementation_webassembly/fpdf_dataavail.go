@@ -49,14 +49,14 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FX_FILEAVAIL_Create").Call(p.Context)
+	res, err := p.call("FX_FILEAVAIL_Create")
 	if err != nil {
 		return nil, err
 	}
 
 	fXFileAvail := res[0]
 
-	res, err = p.Module.ExportedFunction("FPDFAvail_Create").Call(p.Context, fXFileAvail, *fileReaderPointer)
+	res, err = p.call("FPDFAvail_Create", fXFileAvail, *fileReaderPointer)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 
 	hints := uint64(0)
 	if request.AddSegmentCallback != nil {
-		res, err = p.Module.ExportedFunction("FX_DOWNLOADHINTS_Create").Call(p.Context)
+		res, err = p.call("FX_DOWNLOADHINTS_Create")
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +90,58 @@ func (p *PdfiumImplementation) FPDFAvail_Create(request *requests.FPDFAvail_Crea
 	}, nil
 }
 
+// destroyIfUnused destroys the PDFium availability provider once the caller
+// has asked for it to be destroyed and every document that was parsed from it
+// has been closed.
+//
+// PDFium needs that order. FPDFAvail_GetDocument gives the document's parser a
+// CPDF_ReadValidator that holds an unowned pointer to the provider's
+// FX_FILEAVAIL wrapper and calls into it on every availability check, so
+// destroying the provider while a document is still open leaves that document
+// calling a destroyed C++ object on its next read. The provider's file reader
+// is used by both and is released here as well.
+//
+// Call it with the lock held.
+func (d *DataAvailHandle) destroyIfUnused(pi *PdfiumImplementation) error {
+	if !d.destroyRequested || d.openDocuments > 0 || d.handle == nil {
+		return nil
+	}
+
+	_, err := pi.call("FPDFAvail_Destroy", *d.handle)
+	if err != nil {
+		return err
+	}
+
+	d.handle = nil
+
+	pi.releaseFileReader(*d.reader)
+
+	// The FX_FILEAVAIL is ours (FX_FILEAVAIL_Create allocated it), the
+	// FPDF_AVAIL is not: FPDFAvail_Destroy above already deleted the object
+	// PDFium allocated for it, so freeing that pointer here as well would be
+	// a double free.
+	pi.Free(*d.fileAvail)
+
+	FileAvailables.Mutex.Lock()
+	delete(FileAvailables.Refs, uint32(*d.fileAvail))
+	FileAvailables.Mutex.Unlock()
+
+	if d.hints != nil && *d.hints != 0 {
+		pi.Free(*d.hints)
+		FileHints.Mutex.Lock()
+		delete(FileHints.Refs, uint32(*d.hints))
+		FileHints.Mutex.Unlock()
+	}
+
+	return nil
+}
+
 // FPDFAvail_Destroy destroys the given document availability provider.
+//
+// Documents returned by FPDFAvail_GetDocument keep reading through the
+// provider, so when one of them is still open the provider is only released
+// for real once the last of them is closed. The availability provider itself
+// can not be used anymore either way.
 func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Destroy) (*responses.FPDFAvail_Destroy, error) {
 	p.Lock()
 	defer p.Unlock()
@@ -100,29 +151,11 @@ func (p *PdfiumImplementation) FPDFAvail_Destroy(request *requests.FPDFAvail_Des
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFAvail_Destroy").Call(p.Context, *dataAvailHandler.handle)
-	if err != nil {
-		return nil, err
-	}
-
-	p.Free(*p.fileReaders[*dataAvailHandler.reader].FileAccess)
-	p.Free(*dataAvailHandler.fileAvail)
-	p.Free(*dataAvailHandler.handle)
-	delete(p.fileReaders, *dataAvailHandler.reader)
-	FileReaders.Mutex.Lock()
-	delete(FileReaders.Refs, *dataAvailHandler.reader)
-	FileReaders.Mutex.Unlock()
 	delete(p.dataAvailRefs, dataAvailHandler.nativeRef)
 
-	FileAvailables.Mutex.Lock()
-	delete(FileAvailables.Refs, uint32(*dataAvailHandler.fileAvail))
-	FileAvailables.Mutex.Unlock()
-
-	if dataAvailHandler.hints != nil {
-		p.Free(*dataAvailHandler.hints)
-		FileHints.Mutex.Lock()
-		delete(FileHints.Refs, uint32(*dataAvailHandler.hints))
-		FileHints.Mutex.Unlock()
+	dataAvailHandler.destroyRequested = true
+	if err := dataAvailHandler.destroyIfUnused(p); err != nil {
+		return nil, err
 	}
 
 	return &responses.FPDFAvail_Destroy{}, nil
@@ -150,7 +183,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsDocAvail(request *requests.FPDFAvail_
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsDocAvail").Call(p.Context, *dataAvailHandler.handle, hints)
+	res, err := p.call("FPDFAvail_IsDocAvail", *dataAvailHandler.handle, hints)
 	if err != nil {
 		return nil, err
 	}
@@ -186,13 +219,20 @@ func (p *PdfiumImplementation) FPDFAvail_GetDocument(request *requests.FPDFAvail
 		cPassword = cPasswordPointer.Pointer
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_GetDocument").Call(p.Context, *dataAvailHandler.handle, cPassword)
+	res, err := p.call("FPDFAvail_GetDocument", *dataAvailHandler.handle, cPassword)
 	if err != nil {
 		return nil, err
 	}
 
 	doc := res[0]
 	documentHandle := p.registerDocument(&doc)
+
+	if doc != 0 {
+		// The provider has to outlive this document, see
+		// DataAvailHandle.destroyIfUnused.
+		dataAvailHandler.openDocuments++
+		documentHandle.dataAvail = dataAvailHandler
+	}
 
 	return &responses.FPDFAvail_GetDocument{
 		Document: documentHandle.nativeRef,
@@ -212,7 +252,7 @@ func (p *PdfiumImplementation) FPDFAvail_GetFirstPageNum(request *requests.FPDFA
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_GetFirstPageNum").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFAvail_GetFirstPageNum", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +280,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsPageAvail(request *requests.FPDFAvail
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsPageAvail").Call(p.Context, *dataAvailHandler.handle, *(*uint64)(unsafe.Pointer(&request.PageIndex)), hints)
+	res, err := p.call("FPDFAvail_IsPageAvail", *dataAvailHandler.handle, *(*uint64)(unsafe.Pointer(&request.PageIndex)), hints)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +314,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsFormAvail(request *requests.FPDFAvail
 		hints = *dataAvailHandler.hints
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsFormAvail").Call(p.Context, *dataAvailHandler.handle, hints)
+	res, err := p.call("FPDFAvail_IsFormAvail", *dataAvailHandler.handle, hints)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +340,7 @@ func (p *PdfiumImplementation) FPDFAvail_IsLinearized(request *requests.FPDFAvai
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFAvail_IsLinearized").Call(p.Context, *dataAvailHandler.handle)
+	res, err := p.call("FPDFAvail_IsLinearized", *dataAvailHandler.handle)
 	if err != nil {
 		return nil, err
 	}

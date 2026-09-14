@@ -13,6 +13,12 @@ type DocumentHandle struct {
 	dataPointer   *uint64
 	fileHandleRef *uint32
 
+	// dataAvail is the availability provider this document was parsed from,
+	// when it came from FPDFAvail_GetDocument. PDFium requires the provider
+	// to outlive the document, so closing the document is what releases it
+	// when the caller destroyed it first.
+	dataAvail *DataAvailHandle
+
 	// lookup tables keeps track of the opened handles for this instance.
 	// we need this for handle lookups and in case of closing the document
 
@@ -125,7 +131,7 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 		delete(d.structElementRefs, i)
 	}
 
-	pi.Module.ExportedFunction("FPDF_CloseDocument").Call(pi.Context, *d.handle)
+	pi.call("FPDF_CloseDocument", *d.handle)
 	d.handle = nil
 
 	// Remove reference to data.
@@ -141,14 +147,15 @@ func (d *DocumentHandle) Close(pi *PdfiumImplementation) error {
 
 	// Cleanup file handle.
 	if d.fileHandleRef != nil {
-		pi.Free(*pi.fileReaders[*d.fileHandleRef].FileAccess)
-		pi.Free(*pi.fileReaders[*d.fileHandleRef].ParamPointer)
-		pi.fileReaders[*d.fileHandleRef].FileAccess = nil
-		delete(pi.fileReaders, *d.fileHandleRef)
+		pi.releaseFileReader(*d.fileHandleRef)
+	}
 
-		FileReaders.Mutex.Lock()
-		delete(FileReaders.Refs, *d.fileHandleRef)
-		FileReaders.Mutex.Unlock()
+	// Release the availability provider this document was parsed from. When
+	// the caller already destroyed it, this is what actually destroys it.
+	if d.dataAvail != nil {
+		d.dataAvail.openDocuments--
+		d.dataAvail.destroyIfUnused(pi)
+		d.dataAvail = nil
 	}
 
 	return nil
@@ -164,7 +171,7 @@ type PageHandle struct {
 // Close closes the internal references in FPDF
 func (p *PageHandle) Close(pi *PdfiumImplementation) {
 	if p.handle != nil {
-		pi.Module.ExportedFunction("FPDF_ClosePage").Call(pi.Context, *p.handle)
+		pi.call("FPDF_ClosePage", *p.handle)
 		p.handle = nil
 	}
 }

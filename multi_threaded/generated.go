@@ -91,6 +91,14 @@ func (i *pdfiumInstance) FORM_GetSelectedText(request *requests.FORM_GetSelected
 	return i.worker.plugin.FORM_GetSelectedText(request)
 }
 
+func (i *pdfiumInstance) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_GetTextDirection(request)
+}
+
 func (i *pdfiumInstance) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -249,6 +257,14 @@ func (i *pdfiumInstance) FORM_SetIndexSelected(request *requests.FORM_SetIndexSe
 	}
 
 	return i.worker.plugin.FORM_SetIndexSelected(request)
+}
+
+func (i *pdfiumInstance) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FORM_SetTextDirection(request)
 }
 
 func (i *pdfiumInstance) FORM_Undo(request *requests.FORM_Undo) (*responses.FORM_Undo, error) {

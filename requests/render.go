@@ -27,13 +27,21 @@ type RenderPageCrop struct {
 	Height float64 // The height of the region in points, must be larger than 0.
 }
 
+type RenderImageFormat string // The pixel format of the rendered image.
+
+const (
+	RenderImageFormatRGBA      RenderImageFormat = "rgba"      // Render into an *image.RGBA (the RenderedImage field in the response). This is the default when no format is given.
+	RenderImageFormatGrayscale RenderImageFormat = "grayscale" // Render into an *image.Gray (the RenderedImage field in the response). Implies render flag FPDF_RENDER_FLAG_GRAYSCALE.
+)
+
 type RenderPageInDPI struct {
 	Page        Page
 	DPI         int                       // The DPI to render the page in.
-	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
+	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image, except when ImageFormat is RenderImageFormatGrayscale.
 	RenderForm  bool                      // Whether to render form elements.
 	Document    *references.FPDF_DOCUMENT // The document to render if not passed through the page by index, required when RenderForm is true.
 	Crop        *RenderPageCrop           // When given, only this region of the page is rendered. Only supported when rendering a single page.
+	ImageFormat RenderImageFormat         // The pixel format to render in, an empty value means RenderImageFormatRGBA. When rendering multiple pages into one image, all pages must have the same ImageFormat.
 }
 
 type RenderPagesInDPI struct {
@@ -45,17 +53,17 @@ type RenderPageInPixels struct {
 	Page        Page
 	Width       int                       // The maximum width of the image.
 	Height      int                       // The maximum height of the image.
-	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image.
+	RenderFlags enums.FPDF_RENDER_FLAG    // FPDF_RENDER_FLAG_REVERSE_BYTE_ORDER will always be set to render to Go image, except when ImageFormat is RenderImageFormatGrayscale.
 	RenderForm  bool                      // Whether to render form elements.
 	Document    *references.FPDF_DOCUMENT // The document to render if not passed through the page by index, required when RenderForm is true.
 	Crop        *RenderPageCrop           // When given, only this region of the page is rendered, and Width and Height apply to the region instead of to the full page. Only supported when rendering a single page.
+	ImageFormat RenderImageFormat         // The pixel format to render in, an empty value means RenderImageFormatRGBA. When rendering multiple pages into one image, all pages must have the same ImageFormat.
 }
 
 type RenderPagesInPixels struct {
 	Pages   []RenderPageInPixels // The pages
 	Padding int                  // The amount of padding (in pixels) between the images
 }
-
 type RenderToFileOutputFormat string // The file format to render output as.
 
 const (
@@ -78,7 +86,7 @@ type RenderToFile struct {
 	OutputFormat        RenderToFileOutputFormat // The format to output the image as
 	OutputTarget        RenderToFileOutputTarget // Where to output the image
 	OutputQuality       int                      // Only used when OutputFormat RenderToFileOutputFormatJPG. Ranges from 1 to 100 inclusive, higher is better. The default is 95.
-	Progressive         bool                     // Only used when OutputFormat RenderToFileOutputFormatJPG and with build tag pdfium_use_turbojpeg. Will render a progressive jpeg.
+	Progressive         bool                     // Only used when OutputFormat RenderToFileOutputFormatJPG. Will render a progressive jpeg. Requires build tag pdfium_use_turbojpeg on the cgo backend; supported natively on the webassembly backend.
 	MaxFileSize         int64                    // The maximum file size, when OutputFormat RenderToFileOutputFormatJPG, it will try to lower the quality it until it fits.
 	TargetFilePath      string                   // When OutputTarget is file, the path to write it to, if not given, a temp file is created
 }

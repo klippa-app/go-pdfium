@@ -56,8 +56,35 @@ func (f *FormFillInfo) FFI_SetCursor(cursor uint32) {
 }
 
 func (f *FormFillInfo) FFI_SetTimer(uElapse, lpTimerFunc uint32) int {
+	// Every other callback here runs inside one of our API calls, so it is
+	// already serialized against the rest of PDFium. This one is not: the
+	// caller fires it from a timer on a goroutine of its own, so it has to
+	// take the instance lock itself, otherwise it runs PDFium code while
+	// another goroutine is already running PDFium code in the same module.
+	//
+	// It must not wait for that lock. PDFium kills timers from inside API
+	// calls, and the natural way to implement FFI_KillTimer is to stop the
+	// timer goroutine and wait for it, which would deadlock against a timer
+	// tick blocked on this lock. PDFium timers repeat until they are killed,
+	// so a tick dropped because the instance was busy simply comes back on
+	// the next interval.
 	timerFunc := func(idEvent int) {
-		f.Instance.Module.ExportedFunction("FPDF_FORMFILLINFO_CALL_TIMER").Call(f.Instance.Context, *(*uint64)(unsafe.Pointer(&lpTimerFunc)), *(*uint64)(unsafe.Pointer(&idEvent)))
+		if !f.Instance.TryLock() {
+			return
+		}
+		defer f.Instance.Unlock()
+
+		// The form fill environment may have been destroyed since the timer
+		// was handed out, taking the PDFium object behind lpTimerFunc with
+		// it. Its handle is removed by FPDFDOC_ExitFormFillEnvironment.
+		FormFillInfoHandles.Mutex.Lock()
+		_, ok := FormFillInfoHandles.Refs[uint32(*f.Struct)]
+		FormFillInfoHandles.Mutex.Unlock()
+		if !ok {
+			return
+		}
+
+		f.Instance.Fn("FPDF_FORMFILLINFO_CALL_TIMER").Call(f.Instance.Context, uint64(lpTimerFunc), *(*uint64)(unsafe.Pointer(&idEvent)))
 	}
 
 	return f.FormFillInfo.FFI_SetTimer(int(uElapse), timerFunc)
@@ -251,7 +278,7 @@ func (p *PdfiumImplementation) internal_FPDFDOC_InitFormFillEnvironment(request 
 		return nil, errors.New("FormFillInfo callback FFI_ExecuteNamedAction is required")
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_FORMFILLINFO_Create").Call(p.Context)
+	res, err := p.call("FPDF_FORMFILLINFO_Create")
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +288,7 @@ func (p *PdfiumImplementation) internal_FPDFDOC_InitFormFillEnvironment(request 
 		return nil, errors.New("could not init form fill environment")
 	}
 
-	res, err = p.Module.ExportedFunction("FPDFDOC_InitFormFillEnvironment").Call(p.Context, *documentHandle.handle, formInfoStruct)
+	res, err = p.call("FPDFDOC_InitFormFillEnvironment", *documentHandle.handle, formInfoStruct)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +330,7 @@ func (p *PdfiumImplementation) internal_FPDFDOC_ExitFormFillEnvironment(request 
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDFDOC_ExitFormFillEnvironment").Call(p.Context, *formHandleHandle.handle)
+	_, err = p.call("FPDFDOC_ExitFormFillEnvironment", *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +373,7 @@ func (p *PdfiumImplementation) internal_FORM_OnAfterLoadPage(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_OnAfterLoadPage").Call(p.Context, *pageHandle.handle, *formHandleHandle.handle)
+	_, err = p.call("FORM_OnAfterLoadPage", *pageHandle.handle, *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +407,7 @@ func (p *PdfiumImplementation) internal_FORM_OnBeforeClosePage(request *requests
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_OnBeforeClosePage").Call(p.Context, *pageHandle.handle, *formHandleHandle.handle)
+	_, err = p.call("FORM_OnBeforeClosePage", *pageHandle.handle, *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +435,7 @@ func (p *PdfiumImplementation) FORM_DoDocumentJSAction(request *requests.FORM_Do
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_DoDocumentJSAction").Call(p.Context, *formHandleHandle.handle)
+	_, err = p.call("FORM_DoDocumentJSAction", *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -430,7 +457,7 @@ func (p *PdfiumImplementation) FORM_DoDocumentOpenAction(request *requests.FORM_
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_DoDocumentOpenAction").Call(p.Context, *formHandleHandle.handle)
+	_, err = p.call("FORM_DoDocumentOpenAction", *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -452,7 +479,7 @@ func (p *PdfiumImplementation) FORM_DoDocumentAAction(request *requests.FORM_DoD
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_DoDocumentAAction").Call(p.Context, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
+	_, err = p.call("FORM_DoDocumentAAction", *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +506,7 @@ func (p *PdfiumImplementation) FORM_DoPageAAction(request *requests.FORM_DoPageA
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FORM_DoPageAAction").Call(p.Context, *pageHandle.handle, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
+	_, err = p.call("FORM_DoPageAAction", *pageHandle.handle, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.AAType)))
 	if err != nil {
 		return nil, err
 	}
@@ -503,7 +530,7 @@ func (p *PdfiumImplementation) FORM_OnMouseMove(request *requests.FORM_OnMouseMo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnMouseMove").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnMouseMove", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -534,7 +561,7 @@ func (p *PdfiumImplementation) FORM_OnFocus(request *requests.FORM_OnFocus) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnFocus").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnFocus", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -563,7 +590,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonDown(request *requests.FORM_OnLButt
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnLButtonDown").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnLButtonDown", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -595,7 +622,7 @@ func (p *PdfiumImplementation) FORM_OnRButtonDown(request *requests.FORM_OnRButt
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnRButtonDown").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnRButtonDown", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -625,7 +652,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonUp(request *requests.FORM_OnLButton
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnLButtonUp").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnLButtonUp", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -657,7 +684,7 @@ func (p *PdfiumImplementation) FORM_OnRButtonUp(request *requests.FORM_OnRButton
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnRButtonUp").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnRButtonUp", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -687,7 +714,7 @@ func (p *PdfiumImplementation) FORM_OnLButtonDoubleClick(request *requests.FORM_
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnLButtonDoubleClick").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FORM_OnLButtonDoubleClick", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -716,7 +743,7 @@ func (p *PdfiumImplementation) FORM_OnKeyDown(request *requests.FORM_OnKeyDown) 
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnKeyDown").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NKeyCode)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
+	res, err := p.call("FORM_OnKeyDown", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NKeyCode)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
 	if err != nil {
 		return nil, err
 	}
@@ -747,7 +774,7 @@ func (p *PdfiumImplementation) FORM_OnKeyUp(request *requests.FORM_OnKeyUp) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnKeyUp").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NKeyCode)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
+	res, err := p.call("FORM_OnKeyUp", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NKeyCode)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
 	if err != nil {
 		return nil, err
 	}
@@ -777,7 +804,7 @@ func (p *PdfiumImplementation) FORM_OnChar(request *requests.FORM_OnChar) (*resp
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_OnChar").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NChar)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
+	res, err := p.call("FORM_OnChar", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.NChar)), *(*uint64)(unsafe.Pointer(&request.Modifier)))
 	if err != nil {
 		return nil, err
 	}
@@ -808,7 +835,7 @@ func (p *PdfiumImplementation) FORM_GetSelectedText(request *requests.FORM_GetSe
 	}
 
 	// First get the text length
-	res, err := p.Module.ExportedFunction("FORM_GetSelectedText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, 0, 0)
+	res, err := p.call("FORM_GetSelectedText", *formHandleHandle.handle, *pageHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -824,7 +851,7 @@ func (p *PdfiumImplementation) FORM_GetSelectedText(request *requests.FORM_GetSe
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.Module.ExportedFunction("FORM_GetSelectedText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, charDataPointer.Pointer, length)
+	res, err = p.call("FORM_GetSelectedText", *formHandleHandle.handle, *pageHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -870,7 +897,7 @@ func (p *PdfiumImplementation) FORM_ReplaceSelection(request *requests.FORM_Repl
 	}
 	defer text.Free()
 
-	_, err = p.Module.ExportedFunction("FORM_ReplaceSelection").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, text.Pointer)
+	_, err = p.call("FORM_ReplaceSelection", *formHandleHandle.handle, *pageHandle.handle, text.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -895,7 +922,7 @@ func (p *PdfiumImplementation) FORM_CanUndo(request *requests.FORM_CanUndo) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_CanUndo").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.call("FORM_CanUndo", *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -924,7 +951,7 @@ func (p *PdfiumImplementation) FORM_CanRedo(request *requests.FORM_CanRedo) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_CanRedo").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.call("FORM_CanRedo", *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -952,7 +979,7 @@ func (p *PdfiumImplementation) FORM_Undo(request *requests.FORM_Undo) (*response
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_Undo").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.call("FORM_Undo", *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -981,7 +1008,7 @@ func (p *PdfiumImplementation) FORM_Redo(request *requests.FORM_Redo) (*response
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_Redo").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.call("FORM_Redo", *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1007,7 +1034,7 @@ func (p *PdfiumImplementation) FORM_ForceToKillFocus(request *requests.FORM_Forc
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_ForceToKillFocus").Call(p.Context, *formHandleHandle.handle)
+	res, err := p.call("FORM_ForceToKillFocus", *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1035,7 +1062,7 @@ func (p *PdfiumImplementation) FPDFPage_HasFormFieldAtPoint(request *requests.FP
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPage_HasFormFieldAtPoint").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FPDFPage_HasFormFieldAtPoint", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -1062,7 +1089,7 @@ func (p *PdfiumImplementation) FPDFPage_FormFieldZOrderAtPoint(request *requests
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFPage_FormFieldZOrderAtPoint").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
+	res, err := p.call("FPDFPage_FormFieldZOrderAtPoint", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.PageX)), *(*uint64)(unsafe.Pointer(&request.PageY)))
 	if err != nil {
 		return nil, err
 	}
@@ -1085,7 +1112,7 @@ func (p *PdfiumImplementation) FPDF_SetFormFieldHighlightColor(request *requests
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_SetFormFieldHighlightColor").Call(p.Context, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.FieldType)), *(*uint64)(unsafe.Pointer(&request.Color)))
+	_, err = p.call("FPDF_SetFormFieldHighlightColor", *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.FieldType)), *(*uint64)(unsafe.Pointer(&request.Color)))
 	if err != nil {
 		return nil, err
 	}
@@ -1104,7 +1131,7 @@ func (p *PdfiumImplementation) FPDF_SetFormFieldHighlightAlpha(request *requests
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_SetFormFieldHighlightAlpha").Call(p.Context, *formHandleHandle.handle, *(*uint64)(unsafe.Pointer(&request.Alpha)))
+	_, err = p.call("FPDF_SetFormFieldHighlightAlpha", *formHandleHandle.handle, uint64(request.Alpha))
 	if err != nil {
 		return nil, err
 	}
@@ -1122,7 +1149,7 @@ func (p *PdfiumImplementation) FPDF_RemoveFormFieldHighlight(request *requests.F
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_RemoveFormFieldHighlight").Call(p.Context, *formHandleHandle.handle)
+	_, err = p.call("FPDF_RemoveFormFieldHighlight", *formHandleHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1162,7 +1189,7 @@ func (p *PdfiumImplementation) FPDF_FFLDraw(request *requests.FPDF_FFLDraw) (*re
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_FFLDraw").Call(p.Context, *formHandleHandle.handle, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)))
+	_, err = p.call("FPDF_FFLDraw", *formHandleHandle.handle, *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)))
 	if err != nil {
 		return nil, err
 	}
@@ -1180,7 +1207,7 @@ func (p *PdfiumImplementation) FPDF_LoadXFA(request *requests.FPDF_LoadXFA) (*re
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_LoadXFA").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDF_LoadXFA", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1220,7 +1247,7 @@ func (p *PdfiumImplementation) FORM_OnMouseWheel(request *requests.FORM_OnMouseW
 	}
 	defer pageCoordPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FPDF_LoadXFA").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), pageCoordPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.DeltaX)), *(*uint64)(unsafe.Pointer(&request.DeltaY)))
+	res, err := p.call("FPDF_LoadXFA", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), pageCoordPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.DeltaX)), *(*uint64)(unsafe.Pointer(&request.DeltaY)))
 	if err != nil {
 		return nil, err
 	}
@@ -1252,7 +1279,7 @@ func (p *PdfiumImplementation) FORM_GetFocusedText(request *requests.FORM_GetFoc
 	}
 
 	// First get the text length
-	res, err := p.Module.ExportedFunction("FORM_GetFocusedText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, 0, 0)
+	res, err := p.call("FORM_GetFocusedText", *formHandleHandle.handle, *pageHandle.handle, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1268,7 +1295,7 @@ func (p *PdfiumImplementation) FORM_GetFocusedText(request *requests.FORM_GetFoc
 	}
 	defer charDataPointer.Free()
 
-	_, err = p.Module.ExportedFunction("FORM_GetFocusedText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, charDataPointer.Pointer, length)
+	_, err = p.call("FORM_GetFocusedText", *formHandleHandle.handle, *pageHandle.handle, charDataPointer.Pointer, length)
 	if err != nil {
 		return nil, err
 	}
@@ -1306,7 +1333,7 @@ func (p *PdfiumImplementation) FORM_SelectAllText(request *requests.FORM_SelectA
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_SelectAllText").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle)
+	res, err := p.call("FORM_SelectAllText", *formHandleHandle.handle, *pageHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1346,7 +1373,7 @@ func (p *PdfiumImplementation) FORM_GetFocusedAnnot(request *requests.FORM_GetFo
 	}
 	defer annotationPointer.Free()
 
-	res, err := p.Module.ExportedFunction("FORM_GetFocusedAnnot").Call(p.Context, *formHandleHandle.handle, pageIndexPointer.Pointer, annotationPointer.Pointer)
+	res, err := p.call("FORM_GetFocusedAnnot", *formHandleHandle.handle, pageIndexPointer.Pointer, annotationPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1393,7 +1420,7 @@ func (p *PdfiumImplementation) FORM_SetFocusedAnnot(request *requests.FORM_SetFo
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_SetFocusedAnnot").Call(p.Context, *formHandleHandle.handle, *annotationHandle.handle)
+	res, err := p.call("FORM_SetFocusedAnnot", *formHandleHandle.handle, *annotationHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1404,6 +1431,70 @@ func (p *PdfiumImplementation) FORM_SetFocusedAnnot(request *requests.FORM_SetFo
 	}
 
 	return &responses.FORM_SetFocusedAnnot{}, nil
+}
+
+// FORM_GetTextDirection
+// Returns the text direction of the given form field annotation.
+// If the operation fails (e.g., invalid handle), returns
+// FPDF_TEXTDIR_UNKNOWN.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.call("FORM_GetTextDirection", *formHandleHandle.handle, *annotationHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	direction := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FORM_GetTextDirection{
+		Direction: enums.FPDF_TEXT_DIRECTION(direction),
+	}, nil
+}
+
+// FORM_SetTextDirection
+// Sets the text direction of the given form field annotation.
+// Passing FPDF_TEXTDIR_UNKNOWN will fail.
+// Note: This only alters the in-memory state of the form field and does
+// not modify the PDF document.
+// Experimental API.
+func (p *PdfiumImplementation) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	formHandleHandle, err := p.getFormHandleHandle(request.FormHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	annotationHandle, err := p.getAnnotationHandle(request.Annotation)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.call("FORM_SetTextDirection", *formHandleHandle.handle, *annotationHandle.handle, uint64(request.Direction))
+	if err != nil {
+		return nil, err
+	}
+
+	success := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if int(success) == 0 {
+		return nil, errors.New("could not set text direction")
+	}
+
+	return &responses.FORM_SetTextDirection{}, nil
 }
 
 // FPDF_GetFormType returns the type of form contained in the PDF document.
@@ -1418,7 +1509,7 @@ func (p *PdfiumImplementation) FPDF_GetFormType(request *requests.FPDF_GetFormTy
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_GetFormType").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDF_GetFormType", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -1464,7 +1555,7 @@ func (p *PdfiumImplementation) FORM_SetIndexSelected(request *requests.FORM_SetI
 	}
 
 	p.Module.Memory().WriteUint64Le(uint32(selectedPointer.Pointer), api.EncodeI64(selected))
-	res, err := p.Module.ExportedFunction("FORM_SetIndexSelected").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), selectedPointer.Pointer)
+	res, err := p.call("FORM_SetIndexSelected", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), selectedPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -1497,7 +1588,7 @@ func (p *PdfiumImplementation) FORM_IsIndexSelected(request *requests.FORM_IsInd
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FORM_IsIndexSelected").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FORM_IsIndexSelected", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -1536,7 +1627,7 @@ func (p *PdfiumImplementation) FORM_ReplaceAndKeepSelection(request *requests.FO
 	}
 	defer text.Free()
 
-	_, err = p.Module.ExportedFunction("FORM_ReplaceAndKeepSelection").Call(p.Context, *formHandleHandle.handle, *pageHandle.handle, text.Pointer)
+	_, err = p.call("FORM_ReplaceAndKeepSelection", *formHandleHandle.handle, *pageHandle.handle, text.Pointer)
 	if err != nil {
 		return nil, err
 	}

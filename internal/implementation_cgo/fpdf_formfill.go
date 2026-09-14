@@ -147,6 +147,36 @@ func go_formfill_FFI_SetCursor_cb(me *C.FPDF_FORMFILLINFO, nCursorType C.int) {
 	formFillInfoHandle.FormFillInfo.FFI_SetCursor(enums.FXCT(nCursorType))
 }
 
+// formFillTimerTick runs one tick of a form fill timer.
+//
+// Every other callback in this file runs inside one of our API calls, so it
+// is already serialized against the rest of PDFium. A timer tick is not: the
+// caller fires it from a timer on a goroutine of its own, so it has to take
+// the lock itself, otherwise it enters PDFium (which is not thread safe)
+// while another goroutine is already in there.
+//
+// It must not wait for that lock. PDFium kills timers from inside API calls,
+// and the natural way to implement FFI_KillTimer is to stop the timer
+// goroutine and wait for it, which would deadlock against a tick blocked on
+// the lock. PDFium timers repeat until they are killed, so a tick dropped
+// because the instance was busy comes back on the next interval.
+func formFillTimerTick(instance *PdfiumImplementation, formInfo unsafe.Pointer, tick func()) {
+	if !instance.TryLock() {
+		return
+	}
+	defer instance.Unlock()
+
+	// The form fill environment may have been destroyed since the timer was
+	// handed out, taking the PDFium object behind the tick with it. Its
+	// handle is removed by FPDFDOC_ExitFormFillEnvironment, under the same
+	// lock we hold here.
+	if _, ok := formFillInfoHandles[formInfo]; !ok {
+		return
+	}
+
+	tick()
+}
+
 // go_formfill_FFI_SetTimer_cb is the Go implementation of FPDF_FORMFILLINFO::FFI_SetTimer.
 // It is exported through cgo so that we can use the reference to it and set
 // it on FPDF_FORMFILLINFO structs.
@@ -161,8 +191,11 @@ func go_formfill_FFI_SetTimer_cb(me *C.FPDF_FORMFILLINFO, uElapse C.int, lpTimer
 		return 0
 	}
 
+	instance := formFillInfoHandle.Instance
 	timerFunc := func(idEvent int) {
-		C.FPDF_FORMFILLINFO_CALL_TIMER(lpTimerFunc, C.int(idEvent))
+		formFillTimerTick(instance, pointer, func() {
+			C.FPDF_FORMFILLINFO_CALL_TIMER(lpTimerFunc, C.int(idEvent))
+		})
 	}
 
 	timerID := formFillInfoHandle.FormFillInfo.FFI_SetTimer(int(uElapse), timerFunc)

@@ -14,6 +14,14 @@ type DataAvailHandle struct {
 	DataAvailableCallback func(offset, size uint64) bool
 	AddSegmentCallback    func(offset, size uint64)
 	nativeRef             references.FPDF_AVAIL // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+
+	// openDocuments counts the documents FPDFAvail_GetDocument handed out
+	// that have not been closed yet, and destroyRequested records that the
+	// caller is done with the provider. PDFium requires the provider to
+	// outlive those documents, so the two together decide when it can
+	// really be destroyed, see destroyIfUnused.
+	openDocuments    int
+	destroyRequested bool
 }
 
 func (p *PdfiumImplementation) registerDataAvail(dataAvail *uint64, fileAvail *uint64, hints *uint64, reader *uint32, dataAvailableCallback func(offset, size uint64) bool, addSegmentCallback func(offset, size uint64)) *DataAvailHandle {

@@ -75,6 +75,16 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				Expect(err).To(MatchError("formHandle not given"))
 				Expect(FORM_SetFocusedAnnot).To(BeNil())
 			})
+			It("returns an error when calling FORM_GetTextDirection", func() {
+				FORM_GetTextDirection, err := PdfiumInstance.FORM_GetTextDirection(&requests.FORM_GetTextDirection{})
+				Expect(err).To(MatchError("formHandle not given"))
+				Expect(FORM_GetTextDirection).To(BeNil())
+			})
+			It("returns an error when calling FORM_SetTextDirection", func() {
+				FORM_SetTextDirection, err := PdfiumInstance.FORM_SetTextDirection(&requests.FORM_SetTextDirection{})
+				Expect(err).To(MatchError("formHandle not given"))
+				Expect(FORM_SetTextDirection).To(BeNil())
+			})
 			It("returns an error when calling FORM_SetIndexSelected", func() {
 				FORM_SetIndexSelected, err := PdfiumInstance.FORM_SetIndexSelected(&requests.FORM_SetIndexSelected{})
 				Expect(err).To(MatchError("formHandle not given"))
@@ -441,6 +451,22 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					})
 					Expect(err).To(MatchError("annotation not given"))
 					Expect(FORM_SetFocusedAnnot).To(BeNil())
+				})
+
+				It("returns an error when calling FORM_GetTextDirection", func() {
+					FORM_GetTextDirection, err := PdfiumInstance.FORM_GetTextDirection(&requests.FORM_GetTextDirection{
+						FormHandle: formHandle,
+					})
+					Expect(err).To(MatchError("annotation not given"))
+					Expect(FORM_GetTextDirection).To(BeNil())
+				})
+
+				It("returns an error when calling FORM_SetTextDirection", func() {
+					FORM_SetTextDirection, err := PdfiumInstance.FORM_SetTextDirection(&requests.FORM_SetTextDirection{
+						FormHandle: formHandle,
+					})
+					Expect(err).To(MatchError("annotation not given"))
+					Expect(FORM_SetTextDirection).To(BeNil())
 				})
 
 				It("returns an error when calling FPDFAnnot_GetFormFieldFlags", func() {
@@ -1114,6 +1140,46 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				})
 				Expect(err).To(BeNil())
 				Expect(FORM_SetFocusedAnnot).To(Equal(&responses.FORM_SetFocusedAnnot{}))
+
+				FORM_GetTextDirection, err := PdfiumInstance.FORM_GetTextDirection(&requests.FORM_GetTextDirection{
+					FormHandle: formHandle,
+					Annotation: FORM_GetFocusedAnnot.Annotation,
+				})
+				Expect(err).To(BeNil())
+				Expect(FORM_GetTextDirection).To(Equal(&responses.FORM_GetTextDirection{
+					Direction: enums.FPDF_TEXTDIR_AUTO,
+				}))
+
+				// Round-trip every valid direction through the in-memory form
+				// field state. AUTO is set last so that the field is left in
+				// the state the rest of this spec expects.
+				for _, direction := range []enums.FPDF_TEXT_DIRECTION{enums.FPDF_TEXTDIR_RTL, enums.FPDF_TEXTDIR_LTR, enums.FPDF_TEXTDIR_AUTO} {
+					FORM_SetTextDirection, err := PdfiumInstance.FORM_SetTextDirection(&requests.FORM_SetTextDirection{
+						FormHandle: formHandle,
+						Annotation: FORM_GetFocusedAnnot.Annotation,
+						Direction:  direction,
+					})
+					Expect(err).To(BeNil())
+					Expect(FORM_SetTextDirection).To(Equal(&responses.FORM_SetTextDirection{}))
+
+					FORM_GetTextDirectionAfterSet, err := PdfiumInstance.FORM_GetTextDirection(&requests.FORM_GetTextDirection{
+						FormHandle: formHandle,
+						Annotation: FORM_GetFocusedAnnot.Annotation,
+					})
+					Expect(err).To(BeNil())
+					Expect(FORM_GetTextDirectionAfterSet).To(Equal(&responses.FORM_GetTextDirection{
+						Direction: direction,
+					}))
+				}
+
+				// FPDF_TEXTDIR_UNKNOWN is not a settable value.
+				FORM_SetTextDirectionUnknown, err := PdfiumInstance.FORM_SetTextDirection(&requests.FORM_SetTextDirection{
+					FormHandle: formHandle,
+					Annotation: FORM_GetFocusedAnnot.Annotation,
+					Direction:  enums.FPDF_TEXTDIR_UNKNOWN,
+				})
+				Expect(err).To(MatchError("could not set text direction"))
+				Expect(FORM_SetTextDirectionUnknown).To(BeNil())
 
 				FPDFAnnot_GetFormFieldFlags, err := PdfiumInstance.FPDFAnnot_GetFormFieldFlags(&requests.FPDFAnnot_GetFormFieldFlags{
 					FormHandle: formHandle,

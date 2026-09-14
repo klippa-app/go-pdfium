@@ -152,6 +152,11 @@ func InitLibrary(config *pdfium.LibraryConfig) {
 				cFonts[i] = C.CString(config.UserFontPaths[i])
 			}
 
+			// malloc does not zero its result, so write the NULL terminator
+			// explicitly. PDFium walks the array until it reads a NULL entry,
+			// nothing communicates the length to it.
+			cFonts[len(config.UserFontPaths)] = nil
+
 			libraryConfig.m_pUserFontPaths = (**C.char)(cArray)
 		}
 
@@ -185,6 +190,21 @@ type fileReaderRef struct {
 	reader     io.ReadSeeker
 	stringRef  unsafe.Pointer
 	fileAccess *C.FPDF_FILEACCESS
+}
+
+// releaseFileReader frees the file reader registered under ref. PDFium reads
+// through the FPDF_FILEACCESS struct, and the identifier in its m_Param, for
+// as long as it has anything built on top of them, so this may only be called
+// once that is gone. Call it with the lock held.
+func releaseFileReader(ref string) {
+	fileReader, ok := Pdfium.fileReaders[ref]
+	if !ok {
+		return
+	}
+
+	fileReader.fileAccess = nil
+	C.free(fileReader.stringRef)
+	delete(Pdfium.fileReaders, ref)
 }
 
 // Here is the real implementation of Pdfium
@@ -305,6 +325,15 @@ func (p *PdfiumImplementation) Unlock() {
 	Pdfium.mutex.Unlock()
 }
 
+// TryLock is Lock for callers that must not block: it reports whether the
+// lock was taken, and only then must the caller Unlock. It exists for the
+// form fill timer callback, which runs on a goroutine of the caller's
+// choosing and can therefore not wait for PDFium to become free without
+// risking a deadlock, see go_formfill_FFI_SetTimer_cb.
+func (p *PdfiumImplementation) TryLock() bool {
+	return Pdfium.mutex.TryLock()
+}
+
 func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*responses.OpenDocument, error) {
 	p.Lock()
 	defer p.Unlock()
@@ -419,8 +448,7 @@ func (p *PdfiumImplementation) OpenDocument(request *requests.OpenDocument) (*re
 
 		// Cleanup when file loading didn't work.
 		if nativeDoc.fileHandleRef != nil {
-			C.free(Pdfium.fileReaders[*nativeDoc.fileHandleRef].stringRef)
-			delete(Pdfium.fileReaders, *nativeDoc.fileHandleRef)
+			releaseFileReader(*nativeDoc.fileHandleRef)
 		}
 
 		return nil, pdfiumError
@@ -534,6 +562,10 @@ func (p *PdfiumImplementation) Close() error {
 	}
 
 	for i := range p.dataAvailRefs {
+		// The documents parsed from these providers were closed above, so
+		// there is nothing reading through them anymore.
+		p.dataAvailRefs[i].destroyRequested = true
+		p.dataAvailRefs[i].destroyIfUnused()
 		delete(p.dataAvailRefs, i)
 	}
 
@@ -567,9 +599,7 @@ func (p *PdfiumImplementation) Close() error {
 
 	for i := range p.fileReaders {
 		// Cleanup file handle.
-		Pdfium.fileReaders[i].fileAccess = nil
-		C.free(Pdfium.fileReaders[i].stringRef)
-		delete(Pdfium.fileReaders, i)
+		releaseFileReader(i)
 		delete(p.fileReaders, i)
 	}
 

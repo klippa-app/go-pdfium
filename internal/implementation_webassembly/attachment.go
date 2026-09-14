@@ -37,7 +37,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDFDoc_GetAttachmentCount").Call(p.Context, *documentHandle.handle)
+	res, err := p.call("FPDFDoc_GetAttachmentCount", *documentHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 
 	attachments := []responses.Attachment{}
 	for i := 0; i < attachmentCount; i++ {
-		res, err := p.Module.ExportedFunction("FPDFDoc_GetAttachment").Call(p.Context, *documentHandle.handle, uint64(i))
+		res, err := p.call("FPDFDoc_GetAttachment", *documentHandle.handle, uint64(i))
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +61,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 		}
 
 		// First get the name value length.
-		res, err = p.Module.ExportedFunction("FPDFAttachment_GetName").Call(p.Context, attachment, 0, 0)
+		res, err = p.call("FPDFAttachment_GetName", attachment, 0, 0)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 
 		defer charDataPointer.Free()
 
-		_, err = p.Module.ExportedFunction("FPDFAttachment_GetName").Call(p.Context, attachment, charDataPointer.Pointer, nameSize)
+		_, err = p.call("FPDFAttachment_GetName", attachment, charDataPointer.Pointer, nameSize)
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 		}
 		defer bufLenPointer.Free()
 
-		res, err = p.Module.ExportedFunction("FPDFAttachment_GetFile").Call(p.Context, attachment, 0, 0, bufLenPointer.Pointer)
+		res, err = p.call("FPDFAttachment_GetFile", attachment, 0, 0, bufLenPointer.Pointer)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 			fileDataPointer, err := p.ByteArrayPointer(bufLen, nil)
 			defer fileDataPointer.Free()
 
-			res, err = p.Module.ExportedFunction("FPDFAttachment_GetFile").Call(p.Context, attachment, fileDataPointer.Pointer, bufLen, bufLenPointer.Pointer)
+			res, err = p.call("FPDFAttachment_GetFile", attachment, fileDataPointer.Pointer, bufLen, bufLenPointer.Pointer)
 			if err != nil {
 				return nil, err
 			}
@@ -150,7 +150,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 
 			defer keyStr.Free()
 
-			res, err = p.Module.ExportedFunction("FPDFAttachment_GetValueType").Call(p.Context, attachment, keyStr.Pointer)
+			res, err = p.call("FPDFAttachment_GetValueType", attachment, keyStr.Pointer)
 			if err != nil {
 				return nil, err
 			}
@@ -161,7 +161,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 			// Only strings supported for now.
 			if newValue.ValueType == enums.FPDF_OBJECT_TYPE_STRING {
 				// First get the string value length.
-				res, err = p.Module.ExportedFunction("FPDFAttachment_GetStringValue").Call(p.Context, attachment, keyStr.Pointer, 0, 0)
+				res, err = p.call("FPDFAttachment_GetStringValue", attachment, keyStr.Pointer, 0, 0)
 				if err != nil {
 					return nil, err
 				}
@@ -175,7 +175,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 				charDataPointer, err = p.ByteArrayPointer(uint64(stringValueSize), nil)
 				defer charDataPointer.Free()
 
-				res, err = p.Module.ExportedFunction("FPDFAttachment_GetStringValue").Call(p.Context, attachment, keyStr.Pointer, charDataPointer.Pointer, uint64(stringValueSize))
+				res, err = p.call("FPDFAttachment_GetStringValue", attachment, keyStr.Pointer, charDataPointer.Pointer, uint64(stringValueSize))
 				if err != nil {
 					return nil, err
 				}

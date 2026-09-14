@@ -22,6 +22,7 @@ type Pdfium interface {
 	FORM_GetFocusedAnnot(*requests.FORM_GetFocusedAnnot) (*responses.FORM_GetFocusedAnnot, error)
 	FORM_GetFocusedText(*requests.FORM_GetFocusedText) (*responses.FORM_GetFocusedText, error)
 	FORM_GetSelectedText(*requests.FORM_GetSelectedText) (*responses.FORM_GetSelectedText, error)
+	FORM_GetTextDirection(*requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error)
 	FORM_IsIndexSelected(*requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error)
 	FORM_OnAfterLoadPage(*requests.FORM_OnAfterLoadPage) (*responses.FORM_OnAfterLoadPage, error)
 	FORM_OnBeforeClosePage(*requests.FORM_OnBeforeClosePage) (*responses.FORM_OnBeforeClosePage, error)
@@ -42,6 +43,7 @@ type Pdfium interface {
 	FORM_SelectAllText(*requests.FORM_SelectAllText) (*responses.FORM_SelectAllText, error)
 	FORM_SetFocusedAnnot(*requests.FORM_SetFocusedAnnot) (*responses.FORM_SetFocusedAnnot, error)
 	FORM_SetIndexSelected(*requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error)
+	FORM_SetTextDirection(*requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error)
 	FORM_Undo(*requests.FORM_Undo) (*responses.FORM_Undo, error)
 	FPDFAction_GetDest(*requests.FPDFAction_GetDest) (*responses.FPDFAction_GetDest, error)
 	FPDFAction_GetFilePath(*requests.FPDFAction_GetFilePath) (*responses.FPDFAction_GetFilePath, error)
@@ -585,6 +587,16 @@ func (g *PdfiumRPC) FORM_GetSelectedText(request *requests.FORM_GetSelectedText)
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FORM_GetTextDirection(request *requests.FORM_GetTextDirection) (*responses.FORM_GetTextDirection, error) {
+	resp := &responses.FORM_GetTextDirection{}
+	err := g.client.Call("Plugin.FORM_GetTextDirection", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected) (*responses.FORM_IsIndexSelected, error) {
 	resp := &responses.FORM_IsIndexSelected{}
 	err := g.client.Call("Plugin.FORM_IsIndexSelected", request, resp)
@@ -778,6 +790,16 @@ func (g *PdfiumRPC) FORM_SetFocusedAnnot(request *requests.FORM_SetFocusedAnnot)
 func (g *PdfiumRPC) FORM_SetIndexSelected(request *requests.FORM_SetIndexSelected) (*responses.FORM_SetIndexSelected, error) {
 	resp := &responses.FORM_SetIndexSelected{}
 	err := g.client.Call("Plugin.FORM_SetIndexSelected", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FORM_SetTextDirection(request *requests.FORM_SetTextDirection) (*responses.FORM_SetTextDirection, error) {
+	resp := &responses.FORM_SetTextDirection{}
+	err := g.client.Call("Plugin.FORM_SetTextDirection", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -5367,6 +5389,24 @@ func (s *PdfiumRPCServer) FORM_GetSelectedText(request *requests.FORM_GetSelecte
 	return nil
 }
 
+func (s *PdfiumRPCServer) FORM_GetTextDirection(request *requests.FORM_GetTextDirection, resp *responses.FORM_GetTextDirection) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_GetTextDirection", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_GetTextDirection(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FORM_IsIndexSelected(request *requests.FORM_IsIndexSelected, resp *responses.FORM_IsIndexSelected) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -5717,6 +5757,24 @@ func (s *PdfiumRPCServer) FORM_SetIndexSelected(request *requests.FORM_SetIndexS
 	}()
 
 	implResp, err := s.Impl.FORM_SetIndexSelected(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FORM_SetTextDirection(request *requests.FORM_SetTextDirection, resp *responses.FORM_SetTextDirection) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FORM_SetTextDirection", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FORM_SetTextDirection(request)
 	if err != nil {
 		return err
 	}

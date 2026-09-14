@@ -475,6 +475,16 @@ const (
 	FPDF_FORMTYPE_XFA_FOREGROUND FPDF_FORMTYPE = 3
 )
 
+// FPDF_TEXT_DIRECTION is the text direction for form fields.
+type FPDF_TEXT_DIRECTION int
+
+const (
+	FPDF_TEXTDIR_UNKNOWN FPDF_TEXT_DIRECTION = 0 // Unknown or error state.
+	FPDF_TEXTDIR_AUTO    FPDF_TEXT_DIRECTION = 1 // Represents the default layout behavior. This means the text direction is determined by the Unicode Bidi Algorithm.
+	FPDF_TEXTDIR_LTR     FPDF_TEXT_DIRECTION = 2
+	FPDF_TEXTDIR_RTL     FPDF_TEXT_DIRECTION = 3
+)
+
 type FWL_EVENTFLAG int
 
 const (

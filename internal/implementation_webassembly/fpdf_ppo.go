@@ -8,6 +8,8 @@ import (
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
+
+	"github.com/tetratelabs/wazero/api"
 )
 
 // FPDF_ImportPages imports some pages from one PDF document to another one.
@@ -35,7 +37,7 @@ func (p *PdfiumImplementation) FPDF_ImportPages(request *requests.FPDF_ImportPag
 		pageRange = pageRangePointer.Pointer
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_ImportPages").Call(p.Context, *destinationDocHandle.handle, *sourceDocHandle.handle, pageRange, *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_ImportPages", *destinationDocHandle.handle, *sourceDocHandle.handle, pageRange, *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +65,7 @@ func (p *PdfiumImplementation) FPDF_CopyViewerPreferences(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_CopyViewerPreferences").Call(p.Context, *destinationDocHandle.handle, *sourceDocHandle.handle)
+	res, err := p.call("FPDF_CopyViewerPreferences", *destinationDocHandle.handle, *sourceDocHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +113,7 @@ func (p *PdfiumImplementation) FPDF_ImportPagesByIndex(request *requests.FPDF_Im
 		pageIndicesPointer = pageIndices
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_ImportPagesByIndex").Call(p.Context, *destinationDocHandle.handle, *sourceDocHandle.handle, pageIndicesPointer, *(*uint64)(unsafe.Pointer(&pageIndicesSize)), *(*uint64)(unsafe.Pointer(&request.Index)))
+	res, err := p.call("FPDF_ImportPagesByIndex", *destinationDocHandle.handle, *sourceDocHandle.handle, pageIndicesPointer, *(*uint64)(unsafe.Pointer(&pageIndicesSize)), *(*uint64)(unsafe.Pointer(&request.Index)))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +138,7 @@ func (p *PdfiumImplementation) FPDF_ImportNPagesToOne(request *requests.FPDF_Imp
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_ImportNPagesToOne").Call(p.Context, *sourceDocHandle.handle, *(*uint64)(unsafe.Pointer(&request.OutputWidth)), *(*uint64)(unsafe.Pointer(&request.OutputHeight)), *(*uint64)(unsafe.Pointer(&request.NumPagesOnXAxis)), *(*uint64)(unsafe.Pointer(&request.NumPagesOnYAxis)))
+	res, err := p.call("FPDF_ImportNPagesToOne", *sourceDocHandle.handle, api.EncodeF32(request.OutputWidth), api.EncodeF32(request.OutputHeight), *(*uint64)(unsafe.Pointer(&request.NumPagesOnXAxis)), *(*uint64)(unsafe.Pointer(&request.NumPagesOnYAxis)))
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +172,7 @@ func (p *PdfiumImplementation) FPDF_NewXObjectFromPage(request *requests.FPDF_Ne
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_NewXObjectFromPage").Call(p.Context, *sourceDocHandle.handle, *destinationDocHandle.handle, *(*uint64)(unsafe.Pointer(&request.SourcePageIndex)))
+	res, err := p.call("FPDF_NewXObjectFromPage", *sourceDocHandle.handle, *destinationDocHandle.handle, *(*uint64)(unsafe.Pointer(&request.SourcePageIndex)))
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +204,7 @@ func (p *PdfiumImplementation) FPDF_CloseXObject(request *requests.FPDF_CloseXOb
 		return nil, err
 	}
 
-	_, err = p.Module.ExportedFunction("FPDF_CloseXObject").Call(p.Context, *xObjectHandle.handle)
+	_, err = p.call("FPDF_CloseXObject", *xObjectHandle.handle)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +223,7 @@ func (p *PdfiumImplementation) FPDF_NewFormObjectFromXObject(request *requests.F
 		return nil, err
 	}
 
-	res, err := p.Module.ExportedFunction("FPDF_NewFormObjectFromXObject").Call(p.Context, *xObjectHandle.handle)
+	res, err := p.call("FPDF_NewFormObjectFromXObject", *xObjectHandle.handle)
 	if err != nil {
 		return nil, err
 	}
