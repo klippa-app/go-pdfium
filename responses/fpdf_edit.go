@@ -259,6 +259,11 @@ type FPDFPath_GetPathSegment struct {
 	PathSegment references.FPDF_PATHSEGMENT
 }
 
+type FPDFPath_GetBezierControlPoints struct {
+	FirstControlPoint  structs.FPDF_FS_POINTF // The first control point of the cubic Bezier segment.
+	SecondControlPoint structs.FPDF_FS_POINTF // The second control point of the cubic Bezier segment.
+}
+
 type FPDFPathSegment_GetPoint struct {
 	X float32
 	Y float32

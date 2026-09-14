@@ -117,6 +117,12 @@ var _ = Describe("fpdf_doc_experimental", func() {
 				Expect(err).To(MatchError("bookmark not given"))
 				Expect(FPDFBookmark_GetColor).To(BeNil())
 			})
+
+			It("returns an error when calling FPDFBookmark_GetStyle", func() {
+				FPDFBookmark_GetStyle, err := PdfiumInstance.FPDFBookmark_GetStyle(&requests.FPDFBookmark_GetStyle{})
+				Expect(err).To(MatchError("bookmark not given"))
+				Expect(FPDFBookmark_GetStyle).To(BeNil())
+			})
 		})
 	})
 
@@ -668,6 +674,80 @@ var _ = Describe("fpdf_doc_experimental", func() {
 				})
 				Expect(err).To(MatchError("could not get bookmark color"))
 				Expect(FPDFBookmark_GetColor).To(BeNil())
+			})
+		})
+	})
+
+	Context("a PDF file with styled bookmarks", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bookmarks_with_style.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDFBookmark_GetStyle is called", func() {
+			getStyle := func(title string) *responses.FPDFBookmark_GetStyle {
+				bookmark, err := PdfiumInstance.FPDFBookmark_Find(&requests.FPDFBookmark_Find{
+					Document: doc,
+					Title:    title,
+				})
+				Expect(err).To(BeNil())
+				Expect(bookmark).To(Not(BeNil()))
+				Expect(bookmark.Bookmark).To(Not(BeNil()))
+
+				FPDFBookmark_GetStyle, err := PdfiumInstance.FPDFBookmark_GetStyle(&requests.FPDFBookmark_GetStyle{
+					Bookmark: *bookmark.Bookmark,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFBookmark_GetStyle).To(Not(BeNil()))
+
+				return FPDFBookmark_GetStyle
+			}
+
+			It("returns no style for a bookmark without styling", func() {
+				Expect(getStyle("No Style")).To(Equal(&responses.FPDFBookmark_GetStyle{
+					Style: enums.FPDF_BOOKMARK_STYLE_NONE,
+				}))
+			})
+
+			It("returns no style for a bookmark with a normal style", func() {
+				Expect(getStyle("Style is Normal")).To(Equal(&responses.FPDFBookmark_GetStyle{
+					Style: enums.FPDF_BOOKMARK_STYLE_NONE,
+				}))
+			})
+
+			It("returns no style for a bookmark with a style that is not an integer", func() {
+				Expect(getStyle("Style Is Not An Int")).To(Equal(&responses.FPDFBookmark_GetStyle{
+					Style: enums.FPDF_BOOKMARK_STYLE_NONE,
+				}))
+			})
+
+			It("returns the bold and italic style for a bookmark that has both", func() {
+				Expect(getStyle("Style is Bold and Italic")).To(Equal(&responses.FPDFBookmark_GetStyle{
+					Style: enums.FPDF_BOOKMARK_STYLE_ITALIC | enums.FPDF_BOOKMARK_STYLE_BOLD,
+				}))
+			})
+
+			It("returns the style as-is when it has bits that are not defined", func() {
+				Expect(getStyle("Style Is 15")).To(Equal(&responses.FPDFBookmark_GetStyle{
+					Style: enums.FPDF_BOOKMARK_STYLE(15),
+				}))
 			})
 		})
 	})

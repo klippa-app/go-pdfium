@@ -27,6 +27,10 @@ type FPDFBookmark_GetColor struct {
 	Bookmark references.FPDF_BOOKMARK // Reference to the current bookmark.
 }
 
+type FPDFBookmark_GetStyle struct {
+	Bookmark references.FPDF_BOOKMARK // Reference to the current bookmark.
+}
+
 type FPDFBookmark_Find struct {
 	Document references.FPDF_DOCUMENT
 	Title    string // The string for the bookmark title to be searched

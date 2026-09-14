@@ -143,6 +143,7 @@ type Pdfium interface {
 	FPDFBookmark_GetDest(*requests.FPDFBookmark_GetDest) (*responses.FPDFBookmark_GetDest, error)
 	FPDFBookmark_GetFirstChild(*requests.FPDFBookmark_GetFirstChild) (*responses.FPDFBookmark_GetFirstChild, error)
 	FPDFBookmark_GetNextSibling(*requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error)
+	FPDFBookmark_GetStyle(*requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error)
 	FPDFBookmark_GetTitle(*requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error)
 	FPDFCatalog_GetLanguage(*requests.FPDFCatalog_GetLanguage) (*responses.FPDFCatalog_GetLanguage, error)
 	FPDFCatalog_IsTagged(*requests.FPDFCatalog_IsTagged) (*responses.FPDFCatalog_IsTagged, error)
@@ -306,6 +307,7 @@ type Pdfium interface {
 	FPDFPath_BezierTo(*requests.FPDFPath_BezierTo) (*responses.FPDFPath_BezierTo, error)
 	FPDFPath_Close(*requests.FPDFPath_Close) (*responses.FPDFPath_Close, error)
 	FPDFPath_CountSegments(*requests.FPDFPath_CountSegments) (*responses.FPDFPath_CountSegments, error)
+	FPDFPath_GetBezierControlPoints(*requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error)
 	FPDFPath_GetDrawMode(*requests.FPDFPath_GetDrawMode) (*responses.FPDFPath_GetDrawMode, error)
 	FPDFPath_GetPathSegment(*requests.FPDFPath_GetPathSegment) (*responses.FPDFPath_GetPathSegment, error)
 	FPDFPath_LineTo(*requests.FPDFPath_LineTo) (*responses.FPDFPath_LineTo, error)
@@ -1790,6 +1792,16 @@ func (g *PdfiumRPC) FPDFBookmark_GetFirstChild(request *requests.FPDFBookmark_Ge
 func (g *PdfiumRPC) FPDFBookmark_GetNextSibling(request *requests.FPDFBookmark_GetNextSibling) (*responses.FPDFBookmark_GetNextSibling, error) {
 	resp := &responses.FPDFBookmark_GetNextSibling{}
 	err := g.client.Call("Plugin.FPDFBookmark_GetNextSibling", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error) {
+	resp := &responses.FPDFBookmark_GetStyle{}
+	err := g.client.Call("Plugin.FPDFBookmark_GetStyle", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -3420,6 +3432,16 @@ func (g *PdfiumRPC) FPDFPath_Close(request *requests.FPDFPath_Close) (*responses
 func (g *PdfiumRPC) FPDFPath_CountSegments(request *requests.FPDFPath_CountSegments) (*responses.FPDFPath_CountSegments, error) {
 	resp := &responses.FPDFPath_CountSegments{}
 	err := g.client.Call("Plugin.FPDFPath_CountSegments", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error) {
+	resp := &responses.FPDFPath_GetBezierControlPoints{}
+	err := g.client.Call("Plugin.FPDFPath_GetBezierControlPoints", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -7567,6 +7589,24 @@ func (s *PdfiumRPCServer) FPDFBookmark_GetNextSibling(request *requests.FPDFBook
 	return nil
 }
 
+func (s *PdfiumRPCServer) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle, resp *responses.FPDFBookmark_GetStyle) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetStyle", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFBookmark_GetStyle(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
 func (s *PdfiumRPCServer) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle, resp *responses.FPDFBookmark_GetTitle) (err error) {
 	defer func() {
 		if panicError := recover(); panicError != nil {
@@ -10491,6 +10531,24 @@ func (s *PdfiumRPCServer) FPDFPath_CountSegments(request *requests.FPDFPath_Coun
 	}()
 
 	implResp, err := s.Impl.FPDFPath_CountSegments(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints, resp *responses.FPDFPath_GetBezierControlPoints) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPath_GetBezierControlPoints", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPath_GetBezierControlPoints(request)
 	if err != nil {
 		return err
 	}

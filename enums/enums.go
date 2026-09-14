@@ -44,6 +44,16 @@ const (
 	FPDF_PDFDEST_VIEW_FITBV        FPDF_PDFDEST_VIEW = 8
 )
 
+// The text style of a bookmark. See section 12.3.3 "Document Outline",
+// Table 154 of the ISO 32000-1:2008 spec.
+type FPDF_BOOKMARK_STYLE int
+
+const (
+	FPDF_BOOKMARK_STYLE_NONE   FPDF_BOOKMARK_STYLE = 0
+	FPDF_BOOKMARK_STYLE_ITALIC FPDF_BOOKMARK_STYLE = (1 << 0)
+	FPDF_BOOKMARK_STYLE_BOLD   FPDF_BOOKMARK_STYLE = (1 << 1)
+)
+
 // Additional-action types of page object
 type FPDF_PAGE_AACTION int
 
