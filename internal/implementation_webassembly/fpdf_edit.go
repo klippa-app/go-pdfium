@@ -1599,6 +1599,56 @@ func (p *PdfiumImplementation) FPDFPath_GetPathSegment(request *requests.FPDFPat
 	}, nil
 }
 
+// FPDFPath_GetBezierControlPoints returns the two control points of the cubic
+// Bezier segment in the given path at the given index.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	firstControlPointPointer, err := p.FS_POINTFPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer firstControlPointPointer.Free()
+
+	secondControlPointPointer, err := p.FS_POINTFPointer(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer secondControlPointPointer.Free()
+
+	res, err := p.call("FPDFPath_GetBezierControlPoints", *pageObjectHandle.handle, request.Index, firstControlPointPointer.Pointer, secondControlPointPointer.Pointer)
+	if err != nil {
+		return nil, err
+	}
+
+	success := *(*int32)(unsafe.Pointer(&res[0]))
+	if int(success) == 0 {
+		return nil, errors.New("could not get bezier control points")
+	}
+
+	firstControlPoint, err := firstControlPointPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	secondControlPoint, err := secondControlPointPointer.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFPath_GetBezierControlPoints{
+		FirstControlPoint:  *firstControlPoint,
+		SecondControlPoint: *secondControlPoint,
+	}, nil
+}
+
 // FPDFPathSegment_GetPoint returns the coordinates of the given segment.
 func (p *PdfiumImplementation) FPDFPathSegment_GetPoint(request *requests.FPDFPathSegment_GetPoint) (*responses.FPDFPathSegment_GetPoint, error) {
 	p.Lock()

@@ -111,6 +111,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFPageObj_GetMatrix).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFPath_GetBezierControlPoints", func() {
+				FPDFPath_GetBezierControlPoints, err := PdfiumInstance.FPDFPath_GetBezierControlPoints(&requests.FPDFPath_GetBezierControlPoints{})
+				Expect(err).To(MatchError("pageObject not given"))
+				Expect(FPDFPath_GetBezierControlPoints).To(BeNil())
+			})
+
 			It("returns an error when calling FPDFPageObj_SetMatrix", func() {
 				FPDFPageObj_SetMatrix, err := PdfiumInstance.FPDFPageObj_SetMatrix(&requests.FPDFPageObj_SetMatrix{})
 				Expect(err).To(MatchError("pageObject not given"))
@@ -2117,6 +2123,117 @@ end
 		})
 
 		When("is opened", func() {
+			It("allows getting the bezier control points of a path", func() {
+				FPDFPageObj_CreateNewPath, err := PdfiumInstance.FPDFPageObj_CreateNewPath(&requests.FPDFPageObj_CreateNewPath{
+					X: 10,
+					Y: 10,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateNewPath).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateNewPath.PageObject).To(Not(BeEmpty()))
+				pathObject := FPDFPageObj_CreateNewPath.PageObject
+
+				FPDFPath_BezierTo, err := PdfiumInstance.FPDFPath_BezierTo(&requests.FPDFPath_BezierTo{
+					PageObject: pathObject,
+					X1:         20,
+					Y1:         30,
+					X2:         40,
+					Y2:         50,
+					X3:         60,
+					Y3:         70,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPath_BezierTo).To(Equal(&responses.FPDFPath_BezierTo{}))
+
+				// The move to and the three points of the bezier curve.
+				FPDFPath_CountSegments, err := PdfiumInstance.FPDFPath_CountSegments(&requests.FPDFPath_CountSegments{
+					PageObject: pathObject,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPath_CountSegments).To(Equal(&responses.FPDFPath_CountSegments{
+					Count: 4,
+				}))
+
+				// Index 3 is the endpoint of the bezier segment.
+				FPDFPath_GetBezierControlPoints, err := PdfiumInstance.FPDFPath_GetBezierControlPoints(&requests.FPDFPath_GetBezierControlPoints{
+					PageObject: pathObject,
+					Index:      3,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPath_GetBezierControlPoints).To(Equal(&responses.FPDFPath_GetBezierControlPoints{
+					FirstControlPoint: structs.FPDF_FS_POINTF{
+						X: 20,
+						Y: 30,
+					},
+					SecondControlPoint: structs.FPDF_FS_POINTF{
+						X: 40,
+						Y: 50,
+					},
+				}))
+
+				FPDFPageObj_Destroy, err := PdfiumInstance.FPDFPageObj_Destroy(&requests.FPDFPageObj_Destroy{
+					PageObject: pathObject,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_Destroy).To(Not(BeNil()))
+			})
+
+			It("returns an error when getting the bezier control points of a segment that is not a bezier endpoint", func() {
+				FPDFPageObj_CreateNewPath, err := PdfiumInstance.FPDFPageObj_CreateNewPath(&requests.FPDFPageObj_CreateNewPath{
+					X: 10,
+					Y: 10,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateNewPath).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateNewPath.PageObject).To(Not(BeEmpty()))
+				pathObject := FPDFPageObj_CreateNewPath.PageObject
+
+				FPDFPath_LineTo, err := PdfiumInstance.FPDFPath_LineTo(&requests.FPDFPath_LineTo{
+					PageObject: pathObject,
+					X:          20,
+					Y:          20,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPath_LineTo).To(Equal(&responses.FPDFPath_LineTo{}))
+
+				FPDFPath_GetBezierControlPoints, err := PdfiumInstance.FPDFPath_GetBezierControlPoints(&requests.FPDFPath_GetBezierControlPoints{
+					PageObject: pathObject,
+					Index:      1,
+				})
+				Expect(err).To(MatchError("could not get bezier control points"))
+				Expect(FPDFPath_GetBezierControlPoints).To(BeNil())
+
+				FPDFPageObj_Destroy, err := PdfiumInstance.FPDFPageObj_Destroy(&requests.FPDFPageObj_Destroy{
+					PageObject: pathObject,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_Destroy).To(Not(BeNil()))
+			})
+
+			It("returns an error when getting the bezier control points at an out of bounds index", func() {
+				FPDFPageObj_CreateNewPath, err := PdfiumInstance.FPDFPageObj_CreateNewPath(&requests.FPDFPageObj_CreateNewPath{
+					X: 10,
+					Y: 10,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_CreateNewPath).To(Not(BeNil()))
+				Expect(FPDFPageObj_CreateNewPath.PageObject).To(Not(BeEmpty()))
+				pathObject := FPDFPageObj_CreateNewPath.PageObject
+
+				FPDFPath_GetBezierControlPoints, err := PdfiumInstance.FPDFPath_GetBezierControlPoints(&requests.FPDFPath_GetBezierControlPoints{
+					PageObject: pathObject,
+					Index:      35,
+				})
+				Expect(err).To(MatchError("could not get bezier control points"))
+				Expect(FPDFPath_GetBezierControlPoints).To(BeNil())
+
+				FPDFPageObj_Destroy, err := PdfiumInstance.FPDFPageObj_Destroy(&requests.FPDFPageObj_Destroy{
+					PageObject: pathObject,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFPageObj_Destroy).To(Not(BeNil()))
+			})
+
 			It("allows inserting objects at indexes", func() {
 				FPDFPage_CountObjects, err := PdfiumInstance.FPDFPage_CountObjects(&requests.FPDFPage_CountObjects{
 					Page: requests.Page{

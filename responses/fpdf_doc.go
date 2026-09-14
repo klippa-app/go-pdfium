@@ -33,6 +33,15 @@ type FPDFBookmark_GetColor struct {
 	B float32 // The blue component of the bookmark color [0.0 - 1.0].
 }
 
+type FPDFBookmark_GetStyle struct {
+	// The text style of the bookmark, as a bit field. The first bit represents
+	// whether the text is italic, the second bit whether the text is bold.
+	// Please refer to PDF 32000-1:2008, Table 154. Is
+	// FPDF_BOOKMARK_STYLE_NONE when the bookmark doesn't have styling.
+	// Applying these styles remains the responsibility of the embedder.
+	Style enums.FPDF_BOOKMARK_STYLE
+}
+
 type FPDFBookmark_Find struct {
 	Bookmark *references.FPDF_BOOKMARK // Reference to the found bookmark. nil if the title can't be found.
 }

@@ -1845,6 +1845,20 @@ func (i *pdfiumInstance) FPDFBookmark_GetNextSibling(request *requests.FPDFBookm
 	return i.worker.Instance.FPDFBookmark_GetNextSibling(request)
 }
 
+func (i *pdfiumInstance) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (resp *responses.FPDFBookmark_GetStyle, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFBookmark_GetStyle", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFBookmark_GetStyle(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (resp *responses.FPDFBookmark_GetTitle, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -4125,6 +4139,20 @@ func (i *pdfiumInstance) FPDFPath_CountSegments(request *requests.FPDFPath_Count
 	}()
 
 	return i.worker.Instance.FPDFPath_CountSegments(request)
+}
+
+func (i *pdfiumInstance) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (resp *responses.FPDFPath_GetBezierControlPoints, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPath_GetBezierControlPoints", panicError)
+		}
+	}()
+
+	return i.worker.Instance.FPDFPath_GetBezierControlPoints(request)
 }
 
 func (i *pdfiumInstance) FPDFPath_GetDrawMode(request *requests.FPDFPath_GetDrawMode) (resp *responses.FPDFPath_GetDrawMode, err error) {

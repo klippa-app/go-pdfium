@@ -44,3 +44,9 @@ func (p *PdfiumImplementation) FPDFBookmark_GetCount(request *requests.FPDFBookm
 func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFBookmark_GetStyle returns the text style of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

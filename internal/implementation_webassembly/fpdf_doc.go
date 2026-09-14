@@ -1125,3 +1125,26 @@ func (p *PdfiumImplementation) FPDFBookmark_GetColor(request *requests.FPDFBookm
 		B: b,
 	}, nil
 }
+
+// FPDFBookmark_GetStyle returns the text style of a bookmark.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	bookmarkHandle, err := p.getBookmarkHandle(request.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.call("FPDFBookmark_GetStyle", *bookmarkHandle.handle)
+	if err != nil {
+		return nil, err
+	}
+
+	style := *(*int32)(unsafe.Pointer(&res[0]))
+
+	return &responses.FPDFBookmark_GetStyle{
+		Style: enums.FPDF_BOOKMARK_STYLE(style),
+	}, nil
+}

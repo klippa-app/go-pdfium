@@ -1023,6 +1023,14 @@ func (i *pdfiumInstance) FPDFBookmark_GetNextSibling(request *requests.FPDFBookm
 	return i.worker.plugin.FPDFBookmark_GetNextSibling(request)
 }
 
+func (i *pdfiumInstance) FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFBookmark_GetStyle(request)
+}
+
 func (i *pdfiumInstance) FPDFBookmark_GetTitle(request *requests.FPDFBookmark_GetTitle) (*responses.FPDFBookmark_GetTitle, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -2329,6 +2337,14 @@ func (i *pdfiumInstance) FPDFPath_CountSegments(request *requests.FPDFPath_Count
 	}
 
 	return i.worker.plugin.FPDFPath_CountSegments(request)
+}
+
+func (i *pdfiumInstance) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPath_GetBezierControlPoints(request)
 }
 
 func (i *pdfiumInstance) FPDFPath_GetDrawMode(request *requests.FPDFPath_GetDrawMode) (*responses.FPDFPath_GetDrawMode, error) {

@@ -413,6 +413,11 @@ type FPDFPath_GetPathSegment struct {
 	Index      int
 }
 
+type FPDFPath_GetBezierControlPoints struct {
+	PageObject references.FPDF_PAGEOBJECT
+	Index      uint64 // The index of the endpoint of a cubic Bezier segment.
+}
+
 type FPDFPathSegment_GetPoint struct {
 	PathSegment references.FPDF_PATHSEGMENT
 }

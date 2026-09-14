@@ -432,3 +432,10 @@ func (p *PdfiumImplementation) FPDFText_SetPositions(request *requests.FPDFText_
 func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTextObj_SetFontSize) (*responses.FPDFTextObj_SetFontSize, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFPath_GetBezierControlPoints returns the two control points of the cubic
+// Bezier segment in the given path at the given index.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

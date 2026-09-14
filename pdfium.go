@@ -760,6 +760,13 @@ type Pdfium interface {
 	// FPDFPath_GetPathSegment returns the segment in the given path at the given index.
 	FPDFPath_GetPathSegment(request *requests.FPDFPath_GetPathSegment) (*responses.FPDFPath_GetPathSegment, error)
 
+	// FPDFPath_GetBezierControlPoints returns the two control points of the
+	// cubic Bezier segment in the given path at the given index.
+	// Returns an error when the given index is out of bounds or when the
+	// indexed segment is not the endpoint of a cubic Bezier segment.
+	// Experimental API.
+	FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error)
+
 	// FPDFPathSegment_GetPoint returns the coordinates of the given segment.
 	FPDFPathSegment_GetPoint(request *requests.FPDFPathSegment_GetPoint) (*responses.FPDFPathSegment_GetPoint, error)
 
@@ -1018,6 +1025,12 @@ type Pdfium interface {
 	// Returns an error when the bookmark does not specify a color.
 	// Experimental API.
 	FPDFBookmark_GetColor(request *requests.FPDFBookmark_GetColor) (*responses.FPDFBookmark_GetColor, error)
+
+	// FPDFBookmark_GetStyle returns the text style of a bookmark.
+	// Returns FPDF_BOOKMARK_STYLE_NONE when the bookmark doesn't have styling
+	// or when the bookmark is invalid.
+	// Experimental API.
+	FPDFBookmark_GetStyle(request *requests.FPDFBookmark_GetStyle) (*responses.FPDFBookmark_GetStyle, error)
 
 	// FPDFBookmark_Find finds a bookmark in the document, using the bookmark title.
 	FPDFBookmark_Find(request *requests.FPDFBookmark_Find) (*responses.FPDFBookmark_Find, error)

@@ -1599,3 +1599,35 @@ func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTex
 
 	return &responses.FPDFTextObj_SetFontSize{}, nil
 }
+
+// FPDFPath_GetBezierControlPoints returns the two control points of the cubic
+// Bezier segment in the given path at the given index.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPath_GetBezierControlPoints(request *requests.FPDFPath_GetBezierControlPoints) (*responses.FPDFPath_GetBezierControlPoints, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	pageObjectHandle, err := p.getPageObjectHandle(request.PageObject)
+	if err != nil {
+		return nil, err
+	}
+
+	firstControlPoint := C.FS_POINTF{}
+	secondControlPoint := C.FS_POINTF{}
+
+	success := C.FPDFPath_GetBezierControlPoints(pageObjectHandle.handle, C.size_t(request.Index), &firstControlPoint, &secondControlPoint)
+	if int(success) == 0 {
+		return nil, errors.New("could not get bezier control points")
+	}
+
+	return &responses.FPDFPath_GetBezierControlPoints{
+		FirstControlPoint: structs.FPDF_FS_POINTF{
+			X: float32(firstControlPoint.x),
+			Y: float32(firstControlPoint.y),
+		},
+		SecondControlPoint: structs.FPDF_FS_POINTF{
+			X: float32(secondControlPoint.x),
+			Y: float32(secondControlPoint.y),
+		},
+	}, nil
+}
