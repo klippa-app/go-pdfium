@@ -219,28 +219,36 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 	p.Lock()
 	defer p.Unlock()
 
+	resp, _, err := p.renderPageInDPI(request)
+	return resp, err
+}
+
+// The internal render methods return the guest pixel offset as well as the
+// public response. The caller must hold the instance lock until encoding and
+// cleanup are complete when using the offset.
+func (p *PdfiumImplementation) renderPageInDPI(request *requests.RenderPageInDPI) (*responses.RenderPageInDPI, uint64, error) {
 	if request.DPI == 0 {
-		return nil, errors.New("no DPI given")
+		return nil, 0, errors.New("no DPI given")
 	}
 
 	err := validateRenderImageFormat(request.ImageFormat)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	index, pageToRender, err := p.buildRenderPageInDPI(request)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	// Render a single page.
-	result, cleanupFunc, err := p.renderPages([]renderPage{*pageToRender}, 0)
+	result, err := p.renderPages([]renderPage{*pageToRender}, 0)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return &responses.RenderPageInDPI{
-		CleanupFunc: cleanupFunc,
+		CleanupFunc: result.cleanup,
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
@@ -250,7 +258,7 @@ func (p *PdfiumImplementation) RenderPageInDPI(request *requests.RenderPageInDPI
 			Height:            pageToRender.Height,
 			HasTransparency:   result.Pages[0].HasTransparency,
 		},
-	}, nil
+	}, result.pixelsPtr, nil
 }
 
 // RenderPagesInDPI renders a list of pages in a specific dpi, the result is an image.
@@ -258,48 +266,53 @@ func (p *PdfiumImplementation) RenderPagesInDPI(request *requests.RenderPagesInD
 	p.Lock()
 	defer p.Unlock()
 
+	resp, _, err := p.renderPagesInDPI(request)
+	return resp, err
+}
+
+func (p *PdfiumImplementation) renderPagesInDPI(request *requests.RenderPagesInDPI) (*responses.RenderPagesInDPI, uint64, error) {
 	if len(request.Pages) == 0 {
-		return nil, errors.New("no pages given")
+		return nil, 0, errors.New("no pages given")
 	}
 
 	pages := make([]renderPage, len(request.Pages))
 	for i := range request.Pages {
 		if request.Pages[i].DPI == 0 {
-			return nil, fmt.Errorf("no DPI given for requested page %d", i)
+			return nil, 0, fmt.Errorf("no DPI given for requested page %d", i)
 		}
 
 		if len(request.Pages) > 1 && request.Pages[i].Crop != nil {
-			return nil, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
+			return nil, 0, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
 		}
 
 		err := validateRenderImageFormat(request.Pages[i].ImageFormat)
 		if err != nil {
-			return nil, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
+			return nil, 0, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
 		}
 
 		// All pages are rendered into one image, which can only have one
 		// pixel format and one output field.
 		if i > 0 && request.Pages[i].ImageFormat != pages[0].ImageFormat {
-			return nil, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
+			return nil, 0, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
 		}
 
 		_, pageToRender, err := p.buildRenderPageInDPI(&request.Pages[i])
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		pages[i] = *pageToRender
 	}
 
-	result, cleanupFunc, err := p.renderPages(pages, request.Padding)
+	result, err := p.renderPages(pages, request.Padding)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return &responses.RenderPagesInDPI{
-		CleanupFunc: cleanupFunc,
-		Result:      *result,
-	}, nil
+		CleanupFunc: result.cleanup,
+		Result:      result.RenderPages,
+	}, result.pixelsPtr, nil
 }
 
 // calculateRenderImageSize calculates the pixel size of a page when it has to
@@ -322,28 +335,33 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 	p.Lock()
 	defer p.Unlock()
 
+	resp, _, err := p.renderPageInPixels(request)
+	return resp, err
+}
+
+func (p *PdfiumImplementation) renderPageInPixels(request *requests.RenderPageInPixels) (*responses.RenderPageInPixels, uint64, error) {
 	if request.Width == 0 && request.Height == 0 {
-		return nil, errors.New("no width or height given")
+		return nil, 0, errors.New("no width or height given")
 	}
 
 	err := validateRenderImageFormat(request.ImageFormat)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	index, pageToRender, err := p.buildRenderPageInPixels(request)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	// Render a single page.
-	result, cleanupFunc, err := p.renderPages([]renderPage{*pageToRender}, 0)
+	result, err := p.renderPages([]renderPage{*pageToRender}, 0)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return &responses.RenderPageInPixels{
-		CleanupFunc: cleanupFunc,
+		CleanupFunc: result.cleanup,
 		Result: responses.RenderPage{
 			Page:              index,
 			Image:             result.Image,
@@ -353,7 +371,7 @@ func (p *PdfiumImplementation) RenderPageInPixels(request *requests.RenderPageIn
 			Height:            pageToRender.Height,
 			HasTransparency:   result.Pages[0].HasTransparency,
 		},
-	}, nil
+	}, result.pixelsPtr, nil
 }
 
 // RenderPagesInPixels renders a list of pages in a specific pixel size, the result is an image.
@@ -363,48 +381,53 @@ func (p *PdfiumImplementation) RenderPagesInPixels(request *requests.RenderPages
 	p.Lock()
 	defer p.Unlock()
 
+	resp, _, err := p.renderPagesInPixels(request)
+	return resp, err
+}
+
+func (p *PdfiumImplementation) renderPagesInPixels(request *requests.RenderPagesInPixels) (*responses.RenderPagesInPixels, uint64, error) {
 	if len(request.Pages) == 0 {
-		return nil, errors.New("no pages given")
+		return nil, 0, errors.New("no pages given")
 	}
 
 	pages := make([]renderPage, len(request.Pages))
 	for i := range request.Pages {
 		if request.Pages[i].Width == 0 && request.Pages[i].Height == 0 {
-			return nil, fmt.Errorf("no width or height given for requested page %d", i)
+			return nil, 0, fmt.Errorf("no width or height given for requested page %d", i)
 		}
 
 		if len(request.Pages) > 1 && request.Pages[i].Crop != nil {
-			return nil, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
+			return nil, 0, fmt.Errorf("crop is not supported for requested page %d when rendering multiple pages", i)
 		}
 
 		err := validateRenderImageFormat(request.Pages[i].ImageFormat)
 		if err != nil {
-			return nil, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
+			return nil, 0, fmt.Errorf("invalid ImageFormat given for requested page %d", i)
 		}
 
 		// All pages are rendered into one image, which can only have one
 		// pixel format and one output field.
 		if i > 0 && request.Pages[i].ImageFormat != pages[0].ImageFormat {
-			return nil, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
+			return nil, 0, errors.New("all pages must have the same ImageFormat when rendering multiple pages into one image")
 		}
 
 		_, pageToRender, err := p.buildRenderPageInPixels(&request.Pages[i])
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		pages[i] = *pageToRender
 	}
 
-	result, cleanupFunc, err := p.renderPages(pages, request.Padding)
+	result, err := p.renderPages(pages, request.Padding)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return &responses.RenderPagesInPixels{
-		CleanupFunc: cleanupFunc,
-		Result:      *result,
-	}, nil
+		CleanupFunc: result.cleanup,
+		Result:      result.RenderPages,
+	}, result.pixelsPtr, nil
 }
 
 type renderPage struct {
@@ -440,8 +463,16 @@ func validateRenderImageFormat(imageFormat requests.RenderImageFormat) error {
 	return errors.New("invalid ImageFormat given")
 }
 
+// renderedPages retains the guest pixel offset alongside the public image.
+// The offset stays valid across memory growth, until cleanup releases the bitmap.
+type renderedPages struct {
+	responses.RenderPages
+	pixelsPtr uint64
+	cleanup   func()
+}
+
 // renderPages renders a list of pages, the result is an image.
-func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*responses.RenderPages, func(), error) {
+func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*renderedPages, error) {
 	totalWidth := 0
 	totalHeight := 0
 
@@ -460,7 +491,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	}
 
 	if totalWidth < 1 || totalHeight < 1 {
-		return nil, nil, errors.New("could not render an empty image")
+		return nil, errors.New("could not render an empty image")
 	}
 
 	// The image format has been validated by the caller, all pages are
@@ -491,7 +522,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		// by FPDFBitmap_Destroy.
 		res, err := p.call("FPDFBitmap_CreateEx", uint64(totalWidth), uint64(totalHeight), uint64(enums.FPDF_BITMAP_FORMAT_GRAY), 0, 0)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		bitmap = res[0]
@@ -508,12 +539,12 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		// around when we read the buffer back, which would leave us with a much
 		// too small view of the bitmap instead of an error.
 		if int64(img.Stride)*int64(totalHeight) > math.MaxUint32 {
-			return nil, nil, errors.New("the image to render is too large")
+			return nil, errors.New("the image to render is too large")
 		}
 
 		res, err := p.call("FPDFBitmap_Create", uint64(totalWidth), uint64(totalHeight), uint64(1))
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		bitmap = res[0]
@@ -524,7 +555,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	// the dimensions overflow. Rendering into a null bitmap would silently give
 	// us an image full of garbage.
 	if bitmap == 0 {
-		return nil, nil, errors.New("could not create bitmap, the image to render is most likely too large")
+		return nil, errors.New("could not create bitmap, the image to render is most likely too large")
 	}
 
 	releaseFunc := func() {
@@ -546,7 +577,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		index, hasTransparency, err := p.renderPage(bitmap, pages[i], currentOffset, imageFormat)
 		if err != nil {
 			releaseFunc()
-			return nil, nil, err
+			return nil, err
 		}
 		pagesInfo[i].Page = index
 		pagesInfo[i].HasTransparency = hasTransparency
@@ -560,7 +591,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		res, err := p.call("FPDFBitmap_GetStride", bitmap)
 		if err != nil {
 			releaseFunc()
-			return nil, nil, err
+			return nil, err
 		}
 
 		imgGray.Stride = int(*(*int32)(unsafe.Pointer(&res[0])))
@@ -573,7 +604,7 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	// known here because PDFium decides it.
 	if imageSize > math.MaxUint32 {
 		releaseFunc()
-		return nil, nil, errors.New("the image to render is too large")
+		return nil, errors.New("the image to render is too large")
 	}
 
 	size := uint32(imageSize)
@@ -582,14 +613,14 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 	res, err := p.call("FPDFBitmap_GetBuffer", bitmap)
 	if err != nil {
 		releaseFunc()
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Create a view of the underlying memory, not a copy.
 	data, success := p.Module.Memory().Read(uint32(res[0]), size)
 	if !success {
 		releaseFunc()
-		return nil, nil, errors.New("could not get bitmap buffer")
+		return nil, errors.New("could not get bitmap buffer")
 	}
 
 	var renderedImage image.Image
@@ -601,13 +632,17 @@ func (p *PdfiumImplementation) renderPages(pages []renderPage, padding int) (*re
 		renderedImage = img
 	}
 
-	return &responses.RenderPages{
-		Image:         img,
-		RenderedImage: renderedImage,
-		Pages:         pagesInfo,
-		Width:         totalWidth,
-		Height:        totalHeight,
-	}, releaseFunc, nil
+	return &renderedPages{
+		RenderPages: responses.RenderPages{
+			Image:         img,
+			RenderedImage: renderedImage,
+			Pages:         pagesInfo,
+			Width:         totalWidth,
+			Height:        totalHeight,
+		},
+		pixelsPtr: res[0],
+		cleanup:   releaseFunc,
+	}, nil
 }
 
 // renderPage renders a specific page in a specific size on a bitmap.
@@ -734,19 +769,24 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, pageToRender renderPage
 }
 
 func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	var renderedImage image.Image
+	var pixelsPtr uint64
 
 	var myResp *responses.RenderToFile
 	hasTransparency := false
 
 	if request.RenderPageInDPI != nil {
-		resp, err := p.RenderPageInDPI(request.RenderPageInDPI)
+		resp, offset, err := p.renderPageInDPI(request.RenderPageInDPI)
 		if err != nil {
 			return nil, err
 		}
 		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
+		pixelsPtr = offset
 		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
@@ -765,13 +805,14 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			},
 		}
 	} else if request.RenderPagesInDPI != nil {
-		resp, err := p.RenderPagesInDPI(request.RenderPagesInDPI)
+		resp, offset, err := p.renderPagesInDPI(request.RenderPagesInDPI)
 		if err != nil {
 			return nil, err
 		}
 		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
+		pixelsPtr = offset
 
 		for _, page := range resp.Result.Pages {
 			if page.HasTransparency {
@@ -785,13 +826,14 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			Pages:  resp.Result.Pages,
 		}
 	} else if request.RenderPageInPixels != nil {
-		resp, err := p.RenderPageInPixels(request.RenderPageInPixels)
+		resp, offset, err := p.renderPageInPixels(request.RenderPageInPixels)
 		if err != nil {
 			return nil, err
 		}
 		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
+		pixelsPtr = offset
 		hasTransparency = resp.Result.HasTransparency
 		myResp = &responses.RenderToFile{
 			Width:             resp.Result.Width,
@@ -810,13 +852,14 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			},
 		}
 	} else if request.RenderPagesInPixels != nil {
-		resp, err := p.RenderPagesInPixels(request.RenderPagesInPixels)
+		resp, offset, err := p.renderPagesInPixels(request.RenderPagesInPixels)
 		if err != nil {
 			return nil, err
 		}
 		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
+		pixelsPtr = offset
 
 		for _, page := range resp.Result.Pages {
 			if page.HasTransparency {
@@ -853,6 +896,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
 		renderedImage = imageWithWhiteBackground
+		pixelsPtr = 0 // Composited pixels are owned by Go.
 	}
 
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
@@ -868,7 +912,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		}
 
 		for {
-			err := p.encodeJPEG(&imgBuf, renderedImage, opt)
+			err := p.encodeJPEG(&imgBuf, renderedImage, pixelsPtr, opt)
 			if err != nil {
 				return nil, err
 			}
