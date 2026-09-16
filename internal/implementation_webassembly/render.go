@@ -769,8 +769,20 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, pageToRender renderPage
 }
 
 func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*responses.RenderToFile, error) {
+	// The internal render helpers expect the caller to hold the instance lock.
+	// Keep it through encoding and cleanup, which also call into the WASM module.
 	p.Lock()
 	defer p.Unlock()
+
+	var cleanupBitmap func()
+	releaseBitmap := func() {
+		if cleanupBitmap != nil {
+			cleanup := cleanupBitmap
+			cleanupBitmap = nil
+			cleanup()
+		}
+	}
+	defer releaseBitmap()
 
 	var renderedImage image.Image
 	var pixelsPtr uint64
@@ -783,7 +795,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Cleanup()
+		cleanupBitmap = resp.Cleanup
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -809,7 +821,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Cleanup()
+		cleanupBitmap = resp.Cleanup
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -830,7 +842,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Cleanup()
+		cleanupBitmap = resp.Cleanup
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -856,7 +868,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Cleanup()
+		cleanupBitmap = resp.Cleanup
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -897,6 +909,8 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
 		renderedImage = imageWithWhiteBackground
 		pixelsPtr = 0 // Composited pixels are owned by Go.
+		// Release the original bitmap before copying the composited pixels into WASM.
+		releaseBitmap()
 	}
 
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
