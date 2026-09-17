@@ -221,6 +221,118 @@ func (e *Extractor) TextInRect(left, top, right, bottom float32) string {
 	return string(out)
 }
 
+// kSizeEpsilon mirrors CPDF_TextPage's constant: chars with a box narrower or
+// shorter than this (in particular PDFium's generated space/newline chars,
+// which have a zero-size box) never contribute to a rect.
+const kSizeEpsilon = 0.01
+
+// Rect is a text rect as FPDFText_GetRect returns it.
+type Rect struct {
+	Left, Top, Right, Bottom float32
+}
+
+// FirstCharIndices returns, for every rect in rects, the index of the first
+// char that makes up that rect, or -1 when no char lies in it. rects must be
+// all rects of the page in FPDFText_GetRect order.
+//
+// PDFium builds its rects (CPDF_TextPage::GetRectArray) by walking the chars
+// in order and taking the union of the char boxes of each run of chars that
+// share a text object, skipping generated and degenerate chars. Every char of
+// a rect therefore lies inside it, and the rects come out in char order. This
+// method replays that walk from the geometry alone: a run starts at the first
+// unassigned char inside the rect and continues while chars stay inside it.
+// Text objects drawn over each other make the pure geometric walk ambiguous,
+// which is resolved with the next rect: once the run's union has grown to the
+// rect itself, the first char that lies inside the next rect starts the next
+// run, even when it also lies inside the current rect.
+//
+// Unlike FPDFText_GetCharIndexAtPos at the rect's corner this needs no
+// tolerance and cannot pick an unrelated overlapping char: the corner of a
+// rect is not on the first char whenever a later char in the rect is taller,
+// and the position lookup returns the first char in page order whose box
+// contains the point, whichever text object it belongs to.
+func (e *Extractor) FirstCharIndices(rects []Rect) []int {
+	result := make([]int, len(rects))
+	cursor := 0
+	prevFirst := -1
+	for ri := range rects {
+		r := normalizeRect(rects[ri])
+		var next *Rect
+		if ri+1 < len(rects) {
+			n := normalizeRect(rects[ri+1])
+			next = &n
+		}
+
+		first := e.scanRect(cursor, r)
+		if first < 0 && cursor > prevFirst+1 {
+			// The previous run swallowed this rect's chars, which happens
+			// when this rect lies geometrically inside the previous one.
+			// Re-scan the swallowed range.
+			first = e.scanRect(prevFirst+1, r)
+		}
+		result[ri] = first
+		if first < 0 {
+			continue
+		}
+
+		// Consume the run: chars that are degenerate (generated) or inside
+		// this rect. The union of the run's boxes grows towards the rect; once
+		// it equals the rect, a char inside the next rect belongs to it.
+		ul, ut, ur, ub := e.nl[first], e.nt[first], e.nr[first], e.nb[first]
+		cursor = first + 1
+		for cursor < len(e.chars) {
+			if e.degenerate(cursor) {
+				cursor++
+				continue
+			}
+			if !e.contained(cursor, r) {
+				break
+			}
+			if next != nil && ul == r.Left && ut == r.Top && ur == r.Right && ub == r.Bottom && e.contained(cursor, *next) {
+				break
+			}
+			ul, ut = min32(ul, e.nl[cursor]), max32(ut, e.nt[cursor])
+			ur, ub = max32(ur, e.nr[cursor]), min32(ub, e.nb[cursor])
+			cursor++
+		}
+		prevFirst = first
+	}
+	return result
+}
+
+func normalizeRect(r Rect) Rect {
+	if r.Left > r.Right {
+		r.Left, r.Right = r.Right, r.Left
+	}
+	if r.Bottom > r.Top {
+		r.Top, r.Bottom = r.Bottom, r.Top
+	}
+	return r
+}
+
+func (e *Extractor) scanRect(from int, r Rect) int {
+	for i := from; i < len(e.chars); i++ {
+		if e.degenerate(i) {
+			continue
+		}
+		if e.contained(i, r) {
+			return i
+		}
+	}
+	return -1
+}
+
+func (e *Extractor) degenerate(i int) bool {
+	return e.nr[i]-e.nl[i] < kSizeEpsilon || e.nt[i]-e.nb[i] < kSizeEpsilon
+}
+
+// contained reports whether the normalized box of char i lies within the
+// normalized rect. The rect is a float32 union of exactly these boxes, so the
+// comparison is exact, like PDFium's own min/max.
+func (e *Extractor) contained(i int, r Rect) bool {
+	return e.nl[i] >= r.Left && e.nr[i] <= r.Right && e.nb[i] >= r.Bottom && e.nt[i] <= r.Top
+}
+
 func max32(a, b float32) float32 {
 	if a > b {
 		return a
