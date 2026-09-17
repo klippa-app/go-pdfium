@@ -10,8 +10,6 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 type FormFillInfo struct {
@@ -36,7 +34,7 @@ func (f *FormFillInfo) FFI_Invalidate_CB(page uint32, left, top, right, bottom u
 		pageRef = pageHandle.nativeRef
 	}
 
-	f.FormFillInfo.FFI_Invalidate(pageRef, api.DecodeF64(left), api.DecodeF64(top), api.DecodeF64(right), api.DecodeF64(bottom))
+	f.FormFillInfo.FFI_Invalidate(pageRef, DecodeF64(left), DecodeF64(top), DecodeF64(right), DecodeF64(bottom))
 }
 
 func (f *FormFillInfo) FFI_OutputSelectedRect(page uint32, left, top, right, bottom uint64) {
@@ -48,7 +46,7 @@ func (f *FormFillInfo) FFI_OutputSelectedRect(page uint32, left, top, right, bot
 		pageRef = pageHandle.nativeRef
 	}
 
-	f.FormFillInfo.FFI_OutputSelectedRect(pageRef, api.DecodeF64(left), api.DecodeF64(top), api.DecodeF64(right), api.DecodeF64(bottom))
+	f.FormFillInfo.FFI_OutputSelectedRect(pageRef, DecodeF64(left), DecodeF64(top), DecodeF64(right), DecodeF64(bottom))
 }
 
 func (f *FormFillInfo) FFI_SetCursor(cursor uint32) {
@@ -1554,7 +1552,7 @@ func (p *PdfiumImplementation) FORM_SetIndexSelected(request *requests.FORM_SetI
 		return nil, err
 	}
 
-	p.Module.Memory().WriteUint64Le(uint32(selectedPointer.Pointer), api.EncodeI64(selected))
+	p.Module.Memory().WriteUint64Le(uint32(selectedPointer.Pointer), EncodeI64(selected))
 	res, err := p.call("FORM_SetIndexSelected", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Index)), selectedPointer.Pointer)
 	if err != nil {
 		return nil, err

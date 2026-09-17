@@ -14,16 +14,15 @@ import (
 	"github.com/klippa-app/go-pdfium/responses"
 
 	"github.com/google/uuid"
-	"github.com/tetratelabs/wazero/api"
 )
 
-func GetInstance(ctx context.Context, functions map[string]api.Function, module api.Module) *PdfiumImplementation {
+func GetInstance(ctx context.Context, functions map[string]Function, module Module) *PdfiumImplementation {
 	newInstance := &PdfiumImplementation{
 		mutex:                           &sync.Mutex{},
 		Context:                         ctx,
 		Functions:                       functions,
 		Module:                          module,
-		fnCache:                         map[string]api.Function{},
+		fnCache:                         map[string]Function{},
 		documentRefs:                    map[references.FPDF_DOCUMENT]*DocumentHandle{},
 		pageRefs:                        map[references.FPDF_PAGE]*PageHandle{},
 		bookmarkRefs:                    map[references.FPDF_BOOKMARK]*BookmarkHandle{},
@@ -67,7 +66,7 @@ func GetInstance(ctx context.Context, functions map[string]api.Function, module 
 // re-entering the instance) are safe: parameters are consumed when a call
 // starts and the result is copied out here before any later call can reuse
 // the buffer.
-func (p *PdfiumImplementation) callFn(fn api.Function, params ...uint64) ([1]uint64, error) {
+func (p *PdfiumImplementation) callFn(fn Function, params ...uint64) ([1]uint64, error) {
 	buf := p.callScratch[p.callScratchIdx&7][:]
 	p.callScratchIdx++
 	copy(buf, params)
@@ -83,9 +82,9 @@ func (p *PdfiumImplementation) call(name string, params ...uint64) ([1]uint64, e
 }
 
 // Fn returns the exported function with the given name, memoized per
-// instance. wazero's Module.ExportedFunction allocates a new call engine on
-// every lookup, so hot paths must not resolve by name per call.
-func (p *PdfiumImplementation) Fn(name string) api.Function {
+// instance. Module.ExportedFunction can be expensive (wazero allocates a new
+// call engine on every lookup), so hot paths must not resolve by name per call.
+func (p *PdfiumImplementation) Fn(name string) Function {
 	p.fnCacheMutex.RLock()
 	fn, ok := p.fnCache[name]
 	p.fnCacheMutex.RUnlock()
@@ -99,42 +98,21 @@ func (p *PdfiumImplementation) Fn(name string) api.Function {
 	return fn
 }
 
-type FunctionWrapper struct {
-	function api.Function
-	mutex    *sync.Mutex
-}
-
-// Definition implements the same method as documented on api.FunctionDefinition.
-func (f *FunctionWrapper) Definition() api.FunctionDefinition {
-	// We need to lock these because they are not thread safe.
-	f.mutex.Lock()
-	defer f.mutex.Unlock()
-	return f.function.Definition()
-}
-
-// Call implements the same method as documented on api.Function.
-func (f *FunctionWrapper) Call(ctx context.Context, params ...uint64) (ret []uint64, err error) {
-	// We need to lock these because they are not thread safe.
-	f.mutex.Lock()
-	defer f.mutex.Unlock()
-	return f.function.Call(ctx, params...)
-}
-
 // Here is the real implementation of Pdfium
 type PdfiumImplementation struct {
 	mutex *sync.Mutex
 
-	// Wazero items
+	// The WebAssembly runtime that executes this instance.
 	Context   context.Context
-	Functions map[string]api.Function
-	Module    api.Module
+	Functions map[string]Function
+	Module    Module
 
 	// fnCache memoizes Module.ExportedFunction lookups: every lookup
 	// allocates a fresh call engine (~12 KB), so resolving each export once
 	// per instance matters. Guarded by fnCacheMutex so that a lookup from a
 	// caller-owned goroutine (the form fill timer) can never tear the map,
 	// independently of the instance mutex.
-	fnCache      map[string]api.Function
+	fnCache      map[string]Function
 	fnCacheMutex sync.RWMutex
 
 	// callScratch is a small ring of reusable parameter/result buffers for

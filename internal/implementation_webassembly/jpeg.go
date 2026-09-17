@@ -28,7 +28,7 @@ func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, pixelsPtr 
 	// Guard against custom wasm binaries with an older/newer shim signature:
 	// (data, width, height, stride, format, quality, progressive, out_buf,
 	// out_size).
-	if encode == nil || len(encode.Definition().ParamTypes()) != 9 {
+	if encode == nil || encode.ParamCount() != 9 {
 		return image_jpeg.Encode(w, m, opt)
 	}
 

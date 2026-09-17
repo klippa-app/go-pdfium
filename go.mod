@@ -12,6 +12,8 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.2
 	github.com/onsi/gomega v1.43.0
 	github.com/tetratelabs/wazero v1.12.0
+	github.com/wago-org/wago v0.1.0-beta.9
+	github.com/wago-org/wasi v0.3.1
 	golang.org/x/text v0.42.0
 )
 

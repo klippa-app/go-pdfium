@@ -3,7 +3,6 @@ package webassembly
 import (
 	goctx "context"
 	"crypto/rand"
-	_ "embed"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
+	"github.com/klippa-app/go-pdfium/internal/pdfium_wasm"
 	"github.com/klippa-app/go-pdfium/webassembly/imports"
 
 	"github.com/google/uuid"
@@ -25,13 +25,10 @@ import (
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-//go:embed pdfium.wasm
-var pdfiumWasm []byte
-
 type worker struct {
 	Context   goctx.Context
 	Cancel    goctx.CancelFunc
-	Functions map[string]api.Function
+	Functions map[string]implementation_webassembly.Function
 	Module    api.Module
 	Instance  *implementation_webassembly.PdfiumImplementation
 }
@@ -73,7 +70,7 @@ var multiThreadedMutex = &sync.Mutex{}
 // available. So it's important that you close instances when you're done with them.
 func Init(config Config) (pdfium.Pool, error) {
 	if config.WASM == nil {
-		config.WASM = pdfiumWasm
+		config.WASM = pdfium_wasm.Module
 	}
 	return initWithConfig(config)
 }
@@ -181,17 +178,18 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 
 			newWorker.Module = mod
 
-			malloc := mod.ExportedFunction("malloc")
+			module := imports.NewModule(mod)
+			malloc := module.ExportedFunction("malloc")
 			if malloc == nil {
 				return nil, fmt.Errorf("could not find malloc in exported methods")
 			}
 
-			free := mod.ExportedFunction("free")
-			if malloc == nil {
+			free := module.ExportedFunction("free")
+			if free == nil {
 				return nil, fmt.Errorf("could not find free in exported methods")
 			}
 
-			newWorker.Functions = map[string]api.Function{
+			newWorker.Functions = map[string]implementation_webassembly.Function{
 				"malloc": malloc,
 				"free":   free,
 			}
@@ -201,7 +199,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 				return nil, fmt.Errorf("could not call FPDF_InitLibrary: %w", err)
 			}
 
-			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Functions, newWorker.Module)
+			newWorker.Instance = implementation_webassembly.GetInstance(newWorker.Context, newWorker.Functions, module)
 
 			return newWorker, nil
 		}, func(ctx goctx.Context, object *pool.PooledObject) error {

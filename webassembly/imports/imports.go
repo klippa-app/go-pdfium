@@ -2,6 +2,9 @@ package imports
 
 import (
 	"context"
+
+	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
+
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/emscripten"
@@ -43,27 +46,34 @@ type functionExporter struct{}
 
 // ExportFunctions implements FunctionExporter.ExportFunctions
 func (e *functionExporter) ExportFunctions(b wazero.HostModuleBuilder) {
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FILEACCESS_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FILEACCESS_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FILEWRITE_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FILEWRITE_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FX_FILEAVAIL_IS_DATA_AVAILABLE_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FX_FILEAVAIL_IS_DATA_AVAILABLE_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FX_DOWNLOADHINTS_ADD_SEGMENT_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FX_DOWNLOADHINTS_ADD_SEGMENT_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(UNSUPPORT_INFO_HANDLER_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("UNSUPPORT_INFO_HANDLER_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FSDK_SetTimeFunction_CB{}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64}).Export("FSDK_SetTimeFunction_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FSDK_SetLocaltimeFunction_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FSDK_SetLocaltimeFunction_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_Release_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_Release_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_Invalidate_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeF64, api.ValueTypeF64, api.ValueTypeF64, api.ValueTypeF64}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_Invalidate_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeF64, api.ValueTypeF64, api.ValueTypeF64, api.ValueTypeF64}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_SetCursor_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_SetCursor_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_SetTimer_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FORMFILLINFO_FFI_SetTimer_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_KillTimer_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_KillTimer_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_GetLocalTime_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_GetLocalTime_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_OnChange_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_OnChange_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_GetPage_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FORMFILLINFO_FFI_GetPage_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_GetRotation_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("FPDF_FORMFILLINFO_FFI_GetRotation_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_DoURIAction_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_DoURIAction_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(FPDF_FORMFILLINFO_FFI_DoGoToAction_CB{}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{}).Export("FPDF_FORMFILLINFO_FFI_DoGoToAction_CB")
-	b.NewFunctionBuilder().WithGoModuleFunction(IFSDK_PAUSE_NeedToPauseNow_CB{}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI32}).Export("IFSDK_PAUSE_NeedToPauseNow_CB")
+	for i := range implementation_webassembly.HostFunctions {
+		hostFunction := implementation_webassembly.HostFunctions[i]
+		b.NewFunctionBuilder().
+			WithGoModuleFunction(goModuleFunction(hostFunction.Call), valueTypes(hostFunction.Params), valueTypes(hostFunction.Results)).
+			Export(hostFunction.Name)
+	}
+}
+
+// goModuleFunction adapts a runtime independent host function to wazero.
+type goModuleFunction func(ctx context.Context, mod implementation_webassembly.Module, stack []uint64)
+
+func (fn goModuleFunction) Call(ctx context.Context, mod api.Module, stack []uint64) {
+	fn(ctx, NewModule(mod), stack)
+}
+
+func valueTypes(types []implementation_webassembly.ValueType) []api.ValueType {
+	result := make([]api.ValueType, len(types))
+	for i, valueType := range types {
+		switch valueType {
+		case implementation_webassembly.ValueTypeI32:
+			result[i] = api.ValueTypeI32
+		case implementation_webassembly.ValueTypeI64:
+			result[i] = api.ValueTypeI64
+		case implementation_webassembly.ValueTypeF32:
+			result[i] = api.ValueTypeF32
+		case implementation_webassembly.ValueTypeF64:
+			result[i] = api.ValueTypeF64
+		}
+	}
+	return result
 }

@@ -9,8 +9,6 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 type PauseHandle struct {
@@ -217,10 +215,10 @@ func (p *PdfiumImplementation) FPDF_RenderPageBitmapWithColorScheme_Start(reques
 
 		colorScheme = colorSchemePointer
 
-		p.Module.Memory().WriteUint64Le(uint32(colorScheme), api.EncodeU32(uint32(request.ColorScheme.PathFillColor)))
-		p.Module.Memory().WriteUint64Le(uint32(colorScheme+4), api.EncodeU32(uint32(request.ColorScheme.PathStrokeColor)))
-		p.Module.Memory().WriteUint64Le(uint32(colorScheme+8), api.EncodeU32(uint32(request.ColorScheme.TextFillColor)))
-		p.Module.Memory().WriteUint64Le(uint32(colorScheme+12), api.EncodeU32(uint32(request.ColorScheme.TextStrokeColor)))
+		p.Module.Memory().WriteUint64Le(uint32(colorScheme), EncodeU32(uint32(request.ColorScheme.PathFillColor)))
+		p.Module.Memory().WriteUint64Le(uint32(colorScheme+4), EncodeU32(uint32(request.ColorScheme.PathStrokeColor)))
+		p.Module.Memory().WriteUint64Le(uint32(colorScheme+8), EncodeU32(uint32(request.ColorScheme.TextFillColor)))
+		p.Module.Memory().WriteUint64Le(uint32(colorScheme+12), EncodeU32(uint32(request.ColorScheme.TextStrokeColor)))
 	}
 
 	res, err = p.call("FPDF_RenderPageBitmapWithColorScheme_Start", *bitmapHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.StartX)), *(*uint64)(unsafe.Pointer(&request.StartY)), *(*uint64)(unsafe.Pointer(&request.SizeX)), *(*uint64)(unsafe.Pointer(&request.SizeY)), *(*uint64)(unsafe.Pointer(&request.Rotate)), *(*uint64)(unsafe.Pointer(&request.Flags)), colorScheme, pausePointer)

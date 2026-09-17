@@ -141,6 +141,33 @@ jobs:
           path: |
             shared_tests/testdata/*.jpg
             shared_tests/testdata/*.png
+  test-wago:
+    # The experimental wago backend only works on amd64 for now, see the
+    # README, so it is a single Linux job instead of a full matrix.
+    env:
+      CGO_ENABLED: "0"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+      - name: Test the wago backend
+        run: |
+          go test -timeout 30m ./experimental/wago -v
+      - name: Test the wago backend - Experimental
+        run: |
+          go test -timeout 30m ./experimental/wago -tags pdfium_experimental -v
+      - name: Archive render results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wago-renders
+          path: |
+            shared_tests/testdata/*.jpg
+            shared_tests/testdata/*.png
   test-webassembly-race:
     # Go's race detector needs a cgo-capable toolchain to link its sanitizer
     # runtime, so it can't run under the CGO_ENABLED=0 matrix above. Kept as

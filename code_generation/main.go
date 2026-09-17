@@ -95,6 +95,10 @@ func main() {
 			Source: "code_generation/templates/webassembly.go.tmpl",
 			Target: "webassembly/generated.go",
 		},
+		{
+			Source: "code_generation/templates/wago.go.tmpl",
+			Target: "experimental/wago/generated.go",
+		},
 	}
 	for i := range templates {
 		err := generateFromTemplate(templates[i], data)
