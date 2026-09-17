@@ -11,8 +11,6 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	"github.com/klippa-app/go-pdfium/structs"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 // FPDF_CreateNewDocument returns a new document.
@@ -463,7 +461,7 @@ func (p *PdfiumImplementation) FPDFPageObj_Transform(request *requests.FPDFPageO
 		return nil, err
 	}
 
-	_, err = p.call("FPDFPageObj_Transform", *pageObjectHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
+	_, err = p.call("FPDFPageObj_Transform", *pageObjectHandle.handle, EncodeF64(float64(request.Transform.A)), EncodeF64(float64(request.Transform.B)), EncodeF64(float64(request.Transform.C)), EncodeF64(float64(request.Transform.D)), EncodeF64(float64(request.Transform.E)), EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
@@ -487,7 +485,7 @@ func (p *PdfiumImplementation) FPDFPage_TransformAnnots(request *requests.FPDFPa
 		return nil, err
 	}
 
-	_, err = p.call("FPDFPage_TransformAnnots", *pageHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
+	_, err = p.call("FPDFPage_TransformAnnots", *pageHandle.handle, EncodeF64(float64(request.Transform.A)), EncodeF64(float64(request.Transform.B)), EncodeF64(float64(request.Transform.C)), EncodeF64(float64(request.Transform.D)), EncodeF64(float64(request.Transform.E)), EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
@@ -665,7 +663,7 @@ func (p *PdfiumImplementation) FPDFImageObj_SetMatrix(request *requests.FPDFImag
 		return nil, err
 	}
 
-	res, err := p.call("FPDFImageObj_SetMatrix", *imageObjectHandle.handle, api.EncodeF64(float64(request.Transform.A)), api.EncodeF64(float64(request.Transform.B)), api.EncodeF64(float64(request.Transform.C)), api.EncodeF64(float64(request.Transform.D)), api.EncodeF64(float64(request.Transform.E)), api.EncodeF64(float64(request.Transform.F)))
+	res, err := p.call("FPDFImageObj_SetMatrix", *imageObjectHandle.handle, EncodeF64(float64(request.Transform.A)), EncodeF64(float64(request.Transform.B)), EncodeF64(float64(request.Transform.C)), EncodeF64(float64(request.Transform.D)), EncodeF64(float64(request.Transform.E)), EncodeF64(float64(request.Transform.F)))
 	if err != nil {
 		return nil, err
 	}
@@ -1069,7 +1067,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewPath(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.call("FPDFPageObj_CreateNewPath", api.EncodeF32(request.X), api.EncodeF32(request.Y))
+	res, err := p.call("FPDFPageObj_CreateNewPath", EncodeF32(request.X), EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1087,7 +1085,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateNewRect(request *requests.FPDFP
 	p.Lock()
 	defer p.Unlock()
 
-	res, err := p.call("FPDFPageObj_CreateNewRect", api.EncodeF32(request.X), api.EncodeF32(request.Y), api.EncodeF32(request.W), api.EncodeF32(request.H))
+	res, err := p.call("FPDFPageObj_CreateNewRect", EncodeF32(request.X), EncodeF32(request.Y), EncodeF32(request.W), EncodeF32(request.H))
 	if err != nil {
 		return nil, err
 	}
@@ -1303,7 +1301,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetStrokeWidth(request *requests.FPDF
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPageObj_SetStrokeWidth", *pageObjectHandle.handle, api.EncodeF32(request.StrokeWidth))
+	res, err := p.call("FPDFPageObj_SetStrokeWidth", *pageObjectHandle.handle, EncodeF32(request.StrokeWidth))
 	if err != nil {
 		return nil, err
 	}
@@ -1753,7 +1751,7 @@ func (p *PdfiumImplementation) FPDFPath_MoveTo(request *requests.FPDFPath_MoveTo
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPath_MoveTo", *pageObjectHandle.handle, api.EncodeF32(request.X), api.EncodeF32(request.Y))
+	res, err := p.call("FPDFPath_MoveTo", *pageObjectHandle.handle, EncodeF32(request.X), EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1776,7 +1774,7 @@ func (p *PdfiumImplementation) FPDFPath_LineTo(request *requests.FPDFPath_LineTo
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPath_LineTo", *pageObjectHandle.handle, api.EncodeF32(request.X), api.EncodeF32(request.Y))
+	res, err := p.call("FPDFPath_LineTo", *pageObjectHandle.handle, EncodeF32(request.X), EncodeF32(request.Y))
 	if err != nil {
 		return nil, err
 	}
@@ -1799,7 +1797,7 @@ func (p *PdfiumImplementation) FPDFPath_BezierTo(request *requests.FPDFPath_Bezi
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPath_BezierTo", *pageObjectHandle.handle, api.EncodeF32(request.X1), api.EncodeF32(request.Y1), api.EncodeF32(request.X2), api.EncodeF32(request.Y2), api.EncodeF32(request.X3), api.EncodeF32(request.Y3))
+	res, err := p.call("FPDFPath_BezierTo", *pageObjectHandle.handle, EncodeF32(request.X1), EncodeF32(request.Y1), EncodeF32(request.X2), EncodeF32(request.Y2), EncodeF32(request.X3), EncodeF32(request.Y3))
 	if err != nil {
 		return nil, err
 	}
@@ -1924,7 +1922,7 @@ func (p *PdfiumImplementation) FPDFPageObj_NewTextObj(request *requests.FPDFPage
 	font, err := p.CString(request.Font)
 	defer font.Free()
 
-	res, err := p.call("FPDFPageObj_NewTextObj", *documentHandle.handle, font.Pointer, api.EncodeF32(request.FontSize))
+	res, err := p.call("FPDFPageObj_NewTextObj", *documentHandle.handle, font.Pointer, EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}
@@ -2115,7 +2113,7 @@ func (p *PdfiumImplementation) FPDFPageObj_CreateTextObj(request *requests.FPDFP
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPageObj_CreateTextObj", *documentHandle.handle, *fontHandle.handle, api.EncodeF32(request.FontSize))
+	res, err := p.call("FPDFPageObj_CreateTextObj", *documentHandle.handle, *fontHandle.handle, EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}
@@ -2182,7 +2180,7 @@ func (p *PdfiumImplementation) FPDFTextObj_GetText(request *requests.FPDFTextObj
 	}
 	defer charDataPointer.Free()
 
-	res, err = p.call("FPDFTextObj_GetText", *pageObjectHandle.handle, *textPageHandle.handle, charDataPointer.Pointer, api.EncodeI32(textSize))
+	res, err = p.call("FPDFTextObj_GetText", *pageObjectHandle.handle, *textPageHandle.handle, charDataPointer.Pointer, EncodeI32(textSize))
 	if err != nil {
 		return nil, err
 	}
@@ -3071,7 +3069,7 @@ func (p *PdfiumImplementation) FPDFPageObjMark_SetFloatParam(request *requests.F
 	}
 	defer keyPointer.Free()
 
-	res, err := p.call("FPDFPageObjMark_SetFloatParam", *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, api.EncodeF32(request.Value))
+	res, err := p.call("FPDFPageObjMark_SetFloatParam", *documentHandle.handle, *pageObjectHandle.handle, *pageObjectMarkHandle.handle, keyPointer.Pointer, EncodeF32(request.Value))
 	if err != nil {
 		return nil, err
 	}
@@ -3395,7 +3393,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashPhase(request *requests.FPDFPa
 		return nil, err
 	}
 
-	res, err := p.call("FPDFPageObj_SetDashPhase", *pageObjectHandle.handle, api.EncodeF32(request.DashPhase))
+	res, err := p.call("FPDFPageObj_SetDashPhase", *pageObjectHandle.handle, EncodeF32(request.DashPhase))
 	if err != nil {
 		return nil, err
 	}
@@ -3503,7 +3501,7 @@ func (p *PdfiumImplementation) FPDFPageObj_SetDashArray(request *requests.FPDFPa
 		p.Module.Memory().WriteFloat32Le(uint32(valueDataPointer.Pointer+(p.CSizeFloat()*uint64(i))), request.DashArray[i])
 	}
 
-	_, err = p.call("FPDFPageObj_SetDashArray", *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize, api.EncodeF32(request.DashPhase))
+	_, err = p.call("FPDFPageObj_SetDashArray", *pageObjectHandle.handle, valueDataPointer.Pointer, dashCountSize, EncodeF32(request.DashPhase))
 	if err != nil {
 		return nil, err
 	}
@@ -3656,7 +3654,7 @@ func (p *PdfiumImplementation) FPDFTextObj_GetRenderedBitmap(request *requests.F
 		pageHandle = *pageHandleReference.handle
 	}
 
-	res, err := p.call("FPDFTextObj_GetRenderedBitmap", *documentHandle.handle, pageHandle, *pageObjectHandle.handle, api.EncodeF32(request.Scale))
+	res, err := p.call("FPDFTextObj_GetRenderedBitmap", *documentHandle.handle, pageHandle, *pageObjectHandle.handle, EncodeF32(request.Scale))
 	if err != nil {
 		return nil, err
 	}
@@ -4016,7 +4014,7 @@ func (p *PdfiumImplementation) FPDFFont_GetAscent(request *requests.FPDFFont_Get
 		return nil, err
 	}
 
-	res, err := p.call("FPDFFont_GetAscent", *fontHandle.handle, api.EncodeF32(request.FontSize), ascentPointer.Pointer)
+	res, err := p.call("FPDFFont_GetAscent", *fontHandle.handle, EncodeF32(request.FontSize), ascentPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -4054,7 +4052,7 @@ func (p *PdfiumImplementation) FPDFFont_GetDescent(request *requests.FPDFFont_Ge
 		return nil, err
 	}
 
-	res, err := p.call("FPDFFont_GetDescent", *fontHandle.handle, api.EncodeF32(request.FontSize), descentPointer.Pointer)
+	res, err := p.call("FPDFFont_GetDescent", *fontHandle.handle, EncodeF32(request.FontSize), descentPointer.Pointer)
 	if err != nil {
 		return nil, err
 	}
@@ -4245,7 +4243,7 @@ func (p *PdfiumImplementation) FPDFTextObj_SetFontSize(request *requests.FPDFTex
 		return nil, err
 	}
 
-	res, err := p.call("FPDFTextObj_SetFontSize", *pageObjectHandle.handle, api.EncodeF32(request.FontSize))
+	res, err := p.call("FPDFTextObj_SetFontSize", *pageObjectHandle.handle, EncodeF32(request.FontSize))
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,11 @@
-package webassembly
+// Package wazy is a WebAssembly backend for go-pdfium that runs the PDFium
+// WebAssembly module with the wazy runtime (github.com/samyfodil/wazy), a pure
+// Go runtime derived from wazero with a compiler for amd64 and arm64 and an
+// interpreter for every other platform. It is an alternative to the
+// webassembly package and exposes the same pool API and configuration.
+//
+// This backend is experimental: wazy itself is young and its API may change.
+package wazy
 
 import (
 	goctx "context"
@@ -16,14 +23,13 @@ import (
 	"github.com/klippa-app/go-pdfium"
 	"github.com/klippa-app/go-pdfium/internal/implementation_webassembly"
 	"github.com/klippa-app/go-pdfium/internal/pdfium_wasm"
-	"github.com/klippa-app/go-pdfium/webassembly/imports"
 
 	"github.com/google/uuid"
 	pool "github.com/jolestar/go-commons-pool/v2"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/experimental"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	wazyrt "github.com/samyfodil/wazy"
+	"github.com/samyfodil/wazy/api"
+
+	"github.com/samyfodil/wazy/imports/wasi_snapshot_preview1"
 )
 
 type worker struct {
@@ -35,7 +41,7 @@ type worker struct {
 }
 
 type Config struct {
-	// Context is used to initialize the wazero runtime and as the parent
+	// Context is used to initialize the wazy runtime and as the parent
 	// context for its workers. It must remain valid for the lifetime of the
 	// pool. If nil, context.Background is used.
 	Context       goctx.Context
@@ -43,8 +49,8 @@ type Config struct {
 	MaxIdle       int
 	MaxTotal      int
 	WASM          []byte
-	FSConfig      wazero.FSConfig
-	RuntimeConfig wazero.RuntimeConfig
+	FSConfig      wazyrt.FSConfig
+	RuntimeConfig wazyrt.RuntimeConfig
 	Stdout        io.Writer
 	Stderr        io.Writer
 	RandomSource  io.Reader
@@ -52,8 +58,8 @@ type Config struct {
 }
 
 type pdfiumPool struct {
-	runtime        wazero.Runtime
-	compiledModule wazero.CompiledModule
+	runtime        wazyrt.Runtime
+	compiledModule wazyrt.CompiledModule
 	workerPool     *pool.ObjectPool
 	instanceRefs   map[string]*pdfiumInstance
 	poolRef        string
@@ -65,7 +71,8 @@ type pdfiumPool struct {
 var poolRefs = map[string]*pdfiumPool{}
 var multiThreadedMutex = &sync.Mutex{}
 
-// Init will return a multithreaded webassembly pool.
+// Init will return a multithreaded wazy pool running the embedded PDFium
+// module.
 // It will launch a new worker for every requested instance as long as the limits
 // allow it. If the pool has been exhausted. It will wait until a worker becomes
 // available. So it's important that you close instances when you're done with them.
@@ -91,7 +98,7 @@ func InitWithWASM(config Config) (pdfium.Pool, error) {
 func initWithConfig(config Config) (pdfium.Pool, error) {
 	// Mount the full root by default.
 	if config.FSConfig == nil {
-		config.FSConfig = wazero.NewFSConfig()
+		config.FSConfig = wazyrt.NewFSConfig()
 
 		// On Windows we mount the volume of the current working directory as
 		// root. On Linux we mount / as root.
@@ -127,8 +134,8 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 		// exception handling instructions, so the exception handling core
 		// feature is required. When passing a custom RuntimeConfig, include
 		// this feature in the same way.
-		config.RuntimeConfig = wazero.NewRuntimeConfig().WithCoreFeatures(
-			api.CoreFeaturesV2 | experimental.CoreFeaturesExceptionHandling)
+		config.RuntimeConfig = wazyrt.NewRuntimeConfig().WithCoreFeatures(
+			api.CoreFeaturesV2 | api.CoreFeatureExceptionHandling)
 	}
 
 	poolContext := config.Context
@@ -136,7 +143,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 		poolContext = goctx.Background()
 	}
 
-	runtime := wazero.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
+	runtime := wazyrt.NewRuntimeWithConfig(poolContext, config.RuntimeConfig)
 
 	// Import WASI features.
 	if _, err := wasi_snapshot_preview1.Instantiate(poolContext, runtime); err != nil {
@@ -151,7 +158,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 	}
 
 	// Add basic Emscripten specific methods.
-	if _, err := imports.Instantiate(poolContext, runtime, compiledModule); err != nil {
+	if _, err := instantiateEnv(poolContext, runtime, compiledModule); err != nil {
 		runtime.Close(poolContext)
 		return nil, fmt.Errorf("could not instantiate webassembly emscripten/env module: %w", err)
 	}
@@ -164,7 +171,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 				Cancel:  cancel,
 			}
 
-			moduleConfig := wazero.NewModuleConfig().
+			moduleConfig := wazyrt.NewModuleConfig().
 				WithStartFunctions("_initialize").
 				WithStdout(config.Stdout).
 				WithStderr(config.Stderr).
@@ -179,7 +186,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 
 			newWorker.Module = mod
 
-			module := imports.NewModule(mod)
+			module := newModule(mod)
 			malloc := module.ExportedFunction("malloc")
 			if malloc == nil {
 				return nil, fmt.Errorf("could not find malloc in exported methods")

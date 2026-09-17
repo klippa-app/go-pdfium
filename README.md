@@ -677,6 +677,83 @@ We actively monitor PDFium API additions/changes/deletions and apply them in the
 
 The WebAssembly build will always be the latest PDFium version that we added support for.
 
+### WebAssembly with Wago (experimental)
+
+Next to wazero there is an experimental backend that runs the same embedded PDFium WebAssembly module with the
+[Wago runtime](https://github.com/wago-org/wago), a pure Go ahead-of-time compiler. It lives in the
+`experimental/wago` package and exposes the same pool API as the `webassembly` package, so switching between the two
+is a matter of changing the import and the `Init` call:
+
+```go
+package renderer
+
+import (
+	"log"
+	"time"
+
+	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/experimental/wago"
+)
+
+var pool pdfium.Pool
+var instance pdfium.Pdfium
+
+func init() {
+	var err error
+	pool, err = wago.Init(wago.Config{
+		MinIdle:  1,
+		MaxIdle:  1,
+		MaxTotal: 1,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	instance, err = pool.GetInstance(time.Second * 30)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+Wago compiles the module about ten times faster than wazero's compiler and runs it a bit faster, but it is still in
+beta and this backend is experimental for the following reasons:
+
+- Wago's arm64 backend can not compile the PDFium module yet because of a register allocation bug in wago
+  (`no V register available to spill` in agg's `curve4_div::recursive_bezier`), so at the moment this backend only
+  works on amd64. `Init` returns an error on other architectures.
+- Wago's amd64 backend miscompiles something around Little-CMS's `PackLabDoubleFromFloat`, which makes a page with an
+  ICC based colour space (`alpha_channel.pdf` in the test suite) render with a black instead of a white background.
+  Everything else in the go-pdfium test suite produces the same output as wazero and native PDFium.
+- The API of Wago itself is not stable yet.
+
+Filesystem access works through Wago's WASI plugin. Use `Mounts` in the config to choose which host directories PDFium
+can see, by default the root of the disk is mounted read/write like in the wazero backend. All paths have to be
+absolute POSIX paths inside a mount. `Kill` only interrupts a call that is running inside PDFium when
+`InterruptibleCalls` is enabled in the config, which costs a little on every call.
+
+Please be aware that Wago and its WASI plugin come with the `Apache License 2.0` license.
+
+### WebAssembly with wazy (experimental)
+
+There is also an experimental backend on the [wazy runtime](https://github.com/samyfodil/wazy), a pure Go runtime
+derived from wazero that keeps the same API and adds WebAssembly 3.0 and component model support. It lives in the
+`experimental/wazy` package, takes the same configuration as the `webassembly` package (with wazy's `RuntimeConfig`
+and `FSConfig` types), runs the complete go-pdfium test suite with the same results as wazero on amd64 and arm64, and
+also has an interpreter for other platforms:
+
+```go
+pool, err := wazy.Init(wazy.Config{
+	MinIdle:  1,
+	MaxIdle:  1,
+	MaxTotal: 1,
+})
+```
+
+It is marked experimental because wazy itself is young and its API may still change. Like wazero it comes with the
+`Apache License 2.0` license. A comparison of the two runtimes, including a 5,000 document real world corpus, is in
+[experimental/BENCHMARKS.md](experimental/BENCHMARKS.md).
+
 ## `io.ReadSeeker` and `io.Writer`
 
 Document loading allows you to load a document with a `io.ReadSeeker`. Please be aware that this only works efficiently

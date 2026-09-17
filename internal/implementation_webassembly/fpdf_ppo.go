@@ -8,8 +8,6 @@ import (
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 // FPDF_ImportPages imports some pages from one PDF document to another one.
@@ -138,7 +136,7 @@ func (p *PdfiumImplementation) FPDF_ImportNPagesToOne(request *requests.FPDF_Imp
 		return nil, err
 	}
 
-	res, err := p.call("FPDF_ImportNPagesToOne", *sourceDocHandle.handle, api.EncodeF32(request.OutputWidth), api.EncodeF32(request.OutputHeight), *(*uint64)(unsafe.Pointer(&request.NumPagesOnXAxis)), *(*uint64)(unsafe.Pointer(&request.NumPagesOnYAxis)))
+	res, err := p.call("FPDF_ImportNPagesToOne", *sourceDocHandle.handle, EncodeF32(request.OutputWidth), EncodeF32(request.OutputHeight), *(*uint64)(unsafe.Pointer(&request.NumPagesOnXAxis)), *(*uint64)(unsafe.Pointer(&request.NumPagesOnYAxis)))
 	if err != nil {
 		return nil, err
 	}

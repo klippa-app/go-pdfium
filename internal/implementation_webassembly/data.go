@@ -13,7 +13,6 @@ import (
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/structs"
 
-	"github.com/tetratelabs/wazero/api"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -107,7 +106,7 @@ var FileWriters = struct {
 }
 
 type FileWriterKey struct {
-	Module  api.Module
+	Module  Module
 	Pointer uint32
 }
 

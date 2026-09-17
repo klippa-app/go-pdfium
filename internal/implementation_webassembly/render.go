@@ -17,8 +17,6 @@ import (
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 // getPageSize returns the points size of a page given the PDFium page index.
@@ -707,7 +705,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, pageToRender renderPage
 	// color. This is always the area of the page in the bitmap, also when
 	// cropping, so that the part of a region that falls outside of the page
 	// keeps the background color.
-	_, err = p.call("FPDFBitmap_FillRect", bitmap, api.EncodeI32(0), api.EncodeI32(int32(offset)), api.EncodeI32(int32(width)), api.EncodeI32(int32(height)), fillColor)
+	_, err = p.call("FPDFBitmap_FillRect", bitmap, EncodeI32(0), EncodeI32(int32(offset)), EncodeI32(int32(width)), EncodeI32(int32(height)), fillColor)
 	if err != nil {
 		return 0, false, err
 	}
@@ -730,7 +728,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, pageToRender renderPage
 	}
 
 	// Render the bitmap into the given external bitmap.
-	_, err = p.call("FPDF_RenderPageBitmap", bitmap, *pageHandle.handle, api.EncodeI32(int32(startX)), api.EncodeI32(int32(startY)), api.EncodeI32(int32(sizeX)), api.EncodeI32(int32(sizeY)), api.EncodeI32(0), api.EncodeI32(int32(flags)))
+	_, err = p.call("FPDF_RenderPageBitmap", bitmap, *pageHandle.handle, EncodeI32(int32(startX)), EncodeI32(int32(startY)), EncodeI32(int32(sizeX)), EncodeI32(int32(sizeY)), EncodeI32(0), EncodeI32(int32(flags)))
 	if err != nil {
 		return 0, false, err
 	}
@@ -772,7 +770,7 @@ func (p *PdfiumImplementation) renderPage(bitmap uint64, pageToRender renderPage
 		// The form has to be drawn with the exact same position and size as the
 		// page render, otherwise the form fields end up somewhere else than the
 		// content of the page when cropping.
-		_, err = p.call("FPDF_FFLDraw", formHandle, bitmap, *pageHandle.handle, api.EncodeI32(int32(startX)), api.EncodeI32(int32(startY)), api.EncodeI32(int32(sizeX)), api.EncodeI32(int32(sizeY)), api.EncodeI32(0), api.EncodeI32(int32(flags)))
+		_, err = p.call("FPDF_FFLDraw", formHandle, bitmap, *pageHandle.handle, EncodeI32(int32(startX)), EncodeI32(int32(startY)), EncodeI32(int32(sizeX)), EncodeI32(int32(sizeY)), EncodeI32(0), EncodeI32(int32(flags)))
 		if err != nil {
 			return 0, false, err
 		}
