@@ -283,9 +283,8 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 
 		rectsCount := *(*int32)(unsafe.Pointer(&res[0]))
 
-		extractor := textextract.New(extractChars)
-
-		for i := 0; i < int(rectsCount); i++ {
+		rects := make([]textextract.Rect, int(rectsCount))
+		for i := range rects {
 			_, err = p.call("FPDFText_GetRect", textPage, uint64(i), leftPointer.Pointer, topPointer.Pointer, rightPointer.Pointer, bottomPointer.Pointer)
 			if err != nil {
 				return nil, err
@@ -311,27 +310,34 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 				return nil, err
 			}
 
+			// PDFium computes the rects in float32, the round-trip is lossless.
+			rects[i] = textextract.Rect{Left: float32(left), Top: float32(top), Right: float32(right), Bottom: float32(bottom)}
+		}
+
+		extractor := textextract.New(extractChars)
+
+		// All chars of a rect share one text object and thus one font, so the
+		// first char of the rect gives the font of the rect.
+		var firstChars []int
+		if request.CollectFontInformation {
+			firstChars = extractor.FirstCharIndices(rects)
+		}
+
+		for i, rect := range rects {
 			char := &responses.GetPageTextStructuredRect{
-				Text: extractor.TextInRect(float32(left), float32(top), float32(right), float32(bottom)),
+				Text: extractor.TextInRect(rect.Left, rect.Top, rect.Right, rect.Bottom),
 				PointPosition: responses.CharPosition{
-					Left:   float64(left),
-					Top:    float64(top),
-					Right:  float64(right),
-					Bottom: float64(bottom),
+					Left:   float64(rect.Left),
+					Top:    float64(rect.Top),
+					Right:  float64(rect.Right),
+					Bottom: float64(rect.Bottom),
 				},
 			}
 
 			if request.CollectFontInformation {
-				// Find index of the first letter of the rect.
-				// @todo: is 5 a "valid" tolerance?
-				tolerance := float64(5)
-				res, err = p.call("FPDFText_GetCharIndexAtPos", textPage, *(*uint64)(unsafe.Pointer(&char.PointPosition.Left)), *(*uint64)(unsafe.Pointer(&char.PointPosition.Top)), *(*uint64)(unsafe.Pointer(&tolerance)), *(*uint64)(unsafe.Pointer(&tolerance)))
-				if err != nil {
-					return nil, err
-				}
-
-				charIndex := *(*int32)(unsafe.Pointer(&res[0]))
-				fontInfo, err := p.getFontInformation(textPage, int(charIndex))
+				// When no char is found the index is -1 and PDFium reports
+				// zero values, which is what this always returned in that case.
+				fontInfo, err := p.getFontInformation(textPage, firstChars[i])
 				if err != nil {
 					return nil, err
 				}
