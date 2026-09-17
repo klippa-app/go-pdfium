@@ -1,0 +1,32 @@
+name: WebAssembly runtime benchmark
+
+# Runs the runtime comparison in experimental/benchmark on a real amd64 and a
+# real arm64 machine, on demand. The results are uploaded as artifacts, see
+# experimental/BENCHMARKS.md for how to summarize them.
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, ubuntu-24.04-arm ]
+    env:
+      CGO_ENABLED: "0"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+      - name: Run the benchmarks
+        run: |
+          go test -run '^$' -bench . -benchmem -count 5 -timeout 120m ./experimental/benchmark | tee benchmark-${{ matrix.os }}.txt
+      - name: Archive results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-${{ matrix.os }}
+          path: benchmark-${{ matrix.os }}.txt

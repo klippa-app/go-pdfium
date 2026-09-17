@@ -751,7 +751,8 @@ pool, err := wazy.Init(wazy.Config{
 ```
 
 It is marked experimental because wazy itself is young and its API may still change. Like wazero it comes with the
-`Apache License 2.0` license.
+`Apache License 2.0` license. A comparison of the two runtimes, including a 5,000 document real world corpus, is in
+[experimental/BENCHMARKS.md](experimental/BENCHMARKS.md).
 
 ## `io.ReadSeeker` and `io.Writer`
 
