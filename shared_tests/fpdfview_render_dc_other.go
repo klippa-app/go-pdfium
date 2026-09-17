@@ -24,6 +24,11 @@ var _ = Describe("fpdfview FPDF_RenderPage", func() {
 			DC:   uintptr(1),
 			Page: requests.Page{ByIndex: &requests.PageByIndex{Index: 0}},
 		})
-		Expect(err).To(MatchError(pdfium_errors.ErrWindowsUnsupported))
+		if TestType == "multi" {
+			// A device context handle can't cross the process boundary.
+			Expect(err).To(MatchError("unsupported method on multi-threaded usage"))
+		} else {
+			Expect(err).To(MatchError(pdfium_errors.ErrWindowsUnsupported))
+		}
 	})
 })

@@ -11,12 +11,16 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/klippa-app/go-pdfium/enums"
+	pdfium_errors "github.com/klippa-app/go-pdfium/errors"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 )
 
 // FPDF_RenderPage draws to a Windows device context. The handle is passed
 // the way the Windows API hands it out, so a caller never needs the C type.
+// Only the in-process CGO backends can do this: the WebAssembly runtime has
+// no access to GDI, and a device context handle can't cross the process
+// boundary of the multi-threaded backend.
 var _ = Describe("fpdfview FPDF_RenderPage", func() {
 	BeforeEach(func() {
 		Locker.Lock()
@@ -26,10 +30,30 @@ var _ = Describe("fpdfview FPDF_RenderPage", func() {
 		Locker.Unlock()
 	})
 
+	It("is reported as unsupported on the WebAssembly and multi-threaded backends", func() {
+		if TestType != "webassembly" && TestType != "multi" {
+			Skip("FPDF_RenderPage is supported on this backend")
+		}
+
+		_, err := PdfiumInstance.FPDF_RenderPage(&requests.FPDF_RenderPage{
+			DC:   uintptr(1),
+			Page: requests.Page{ByIndex: &requests.PageByIndex{Index: 0}},
+		})
+		if TestType == "multi" {
+			Expect(err).To(MatchError("unsupported method on multi-threaded usage"))
+		} else {
+			Expect(err).To(MatchError(pdfium_errors.ErrWindowsUnsupported))
+		}
+	})
+
 	Context("a normal PDF file", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
+			if TestType == "webassembly" || TestType == "multi" {
+				Skip("FPDF_RenderPage is not supported on this backend")
+			}
+
 			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
@@ -42,6 +66,10 @@ var _ = Describe("fpdfview FPDF_RenderPage", func() {
 		})
 
 		AfterEach(func() {
+			if TestType == "webassembly" || TestType == "multi" {
+				Skip("FPDF_RenderPage is not supported on this backend")
+			}
+
 			_, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
 				Document: doc,
 			})
