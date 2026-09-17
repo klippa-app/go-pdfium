@@ -3259,6 +3259,20 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	return i.pdfium.FPDFPageObj_GetMatrix(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (resp *responses.FPDFPageObj_GetRenderedStrokePattern, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRenderedStrokePattern", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_GetRenderedStrokePattern(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (resp *responses.FPDFPageObj_GetRotatedBounds, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

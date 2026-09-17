@@ -1835,6 +1835,14 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	return i.worker.plugin.FPDFPageObj_GetMatrix(request)
 }
 
+func (i *pdfiumInstance) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_GetRenderedStrokePattern(request)
+}
+
 func (i *pdfiumInstance) FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")

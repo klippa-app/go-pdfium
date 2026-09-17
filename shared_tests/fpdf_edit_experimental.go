@@ -74,6 +74,12 @@ var _ = Describe("fpdf_edit", func() {
 				Expect(FPDFTextObj_GetRenderedBitmap).To(BeNil())
 			})
 
+			It("returns an error when calling FPDFPageObj_GetRenderedStrokePattern", func() {
+				FPDFPageObj_GetRenderedStrokePattern, err := PdfiumInstance.FPDFPageObj_GetRenderedStrokePattern(&requests.FPDFPageObj_GetRenderedStrokePattern{})
+				Expect(err).To(MatchError("document not given"))
+				Expect(FPDFPageObj_GetRenderedStrokePattern).To(BeNil())
+			})
+
 			It("returns an error when calling FPDF_MovePages", func() {
 				FPDF_MovePages, err := PdfiumInstance.FPDF_MovePages(&requests.FPDF_MovePages{})
 				Expect(err).To(MatchError("document not given"))
@@ -2501,6 +2507,99 @@ end
 					Expect(char1Origin.X - char0Origin.X).To(BeNumerically("~", expectedDiff, 0.01))
 				})
 			})
+		})
+	})
+
+	Context("a PDF file with a tiling pattern stroke", func() {
+		// firstPathObject opens the file and returns the document and the
+		// path object that is stroked with the pattern.
+		firstPathObject := func(file string) (references.FPDF_DOCUMENT, references.FPDF_PAGEOBJECT) {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/" + file)
+			Expect(err).To(BeNil())
+
+			doc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			pageObject, err := PdfiumInstance.FPDFPage_GetObject(&requests.FPDFPage_GetObject{
+				Page: requests.Page{
+					ByIndex: &requests.PageByIndex{
+						Document: doc.Document,
+						Index:    0,
+					},
+				},
+				Index: 0,
+			})
+			Expect(err).To(BeNil())
+
+			objectType, err := PdfiumInstance.FPDFPageObj_GetType(&requests.FPDFPageObj_GetType{
+				PageObject: pageObject.PageObject,
+			})
+			Expect(err).To(BeNil())
+			Expect(objectType.Type).To(Equal(enums.FPDF_PAGEOBJ_PATH))
+
+			return doc.Document, pageObject.PageObject
+		}
+
+		// expectRenderedPattern renders the stroke pattern of the object and
+		// checks that a real bitmap came back.
+		expectRenderedPattern := func(doc references.FPDF_DOCUMENT, pageObject references.FPDF_PAGEOBJECT) {
+			FPDFPageObj_GetRenderedStrokePattern, err := PdfiumInstance.FPDFPageObj_GetRenderedStrokePattern(&requests.FPDFPageObj_GetRenderedStrokePattern{
+				Document:   doc,
+				PageObject: pageObject,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFPageObj_GetRenderedStrokePattern).ToNot(BeNil())
+			Expect(FPDFPageObj_GetRenderedStrokePattern.Bitmap).ToNot(BeEmpty())
+
+			width, err := PdfiumInstance.FPDFBitmap_GetWidth(&requests.FPDFBitmap_GetWidth{Bitmap: FPDFPageObj_GetRenderedStrokePattern.Bitmap})
+			Expect(err).To(BeNil())
+			Expect(width.Width).To(BeNumerically(">", 0))
+
+			height, err := PdfiumInstance.FPDFBitmap_GetHeight(&requests.FPDFBitmap_GetHeight{Bitmap: FPDFPageObj_GetRenderedStrokePattern.Bitmap})
+			Expect(err).To(BeNil())
+			Expect(height.Height).To(BeNumerically(">", 0))
+
+			_, err = PdfiumInstance.FPDFBitmap_Destroy(&requests.FPDFBitmap_Destroy{Bitmap: FPDFPageObj_GetRenderedStrokePattern.Bitmap})
+			Expect(err).To(BeNil())
+		}
+
+		It("renders a colored stroke pattern", func() {
+			doc, pageObject := firstPathObject("pattern_stroke.pdf")
+			defer PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc})
+
+			expectRenderedPattern(doc, pageObject)
+		})
+
+		It("renders an uncolored stroke pattern", func() {
+			doc, pageObject := firstPathObject("pattern_stroke_uncolored.pdf")
+			defer PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc})
+
+			expectRenderedPattern(doc, pageObject)
+		})
+
+		It("returns an error without a page object", func() {
+			doc, _ := firstPathObject("pattern_stroke.pdf")
+			defer PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc})
+
+			FPDFPageObj_GetRenderedStrokePattern, err := PdfiumInstance.FPDFPageObj_GetRenderedStrokePattern(&requests.FPDFPageObj_GetRenderedStrokePattern{
+				Document: doc,
+			})
+			Expect(err).To(MatchError("pageObject not given"))
+			Expect(FPDFPageObj_GetRenderedStrokePattern).To(BeNil())
+		})
+
+		It("returns an error for a path that is not stroked with a pattern", func() {
+			doc, pageObject := firstPathObject("rectangles.pdf")
+			defer PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc})
+
+			FPDFPageObj_GetRenderedStrokePattern, err := PdfiumInstance.FPDFPageObj_GetRenderedStrokePattern(&requests.FPDFPageObj_GetRenderedStrokePattern{
+				Document:   doc,
+				PageObject: pageObject,
+			})
+			Expect(err).To(MatchError("could not render stroke pattern as bitmap"))
+			Expect(FPDFPageObj_GetRenderedStrokePattern).To(BeNil())
 		})
 	})
 })

@@ -183,6 +183,18 @@ func (p *PdfiumImplementation) FPDFImageObj_GetRenderedBitmap(request *requests.
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFPageObj_GetRenderedStrokePattern returns a bitmap rasterization of the
+// stroke pattern of the given page object.
+// To render correctly, the caller must provide the document associated with
+// the page object. The returned bitmap will be owned by the caller, and
+// FPDFBitmap_Destroy() must be called on the returned bitmap when it is no
+// longer needed.
+// Returns an error when the stroke is not a tiling pattern or on failure.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
 // Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
 // object. When the object is rotated by a non-multiple of 90 degrees, this API

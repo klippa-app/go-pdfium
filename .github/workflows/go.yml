@@ -17,9 +17,9 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         go: [ "1.26", "1.27" ]
-        pdfium: [ "4849", "8044" ]
+        pdfium: [ "4849", "8057" ]
     env:
-      PDFIUM_EXPERIMENTAL_VERSION: "8044"
+      PDFIUM_EXPERIMENTAL_VERSION: "8057"
       PDFIUM_EXPERIMENTAL_GO_VERSION: "1.27"
     runs-on: ${{ matrix.os }}
     steps:

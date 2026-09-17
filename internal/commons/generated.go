@@ -244,6 +244,7 @@ type Pdfium interface {
 	FPDFPageObj_GetMark(*requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
 	FPDFPageObj_GetMarkedContentID(*requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error)
 	FPDFPageObj_GetMatrix(*requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error)
+	FPDFPageObj_GetRenderedStrokePattern(*requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error)
 	FPDFPageObj_GetRotatedBounds(*requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
 	FPDFPageObj_GetStrokeColor(*requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error)
 	FPDFPageObj_GetStrokeWidth(*requests.FPDFPageObj_GetStrokeWidth) (*responses.FPDFPageObj_GetStrokeWidth, error)
@@ -2802,6 +2803,16 @@ func (g *PdfiumRPC) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj
 func (g *PdfiumRPC) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
 	resp := &responses.FPDFPageObj_GetMatrix{}
 	err := g.client.Call("Plugin.FPDFPageObj_GetMatrix", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error) {
+	resp := &responses.FPDFPageObj_GetRenderedStrokePattern{}
+	err := g.client.Call("Plugin.FPDFPageObj_GetRenderedStrokePattern", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -9397,6 +9408,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Ge
 	}()
 
 	implResp, err := s.Impl.FPDFPageObj_GetMatrix(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern, resp *responses.FPDFPageObj_GetRenderedStrokePattern) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRenderedStrokePattern", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_GetRenderedStrokePattern(request)
 	if err != nil {
 		return err
 	}
