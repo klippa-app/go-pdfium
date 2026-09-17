@@ -734,6 +734,16 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObj_GetRotatedBounds(request *requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
 
+	// FPDFPageObj_GetRenderedStrokePattern returns a bitmap rasterization of the
+	// stroke pattern of the given page object.
+	// To render correctly, the caller must provide the document associated with
+	// the page object. The returned bitmap will be owned by the caller, and
+	// FPDFBitmap_Destroy() must be called on the returned bitmap when it is no
+	// longer needed.
+	// Returns an error when the stroke is not a tiling pattern or on failure.
+	// Experimental API.
+	FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error)
+
 	// FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
 	// Experimental API.
 	FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error)

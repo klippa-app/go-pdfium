@@ -377,6 +377,11 @@ type FPDFPageObj_GetFillColor struct {
 	PageObject references.FPDF_PAGEOBJECT
 }
 
+type FPDFPageObj_GetRenderedStrokePattern struct {
+	Document   references.FPDF_DOCUMENT   // Handle to the document containing the page object.
+	PageObject references.FPDF_PAGEOBJECT // Handle to the page object.
+}
+
 type FPDFPageObj_GetRotatedBounds struct {
 	PageObject references.FPDF_PAGEOBJECT
 }

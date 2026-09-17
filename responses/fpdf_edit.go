@@ -231,6 +231,10 @@ type FPDFPageObj_GetFillColor struct {
 	FillColor structs.FPDF_COLOR
 }
 
+type FPDFPageObj_GetRenderedStrokePattern struct {
+	Bitmap references.FPDF_BITMAP
+}
+
 type FPDFPageObj_GetRotatedBounds struct {
 	QuadPoints structs.FPDF_FS_QUADPOINTSF
 }
