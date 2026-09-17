@@ -265,7 +265,7 @@ type FPDF_SetPrintMode struct {
 }
 
 type FPDF_RenderPage struct {
-	DC     any // Handle to the device context. This should be of type C.HDC, which is a device (screen, bitmap, or printer).
+	DC     any // Handle to the Windows device context (screen, bitmap, or printer) to render to. Give the HDC as it comes from the Windows API: a uintptr or syscall.Handle (for example from GetDC, CreateCompatibleDC or golang.org/x/sys/windows), or an unsafe.Pointer. Windows only, CGO only.
 	Page   Page
 	StartX int                      // Left pixel position of the display area in bitmap coordinates.
 	StartY int                      // Top pixel position of the display area in bitmap coordinates.
