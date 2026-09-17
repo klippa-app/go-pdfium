@@ -73,7 +73,7 @@ var _ = Describe("JPEG encoding", func() {
 			"<< /ExtGState << /GS1 << /Type /ExtGState /BM /Screen /ca 0.5 >> >> >>")
 
 		// Render twice to make sure the bitmap of the first render was released.
-		for attempt := 0; attempt < 2; attempt++ {
+		for attempt := range 2 {
 			By(fmt.Sprintf("render %d", attempt+1))
 			resp, err := instance.RenderToFile(&requests.RenderToFile{
 				RenderPageInPixels: &requests.RenderPageInPixels{

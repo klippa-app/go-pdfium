@@ -1,5 +1,4 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
@@ -8,7 +7,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
+	"os"
 	"time"
 	"unsafe"
 
@@ -100,7 +99,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 	type FormHistory struct {
 		Name string
-		Args []interface{}
+		Args []any
 	}
 
 	type FormTicker struct {
@@ -176,14 +175,14 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				return
 			}
 
-			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			os.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
 			renderCount++
 			//log.Println("did render")
 		}
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -204,25 +203,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -250,7 +249,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -275,7 +274,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -283,39 +282,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -331,7 +330,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -851,14 +850,14 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				return
 			}
 
-			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_annotation-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			os.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_annotation-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
 			renderCount++
 			//log.Println("did render")
 		}
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annotiter.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annotiter.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -879,25 +878,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -925,7 +924,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -950,7 +949,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -958,39 +957,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -1006,7 +1005,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -1284,7 +1283,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_color.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_color.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1305,25 +1304,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -1351,7 +1350,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -1376,7 +1375,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -1384,39 +1383,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -1432,7 +1431,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -1638,14 +1637,14 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				return
 			}
 
-			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_combobox-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			os.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_combobox-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
 			renderCount++
 			//log.Println("did render")
 		}
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/combobox_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/combobox_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1666,25 +1665,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -1712,7 +1711,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -1737,7 +1736,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -1745,39 +1744,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -1793,7 +1792,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -2081,14 +2080,14 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 				return
 			}
 
-			ioutil.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_combobox-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
+			os.WriteFile(TestDataPath+"/testdata/"+fmt.Sprintf("render_fpdf_formfill_experimental_combobox-%d.jpg", renderCount), imgBuf.Bytes(), 0777)
 			renderCount++
 			//log.Println("did render")
 		}
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2109,25 +2108,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -2155,7 +2154,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -2180,7 +2179,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -2188,39 +2187,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -2236,7 +2235,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -2437,7 +2436,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annots.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annots.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2458,25 +2457,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -2504,7 +2503,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -2529,7 +2528,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -2537,39 +2536,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -2674,7 +2673,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/freetext_annotation_without_da.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/freetext_annotation_without_da.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2695,25 +2694,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -2741,7 +2740,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -2766,7 +2765,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -2774,39 +2773,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},
@@ -2822,7 +2821,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 			fileSize := stride * height
 			var buffer []byte
-			var pointer interface{}
+			var pointer any
 
 			if TestType == "single" || TestType == "internal" {
 				buffer = make([]byte, fileSize)
@@ -2983,7 +2982,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 
 		BeforeEach(func() {
 			formHistory = []FormHistory{}
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3004,25 +3003,25 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_Invalidate",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_OutputSelectedRect: func(page references.FPDF_PAGE, left, top, right, bottom float64) {
 						addToHistory(FormHistory{
 							Name: "FFI_OutputSelectedRect",
-							Args: []interface{}{page, left, top, right, bottom},
+							Args: []any{page, left, top, right, bottom},
 						})
 					},
 					FFI_SetCursor: func(cursorType enums.FXCT) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetCursor",
-							Args: []interface{}{cursorType},
+							Args: []any{cursorType},
 						})
 					},
 					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTimer",
-							Args: []interface{}{elapse},
+							Args: []any{elapse},
 						})
 
 						ticker := time.NewTicker(time.Duration(elapse) * time.Millisecond)
@@ -3050,7 +3049,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_KillTimer: func(timerID int) {
 						addToHistory(FormHistory{
 							Name: "FFI_KillTimer",
-							Args: []interface{}{timerID},
+							Args: []any{timerID},
 						})
 
 						_, ok := timers[timerID]
@@ -3075,7 +3074,7 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetPage",
-							Args: []interface{}{document, index},
+							Args: []any{document, index},
 						})
 
 						return nil
@@ -3083,39 +3082,39 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 					FFI_GetCurrentPage: func(document references.FPDF_DOCUMENT) *references.FPDF_PAGE {
 						addToHistory(FormHistory{
 							Name: "FFI_GetCurrentPage",
-							Args: []interface{}{document},
+							Args: []any{document},
 						})
 						return nil
 					},
 					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
 						addToHistory(FormHistory{
 							Name: "FFI_GetRotation",
-							Args: []interface{}{page},
+							Args: []any{page},
 						})
 						return enums.FPDF_PAGE_ROTATION_NONE
 					},
 					FFI_ExecuteNamedAction: func(namedAction string) {
 						addToHistory(FormHistory{
 							Name: "FFI_ExecuteNamedAction",
-							Args: []interface{}{namedAction},
+							Args: []any{namedAction},
 						})
 					},
 					FFI_SetTextFieldFocus: func(value string, isFocus bool) {
 						addToHistory(FormHistory{
 							Name: "FFI_SetTextFieldFocus",
-							Args: []interface{}{value, isFocus},
+							Args: []any{value, isFocus},
 						})
 					},
 					FFI_DoURIAction: func(bsURI string) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoURIAction",
-							Args: []interface{}{bsURI},
+							Args: []any{bsURI},
 						})
 					},
 					FFI_DoGoToAction: func(pageIndex int, zoomMode enums.FPDF_ZOOM_MODE, pos []float32) {
 						addToHistory(FormHistory{
 							Name: "FFI_DoGoToAction",
-							Args: []interface{}{pageIndex, zoomMode, pos},
+							Args: []any{pageIndex, zoomMode, pos},
 						})
 					},
 				},

@@ -8,7 +8,7 @@ import "C"
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"math"
 
 	"github.com/klippa-app/go-pdfium/internal/textextract"
@@ -240,7 +240,7 @@ func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, 
 	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
 	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
 
-	decoded, err := ioutil.ReadAll(unicodeReader)
+	decoded, err := io.ReadAll(unicodeReader)
 	if err != nil {
 		return "", err
 	}

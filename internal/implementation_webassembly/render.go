@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"io/ioutil"
 	"math"
 	"os"
 	"unsafe"
@@ -923,7 +922,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 			}
 			targetFile = existingFile
 		} else {
-			tempFile, err := ioutil.TempFile("", "")
+			tempFile, err := os.CreateTemp("", "")
 			if err != nil {
 				return nil, err
 			}

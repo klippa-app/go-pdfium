@@ -1,7 +1,6 @@
 package shared_tests
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -419,7 +418,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -739,7 +738,7 @@ var _ = Describe("fpdf_edit", func() {
 
 				Context("not inline", func() {
 					It("returns an error when giving an invalid page", func() {
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFile, err := PdfiumInstance.FPDFImageObj_LoadJpegFile(&requests.FPDFImageObj_LoadJpegFile{
@@ -757,7 +756,7 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from bytes", func() {
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFile, err := PdfiumInstance.FPDFImageObj_LoadJpegFile(&requests.FPDFImageObj_LoadJpegFile{
@@ -770,7 +769,7 @@ var _ = Describe("fpdf_edit", func() {
 
 					It("allows for a jpeg file to be loaded from bytes into a page", func() {
 
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFile, err := PdfiumInstance.FPDFImageObj_LoadJpegFile(&requests.FPDFImageObj_LoadJpegFile{
@@ -829,7 +828,7 @@ var _ = Describe("fpdf_edit", func() {
 
 				Context("inline", func() {
 					It("returns an error when giving an invalid page", func() {
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFileInline, err := PdfiumInstance.FPDFImageObj_LoadJpegFileInline(&requests.FPDFImageObj_LoadJpegFileInline{
@@ -847,7 +846,7 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from bytes", func() {
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFileInline, err := PdfiumInstance.FPDFImageObj_LoadJpegFileInline(&requests.FPDFImageObj_LoadJpegFileInline{
@@ -859,7 +858,7 @@ var _ = Describe("fpdf_edit", func() {
 					})
 
 					It("allows for a jpeg file to be loaded from bytes into a page", func() {
-						fileData, err := ioutil.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
+						fileData, err := os.ReadFile(TestDataPath + "/testdata/mona_lisa.jpg")
 						Expect(err).To(BeNil())
 
 						FPDFImageObj_LoadJpegFileInline, err := PdfiumInstance.FPDFImageObj_LoadJpegFileInline(&requests.FPDFImageObj_LoadJpegFileInline{
@@ -1060,7 +1059,7 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows a font to be loaded, a text object to be created with it and to be closed", func() {
-				fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
+				fontData, err := os.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
 				Expect(err).To(BeNil())
 
 				FPDFText_LoadFont, err := PdfiumInstance.FPDFText_LoadFont(&requests.FPDFText_LoadFont{
@@ -1094,7 +1093,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/embedded_images.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/embedded_images.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1469,7 +1468,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/clip_path.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/clip_path.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1690,7 +1689,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1878,7 +1877,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/form_object.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/form_object.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

@@ -1,10 +1,9 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -164,7 +163,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_table.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_table.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -708,7 +707,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_actual_text.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_actual_text.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -990,7 +989,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_marked_content.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_marked_content.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1108,7 +1107,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_mcr_multipage.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_mcr_multipage.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1311,7 +1310,7 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_expansion.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_expansion.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

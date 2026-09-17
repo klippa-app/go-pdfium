@@ -1,8 +1,9 @@
 package shared_tests
 
 import (
+	"os"
+
 	"github.com/klippa-app/go-pdfium/responses"
-	"io/ioutil"
 
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -96,7 +97,7 @@ var _ = Describe("fpdf_structtree", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -135,7 +136,7 @@ var _ = Describe("fpdf_structtree", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_alt_text.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_alt_text.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -334,7 +335,7 @@ var _ = Describe("fpdf_structtree", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/marked_content_id.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/marked_content_id.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -431,7 +432,7 @@ var _ = Describe("fpdf_structtree", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_alt_text.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_alt_text.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

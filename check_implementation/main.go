@@ -6,7 +6,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
@@ -32,18 +31,18 @@ var skipMethods = map[string]bool{
 
 func main() {
 	implementedMethods := map[string]bool{}
-	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()
+	docType := reflect.TypeFor[pdfium.Pdfium]()
 	numMethods := docType.NumMethod()
 
 	fmt.Println("Currently implemented methods:")
-	for i := 0; i < numMethods; i++ {
+	for i := range numMethods {
 		method := docType.Method(i)
 		implementedMethods[method.Name] = true
 		fmt.Println(method.Name)
 	}
 
 	pdfiumFolder := "/opt/lib/pdfium"
-	items, err := ioutil.ReadDir(pdfiumFolder + "/include")
+	items, err := os.ReadDir(pdfiumFolder + "/include")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -28,7 +28,7 @@ package shared_tests
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/internal/textextract"
 	"github.com/klippa-app/go-pdfium/references"
@@ -105,7 +105,7 @@ type textExtractQuery struct {
 // from, using only the public API, mirroring what each backend's text.go does.
 func textExtractPageChars(textPage references.FPDF_TEXTPAGE, count int) []textextract.Char {
 	chars := make([]textextract.Char, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		box, err := PdfiumInstance.FPDFText_GetCharBox(&requests.FPDFText_GetCharBox{TextPage: textPage, Index: i})
 		Expect(err).To(BeNil())
 		origin, err := PdfiumInstance.FPDFText_GetCharOrigin(&requests.FPDFText_GetCharOrigin{TextPage: textPage, Index: i})
@@ -214,7 +214,7 @@ var _ = Describe("textextract parity with PDFium", func() {
 	// withPage loads a file and runs body once per page, with a text page
 	// loaded, cleaning up as it goes.
 	withPage := func(file string, maxPages int, body func(doc references.FPDF_DOCUMENT, page int, textPage references.FPDF_TEXTPAGE, charCount int)) {
-		pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/" + file)
+		pdfData, err := os.ReadFile(TestDataPath + "/testdata/" + file)
 		Expect(err).To(BeNil())
 
 		loadedDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{Data: &pdfData})

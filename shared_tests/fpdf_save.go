@@ -2,7 +2,6 @@ package shared_tests
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/references"
@@ -43,7 +42,7 @@ var _ = Describe("fpdf_save", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -77,7 +76,7 @@ var _ = Describe("fpdf_save", func() {
 
 			Context("and saved to a file path", func() {
 				It("it returns the correct bytes", func() {
-					tempFile, err := ioutil.TempFile("", "")
+					tempFile, err := os.CreateTemp("", "")
 					Expect(err).To(BeNil())
 					defer tempFile.Close()
 					defer os.Remove(tempFile.Name())

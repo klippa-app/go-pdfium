@@ -62,7 +62,7 @@ func (f *FakeReadSeeker) AddSegmentCallback(offset, size uint64) {
 		return
 	}
 
-	for i := 0; i < amountRead; i++ {
+	for i := range amountRead {
 		f.LoadedBytes[int(offset)+i] = true
 		f.FileData[int(offset)+i] = res[i]
 	}

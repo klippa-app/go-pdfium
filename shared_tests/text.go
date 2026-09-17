@@ -3,7 +3,6 @@ package shared_tests
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/errors"
@@ -61,7 +60,7 @@ var _ = Describe("text", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -212,7 +211,7 @@ var _ = Describe("text", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rect-wrong.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/rect-wrong.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -334,7 +333,7 @@ func loadStructuredText(resp *responses.GetPageTextStructured, paths ...string) 
 
 	for _, path := range paths {
 		writeStructuredText(path, resp)
-		preRender, err := ioutil.ReadFile(path)
+		preRender, err := os.ReadFile(path)
 		if err != nil {
 			return nil
 		}
@@ -363,7 +362,7 @@ func writeStructuredText(path string, resp *responses.GetPageTextStructured) err
 		return err
 	}
 
-	if err := ioutil.WriteFile(path, buf.Bytes(), 0777); err != nil {
+	if err := os.WriteFile(path, buf.Bytes(), 0777); err != nil {
 		return err
 	}
 

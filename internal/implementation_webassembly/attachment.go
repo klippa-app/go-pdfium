@@ -49,7 +49,7 @@ func (p *PdfiumImplementation) GetAttachments(request *requests.GetAttachments) 
 	}
 
 	attachments := []responses.Attachment{}
-	for i := 0; i < attachmentCount; i++ {
+	for i := range attachmentCount {
 		res, err := p.call("FPDFDoc_GetAttachment", *documentHandle.handle, uint64(i))
 		if err != nil {
 			return nil, err

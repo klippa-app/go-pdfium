@@ -66,7 +66,6 @@ var _ = Describe("FPDFBitmap_CreateEx", func() {
 		{name: "a buffer", useRawPointer: false},
 		{name: "a raw pointer", useRawPointer: true},
 	} {
-		variant := variant
 
 		When("given an external bitmap buffer as "+variant.name, func() {
 			It("keeps the Go memory alive until the bitmap is destroyed", func() {

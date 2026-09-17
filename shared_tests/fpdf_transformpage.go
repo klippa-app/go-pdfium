@@ -1,7 +1,6 @@
 package shared_tests
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/references"
@@ -388,7 +387,7 @@ var _ = Describe("fpdf_transformpage", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/clip_path.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/clip_path.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

@@ -1,10 +1,9 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -14,10 +13,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
-
-func toPointer[T any](input T) *T {
-	return &input
-}
 
 var _ = Describe("fpdf_attachment", func() {
 	BeforeEach(func() {
@@ -40,7 +35,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -80,7 +75,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -115,7 +110,7 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_TEXTFIELD,
 						Name:      "Text Box",
-						Value:     toPointer(""),
+						Value:     new(""),
 						IsChecked: nil,
 						ToolTip:   "",
 						Options:   nil,
@@ -124,7 +119,7 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_TEXTFIELD,
 						Name:      "ReadOnly",
-						Value:     toPointer(""),
+						Value:     new(""),
 						IsChecked: nil,
 						ToolTip:   "",
 						Options:   nil,
@@ -133,7 +128,7 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_TEXTFIELD,
 						Name:      "CharLimit",
-						Value:     toPointer("Elephant"),
+						Value:     new("Elephant"),
 						IsChecked: nil,
 						ToolTip:   "",
 						Options:   nil,
@@ -142,7 +137,7 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_TEXTFIELD,
 						Name:      "Password",
-						Value:     toPointer(""),
+						Value:     new(""),
 						IsChecked: nil,
 						ToolTip:   "",
 						Options:   nil,
@@ -157,7 +152,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -194,7 +189,7 @@ var _ = Describe("fpdf_attachment", func() {
 						Type:      enums.FPDF_FORMFIELD_TYPE_CHECKBOX,
 						Name:      "readOnlyCheckbox",
 						Values:    nil,
-						IsChecked: toPointer(true),
+						IsChecked: new(true),
 						ToolTip:   "readOnlyCheckbox",
 						Options:   nil,
 						Flags:     responses.FormFieldFlags{ReadOnly: true, Required: false, NoExport: false},
@@ -203,7 +198,7 @@ var _ = Describe("fpdf_attachment", func() {
 						Type:      enums.FPDF_FORMFIELD_TYPE_CHECKBOX,
 						Name:      "checkbox",
 						Values:    nil,
-						IsChecked: toPointer(false),
+						IsChecked: new(false),
 						ToolTip:   "checkbox",
 						Options:   nil,
 						Flags:     responses.FormFieldFlags{ReadOnly: false, Required: true, NoExport: false},
@@ -211,8 +206,8 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_RADIOBUTTON,
 						Name:      "readOnlyRadioButton",
-						Value:     toPointer("value3"),
-						IsChecked: toPointer(true),
+						Value:     new("value3"),
+						IsChecked: new(true),
 						ToolTip:   "readOnlyRadioButton1",
 						Options:   []string{"value1", "value2", "value3"},
 						Flags:     responses.FormFieldFlags{ReadOnly: true, Required: false, NoExport: false},
@@ -220,8 +215,8 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_RADIOBUTTON,
 						Name:      "radioButton",
-						Value:     toPointer("value3"),
-						IsChecked: toPointer(true),
+						Value:     new("value3"),
+						IsChecked: new(true),
 						ToolTip:   "radioButton1",
 						Options:   []string{"value1", "value2", "value3"},
 						Flags:     responses.FormFieldFlags{ReadOnly: false, Required: true, NoExport: false},
@@ -235,7 +230,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/listbox_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/listbox_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -351,7 +346,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/combobox_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/combobox_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -423,7 +418,7 @@ var _ = Describe("fpdf_attachment", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/multiple_form_types.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/multiple_form_types.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -479,7 +474,7 @@ var _ = Describe("fpdf_attachment", func() {
 					{
 						Type:      enums.FPDF_FORMFIELD_TYPE_TEXTFIELD,
 						Name:      "Text Box",
-						Value:     toPointer(""),
+						Value:     new(""),
 						Values:    nil,
 						IsChecked: nil,
 						ToolTip:   "",
@@ -491,7 +486,7 @@ var _ = Describe("fpdf_attachment", func() {
 						Name:      "Checkbox",
 						Value:     nil,
 						Values:    nil,
-						IsChecked: toPointer(false),
+						IsChecked: new(false),
 						ToolTip:   "",
 						Options:   nil,
 						Flags:     responses.FormFieldFlags{ReadOnly: false, Required: false, NoExport: false},
@@ -501,7 +496,7 @@ var _ = Describe("fpdf_attachment", func() {
 						Name:      "radioButton",
 						Value:     nil,
 						Values:    nil,
-						IsChecked: toPointer(false),
+						IsChecked: new(false),
 						ToolTip:   "radioButton1",
 						Options:   []string{"Yes"},
 						Flags:     responses.FormFieldFlags{ReadOnly: false, Required: false, NoExport: false},

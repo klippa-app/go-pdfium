@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"image"
 	"image/png"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -139,7 +138,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -706,7 +705,7 @@ var _ = Describe("Render", func() {
 							// row keeps the failure readable and skips the padding
 							// that the full render rounded up to.
 							fullImage := fullPage.Result.Image
-							for y := 0; y < mosaicHeight; y++ {
+							for y := range mosaicHeight {
 								mosaicRow := mosaic.Pix[y*mosaic.Stride : y*mosaic.Stride+mosaicWidth*4]
 								fullRow := fullImage.Pix[y*fullImage.Stride : y*fullImage.Stride+mosaicWidth*4]
 								Expect(mosaicRow).To(Equal(fullRow), "row %d of the tiled render is different from the full page render", y)
@@ -2995,7 +2994,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/alpha_channel.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/alpha_channel.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3042,7 +3041,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3101,7 +3100,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3178,7 +3177,7 @@ var _ = Describe("Render", func() {
 		var doc2 references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3188,7 +3187,7 @@ var _ = Describe("Render", func() {
 
 			doc = newDoc.Document
 
-			pdfData2, err := ioutil.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
+			pdfData2, err := os.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc2, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3326,7 +3325,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_filled.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_filled.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3373,7 +3372,7 @@ var _ = Describe("Render", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -3472,7 +3471,7 @@ func compareRenderHash(renderedPage *responses.RenderPage, matcher types.GomegaM
 	existingFileHashes := []types.GomegaMatcher{}
 
 	for _, testName := range testNames {
-		existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+		existingFileHash, err := os.ReadFile(testName + ".hash")
 		Expect(err).To(BeNil())
 		existingFileHashes = append(existingFileHashes, Equal(string(existingFileHash)))
 	}
@@ -3516,7 +3515,7 @@ func compareRenderHashForPages(renderedPages *responses.RenderPages, matcher typ
 	existingFileHashes := []types.GomegaMatcher{}
 
 	for _, testName := range testNames {
-		existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+		existingFileHash, err := os.ReadFile(testName + ".hash")
 		Expect(err).To(BeNil())
 		existingFileHashes = append(existingFileHashes, Equal(string(existingFileHash)))
 	}
@@ -3549,7 +3548,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	existingFileHashes := []types.GomegaMatcher{}
 
 	for _, testName := range testNames {
-		existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+		existingFileHash, err := os.ReadFile(testName + ".hash")
 		Expect(err).To(BeNil())
 		existingFileHashes = append(existingFileHashes, Equal(string(existingFileHash)))
 	}
@@ -3565,7 +3564,7 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 			// Cleanup tmp file.
 			defer os.Remove(renderedFile.ImagePath)
 		}
-		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		fileContent, err := os.ReadFile(renderedFile.ImagePath)
 		Expect(err).To(BeNil())
 		hasher.Write(fileContent)
 	}
@@ -3574,71 +3573,71 @@ func compareFileHash(request *requests.RenderToFile, renderedFile *responses.Ren
 	Expect(currentHash).To(Or(existingFileHashes...))
 
 	for _, testName := range testNames {
-		existingFileHash, err := ioutil.ReadFile(testName + ".hash")
+		existingFileHash, err := os.ReadFile(testName + ".hash")
 		Expect(err).To(BeNil())
 
 		if strings.Contains(testName, "_single_") {
 			// Compare the single variant to the multi variant.
-			existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
+			existingMultiFileHash, err := os.ReadFile(strings.Replace(testName, "_single_", "_multi_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingMultiFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the single variant to the webassembly variant.
 			// @todo: figure out why webassembly renders have a different hash.
-			//existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_webassembly_", 1) + ".hash")
+			//existingWebassemblyFileHash, err := os.ReadFile(strings.Replace(testName, "_single_", "_webassembly_", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingWebassemblyFileHash)).To(Equal(existingFileHash))
 
 			// Compare the single variant to the internal variant.
-			existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
+			existingInternalFileHash, err := os.ReadFile(strings.Replace(testName, "_single_", "_internal_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingInternalFileHash)).To(Equal(string(existingFileHash)))
 		} else if strings.Contains(testName, "_multi_") {
 			// Compare the multi variant to the single variant.
-			existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_single_", 1) + ".hash")
+			existingSingleFileHash, err := os.ReadFile(strings.Replace(testName, "_multi_", "_single_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingSingleFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the multi variant to the webassembly variant.
 			// @todo: figure out why webassembly renders have a different hash.
-			//existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_webassembly_", 1) + ".hash")
+			//existingWebassemblyFileHash, err := os.ReadFile(strings.Replace(testName, "_multi_", "_webassembly_", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingWebassemblyFileHash)).To(Equal(existingFileHash))
 
 			// Compare the multi variant to the internal variant.
-			existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
+			existingInternalFileHash, err := os.ReadFile(strings.Replace(testName, "_multi_", "_internal_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingInternalFileHash)).To(Equal(string(existingFileHash)))
 		} else if strings.Contains(testName, "_internal_") {
 			// Compare the internal variant to the single variant.
-			existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_single_", 1) + ".hash")
+			existingSingleFileHash, err := os.ReadFile(strings.Replace(testName, "_internal_", "_single_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingSingleFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the internal variant to the webassembly variant.
 			// @todo: figure out why webassembly renders have a different hash.
-			//existingWebassemblyFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_webassembly_", 1) + ".hash")
+			//existingWebassemblyFileHash, err := os.ReadFile(strings.Replace(testName, "_internal_", "_webassembly_", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingWebassemblyFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the internal variant to the multi variant.
-			existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
+			existingMultiFileHash, err := os.ReadFile(strings.Replace(testName, "_internal_", "_multi_", 1) + ".hash")
 			Expect(err).To(BeNil())
 			Expect(string(existingMultiFileHash)).To(Equal(string(existingFileHash)))
 		} else if strings.Contains(testName, "_webassembly_") {
 			// @todo: figure out why webassembly renders have a different hash.
 			// Compare the webassembly variant to the single variant.
-			//existingSingleFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "_single_", 1) + ".hash")
+			//existingSingleFileHash, err := os.ReadFile(strings.Replace(testName, "_webassembly_", "_single_", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingSingleFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the webassembly variant to the multi variant.
-			//existingMultiFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "_multi_", 1) + ".hash")
+			//existingMultiFileHash, err := os.ReadFile(strings.Replace(testName, "_webassembly_", "_multi_", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingMultiFileHash)).To(Equal(string(existingFileHash)))
 
 			// Compare the webassembly variant to the internal variant.
-			//existingInternalFileHash, err := ioutil.ReadFile(strings.Replace(testName, "_webassembly_", "internal", 1) + ".hash")
+			//existingInternalFileHash, err := os.ReadFile(strings.Replace(testName, "_webassembly_", "internal", 1) + ".hash")
 			//Expect(err).To(BeNil())
 			//Expect(string(existingInternalFileHash)).To(Equal(string(existingFileHash)))
 		}
@@ -3675,7 +3674,7 @@ func writePrerenderedImage(renderedImage image.Image, renderedPix []uint8, testN
 	hasher.Write(buf.Bytes())
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
 
-	if err := ioutil.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
+	if err := os.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
 		return err
 	}
 
@@ -3690,7 +3689,7 @@ func writePrerenderedFile(request *requests.RenderToFile, renderedFile *response
 	if request.OutputTarget == requests.RenderToFileOutputTargetBytes {
 		fileBytes = *renderedFile.ImageBytes
 	} else if request.OutputTarget == requests.RenderToFileOutputTargetFile {
-		fileContent, err := ioutil.ReadFile(renderedFile.ImagePath)
+		fileContent, err := os.ReadFile(renderedFile.ImagePath)
 		if err != nil {
 			return err
 		}
@@ -3705,7 +3704,7 @@ func writePrerenderedFile(request *requests.RenderToFile, renderedFile *response
 		imagefilename += ".jpg"
 	}
 
-	err := ioutil.WriteFile(imagefilename, fileBytes, 0777)
+	err := os.WriteFile(imagefilename, fileBytes, 0777)
 	if err != nil {
 		return err
 	}
@@ -3720,7 +3719,7 @@ func writePrerenderedFile(request *requests.RenderToFile, renderedFile *response
 
 	currentHash := fmt.Sprintf("%x", hasher.Sum(nil))
 
-	if err := ioutil.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
+	if err := os.WriteFile(filename+".hash", []byte(currentHash), 0777); err != nil {
 		return err
 	}
 

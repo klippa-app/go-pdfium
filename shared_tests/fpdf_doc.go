@@ -1,7 +1,7 @@
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
@@ -103,7 +103,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -296,7 +296,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -361,7 +361,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bookmarks.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/bookmarks.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -530,7 +530,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/about_blank.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/about_blank.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -565,7 +565,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/page_labels.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/page_labels.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -690,7 +690,7 @@ var _ = Describe("fpdf_doc", func() {
 	Context("a PDF file with a link", func() {
 		var doc references.FPDF_DOCUMENT
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -749,7 +749,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -889,7 +889,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/uri_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/uri_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1004,7 +1004,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/goto_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/goto_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1145,7 +1145,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/gotoe_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/gotoe_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1289,7 +1289,7 @@ var _ = Describe("fpdf_doc", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bug_821454.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/bug_821454.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1438,7 +1438,7 @@ var _ = Describe("fpdf_doc", func() {
 	Context("a PDF file with quad point links", func() {
 		var doc references.FPDF_DOCUMENT
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annots.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annots.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
