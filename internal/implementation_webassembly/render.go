@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"image"
-	"image/color"
-	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
@@ -774,16 +772,6 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 	p.Lock()
 	defer p.Unlock()
 
-	var cleanupBitmap func()
-	releaseBitmap := func() {
-		if cleanupBitmap != nil {
-			cleanup := cleanupBitmap
-			cleanupBitmap = nil
-			cleanup()
-		}
-	}
-	defer releaseBitmap()
-
 	var renderedImage image.Image
 	var pixelsPtr uint64
 
@@ -795,7 +783,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		cleanupBitmap = resp.Cleanup
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -821,7 +809,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		cleanupBitmap = resp.Cleanup
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -842,7 +830,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		cleanupBitmap = resp.Cleanup
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -868,7 +856,7 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 		if err != nil {
 			return nil, err
 		}
-		cleanupBitmap = resp.Cleanup
+		defer resp.Cleanup()
 
 		renderedImage = resp.Result.RenderedImage
 		pixelsPtr = offset
@@ -890,27 +878,19 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 
 	var imgBuf bytes.Buffer
 
-	// If any of the pages have transparency, place a white background under
-	// the image like a PDF viewer would. This is also to fix transparency JPEG
+	// If any of the pages have transparency, flatten the image onto a white
+	// background like a PDF viewer would. This is also to fix transparency JPEG
 	// rendering, when you render a JPG image in Go, it will make the
 	// transparent background black.
+	// The blend is done in place on the bitmap's pixel view, which is a live
+	// window into WASM memory. That keeps pixelsPtr valid so the JPEG encoder
+	// can still borrow the bitmap instead of allocating and copying a second
+	// full-size buffer. This is safe because no WASM call happens between the
+	// render returning and this blend, so the view cannot have gone stale.
 	// Grayscale images have no alpha channel and are always rendered on a
 	// white background, so they don't need this.
 	if renderedImageRGBA, isRGBA := renderedImage.(*image.RGBA); hasTransparency && isRGBA {
-		imageWithWhiteBackground := image.NewRGBA(renderedImageRGBA.Bounds())
-		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-		// PDFium's FPDFBitmap_BGRA has straight (non-premultiplied) alpha.
-		// Wrap as NRGBA so draw.Over uses the correct straight-alpha compositing formula.
-		straightAlphaSrc := &image.NRGBA{
-			Pix:    renderedImageRGBA.Pix,
-			Stride: renderedImageRGBA.Stride,
-			Rect:   renderedImageRGBA.Rect,
-		}
-		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
-		renderedImage = imageWithWhiteBackground
-		pixelsPtr = 0 // Composited pixels are owned by Go.
-		// Release the original bitmap before copying the composited pixels into WASM.
-		releaseBitmap()
+		renderutil.CompositeOnWhiteInPlace(renderedImageRGBA)
 	}
 
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
