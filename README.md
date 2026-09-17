@@ -691,17 +691,27 @@ matter.
 
 ## Improving JPEG rendering speed
 
-By default, this library renders images with the `image/jpeg` package that comes with Go to make distribution as simple
-as possible. However, this package is quite slow compared to other native libraries like libjpeg and libjpeg-turbo, you
-can enable the usage of libjpeg-turbo by using the build tag `pdfium_use_turbojpeg`, this will require you to have the
-package `libturbojpeg-dev` installed during build time and the `libturbojpeg` package during runtime and build time.
+### CGO
+
+By default, the CGO implementation encodes JPEG images with the `image/jpeg` package that comes with Go to make
+distribution as simple as possible. However, this package is quite slow compared to native libraries like libjpeg and
+libjpeg-turbo. You can enable the usage of libjpeg-turbo with the build tag `pdfium_use_turbojpeg`, this requires the
+package `libturbojpeg-dev` to be installed during build time and the `libturbojpeg` package during build time and
+runtime.
 
 Speed improvements that can be expected are significant, for example: on a simple PDF the full process of rendering a
-page is 3x as fast compared to a build without libjpeg-turbo.
+page is 3x as fast compared to a build without libjpeg-turbo. On the CGO implementation, progressive JPEG output
+(`Progressive` in `RenderToFile`) requires this build tag; without it the option is ignored and a baseline JPEG is
+written.
 
-This is supported in both the CGO and WebAssembly implementation, please note that the WebAssembly implementation also
-uses CGO for libjpeg-turbo for now. There are plans to compile libjpeg-turbo to WebAssembly for the WebAssembly
-implementation to keep the WebAssembly implementation actually full WebAssembly.
+### WebAssembly
+
+The WebAssembly implementation does not need the build tag or any native library. The bundled PDFium module contains
+libjpeg-turbo compiled to WebAssembly, including its SIMD kernels, and exports its encoder. Rendered pages are encoded
+to JPEG inside the WebAssembly module directly from the rendered bitmap, so the pixels are never copied out into Go
+first, and progressive JPEG output is supported out of the box. When a custom module without the encoder export is
+used, or for image types the encoder cannot consume directly, the implementation falls back to the same encoder the
+CGO implementation uses.
 
 ## Support Policy
 
