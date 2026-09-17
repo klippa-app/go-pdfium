@@ -11,7 +11,6 @@ require (
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.32.2
 	github.com/onsi/gomega v1.43.0
-	github.com/stretchr/testify v1.12.1
 	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/text v0.42.0
 )
@@ -28,6 +27,7 @@ require (
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/oklog/run v1.1.0 // indirect
+	github.com/stretchr/testify v1.12.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
