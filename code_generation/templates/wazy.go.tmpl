@@ -12,7 +12,7 @@ import (
 )
 {{ range $method := .Methods }}
 func (i *pdfiumInstance) {{ $method.Name }}(request *requests.{{ $method.Input }}) (resp *responses.{{ $method.Output }}, err error) {
-	if i.closed {
+	if i.closed.Load() {
 		return nil, errors.New("instance is closed")
 	}
 

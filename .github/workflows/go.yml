@@ -55,25 +55,25 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export PKG_CONFIG_PATH="/opt/pdfium"
-          go test -race -timeout 45m `go list ./... | grep -v webassembly` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+          go test -race -timeout 45m `go list ./... | grep -v "webassembly\|experimental"` -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Linux & MacOS) - Experimental
         if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           export LD_LIBRARY_PATH="/opt/pdfium/lib"
           export PKG_CONFIG_PATH="/opt/pdfium"
-          go test -race -timeout 45m `go list ./... | grep -v webassembly` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
+          go test -race -timeout 45m `go list ./... | grep -v "webassembly\|experimental"` -tags pdfium_experimental -exec "env DYLD_LIBRARY_PATH=/opt/pdfium/lib" -v
       - name: Test all packages (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go test -race -timeout 45m $(go list ./... | grep -v webassembly) -v
+          go test -race -timeout 45m $(go list ./... | grep -v "webassembly\|experimental") -v
       - name: Test all packages (Windows) - Experimental
         if: matrix.os == 'windows-latest' && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
           $env:PKG_CONFIG_PATH = 'D:\opt\pkgconfig'
           $env:Path += ";D:\opt\pdfium\bin"
-          go test -race -timeout 45m $(go list ./... | grep -v webassembly) -tags pdfium_experimental -v
+          go test -race -timeout 45m $(go list ./... | grep -v "webassembly\|experimental") -tags pdfium_experimental -v
       - name: Test implementation for coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == env.PDFIUM_EXPERIMENTAL_GO_VERSION && matrix.pdfium == env.PDFIUM_EXPERIMENTAL_VERSION
         run: |
@@ -218,10 +218,14 @@ jobs:
         run: |
           go test -race -timeout 45m ./internal/implementation_webassembly -v
           go test -race -timeout 45m ./webassembly -v
+          go test -race -timeout 45m ./experimental/wazy -v
+          go test -race -timeout 45m ./experimental/wago -v
       - name: Test all packages with -race - Experimental
         run: |
           go test -race -timeout 45m ./internal/implementation_webassembly -tags pdfium_experimental -v
           go test -race -timeout 45m ./webassembly -tags pdfium_experimental -v
+          go test -race -timeout 45m ./experimental/wazy -tags pdfium_experimental -v
+          go test -race -timeout 45m ./experimental/wago -tags pdfium_experimental -v
       - name: Archive render results
         uses: actions/upload-artifact@v4
         if: always()

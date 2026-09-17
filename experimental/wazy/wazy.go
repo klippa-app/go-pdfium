@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
@@ -347,8 +348,10 @@ type pdfiumInstance struct {
 	worker      *worker
 	pool        *pdfiumPool
 	instanceRef string
-	closed      bool
-	lock        *sync.Mutex
+	// closed is atomic because Kill deliberately does not take the instance
+	// lock (a stuck call may hold it) while the generated methods read it.
+	closed atomic.Bool
+	lock   *sync.Mutex
 }
 
 // Close will close the instance and will clean up the underlying PDFium resources
@@ -356,7 +359,7 @@ type pdfiumInstance struct {
 func (i *pdfiumInstance) Close() (err error) {
 	i.lock.Lock()
 
-	if i.closed {
+	if i.closed.Load() {
 		i.lock.Unlock()
 		return errors.New("instance is already closed")
 	}
@@ -379,7 +382,7 @@ func (i *pdfiumInstance) Close() (err error) {
 		delete(i.pool.instanceRefs, i.instanceRef)
 		i.pool.lock.Unlock()
 		i.pool = nil
-		i.closed = true
+		i.closed.Store(true)
 		i.lock.Unlock()
 	}()
 
@@ -391,7 +394,7 @@ func (i *pdfiumInstance) Close() (err error) {
 func (i *pdfiumInstance) Kill() (err error) {
 	// Kill should not be protected by a lock, since Kill is a last-effort
 	// to "recover" a broken process.
-	if i.closed {
+	if i.closed.Load() {
 		return errors.New("instance is already closed")
 	}
 
@@ -414,7 +417,7 @@ func (i *pdfiumInstance) Kill() (err error) {
 	err = i.pool.workerPool.InvalidateObject(goctx.Background(), i.worker)
 
 	i.pool = nil
-	i.closed = true
+	i.closed.Store(true)
 
 	return err
 }
