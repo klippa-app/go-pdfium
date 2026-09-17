@@ -3,9 +3,17 @@ package pdfium_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestStub(t *testing.T) {
-	assert.True(t, true, "This is good. Canary test passing")
+func TestPdfium(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Pdfium Suite")
 }
+
+var _ = Describe("canary", func() {
+	It("passes", func() {
+		Expect(true).To(BeTrue(), "This is good. Canary test passing")
+	})
+})

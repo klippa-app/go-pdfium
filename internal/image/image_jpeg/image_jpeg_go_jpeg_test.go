@@ -6,33 +6,33 @@ import (
 	"bytes"
 	"image"
 	"image/jpeg"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestEncode(t *testing.T) {
-	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
-	testWriter := bytes.NewBuffer(nil)
-	err := Encode(testWriter, img, Options{})
-	if err != nil {
-		t.Fatalf("Encode resulted in error: %s", err.Error())
-	}
-	if testWriter.Len() != 789 {
-		t.Fatalf("Encode resulted in wrong byte result, got %d, want %d", testWriter.Len(), 789)
-	}
-}
+var _ = Describe("Encode with image/jpeg", func() {
+	var img *image.RGBA
 
-func TestEncodeQuality(t *testing.T) {
-	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
-	testWriter := bytes.NewBuffer(nil)
-	err := Encode(testWriter, img, Options{
-		Options: &jpeg.Options{
-			Quality: 100,
-		},
+	BeforeEach(func() {
+		img = image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
 	})
-	if err != nil {
-		t.Fatalf("Encode resulted in error: %s", err.Error())
-	}
-	if testWriter.Len() != 791 {
-		t.Fatalf("Encode resulted in wrong byte result, got %d, want %d", testWriter.Len(), 791)
-	}
-}
+
+	It("encodes with the default options", func() {
+		testWriter := bytes.NewBuffer(nil)
+		err := Encode(testWriter, img, Options{})
+		Expect(err).To(BeNil())
+		Expect(testWriter.Len()).To(Equal(789))
+	})
+
+	It("encodes with a quality", func() {
+		testWriter := bytes.NewBuffer(nil)
+		err := Encode(testWriter, img, Options{
+			Options: &jpeg.Options{
+				Quality: 100,
+			},
+		})
+		Expect(err).To(BeNil())
+		Expect(testWriter.Len()).To(Equal(791))
+	})
+})

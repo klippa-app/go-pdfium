@@ -6,50 +6,45 @@ import (
 	"bytes"
 	"image"
 	"image/jpeg"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestEncode(t *testing.T) {
-	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
-	testWriter := bytes.NewBuffer(nil)
-	err := Encode(testWriter, img, Options{})
-	if err != nil {
-		t.Fatalf("Encode resulted in error: %s", err.Error())
-	}
-	if testWriter.Len() != 823 {
-		t.Fatalf("Encode resulted in wrong byte result, got %d, want %d", testWriter.Len(), 823)
-	}
-}
+var _ = Describe("Encode with turbojpeg", func() {
+	var img *image.RGBA
 
-func TestEncodeQuality(t *testing.T) {
-	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
-	testWriter := bytes.NewBuffer(nil)
-	err := Encode(testWriter, img, Options{
-		Options: &jpeg.Options{
-			Quality: 100,
-		},
+	BeforeEach(func() {
+		img = image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
 	})
-	if err != nil {
-		t.Fatalf("Encode resulted in error: %s", err.Error())
-	}
-	if testWriter.Len() != 825 {
-		t.Fatalf("Encode resulted in wrong byte result, got %d, want %d", testWriter.Len(), 825)
-	}
-}
 
-func TestEncodeProgressive(t *testing.T) {
-	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{100, 100}})
-	testWriter := bytes.NewBuffer(nil)
-	err := Encode(testWriter, img, Options{
-		Options: &jpeg.Options{
-			Quality: 100,
-		},
-		Progressive: true,
+	It("encodes with the default options", func() {
+		testWriter := bytes.NewBuffer(nil)
+		err := Encode(testWriter, img, Options{})
+		Expect(err).To(BeNil())
+		Expect(testWriter.Len()).To(Equal(823))
 	})
-	if err != nil {
-		t.Fatalf("Encode resulted in error: %s", err.Error())
-	}
-	if testWriter.Len() != 592 {
-		t.Fatalf("Encode resulted in wrong byte result, got %d, want %d", testWriter.Len(), 592)
-	}
-}
+
+	It("encodes with a quality", func() {
+		testWriter := bytes.NewBuffer(nil)
+		err := Encode(testWriter, img, Options{
+			Options: &jpeg.Options{
+				Quality: 100,
+			},
+		})
+		Expect(err).To(BeNil())
+		Expect(testWriter.Len()).To(Equal(825))
+	})
+
+	It("encodes progressive", func() {
+		testWriter := bytes.NewBuffer(nil)
+		err := Encode(testWriter, img, Options{
+			Options: &jpeg.Options{
+				Quality: 100,
+			},
+			Progressive: true,
+		})
+		Expect(err).To(BeNil())
+		Expect(testWriter.Len()).To(Equal(592))
+	})
+})
