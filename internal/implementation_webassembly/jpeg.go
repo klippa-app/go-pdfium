@@ -32,6 +32,10 @@ func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, pixelsPtr 
 		return image_jpeg.Encode(w, m, opt)
 	}
 
+	// pixels is only used for the empty check and for the Go-owned fallback
+	// below. For a rendered bitmap it is a view into guest memory that goes
+	// stale when a later allocation grows the memory, only pixelsPtr survives
+	// that. Do not read it after any call into the guest.
 	var pixels []byte
 	var stride, format int
 	switch img := m.(type) {
@@ -78,8 +82,9 @@ func (p *PdfiumImplementation) encodeJPEG(w io.Writer, m image.Image, pixelsPtr 
 		}
 	}
 
-	// Two output parameters: the buffer pointer and its size.
-	outParams, err := p.Malloc(16)
+	// Two output parameters: the buffer pointer and its size. The shim sets
+	// both before it does anything else, so they don't need to be zeroed.
+	outParams, err := p.MallocNoZero(16)
 	if err != nil {
 		return err
 	}
