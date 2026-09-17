@@ -188,6 +188,10 @@ var _ = Describe("fpdf_flatten", func() {
 		var formHandle references.FPDF_FORMHANDLE
 
 		BeforeEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
 			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_filled.pdf")
 			Expect(err).To(BeNil())
 
@@ -222,6 +226,10 @@ var _ = Describe("fpdf_flatten", func() {
 		})
 
 		AfterEach(func() {
+			if TestType == "multi" {
+				Skip("Form filling is not supported on multi-threaded usage")
+			}
+
 			_, err := PdfiumInstance.FPDFDOC_ExitFormFillEnvironment(&requests.FPDFDOC_ExitFormFillEnvironment{FormHandle: formHandle})
 			Expect(err).To(BeNil())
 			_, err = PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc})
