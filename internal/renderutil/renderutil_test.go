@@ -120,7 +120,7 @@ func TestCalculateCropTilesAreAdjacent(t *testing.T) {
 
 	totalWidth := 0
 	previousRight := 0
-	for tile := 0; tile < 3; tile++ {
+	for tile := range 3 {
 		crop, err := CalculateCrop(requests.RenderPageCrop{
 			X:      float64(tile) * tileSize,
 			Y:      0,

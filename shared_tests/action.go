@@ -1,10 +1,11 @@
 package shared_tests
 
 import (
+	"os"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
-	"io/ioutil"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -40,7 +41,7 @@ var _ = Describe("action", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -84,7 +85,7 @@ var _ = Describe("action", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/launch_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -156,7 +157,7 @@ var _ = Describe("action", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/uri_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/uri_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -228,7 +229,7 @@ var _ = Describe("action", func() {
 		var doc references.FPDF_DOCUMENT
 		var link references.FPDF_LINK
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/goto_action.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/goto_action.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

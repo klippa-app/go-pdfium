@@ -1,10 +1,8 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
 	"os"
 	"unsafe"
 
@@ -1009,7 +1007,7 @@ var _ = Describe("fpdfview", func() {
 			When("an external bitmap has been created with a pointer reference", func() {
 				var bitmap references.FPDF_BITMAP
 				var buffer []byte
-				var pointer interface{}
+				var pointer any
 				width := 1000
 				height := 1500
 				stride := width * 4
@@ -1221,7 +1219,7 @@ var _ = Describe("fpdfview", func() {
 
 	Context("a normal PDF file", func() {
 		It("can be loaded with FPDF_LoadMemDocument", func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument64(&requests.FPDF_LoadMemDocument64{

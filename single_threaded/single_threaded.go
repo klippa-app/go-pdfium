@@ -166,6 +166,6 @@ func (i *pdfiumInstance) Kill() (err error) {
 	return i.Close()
 }
 
-func (i *pdfiumInstance) GetImplementation() interface{} {
+func (i *pdfiumInstance) GetImplementation() any {
 	return i.pdfium
 }

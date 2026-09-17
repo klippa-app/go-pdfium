@@ -1,10 +1,9 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 	"strconv"
 
 	"github.com/klippa-app/go-pdfium/enums"
@@ -437,7 +436,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annotation_stamp_with_ap.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annotation_stamp_with_ap.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1136,7 +1135,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/polygon_annot.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/polygon_annot.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1201,7 +1200,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/line_annot.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/line_annot.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1296,7 +1295,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form_multiple.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1431,7 +1430,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annotation_highlight_square_with_ap.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annotation_highlight_square_with_ap.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1528,7 +1527,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annots.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annots.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1644,7 +1643,7 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/click_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/click_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1751,7 +1750,7 @@ var _ = Describe("fpdf_annot", func() {
 				Skip("Form filling is not supported on multi-threaded usage")
 			}
 
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annot_javascript.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annot_javascript.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1875,7 +1874,7 @@ var _ = Describe("fpdf_annot", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/annotation_fileattachment.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/annotation_fileattachment.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

@@ -1,13 +1,14 @@
 package shared_tests
 
 import (
+	"os"
+
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("fpdf_progressive", func() {
@@ -51,7 +52,7 @@ var _ = Describe("fpdf_progressive", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_form.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_form.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

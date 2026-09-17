@@ -5,7 +5,7 @@ package multi_threaded
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/responses"
@@ -3716,7 +3716,7 @@ func (i *pdfiumInstance) OpenDocument(request *requests.OpenDocument) (*response
 	// To make it support the full interface, we just fully reads the io.ReadSeeker into
 	// an byte array.
 	if request.FileReader != nil {
-		fileData, err := ioutil.ReadAll(request.FileReader)
+		fileData, err := io.ReadAll(request.FileReader)
 		if err != nil {
 			return nil, err
 		}

@@ -1,10 +1,9 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -79,7 +78,7 @@ var _ = Describe("fpdf_signature", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -115,7 +114,7 @@ var _ = Describe("fpdf_signature", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/two_signatures.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/two_signatures.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -225,7 +224,7 @@ var _ = Describe("fpdf_signature", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/signature_no_sub_filter.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/signature_no_sub_filter.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -333,7 +332,7 @@ var _ = Describe("fpdf_signature", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/signature_reason.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/signature_reason.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -447,7 +446,7 @@ var _ = Describe("fpdf_signature", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/docmdp.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/docmdp.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

@@ -1,7 +1,7 @@
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/references"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -176,7 +176,7 @@ var _ = Describe("fpdf_text", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -556,7 +556,7 @@ var _ = Describe("fpdf_text", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/weblinks.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/weblinks.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

@@ -719,7 +719,7 @@ var _ = Describe("fpdfview", func() {
 			When("an external bitmap has been created with a pointer reference", func() {
 				var bitmap references.FPDF_BITMAP
 				var buffer []byte
-				var pointer interface{}
+				var pointer any
 				width := 1000
 				height := 1500
 				stride := width * 4

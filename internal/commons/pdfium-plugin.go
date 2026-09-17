@@ -10,7 +10,7 @@ type PdfiumRPC struct{ client *rpc.Client }
 
 func (g *PdfiumRPC) Ping() (string, error) {
 	var resp string
-	err := g.client.Call("Plugin.Ping", new(interface{}), &resp)
+	err := g.client.Call("Plugin.Ping", new(any), &resp)
 	if err != nil {
 		return "", err
 	}
@@ -19,7 +19,7 @@ func (g *PdfiumRPC) Ping() (string, error) {
 }
 
 func (g *PdfiumRPC) Close() error {
-	err := g.client.Call("Plugin.Close", new(interface{}), new(interface{}))
+	err := g.client.Call("Plugin.Close", new(any), new(any))
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ type PdfiumRPCServer struct {
 	Impl Pdfium
 }
 
-func (s *PdfiumRPCServer) Ping(args interface{}, resp *string) error {
+func (s *PdfiumRPCServer) Ping(args any, resp *string) error {
 	var err error
 	*resp, err = s.Impl.Ping()
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *PdfiumRPCServer) Ping(args interface{}, resp *string) error {
 	return nil
 }
 
-func (s *PdfiumRPCServer) Close(args interface{}, resp *interface{}) error {
+func (s *PdfiumRPCServer) Close(args any, resp *any) error {
 	var err error
 	err = s.Impl.Close()
 	if err != nil {
@@ -53,10 +53,10 @@ type PdfiumPlugin struct {
 	Impl Pdfium
 }
 
-func (p *PdfiumPlugin) Server(*plugin.MuxBroker) (interface{}, error) {
+func (p *PdfiumPlugin) Server(*plugin.MuxBroker) (any, error) {
 	return &PdfiumRPCServer{Impl: p.Impl}, nil
 }
 
-func (PdfiumPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (interface{}, error) {
+func (PdfiumPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (any, error) {
 	return &PdfiumRPC{client: c}, nil
 }

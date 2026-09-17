@@ -5,7 +5,6 @@ package main
 // generate the implementations, saving a lot of copy-pasting time.
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -55,12 +54,12 @@ func main() {
 		Methods: []GenerateDataMethod{},
 	}
 
-	docType := reflect.TypeOf((*pdfium.Pdfium)(nil)).Elem()
+	docType := reflect.TypeFor[pdfium.Pdfium]()
 	numMethods := docType.NumMethod()
 
-	inter := reflect.TypeOf((*responses.AfterUnmarshaler)(nil)).Elem()
+	inter := reflect.TypeFor[responses.AfterUnmarshaler]()
 
-	for i := 0; i < numMethods; i++ {
+	for i := range numMethods {
 		method := docType.Method(i)
 
 		// These are special, don't generate them
@@ -106,7 +105,7 @@ func main() {
 }
 
 func generateFromTemplate(codeTemplate Template, data GenerateData) error {
-	templateContent, err := ioutil.ReadFile(codeTemplate.Source)
+	templateContent, err := os.ReadFile(codeTemplate.Source)
 	if err != nil {
 		return err
 	}

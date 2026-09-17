@@ -30,8 +30,8 @@ func compositeOnWhiteReference(src *image.RGBA) *image.RGBA {
 // alpha value on the y axis, so all 256 * 256 (colour, alpha) combinations
 // are covered by a single 256x256 image.
 func fillAllColorAlphaPairs(img *image.RGBA) {
-	for y := 0; y < 256; y++ {
-		for x := 0; x < 256; x++ {
+	for y := range 256 {
+		for x := range 256 {
 			o := img.PixOffset(img.Rect.Min.X+x, img.Rect.Min.Y+y)
 			img.Pix[o+0] = uint8(x)
 			img.Pix[o+1] = uint8(255 - x)
@@ -85,7 +85,7 @@ var _ = Describe("CompositeOnWhiteInPlace", func() {
 
 		renderutil.CompositeOnWhiteInPlace(img)
 
-		for y := 0; y < 4; y++ {
+		for y := range 4 {
 			pad := img.Pix[y*img.Stride+8 : (y+1)*img.Stride]
 			for _, b := range pad {
 				Expect(b).To(Equal(byte(0x42)), "padding of row %d was modified", y)
@@ -95,7 +95,7 @@ var _ = Describe("CompositeOnWhiteInPlace", func() {
 
 	It("leaves fully opaque pixels unchanged", func() {
 		img := image.NewRGBA(image.Rect(0, 0, 4, 1))
-		for x := 0; x < 4; x++ {
+		for x := range 4 {
 			img.SetRGBA(x, 0, color.RGBA{R: uint8(x * 60), G: 10, B: 200, A: 255})
 		}
 		before := append([]byte(nil), img.Pix...)
@@ -107,13 +107,13 @@ var _ = Describe("CompositeOnWhiteInPlace", func() {
 
 	It("turns fully transparent pixels white", func() {
 		img := image.NewRGBA(image.Rect(0, 0, 4, 1))
-		for x := 0; x < 4; x++ {
+		for x := range 4 {
 			img.SetRGBA(x, 0, color.RGBA{R: uint8(x * 60), G: 10, B: 200, A: 0})
 		}
 
 		renderutil.CompositeOnWhiteInPlace(img)
 
-		for x := 0; x < 4; x++ {
+		for x := range 4 {
 			Expect(img.RGBAAt(x, 0)).To(Equal(color.RGBA{R: 255, G: 255, B: 255, A: 255}))
 		}
 	})

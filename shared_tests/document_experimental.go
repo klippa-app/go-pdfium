@@ -1,10 +1,8 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/klippa-app/go-pdfium/errors"
@@ -30,7 +28,7 @@ var _ = Describe("document", func() {
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+				pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 				Expect(err).To(BeNil())
 
 				newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -136,7 +134,7 @@ var _ = Describe("document", func() {
 			var doc references.FPDF_DOCUMENT
 
 			BeforeEach(func() {
-				pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
+				pdfData, err := os.ReadFile(TestDataPath + "/testdata/test_multipage.pdf")
 				Expect(err).To(BeNil())
 
 				newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -172,7 +170,7 @@ var _ = Describe("document", func() {
 			var pdfData []byte
 			BeforeEach(func() {
 				var err error
-				pdfData, err = ioutil.ReadFile(TestDataPath + "/testdata/password_test123.pdf")
+				pdfData, err = os.ReadFile(TestDataPath + "/testdata/password_test123.pdf")
 				Expect(err).To(BeNil())
 			})
 
@@ -473,7 +471,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -541,7 +539,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_none.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -611,7 +609,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -679,7 +677,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_printing.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -749,7 +747,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -817,7 +815,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_degraded_printing.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -887,7 +885,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -955,7 +953,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_modify_contents.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1025,7 +1023,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1093,7 +1091,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_assembly.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1163,7 +1161,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1231,7 +1229,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_copy_contents.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1301,7 +1299,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1369,7 +1367,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_screen_readers.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1439,7 +1437,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1507,7 +1505,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_modify_annotations.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1577,7 +1575,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1645,7 +1643,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_fill_in.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1715,7 +1713,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "test123"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1783,7 +1781,7 @@ var _ = Describe("document", func() {
 
 				BeforeEach(func() {
 					pdfPassword := "123test"
-					pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
+					pdfData, err := os.ReadFile(TestDataPath + "/testdata/permissions_all_features.pdf")
 					Expect(err).To(BeNil())
 
 					newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

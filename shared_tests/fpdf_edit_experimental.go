@@ -1,10 +1,9 @@
 //go:build pdfium_experimental
-// +build pdfium_experimental
 
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -405,7 +404,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -429,7 +428,7 @@ var _ = Describe("fpdf_edit", func() {
 				var font references.FPDF_FONT
 
 				BeforeEach(func() {
-					fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
+					fontData, err := os.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
 					Expect(err).To(BeNil())
 
 					FPDFText_LoadFont, err := PdfiumInstance.FPDFText_LoadFont(&requests.FPDFText_LoadFont{
@@ -501,7 +500,7 @@ var _ = Describe("fpdf_edit", func() {
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_font.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_font.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -538,7 +537,7 @@ var _ = Describe("fpdf_edit", func() {
 			})
 
 			It("allows a CID Type 2 font to be loaded, a text object to be created with it and to be closed", func() {
-				fontData, err := ioutil.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
+				fontData, err := os.ReadFile(TestDataPath + "/testdata/NotoSansSC-Regular.subset.otf")
 				Expect(err).To(BeNil())
 
 				FPDFText_LoadCidType2Font, err := PdfiumInstance.FPDFText_LoadCidType2Font(&requests.FPDFText_LoadCidType2Font{
@@ -943,7 +942,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/dashed_lines.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/dashed_lines.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1096,7 +1095,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/embedded_images.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/embedded_images.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1279,7 +1278,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/text_in_page_marked_indirect.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_in_page_marked_indirect.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1680,7 +1679,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/tagged_marked_content.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/tagged_marked_content.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1814,7 +1813,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/test.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/test.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -1877,7 +1876,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/rectangles.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2017,7 +2016,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/bug_42270471.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/bug_42270471.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2316,7 +2315,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/form_object.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/form_object.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
@@ -2411,7 +2410,7 @@ end
 		var doc references.FPDF_DOCUMENT
 
 		BeforeEach(func() {
-			pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/hello_world.pdf")
 			Expect(err).To(BeNil())
 
 			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{

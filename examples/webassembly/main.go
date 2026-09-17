@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
@@ -56,7 +56,7 @@ func main() {
 
 func getPageCount(filePath string) (int, error) {
 	// Load the PDF file into a byte array.
-	pdfBytes, err := ioutil.ReadFile(filePath)
+	pdfBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return 0, err
 	}

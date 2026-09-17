@@ -48,7 +48,7 @@ func (p *PdfiumImplementation) GetJavaScriptActions(request *requests.GetJavaScr
 	}
 
 	javaScriptActions := []responses.JavaScriptAction{}
-	for i := 0; i < javaScriptActionCount; i++ {
+	for i := range javaScriptActionCount {
 		res, err = p.call("FPDFDoc_GetJavaScriptAction", *documentHandle.handle, uint64(i))
 		if err != nil {
 			return nil, err

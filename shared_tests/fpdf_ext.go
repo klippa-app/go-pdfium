@@ -1,7 +1,7 @@
 package shared_tests
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/klippa-app/go-pdfium/enums"
 	"github.com/klippa-app/go-pdfium/requests"
@@ -217,7 +217,7 @@ var _ = Describe("fpdf_ext", func() {
 
 		When("a document with unsupported objects is opened", func() {
 			It("reports the unsupported objects to the handler", func() {
-				pdfData, err := ioutil.ReadFile(TestDataPath + "/testdata/unsupported_feature.pdf")
+				pdfData, err := os.ReadFile(TestDataPath + "/testdata/unsupported_feature.pdf")
 				Expect(err).To(BeNil())
 
 				newDoc, err := PdfiumInstance.OpenDocument(&requests.OpenDocument{
