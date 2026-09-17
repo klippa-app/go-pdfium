@@ -734,6 +734,25 @@ absolute POSIX paths inside a mount. `Kill` only interrupts a call that is runni
 
 Please be aware that Wago and its WASI plugin come with the `Apache License 2.0` license.
 
+### WebAssembly with wazy (experimental)
+
+There is also an experimental backend on the [wazy runtime](https://github.com/samyfodil/wazy), a pure Go runtime
+derived from wazero that keeps the same API and adds WebAssembly 3.0 and component model support. It lives in the
+`experimental/wazy` package, takes the same configuration as the `webassembly` package (with wazy's `RuntimeConfig`
+and `FSConfig` types), runs the complete go-pdfium test suite with the same results as wazero on amd64 and arm64, and
+also has an interpreter for other platforms:
+
+```go
+pool, err := wazy.Init(wazy.Config{
+	MinIdle:  1,
+	MaxIdle:  1,
+	MaxTotal: 1,
+})
+```
+
+It is marked experimental because wazy itself is young and its API may still change. Like wazero it comes with the
+`Apache License 2.0` license.
+
 ## `io.ReadSeeker` and `io.Writer`
 
 Document loading allows you to load a document with a `io.ReadSeeker`. Please be aware that this only works efficiently

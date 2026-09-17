@@ -194,11 +194,7 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 			// Every instance gets its own WASI state (file descriptors) and
 			// its own env module, because the env functions have to know
 			// which instance they run for.
-			wasi, err := wasiImports(workerCtx, compiledModule, config.Stdout, config.Stderr, config.RandomSource, config.Mounts)
-			if err != nil {
-				cancel()
-				return nil, err
-			}
+			wasi := wasiImports(workerCtx, config.Stdout, config.Stderr, config.RandomSource, config.Mounts)
 
 			instance, err := wagoRuntime.Instantiate(workerCtx, compiledModule, wagort.WithImports(hostImports(newModule)), wagort.WithImports(wasi))
 			if err != nil {
