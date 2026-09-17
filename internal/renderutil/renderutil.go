@@ -1,5 +1,6 @@
-// Package renderutil contains the size calculations that are shared between
-// the cgo and the webassembly implementation of the render methods.
+// Package renderutil contains the size calculations and pixel helpers that are
+// shared between the cgo and the webassembly implementation of the render
+// methods.
 package renderutil
 
 import (

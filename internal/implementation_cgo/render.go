@@ -11,8 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"image"
-	"image/color"
-	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
@@ -710,24 +708,16 @@ func (p *PdfiumImplementation) RenderToFile(request *requests.RenderToFile) (*re
 
 	var imgBuf bytes.Buffer
 
-	// If any of the pages have transparency, place a white background under
-	// the image like a PDF viewer would. This is also to fix transparency JPEG
+	// If any of the pages have transparency, flatten the image onto a white
+	// background like a PDF viewer would. This is also to fix transparency JPEG
 	// rendering, when you render a JPG image in Go, it will make the
 	// transparent background black.
+	// The blend is done in place on the rendered bitmap, which avoids a second
+	// full-size image allocation.
 	// Grayscale images have no alpha channel and are always rendered on a
 	// white background, so they don't need this.
 	if renderedImageRGBA, isRGBA := renderedImage.(*image.RGBA); hasTransparency && isRGBA {
-		imageWithWhiteBackground := image.NewRGBA(renderedImageRGBA.Bounds())
-		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-		// PDFium's FPDFBitmap_BGRA has straight (non-premultiplied) alpha.
-		// Wrap as NRGBA so draw.Over uses the correct straight-alpha compositing formula.
-		straightAlphaSrc := &image.NRGBA{
-			Pix:    renderedImageRGBA.Pix,
-			Stride: renderedImageRGBA.Stride,
-			Rect:   renderedImageRGBA.Rect,
-		}
-		draw.Draw(imageWithWhiteBackground, imageWithWhiteBackground.Bounds(), straightAlphaSrc, straightAlphaSrc.Bounds().Min, draw.Over)
-		renderedImage = imageWithWhiteBackground
+		renderutil.CompositeOnWhiteInPlace(renderedImageRGBA)
 	}
 
 	if request.OutputFormat == requests.RenderToFileOutputFormatJPG {
