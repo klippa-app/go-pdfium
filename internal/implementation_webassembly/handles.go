@@ -166,6 +166,12 @@ type PageHandle struct {
 	index       int // -1 when unknown.
 	documentRef references.FPDF_DOCUMENT
 	nativeRef   references.FPDF_PAGE // A string that is our reference inside the process. We need this to close the references in DestroyLibrary.
+
+	// stalePages are earlier FPDF_PAGE objects of this handle that were
+	// replaced by reloadPage. They stay alive until the handle is closed so
+	// that text pages, page objects and annotations obtained from them
+	// remain valid memory.
+	stalePages []uint64
 }
 
 // Close closes the internal references in FPDF
@@ -174,6 +180,10 @@ func (p *PageHandle) Close(pi *PdfiumImplementation) {
 		pi.call("FPDF_ClosePage", *p.handle)
 		p.handle = nil
 	}
+	for _, stalePage := range p.stalePages {
+		pi.call("FPDF_ClosePage", stalePage)
+	}
+	p.stalePages = nil
 }
 
 type BookmarkHandle struct {

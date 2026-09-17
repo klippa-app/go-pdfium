@@ -976,7 +976,14 @@ type Pdfium interface {
 
 	// Start fpdf_flatten.h
 
-	// FPDFPage_Flatten makes annotations and form fields become part of the page contents itself
+	// FPDFPage_Flatten makes annotations and form fields become part of the page contents itself.
+	// PDFium parses the content of a page only when the page is loaded, so on
+	// success the page is reloaded behind the given reference (or index):
+	// rendering and text extraction through the same page afterwards show the
+	// flattened result. Form fill environments that have the page loaded are
+	// moved over to the reloaded page. Text pages, page objects and annotations
+	// obtained from the page before flattening keep pointing at the old,
+	// unflattened content and should be re-acquired.
 	FPDFPage_Flatten(request *requests.FPDFPage_Flatten) (*responses.FPDFPage_Flatten, error)
 
 	// End fpdf_flatten.h
