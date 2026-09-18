@@ -122,7 +122,7 @@ even if you stay on wazero.
 
 The same benchmarks were run against unreleased wazero builds, to see what the upcoming changes bring for go-pdfium.
 Each variant was substituted for wazero v1.12.0 through a Go workspace `replace` directive, with everything else
-identical, and all four variants pass go-pdfium's complete wazero test suite. wazy was included in every run as a
+identical, and all five variants pass go-pdfium's complete wazero test suite. wazy was included in every run as a
 control for machine drift: its numbers were flat across the runs except for the `Render/test` micro-benchmark, where
 the control moved by about 20% between runs, so treat that one row as noisier than the rest.
 
@@ -132,20 +132,21 @@ the control moved by about 20% between runs, so treat that one row as noisier th
 | main | `451613ca` (2026-09-08) | wazero `main` |
 | main + 2533 | `451613ca` + [#2533](https://github.com/wazero/wazero/pull/2533) | function entry as a termination checkpoint |
 | main + 2529 + 2530 | `451613ca` + [#2529](https://github.com/wazero/wazero/pull/2529) + [#2530](https://github.com/wazero/wazero/pull/2530) | wazevo group-ID fix; clone-free `try_table` checkpoints via top-relative offsets and a trampoline |
+| main + 2529 + 2530 + 2533 | all three merged (one trivial conflict, both PRs add fields to the same struct) | the combination |
 
 ### Micro-benchmarks (native arm64, median of 5)
 
-| Benchmark | v1.12.0 | main | main+2533 | main+2529+2530 | main vs v1.12.0 | main+2533 vs v1.12.0 | main+2529+2530 vs v1.12.0 |
-|---|---|---|---|---|---|---|---|
-| Init | 1.14 s | 1.13 s | 1.14 s | 1.15 s | 0.99x | 1.01x | 1.02x |
-| NewInstance | 437.6 µs | 474.7 µs | 459.2 µs | 456.2 µs | 1.08x | 1.05x | 1.04x |
-| OpenDocument | 8.8 µs | 8.6 µs | 8.6 µs | 8.5 µs | 0.97x | 0.97x | 0.97x |
-| Render/test | 193.4 µs | 139.2 µs | 140.2 µs | 134.3 µs | 0.72x | 0.72x | 0.69x |
-| Render/alpha_channel | 26.97 ms | 25.58 ms | 25.54 ms | 24.67 ms | 0.95x | 0.95x | 0.91x |
-| Render/embedded_images | 1.05 ms | 973.1 µs | 966.4 µs | 905.0 µs | 0.93x | 0.92x | 0.86x |
-| Render/rect-wrong | 7.04 ms | 6.87 ms | 6.89 ms | 6.80 ms | 0.98x | 0.98x | 0.97x |
-| RenderToJPEG | 11.20 ms | 6.87 ms | 6.87 ms | 6.72 ms | 0.61x | 0.61x | 0.60x |
-| GetPageText | 29.0 µs | 26.8 µs | 27.2 µs | 26.6 µs | 0.93x | 0.94x | 0.92x |
+| Benchmark | v1.12.0 | main | main+2533 | main+2529+2530 | main+all three | main vs v1.12.0 | main+2533 vs v1.12.0 | main+2529+2530 vs v1.12.0 | main+all three vs v1.12.0 |
+|---|---|---|---|---|---|---|---|---|---|
+| Init | 1.14 s | 1.13 s | 1.14 s | 1.15 s | 1.15 s | 0.99x | 1.01x | 1.02x | 1.01x |
+| NewInstance | 437.6 µs | 474.7 µs | 459.2 µs | 456.2 µs | 451.8 µs | 1.08x | 1.05x | 1.04x | 1.03x |
+| OpenDocument | 8.8 µs | 8.6 µs | 8.6 µs | 8.5 µs | 8.3 µs | 0.97x | 0.97x | 0.97x | 0.94x |
+| Render/test | 193.4 µs | 139.2 µs | 140.2 µs | 134.3 µs | 147.4 µs | 0.72x | 0.72x | 0.69x | 0.76x |
+| Render/alpha_channel | 26.97 ms | 25.58 ms | 25.54 ms | 24.67 ms | 25.79 ms | 0.95x | 0.95x | 0.91x | 0.96x |
+| Render/embedded_images | 1.05 ms | 973.1 µs | 966.4 µs | 905.0 µs | 923.9 µs | 0.93x | 0.92x | 0.86x | 0.88x |
+| Render/rect-wrong | 7.04 ms | 6.87 ms | 6.89 ms | 6.80 ms | 6.65 ms | 0.98x | 0.98x | 0.97x | 0.94x |
+| RenderToJPEG | 11.20 ms | 6.87 ms | 6.87 ms | 6.72 ms | 6.82 ms | 0.61x | 0.61x | 0.60x | 0.61x |
+| GetPageText | 29.0 µs | 26.8 µs | 27.2 µs | 26.6 µs | 26.9 µs | 0.93x | 0.94x | 0.92x | 0.93x |
 
 ### Corpus, default configuration (5,000 documents)
 
@@ -155,6 +156,7 @@ the control moved by about 20% between runs, so treat that one row as noisier th
 | main | 66.6 s | 13.32 ms | 6.79 ms | 29.2 ms | 80 ms | 0.96x |
 | main + 2533 | 66.8 s | 13.37 ms | 6.80 ms | 29.4 ms | 81 ms | 0.96x |
 | main + 2529 + 2530 | 63.9 s | 12.79 ms | 6.66 ms | 28.0 ms | 77 ms | 0.92x |
+| main + 2529 + 2530 + 2533 | 64.6 s | 12.93 ms | 6.71 ms | 28.3 ms | 79 ms | 0.93x |
 
 ### Corpus with close-on-context-done (every fifth document, 1,000 files)
 
@@ -164,6 +166,7 @@ the control moved by about 20% between runs, so treat that one row as noisier th
 | main | 63.6 s | 63.56 ms | 24.79 ms | 174.2 ms | 392 ms | 0.98x |
 | main + 2533 | 14.8 s | 14.82 ms | 6.97 ms | 31.6 ms | 85 ms | 0.23x |
 | main + 2529 + 2530 | 62.9 s | 62.94 ms | 24.49 ms | 172.4 ms | 379 ms | 0.97x |
+| main + 2529 + 2530 + 2533 | 14.2 s | 14.22 ms | 6.79 ms | 30.2 ms | 81 ms | 0.22x |
 
 ### Reading the numbers
 
@@ -175,5 +178,6 @@ the control moved by about 20% between runs, so treat that one row as noisier th
   becomes essentially free on wazero, and wazero is faster than wazy in that mode (wazy: 17.6 s on the same files).
 - **#2529 + #2530** improve default execution a little further (another 4% on the corpus, 0.86x on the image page,
   0.60x on JPEG encode) but do not touch the close-on-context-done cost.
-
-The two changes are independent, so the combination of all three PRs is the one to look forward to.
+- **All three together** behave as the sum of the parts: the default corpus matches #2529 + #2530 (64.6 s, 0.93x),
+  and the interruptible corpus matches #2533 (14.2 s, 0.22x). Nothing regresses when they are combined, so this is
+  the configuration to look forward to: a few percent faster than today, and `WithCloseOnContextDone` at no cost.
