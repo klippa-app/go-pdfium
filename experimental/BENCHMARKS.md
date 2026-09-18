@@ -117,3 +117,63 @@ go-pdfium. Enabling it changes the picture completely, measured on every fifth d
 wazero becomes about 4.5 times slower with the option on, wazy about 1.4 times. If you need `Kill()` to interrupt
 stuck renders, this is the biggest performance difference between the two runtimes by far, and worth knowing about
 even if you stay on wazero.
+
+## wazero versions
+
+The same benchmarks were run against unreleased wazero builds, to see what the upcoming changes bring for go-pdfium.
+Each variant was substituted for wazero v1.12.0 through a Go workspace `replace` directive, with everything else
+identical, and all four variants pass go-pdfium's complete wazero test suite. wazy was included in every run as a
+control for machine drift: its numbers were flat across the runs except for the `Render/test` micro-benchmark, where
+the control moved by about 20% between runs, so treat that one row as noisier than the rest.
+
+| Variant | Commit | What it is |
+|---|---|---|
+| v1.12.0 | release | the version go-pdfium uses |
+| main | `451613ca` (2026-09-08) | wazero `main` |
+| main + 2533 | `451613ca` + [#2533](https://github.com/wazero/wazero/pull/2533) | function entry as a termination checkpoint |
+| main + 2529 + 2530 | `451613ca` + [#2529](https://github.com/wazero/wazero/pull/2529) + [#2530](https://github.com/wazero/wazero/pull/2530) | wazevo group-ID fix; clone-free `try_table` checkpoints via top-relative offsets and a trampoline |
+
+### Micro-benchmarks (native arm64, median of 5)
+
+| Benchmark | v1.12.0 | main | main+2533 | main+2529+2530 | main vs v1.12.0 | main+2533 vs v1.12.0 | main+2529+2530 vs v1.12.0 |
+|---|---|---|---|---|---|---|---|
+| Init | 1.14 s | 1.13 s | 1.14 s | 1.15 s | 0.99x | 1.01x | 1.02x |
+| NewInstance | 437.6 µs | 474.7 µs | 459.2 µs | 456.2 µs | 1.08x | 1.05x | 1.04x |
+| OpenDocument | 8.8 µs | 8.6 µs | 8.6 µs | 8.5 µs | 0.97x | 0.97x | 0.97x |
+| Render/test | 193.4 µs | 139.2 µs | 140.2 µs | 134.3 µs | 0.72x | 0.72x | 0.69x |
+| Render/alpha_channel | 26.97 ms | 25.58 ms | 25.54 ms | 24.67 ms | 0.95x | 0.95x | 0.91x |
+| Render/embedded_images | 1.05 ms | 973.1 µs | 966.4 µs | 905.0 µs | 0.93x | 0.92x | 0.86x |
+| Render/rect-wrong | 7.04 ms | 6.87 ms | 6.89 ms | 6.80 ms | 0.98x | 0.98x | 0.97x |
+| RenderToJPEG | 11.20 ms | 6.87 ms | 6.87 ms | 6.72 ms | 0.61x | 0.61x | 0.60x |
+| GetPageText | 29.0 µs | 26.8 µs | 27.2 µs | 26.6 µs | 0.93x | 0.94x | 0.92x |
+
+### Corpus, default configuration (5,000 documents)
+
+| wazero | Total render time | Mean | Median | p90 | p99 | vs v1.12.0 |
+|---|---|---|---|---|---|---|
+| v1.12.0 | 69.4 s | 13.88 ms | 7.09 ms | 30.7 ms | 83 ms | 1.00x |
+| main | 66.6 s | 13.32 ms | 6.79 ms | 29.2 ms | 80 ms | 0.96x |
+| main + 2533 | 66.8 s | 13.37 ms | 6.80 ms | 29.4 ms | 81 ms | 0.96x |
+| main + 2529 + 2530 | 63.9 s | 12.79 ms | 6.66 ms | 28.0 ms | 77 ms | 0.92x |
+
+### Corpus with close-on-context-done (every fifth document, 1,000 files)
+
+| wazero | Total render time | Mean | Median | p90 | p99 | vs v1.12.0 |
+|---|---|---|---|---|---|---|
+| v1.12.0 | 64.8 s | 64.79 ms | 25.36 ms | 175.1 ms | 426 ms | 1.00x |
+| main | 63.6 s | 63.56 ms | 24.79 ms | 174.2 ms | 392 ms | 0.98x |
+| main + 2533 | 14.8 s | 14.82 ms | 6.97 ms | 31.6 ms | 85 ms | 0.23x |
+| main + 2529 + 2530 | 62.9 s | 62.94 ms | 24.49 ms | 172.4 ms | 379 ms | 0.97x |
+
+### Reading the numbers
+
+- **main** is a few percent faster than v1.12.0 across the board (4% on the corpus) and a lot faster on the JPEG
+  encode path (0.61x), which runs libjpeg-turbo's SIMD kernels inside the module.
+- **#2533** does not change the default path at all, but it removes the close-on-context-done penalty almost
+  completely: the interruptible corpus run goes from 63.6 s to 14.8 s, within 3% of the 14.4 s that v1.12.0 needs
+  with the option off. With this PR, enabling `WithCloseOnContextDone` so that `Kill()` can interrupt a stuck render
+  becomes essentially free on wazero, and wazero is faster than wazy in that mode (wazy: 17.6 s on the same files).
+- **#2529 + #2530** improve default execution a little further (another 4% on the corpus, 0.86x on the image page,
+  0.60x on JPEG encode) but do not touch the close-on-context-done cost.
+
+The two changes are independent, so the combination of all three PRs is the one to look forward to.
