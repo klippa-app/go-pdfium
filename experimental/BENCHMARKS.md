@@ -181,3 +181,29 @@ the control moved by about 20% between runs, so treat that one row as noisier th
 - **All three together** behave as the sum of the parts: the default corpus matches #2529 + #2530 (64.6 s, 0.93x),
   and the interruptible corpus matches #2533 (14.2 s, 0.22x). Nothing regresses when they are combined, so this is
   the configuration to look forward to: a few percent faster than today, and `WithCloseOnContextDone` at no cost.
+
+### Compared with wazy
+
+wazy was the control in every run, so the combined variant can be compared with it directly, from the same run:
+
+| Benchmark | wazero main + 2529 + 2530 + 2533 | wazy v0.3.0 | wazy vs wazero |
+|---|---|---|---|
+| Init | 1.15 s | 714 ms | 0.62x |
+| NewInstance | 451.8 µs | 230.7 µs | 0.51x |
+| OpenDocument | 8.3 µs | 6.7 µs | 0.81x |
+| Render/test | 147.4 µs | 129.8 µs | 0.88x |
+| Render/alpha_channel | 25.79 ms | 24.13 ms | 0.94x |
+| Render/embedded_images | 923.9 µs | 811.9 µs | 0.88x |
+| Render/rect-wrong | 6.65 ms | 6.28 ms | 0.95x |
+| RenderToJPEG | 6.82 ms | 7.43 ms | 1.09x |
+| GetPageText | 26.9 µs | 24.3 µs | 0.90x |
+
+| Corpus | wazero main + 2529 + 2530 + 2533 | wazy v0.3.0 | wazy vs wazero |
+|---|---|---|---|
+| default configuration, 5,000 documents | 64.6 s | 61.2 s | 0.92x |
+| close-on-context-done, 1,000 documents | 14.2 s | 17.6 s | 1.16x |
+
+Against v1.12.0 wazy is 14% faster on the corpus; against wazero with the three PRs it is 8% faster in the default
+configuration and 16% slower once close-on-context-done is enabled, and wazero wins the in-module JPEG encode. What
+wazy keeps is the startup side: it compiles the module in 0.62x the time and creates a worker in half the time with a
+small fraction of the allocations. In execution the two runtimes end up close to even.
