@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/go-plugin v1.8.0
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
+	github.com/onsi/gomega v1.43.1
 	github.com/samyfodil/wazy v0.3.0
 	github.com/tetratelabs/wazero v1.12.0
 	github.com/wago-org/wago v0.1.0-beta.9
