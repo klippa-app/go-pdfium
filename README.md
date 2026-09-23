@@ -719,12 +719,14 @@ func init() {
 Wago compiles the module about ten times faster than wazero's compiler and runs it a bit faster, but it is still in
 beta and this backend is experimental for the following reasons:
 
-- Wago's arm64 backend can not compile the PDFium module yet because of a register allocation bug in wago
-  (`no V register available to spill` in agg's `curve4_div::recursive_bezier`), so at the moment this backend only
-  works on amd64. `Init` returns an error on other architectures.
-- Wago's amd64 backend miscompiles something around Little-CMS's `PackLabDoubleFromFloat`, which makes a page with an
-  ICC based colour space (`alpha_channel.pdf` in the test suite) render with a black instead of a white background.
-  Everything else in the go-pdfium test suite produces the same output as wazero and native PDFium.
+- It needs a very recent wago: releases up to `v0.1.0-beta.9` could not compile the PDFium module on arm64 and
+  miscompiled parts of it on both architectures. Those bugs were fixed on wago's main branch in September 2026 and
+  go-pdfium pins a commit that passes the complete go-pdfium test suite on amd64 and arm64. Do not downgrade the
+  dependency.
+- One known problem remains on arm64: wago's `memory.fill` clobbers a register that is still in use, which PDFium hits
+  in `std::fill_n` on a `std::vector<bool>`. In a sequence of 1,000 real world documents rendered on one long running
+  instance, 2 documents came out differently from wazero because of it (a different sequence of 5,000 documents had
+  no mismatch). linux/amd64 is not affected. This has been reported to wago with a 30 line reproducer.
 - The API of Wago itself is not stable yet.
 
 Filesystem access works through Wago's WASI plugin. Use `Mounts` in the config to choose which host directories PDFium
@@ -751,8 +753,13 @@ pool, err := wazy.Init(wazy.Config{
 ```
 
 It is marked experimental because wazy itself is young and its API may still change. Like wazero it comes with the
-`Apache License 2.0` license. A comparison of the two runtimes, including a 5,000 document real world corpus, is in
+`Apache License 2.0` license. A comparison of the runtimes, including a 5,000 document real world corpus, is in
 [experimental/BENCHMARKS.md](experimental/BENCHMARKS.md).
+
+Both wazero and wazy compile the module with a single goroutine by default, which takes about a second on a fast
+machine. Both can compile in parallel when the context passed as `Context` in the config carries the number of
+workers: `experimental.WithCompilationWorkers(ctx, n)` from wazero, or `api.WithCompilationWorkers(ctx, n)` from wazy.
+With four workers the pool starts about three times faster.
 
 ## `io.ReadSeeker` and `io.Writer`
 

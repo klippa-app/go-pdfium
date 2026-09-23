@@ -3,7 +3,10 @@
 // equality. All runtimes run in one process and are interleaved per document,
 // so that machine state drift affects them equally.
 //
-//	go run ./experimental/benchmark/cmd/corpus -dir /path/to/pdfs [-runtimes wazero,wazy] [-dpi 100] [-limit N] [-csv out.csv]
+//	go run ./experimental/benchmark/cmd/corpus -dir /path/to/pdfs [-runtimes wazero,wazy,wago] [-dpi 100] [-limit N] [-csv out.csv]
+//
+// A runtime that can not run the module on this machine is reported and left
+// out.
 package main
 
 import (
@@ -20,6 +23,7 @@ import (
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/experimental/wago"
 	"github.com/klippa-app/go-pdfium/experimental/wazy"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/webassembly"
@@ -29,6 +33,7 @@ import (
 	"github.com/tetratelabs/wazero"
 	wazeroapi "github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/experimental"
+	wagort "github.com/wago-org/wago"
 )
 
 type runtimeSpec struct {
@@ -47,6 +52,10 @@ var specs = []runtimeSpec{
 	{"wazy", func(interruptible bool) (pdfium.Pool, error) {
 		return wazy.Init(wazy.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: true,
 			RuntimeConfig: wazyrt.NewRuntimeConfig().WithCoreFeatures(wazyapi.CoreFeaturesV2 | wazyapi.CoreFeatureExceptionHandling).WithCloseOnContextDone(interruptible)})
+	}},
+	{"wago", func(interruptible bool) (pdfium.Pool, error) {
+		return wago.Init(wago.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: true, InterruptibleCalls: interruptible,
+			RuntimeConfig: wagort.NewRuntimeConfig()})
 	}},
 }
 
@@ -108,6 +117,18 @@ func (s *runtimeState) render(data []byte, dpi int, timeout time.Duration) resul
 	}
 }
 
+// readSmokeDocument returns the first PDF of the directory, used to check that
+// a runtime works at all.
+func readSmokeDocument(dir string) []byte {
+	files, _ := filepath.Glob(filepath.Join(dir, "*.pdf"))
+	sort.Strings(files)
+	if len(files) == 0 {
+		return nil
+	}
+	data, _ := os.ReadFile(files[0])
+	return data
+}
+
 func percentile(sorted []float64, p float64) float64 {
 	if len(sorted) == 0 {
 		return math.NaN()
@@ -118,7 +139,7 @@ func percentile(sorted []float64, p float64) float64 {
 
 func main() {
 	dir := flag.String("dir", "", "directory with PDF files")
-	names := flag.String("runtimes", "wazero,wazy", "comma separated runtimes to compare")
+	names := flag.String("runtimes", "wazero,wazy,wago", "comma separated runtimes to compare")
 	dpi := flag.Int("dpi", 100, "render DPI")
 	limit := flag.Int("limit", 0, "only use the first N files (0 = all)")
 	stride := flag.Int("stride", 1, "use every Nth file")
@@ -160,7 +181,17 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		states = append(states, &runtimeState{spec: spec, pool: pool, instance: instance, compile: time.Since(start)})
+		compile := time.Since(start)
+		// Check one render up front, a runtime that miscompiles the module on
+		// this machine would otherwise fail on every document.
+		state := &runtimeState{spec: spec, pool: pool, instance: instance, compile: compile}
+		if smoke := state.render(readSmokeDocument(*dir), *dpi, *timeout); smoke.err != nil {
+			fmt.Printf("%s: can not run the module on this machine: %v\n", spec.name, smoke.err)
+			instance.Close()
+			pool.Close()
+			continue
+		}
+		states = append(states, state)
 	}
 	if len(states) == 0 {
 		fmt.Println("no runtime available")

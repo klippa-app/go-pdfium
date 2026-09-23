@@ -29,11 +29,6 @@ var _ = BeforeSuite(func() {
 		MaxIdle:  1, // Makes sure that at most x workers are ever available
 		MaxTotal: 1, // The maximum number of workers in total, allows the number of workers to grow when needed, items between total max and idle max are automatically cleaned up, while idle workers are kept alive so they can be used directly.
 	})
-	if err != nil && runtime.GOARCH == "arm64" && strings.Contains(err.Error(), "could not compile webassembly module") {
-		// The wago arm64 backend can not compile the PDFium module yet, see
-		// the note in the package documentation.
-		Skip("wago can not compile the PDFium module on arm64: " + err.Error())
-	}
 	Expect(err).To(BeNil())
 
 	shared_tests.PdfiumPool = pool
@@ -41,6 +36,20 @@ var _ = BeforeSuite(func() {
 	instance, err := pool.GetInstance(time.Second * 30)
 	Expect(err).To(BeNil())
 	shared_tests.PdfiumInstance = instance
+
+	// Older wago versions compiled the module on arm64 but miscompiled part
+	// of it, which showed up as memory traps on the first render. Check one
+	// render up front and skip the suite instead of failing hundreds of
+	// specs when that happens again, for example after a wago downgrade.
+	if runtime.GOARCH == "arm64" {
+		if err := smokeRender(instance); err != nil {
+			Expect(instance.Close()).To(Succeed())
+			Expect(pool.Close()).To(Succeed())
+			shared_tests.PdfiumInstance = nil
+			shared_tests.PdfiumPool = nil
+			Skip("wago miscompiles the PDFium module on arm64: " + err.Error())
+		}
+	}
 	shared_tests.TestDataPath = "../../shared_tests"
 
 	if runtime.GOOS == "windows" {
@@ -57,6 +66,28 @@ var _ = BeforeSuite(func() {
 
 	shared_tests.TestType = "webassembly"
 })
+
+// smokeRender renders the first page of the smallest test document once.
+func smokeRender(instance pdfium.Pdfium) error {
+	data, err := os.ReadFile("../../shared_tests/testdata/test.pdf")
+	if err != nil {
+		return err
+	}
+	doc, err := instance.OpenDocument(&requests.OpenDocument{File: &data})
+	if err != nil {
+		return err
+	}
+	defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc.Document})
+	rendered, err := instance.RenderPageInDPI(&requests.RenderPageInDPI{
+		Page: requests.Page{ByIndex: &requests.PageByIndex{Document: doc.Document, Index: 0}},
+		DPI:  50,
+	})
+	if err != nil {
+		return err
+	}
+	rendered.Cleanup()
+	return nil
+}
 
 var _ = AfterSuite(func() {
 	if shared_tests.PdfiumInstance == nil {

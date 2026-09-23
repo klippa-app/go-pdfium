@@ -3,12 +3,14 @@
 // pure Go ahead-of-time compiler. It is an alternative to the webassembly
 // package, which uses wazero, and exposes the same pool API.
 //
-// Wago is still in beta and this backend is experimental. At the time of
-// writing wago's arm64 backend fails to compile the bundled PDFium module (a
-// register allocation bug in wago), so this backend only works on amd64, and
-// its amd64 backend miscompiles part of Little-CMS, which makes pages with an
-// ICC based colour space render with a wrong background. See the README for
-// the current state.
+// Wago is still in beta and this backend is experimental. It passes
+// go-pdfium's complete test suite on amd64 and arm64 with the wago commit
+// pinned in go.mod; earlier wago versions could not compile or miscompiled
+// the PDFium module, so do not downgrade the dependency. One known problem
+// remains on arm64: wago's memory.fill clobbers a live register, which makes
+// PDFium's std::fill_n on a std::vector<bool> corrupt memory in rare cases (2
+// of 1,000 real world documents in one test sequence rendered differently).
+// This has been reported to wago. See the README for the current state.
 package wago
 
 import (

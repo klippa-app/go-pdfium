@@ -1,18 +1,18 @@
 // Package benchmark compares the WebAssembly runtimes go-pdfium can run the
-// PDFium module on: wazero (the webassembly package) and wazy (the
-// experimental package). Every benchmark runs the same workload through the
+// PDFium module on: wazero (the webassembly package), wazy and wago (the
+// experimental packages). Every benchmark runs the same workload through the
 // public pdfium.Pool API of each backend, so the numbers include go-pdfium's
 // own overhead in the same way for all of them.
 //
-// The experimental wago backend is left out until wago's arm64 compile and
-// amd64 miscompile issues are fixed, see the wago package documentation.
+// A runtime that can not run the module on the current machine is skipped
+// after a smoke render.
 //
 // Run with:
 //
 //	go test -run '^$' -bench . -benchmem -count 5 ./experimental/benchmark
 //
-// Set PDFIUM_BENCHMARK_RUNTIMES to a comma separated subset of wazero,wazy to
-// benchmark fewer runtimes.
+// Set PDFIUM_BENCHMARK_RUNTIMES to a comma separated subset of
+// wazero,wazy,wago to benchmark fewer runtimes.
 package benchmark
 
 import (
@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium/experimental/wago"
 	"github.com/klippa-app/go-pdfium/experimental/wazy"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/webassembly"
@@ -41,16 +42,61 @@ var runtimes = []runtimeSpec{
 	{"wazy", func(reuse bool) (pdfium.Pool, error) {
 		return wazy.Init(wazy.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse})
 	}},
+	{"wago", func(reuse bool) (pdfium.Pool, error) {
+		return wago.Init(wago.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse})
+	}},
+}
+
+// smokeRender renders the first page of the smallest test document once. It
+// reports whether the runtime can actually run the module on this machine.
+func smokeRender(instance pdfium.Pdfium) error {
+	data, err := os.ReadFile(testdata + "test.pdf")
+	if err != nil {
+		return err
+	}
+	doc, err := instance.OpenDocument(&requests.OpenDocument{File: &data})
+	if err != nil {
+		return err
+	}
+	defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{Document: doc.Document})
+	rendered, err := instance.RenderPageInDPI(&requests.RenderPageInDPI{
+		Page: requests.Page{ByIndex: &requests.PageByIndex{Document: doc.Document, Index: 0}},
+		DPI:  50,
+	})
+	if err != nil {
+		return err
+	}
+	rendered.Cleanup()
+	return nil
+}
+
+// usable reports whether spec can run the module on this machine, skipping
+// the benchmark with the reason when it can not.
+func usable(b *testing.B, spec runtimeSpec) bool {
+	pool, err := spec.init(true)
+	if err != nil {
+		b.Skipf("%s: %v", spec.name, err)
+		return false
+	}
+	defer pool.Close()
+	instance, err := pool.GetInstance(30 * time.Second)
+	if err != nil {
+		b.Skipf("%s: %v", spec.name, err)
+		return false
+	}
+	defer instance.Close()
+	if err := smokeRender(instance); err != nil {
+		b.Skipf("%s can not run the module on this machine: %v", spec.name, err)
+		return false
+	}
+	return true
 }
 
 func selectedRuntimes(b *testing.B) []runtimeSpec {
 	env := os.Getenv("PDFIUM_BENCHMARK_RUNTIMES")
-	if env == "" {
-		return runtimes
-	}
 	var out []runtimeSpec
 	for _, spec := range runtimes {
-		if strings.Contains(","+env+",", ","+spec.name+",") {
+		if env == "" || strings.Contains(","+env+",", ","+spec.name+",") {
 			out = append(out, spec)
 		}
 	}
@@ -63,6 +109,9 @@ func forEachRuntime(b *testing.B, fn func(b *testing.B, instance pdfium.Pdfium))
 	for _, spec := range selectedRuntimes(b) {
 		spec := spec
 		b.Run(spec.name, func(b *testing.B) {
+			if !usable(b, spec) {
+				return
+			}
 			pool, err := spec.init(true)
 			if err != nil {
 				b.Skipf("%s: %v", spec.name, err)
@@ -92,6 +141,10 @@ func BenchmarkInit(b *testing.B) {
 	for _, spec := range selectedRuntimes(b) {
 		spec := spec
 		b.Run(spec.name, func(b *testing.B) {
+			if !usable(b, spec) {
+				return
+			}
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				pool, err := spec.init(true)
 				if err != nil {
@@ -110,6 +163,9 @@ func BenchmarkNewInstance(b *testing.B) {
 	for _, spec := range selectedRuntimes(b) {
 		spec := spec
 		b.Run(spec.name, func(b *testing.B) {
+			if !usable(b, spec) {
+				return
+			}
 			pool, err := spec.init(false)
 			if err != nil {
 				b.Skipf("%s: %v", spec.name, err)
