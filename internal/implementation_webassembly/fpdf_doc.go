@@ -184,7 +184,7 @@ func (p *PdfiumImplementation) FPDFBookmark_GetDest(request *requests.FPDFBookma
 		return nil, err
 	}
 
-	res, err := p.call("FPDFBookmark_Find", *documentHandle.handle, *bookmarkHandle.handle)
+	res, err := p.call("FPDFBookmark_GetDest", *documentHandle.handle, *bookmarkHandle.handle)
 	if err != nil {
 		return nil, err
 	}
