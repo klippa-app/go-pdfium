@@ -357,6 +357,63 @@ var _ = Describe("fpdf_doc", func() {
 		})
 	})
 
+	Context("a PDF file with bookmarks that carry an explicit /Dest", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/bookmarks_dest.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		When("FPDFBookmark_GetDest is called", func() {
+			It("returns the destination page of each bookmark", func() {
+				bookmark, err := PdfiumInstance.FPDFBookmark_GetFirstChild(&requests.FPDFBookmark_GetFirstChild{
+					Document: doc,
+				})
+				Expect(err).To(BeNil())
+
+				for _, wantPage := range []int{1, 2} {
+					Expect(bookmark.Bookmark).To(Not(BeNil()))
+					dest, err := PdfiumInstance.FPDFBookmark_GetDest(&requests.FPDFBookmark_GetDest{
+						Document: doc,
+						Bookmark: *bookmark.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					Expect(dest.Dest).To(Not(BeNil()))
+
+					pageIndex, err := PdfiumInstance.FPDFDest_GetDestPageIndex(&requests.FPDFDest_GetDestPageIndex{
+						Document: doc,
+						Dest:     *dest.Dest,
+					})
+					Expect(err).To(BeNil())
+					Expect(pageIndex.Index).To(Equal(wantPage))
+
+					next, err := PdfiumInstance.FPDFBookmark_GetNextSibling(&requests.FPDFBookmark_GetNextSibling{
+						Document: doc,
+						Bookmark: *bookmark.Bookmark,
+					})
+					Expect(err).To(BeNil())
+					bookmark = &responses.FPDFBookmark_GetFirstChild{Bookmark: next.Bookmark}
+				}
+			})
+		})
+	})
+
 	Context("a PDF file with bookmarks", func() {
 		var doc references.FPDF_DOCUMENT
 
