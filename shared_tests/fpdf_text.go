@@ -676,4 +676,106 @@ var _ = Describe("fpdf_text", func() {
 			})
 		})
 	})
+
+	Context("a PDF file whose page texts start with bytes that look like a byte order mark", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/text_bom_lookalike.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		loadTextPage := func(index int) references.FPDF_TEXTPAGE {
+			FPDFText_LoadPage, err := PdfiumInstance.FPDFText_LoadPage(&requests.FPDFText_LoadPage{
+				Page: requests.Page{
+					ByIndex: &requests.PageByIndex{
+						Document: doc,
+						Index:    index,
+					},
+				},
+			})
+			Expect(err).To(BeNil())
+			return FPDFText_LoadPage.TextPage
+		}
+
+		closeTextPage := func(textPage references.FPDF_TEXTPAGE) {
+			FPDFText_ClosePage, err := PdfiumInstance.FPDFText_ClosePage(&requests.FPDFText_ClosePage{
+				TextPage: textPage,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFText_ClosePage).To(Not(BeNil()))
+		}
+
+		// In UTF-16LE, "믯얿" starts with EF BB BF and U+FEFF is FF FE.
+		It("returns each page's text as written", func() {
+			for index, want := range []string{
+				"믯얿 page one",
+				"\ufeffpage two",
+			} {
+				textPage := loadTextPage(index)
+				FPDFText_CountChars, err := PdfiumInstance.FPDFText_CountChars(&requests.FPDFText_CountChars{
+					TextPage: textPage,
+				})
+				Expect(err).To(BeNil())
+
+				FPDFText_GetText, err := PdfiumInstance.FPDFText_GetText(&requests.FPDFText_GetText{
+					TextPage:   textPage,
+					StartIndex: 0,
+					Count:      FPDFText_CountChars.Count,
+				})
+				Expect(err).To(BeNil())
+				Expect(FPDFText_GetText).To(Equal(&responses.FPDFText_GetText{
+					Text: want,
+				}))
+				closeTextPage(textPage)
+			}
+		})
+
+		It("finds a term that starts with U+FEFF", func() {
+			textPage := loadTextPage(1)
+			FPDFText_FindStart, err := PdfiumInstance.FPDFText_FindStart(&requests.FPDFText_FindStart{
+				TextPage: textPage,
+				Find:     "\ufeffpage",
+			})
+			Expect(err).To(BeNil())
+
+			FPDFText_FindNext, err := PdfiumInstance.FPDFText_FindNext(&requests.FPDFText_FindNext{
+				Search: FPDFText_FindStart.Search,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFText_FindNext).To(Equal(&responses.FPDFText_FindNext{
+				GotMatch: true,
+			}))
+
+			FPDFText_GetSchResultIndex, err := PdfiumInstance.FPDFText_GetSchResultIndex(&requests.FPDFText_GetSchResultIndex{
+				Search: FPDFText_FindStart.Search,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFText_GetSchResultIndex).To(Equal(&responses.FPDFText_GetSchResultIndex{
+				Index: 0,
+			}))
+
+			FPDFText_FindClose, err := PdfiumInstance.FPDFText_FindClose(&requests.FPDFText_FindClose{
+				Search: FPDFText_FindStart.Search,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFText_FindClose).To(Not(BeNil()))
+			closeTextPage(textPage)
+		})
+	})
 })

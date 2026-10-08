@@ -247,9 +247,9 @@ func (p *PdfiumImplementation) GetPageTextStructured(request *requests.GetPageTe
 }
 
 func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
+	// PDFium returns UTF-16LE without a byte order mark, so don't look for one.
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewDecoder())
-	unicodeReader := transform.NewReader(bytes.NewReader(charData), utf16bom)
+	unicodeReader := transform.NewReader(bytes.NewReader(charData), pdf16le.NewDecoder())
 
 	decoded, err := io.ReadAll(unicodeReader)
 	if err != nil {
@@ -263,11 +263,11 @@ func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, 
 }
 
 func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
+	// PDFium takes UTF-16LE without a byte order mark, so a leading U+FEFF is kept.
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
 
 	output := &bytes.Buffer{}
-	unicodeWriter := transform.NewWriter(output, utf16bom)
+	unicodeWriter := transform.NewWriter(output, pdf16le.NewEncoder())
 	unicodeWriter.Write([]byte(text))
 	unicodeWriter.Close()
 
