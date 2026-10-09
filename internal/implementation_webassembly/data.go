@@ -138,27 +138,10 @@ func (p *PdfiumImplementation) CString(input string) (*CString, error) {
 }
 
 func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, error) {
-	// BOM handling, matching the previous unicode.BOMOverride behavior.
-	if bytes.HasPrefix(charData, []byte{0xEF, 0xBB, 0xBF}) {
-		// Data is already UTF-8.
-		return string(bytes.TrimSuffix(charData[3:], []byte("\x00"))), nil
-	}
-
-	bigEndian := false
-	if bytes.HasPrefix(charData, []byte{0xFF, 0xFE}) {
-		charData = charData[2:]
-	} else if bytes.HasPrefix(charData, []byte{0xFE, 0xFF}) {
-		bigEndian = true
-		charData = charData[2:]
-	}
-
+	// PDFium returns UTF-16LE without a byte order mark, so don't look for one.
 	u16 := make([]uint16, 0, len(charData)/2)
 	for i := 0; i+1 < len(charData); i += 2 {
-		if bigEndian {
-			u16 = append(u16, uint16(charData[i])<<8|uint16(charData[i+1]))
-		} else {
-			u16 = append(u16, uint16(charData[i])|uint16(charData[i+1])<<8)
-		}
+		u16 = append(u16, uint16(charData[i])|uint16(charData[i+1])<<8)
 	}
 
 	runes := utf16.Decode(u16)
@@ -177,11 +160,11 @@ func (p *PdfiumImplementation) transformUTF16LEToUTF8(charData []byte) (string, 
 }
 
 func (p *PdfiumImplementation) transformUTF8ToUTF16LE(text string) ([]byte, error) {
+	// PDFium takes UTF-16LE without a byte order mark, so a leading U+FEFF is kept.
 	pdf16le := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	utf16bom := unicode.BOMOverride(pdf16le.NewEncoder())
 
 	output := &bytes.Buffer{}
-	unicodeWriter := transform.NewWriter(output, utf16bom)
+	unicodeWriter := transform.NewWriter(output, pdf16le.NewEncoder())
 	unicodeWriter.Write([]byte(text))
 	unicodeWriter.Close()
 
