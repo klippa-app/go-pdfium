@@ -190,6 +190,52 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentID(request *re
 	}, nil
 }
 
+// FPDF_StructElement_GetRawType returns the raw value of the /S entry for a given element.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	structElementHandle, err := p.getStructElementHandle(request.StructElement)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := p.call("FPDF_StructElement_GetRawType", *structElementHandle.handle, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	rawTypeLength := uint64(*(*int32)(unsafe.Pointer(&res[0])))
+	if rawTypeLength == 0 {
+		return nil, errors.New("could not get raw type")
+	}
+
+	charDataPointer, err := p.ByteArrayPointer(rawTypeLength, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.call("FPDF_StructElement_GetRawType", *structElementHandle.handle, charDataPointer.Pointer, rawTypeLength)
+	if err != nil {
+		return nil, err
+	}
+
+	charData, err := charDataPointer.Value(false)
+	if err != nil {
+		return nil, err
+	}
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_StructElement_GetRawType{
+		RawType: transformedText,
+	}, nil
+}
+
 // FPDF_StructElement_GetType returns the type (/S) for a given element.
 func (p *PdfiumImplementation) FPDF_StructElement_GetType(request *requests.FPDF_StructElement_GetType) (*responses.FPDF_StructElement_GetType, error) {
 	p.Lock()

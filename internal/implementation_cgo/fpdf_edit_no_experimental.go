@@ -195,6 +195,18 @@ func (p *PdfiumImplementation) FPDFPageObj_GetRenderedStrokePattern(request *req
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
 
+// FPDFPageObj_GetRenderedFillPattern returns a bitmap rasterization of the
+// fill pattern of the given page object.
+// To render correctly, the caller must provide the document associated with
+// the page object. The returned bitmap will be owned by the caller, and
+// FPDFBitmap_Destroy() must be called on the returned bitmap when it is no
+// longer needed.
+// Returns an error when the fill is not a tiling pattern or on failure.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern) (*responses.FPDFPageObj_GetRenderedFillPattern, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}
+
 // FPDFPageObj_GetRotatedBounds Get the quad points that bounds the page object.
 // Similar to FPDFPageObj_GetBounds(), this returns the bounds of a page
 // object. When the object is rotated by a non-multiple of 90 degrees, this API

@@ -406,3 +406,35 @@ func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFA
 		Subtype: &transformedText,
 	}, nil
 }
+
+// FPDFAttachment_GetAFRelationship gets the associated file relationship string (the /AFRelationship
+// entry in the file specification dictionary) of the embedded file attachment. Returns an empty value
+// when the entry is absent or is not a name.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	attachmentHandle, err := p.getAttachmentHandle(request.Attachment)
+	if err != nil {
+		return nil, err
+	}
+
+	// First get the relationship length.
+	relationshipSize := C.FPDFAttachment_GetAFRelationship(attachmentHandle.handle, nil, 0)
+	if relationshipSize == 0 {
+		return nil, errors.New("could not get AF relationship")
+	}
+
+	charData := make([]byte, relationshipSize)
+	C.FPDFAttachment_GetAFRelationship(attachmentHandle.handle, (*C.ushort)(unsafe.Pointer(&charData[0])), C.ulong(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDFAttachment_GetAFRelationship{
+		Value: transformedText,
+	}, nil
+}

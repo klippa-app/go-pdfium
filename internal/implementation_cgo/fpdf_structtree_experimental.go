@@ -588,3 +588,32 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(reques
 		ChildMarkedContentID: int(markedContentID),
 	}, nil
 }
+
+// FPDF_StructElement_GetRawType returns the raw value of the /S entry for a given element.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	structElementHandle, err := p.getStructElementHandle(request.StructElement)
+	if err != nil {
+		return nil, err
+	}
+
+	rawTypeLength := C.FPDF_StructElement_GetRawType(structElementHandle.handle, nil, 0)
+	if rawTypeLength == 0 {
+		return nil, errors.New("could not get raw type")
+	}
+
+	charData := make([]byte, rawTypeLength)
+	C.FPDF_StructElement_GetRawType(structElementHandle.handle, (*C.FPDF_WCHAR)(unsafe.Pointer(&charData[0])), C.size_t(len(charData)))
+
+	transformedText, err := p.transformUTF16LEToUTF8(charData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.FPDF_StructElement_GetRawType{
+		RawType: transformedText,
+	}, nil
+}

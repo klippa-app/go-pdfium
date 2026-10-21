@@ -103,6 +103,12 @@ var _ = Describe("fpdf_attachment", func() {
 			Expect(err).To(MatchError("attachment not given"))
 			Expect(FPDFAttachment_GetSubtype).To(BeNil())
 		})
+
+		It("returns an error when FPDFAttachment_GetAFRelationship is called", func() {
+			FPDFAttachment_GetAFRelationship, err := PdfiumInstance.FPDFAttachment_GetAFRelationship(&requests.FPDFAttachment_GetAFRelationship{})
+			Expect(err).To(MatchError("attachment not given"))
+			Expect(FPDFAttachment_GetAFRelationship).To(BeNil())
+		})
 	})
 
 	Context("a normal PDF file without attachments", func() {
@@ -513,6 +519,86 @@ var _ = Describe("fpdf_attachment", func() {
 					Value: "Test description",
 				}))
 			})
+		})
+	})
+
+	Context("a PDF file with attachments that have an AFRelationship", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/embedded_attachments_with_af.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("returns the correct AFRelationship values", func() {
+			FPDFDoc_GetAttachmentCount, err := PdfiumInstance.FPDFDoc_GetAttachmentCount(&requests.FPDFDoc_GetAttachmentCount{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDoc_GetAttachmentCount).To(Equal(&responses.FPDFDoc_GetAttachmentCount{
+				AttachmentCount: 3,
+			}))
+
+			// Attachment 0 (1.txt) has /AFRelationship /Alternative.
+			attachment0, err := PdfiumInstance.FPDFDoc_GetAttachment(&requests.FPDFDoc_GetAttachment{
+				Document: doc,
+				Index:    0,
+			})
+			Expect(err).To(BeNil())
+
+			FPDFAttachment_GetAFRelationship, err := PdfiumInstance.FPDFAttachment_GetAFRelationship(&requests.FPDFAttachment_GetAFRelationship{
+				Attachment: attachment0.Attachment,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFAttachment_GetAFRelationship).To(Equal(&responses.FPDFAttachment_GetAFRelationship{
+				Value: "Alternative",
+			}))
+
+			// Attachment 1 (2.txt) has no /AFRelationship -> empty string.
+			attachment1, err := PdfiumInstance.FPDFDoc_GetAttachment(&requests.FPDFDoc_GetAttachment{
+				Document: doc,
+				Index:    1,
+			})
+			Expect(err).To(BeNil())
+
+			FPDFAttachment_GetAFRelationship, err = PdfiumInstance.FPDFAttachment_GetAFRelationship(&requests.FPDFAttachment_GetAFRelationship{
+				Attachment: attachment1.Attachment,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFAttachment_GetAFRelationship).To(Equal(&responses.FPDFAttachment_GetAFRelationship{
+				Value: "",
+			}))
+
+			// Attachment 2 (3.txt) has a numeric /AFRelationship, which is not
+			// a name object -> empty string.
+			attachment2, err := PdfiumInstance.FPDFDoc_GetAttachment(&requests.FPDFDoc_GetAttachment{
+				Document: doc,
+				Index:    2,
+			})
+			Expect(err).To(BeNil())
+
+			FPDFAttachment_GetAFRelationship, err = PdfiumInstance.FPDFAttachment_GetAFRelationship(&requests.FPDFAttachment_GetAFRelationship{
+				Attachment: attachment2.Attachment,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFAttachment_GetAFRelationship).To(Equal(&responses.FPDFAttachment_GetAFRelationship{
+				Value: "",
+			}))
 		})
 	})
 })

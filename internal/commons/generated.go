@@ -109,6 +109,7 @@ type Pdfium interface {
 	FPDFAnnot_SetStringValue(*requests.FPDFAnnot_SetStringValue) (*responses.FPDFAnnot_SetStringValue, error)
 	FPDFAnnot_SetURI(*requests.FPDFAnnot_SetURI) (*responses.FPDFAnnot_SetURI, error)
 	FPDFAnnot_UpdateObject(*requests.FPDFAnnot_UpdateObject) (*responses.FPDFAnnot_UpdateObject, error)
+	FPDFAttachment_GetAFRelationship(*requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error)
 	FPDFAttachment_GetDescription(*requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error)
 	FPDFAttachment_GetFile(*requests.FPDFAttachment_GetFile) (*responses.FPDFAttachment_GetFile, error)
 	FPDFAttachment_GetName(*requests.FPDFAttachment_GetName) (*responses.FPDFAttachment_GetName, error)
@@ -244,6 +245,7 @@ type Pdfium interface {
 	FPDFPageObj_GetMark(*requests.FPDFPageObj_GetMark) (*responses.FPDFPageObj_GetMark, error)
 	FPDFPageObj_GetMarkedContentID(*requests.FPDFPageObj_GetMarkedContentID) (*responses.FPDFPageObj_GetMarkedContentID, error)
 	FPDFPageObj_GetMatrix(*requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error)
+	FPDFPageObj_GetRenderedFillPattern(*requests.FPDFPageObj_GetRenderedFillPattern) (*responses.FPDFPageObj_GetRenderedFillPattern, error)
 	FPDFPageObj_GetRenderedStrokePattern(*requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error)
 	FPDFPageObj_GetRotatedBounds(*requests.FPDFPageObj_GetRotatedBounds) (*responses.FPDFPageObj_GetRotatedBounds, error)
 	FPDFPageObj_GetStrokeColor(*requests.FPDFPageObj_GetStrokeColor) (*responses.FPDFPageObj_GetStrokeColor, error)
@@ -453,6 +455,7 @@ type Pdfium interface {
 	FPDF_StructElement_GetMarkedContentIdCount(*requests.FPDF_StructElement_GetMarkedContentIdCount) (*responses.FPDF_StructElement_GetMarkedContentIdCount, error)
 	FPDF_StructElement_GetObjType(*requests.FPDF_StructElement_GetObjType) (*responses.FPDF_StructElement_GetObjType, error)
 	FPDF_StructElement_GetParent(*requests.FPDF_StructElement_GetParent) (*responses.FPDF_StructElement_GetParent, error)
+	FPDF_StructElement_GetRawType(*requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error)
 	FPDF_StructElement_GetStringAttribute(*requests.FPDF_StructElement_GetStringAttribute) (*responses.FPDF_StructElement_GetStringAttribute, error)
 	FPDF_StructElement_GetTitle(*requests.FPDF_StructElement_GetTitle) (*responses.FPDF_StructElement_GetTitle, error)
 	FPDF_StructElement_GetType(*requests.FPDF_StructElement_GetType) (*responses.FPDF_StructElement_GetType, error)
@@ -1453,6 +1456,16 @@ func (g *PdfiumRPC) FPDFAnnot_SetURI(request *requests.FPDFAnnot_SetURI) (*respo
 func (g *PdfiumRPC) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_UpdateObject) (*responses.FPDFAnnot_UpdateObject, error) {
 	resp := &responses.FPDFAnnot_UpdateObject{}
 	err := g.client.Call("Plugin.FPDFAnnot_UpdateObject", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error) {
+	resp := &responses.FPDFAttachment_GetAFRelationship{}
+	err := g.client.Call("Plugin.FPDFAttachment_GetAFRelationship", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -2803,6 +2816,16 @@ func (g *PdfiumRPC) FPDFPageObj_GetMarkedContentID(request *requests.FPDFPageObj
 func (g *PdfiumRPC) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_GetMatrix) (*responses.FPDFPageObj_GetMatrix, error) {
 	resp := &responses.FPDFPageObj_GetMatrix{}
 	err := g.client.Call("Plugin.FPDFPageObj_GetMatrix", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (g *PdfiumRPC) FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern) (*responses.FPDFPageObj_GetRenderedFillPattern, error) {
+	resp := &responses.FPDFPageObj_GetRenderedFillPattern{}
+	err := g.client.Call("Plugin.FPDFPageObj_GetRenderedFillPattern", request, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -4900,6 +4923,16 @@ func (g *PdfiumRPC) FPDF_StructElement_GetParent(request *requests.FPDF_StructEl
 	return resp, nil
 }
 
+func (g *PdfiumRPC) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error) {
+	resp := &responses.FPDF_StructElement_GetRawType{}
+	err := g.client.Call("Plugin.FPDF_StructElement_GetRawType", request, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (g *PdfiumRPC) FPDF_StructElement_GetStringAttribute(request *requests.FPDF_StructElement_GetStringAttribute) (*responses.FPDF_StructElement_GetStringAttribute, error) {
 	resp := &responses.FPDF_StructElement_GetStringAttribute{}
 	err := g.client.Call("Plugin.FPDF_StructElement_GetStringAttribute", request, resp)
@@ -6978,6 +7011,24 @@ func (s *PdfiumRPCServer) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upd
 	}()
 
 	implResp, err := s.Impl.FPDFAnnot_UpdateObject(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship, resp *responses.FPDFAttachment_GetAFRelationship) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetAFRelationship", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFAttachment_GetAFRelationship(request)
 	if err != nil {
 		return err
 	}
@@ -9408,6 +9459,24 @@ func (s *PdfiumRPCServer) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Ge
 	}()
 
 	implResp, err := s.Impl.FPDFPageObj_GetMatrix(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern, resp *responses.FPDFPageObj_GetRenderedFillPattern) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRenderedFillPattern", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDFPageObj_GetRenderedFillPattern(request)
 	if err != nil {
 		return err
 	}
@@ -13170,6 +13239,24 @@ func (s *PdfiumRPCServer) FPDF_StructElement_GetParent(request *requests.FPDF_St
 	}()
 
 	implResp, err := s.Impl.FPDF_StructElement_GetParent(request)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the target address of resp to the target address of implResp.
+	*resp = *implResp
+
+	return nil
+}
+
+func (s *PdfiumRPCServer) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType, resp *responses.FPDF_StructElement_GetRawType) (err error) {
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetRawType", panicError)
+		}
+	}()
+
+	implResp, err := s.Impl.FPDF_StructElement_GetRawType(request)
 	if err != nil {
 		return err
 	}

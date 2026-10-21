@@ -744,6 +744,16 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error)
 
+	// FPDFPageObj_GetRenderedFillPattern returns a bitmap rasterization of the
+	// fill pattern of the given page object.
+	// To render correctly, the caller must provide the document associated with
+	// the page object. The returned bitmap will be owned by the caller, and
+	// FPDFBitmap_Destroy() must be called on the returned bitmap when it is no
+	// longer needed.
+	// Returns an error when the fill is not a tiling pattern or on failure.
+	// Experimental API.
+	FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern) (*responses.FPDFPageObj_GetRenderedFillPattern, error)
+
 	// FPDFPageObj_GetDashPhase returns the line dash phase of the page object.
 	// Experimental API.
 	FPDFPageObj_GetDashPhase(request *requests.FPDFPageObj_GetDashPhase) (*responses.FPDFPageObj_GetDashPhase, error)
@@ -1303,6 +1313,12 @@ type Pdfium interface {
 	// Experimental API.
 	FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error)
 
+	// FPDFAttachment_GetAFRelationship gets the associated file relationship string (the /AFRelationship
+	// entry in the file specification dictionary) of the embedded file attachment. Returns an empty value
+	// when the entry is absent or is not a name.
+	// Experimental API.
+	FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error)
+
 	// End fpdf_attachment.h
 
 	// Start attachment: attachment helpers
@@ -1676,6 +1692,10 @@ type Pdfium interface {
 
 	// FPDF_StructElement_GetMarkedContentID returns the marked content ID for a given element.
 	FPDF_StructElement_GetMarkedContentID(request *requests.FPDF_StructElement_GetMarkedContentID) (*responses.FPDF_StructElement_GetMarkedContentID, error)
+
+	// FPDF_StructElement_GetRawType returns the raw value of the /S entry for a given element.
+	// Experimental API.
+	FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error)
 
 	// FPDF_StructElement_GetType returns the type (/S) for a given element.
 	FPDF_StructElement_GetType(request *requests.FPDF_StructElement_GetType) (*responses.FPDF_StructElement_GetType, error)
