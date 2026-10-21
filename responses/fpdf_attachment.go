@@ -63,3 +63,7 @@ type FPDFAttachment_GetFile struct {
 type FPDFAttachment_GetSubtype struct {
 	Subtype *string // nil when not found.
 }
+
+type FPDFAttachment_GetAFRelationship struct {
+	Value string // The AFRelationship of the attachment. Empty when absent or not a name.
+}

@@ -67,3 +67,7 @@ type FPDFAttachment_GetFile struct {
 type FPDFAttachment_GetSubtype struct {
 	Attachment references.FPDF_ATTACHMENT
 }
+
+type FPDFAttachment_GetAFRelationship struct {
+	Attachment references.FPDF_ATTACHMENT
+}

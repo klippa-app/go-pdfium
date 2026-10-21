@@ -1369,6 +1369,20 @@ func (i *pdfiumInstance) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upda
 	return i.pdfium.FPDFAnnot_UpdateObject(request)
 }
 
+func (i *pdfiumInstance) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (resp *responses.FPDFAttachment_GetAFRelationship, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFAttachment_GetAFRelationship", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFAttachment_GetAFRelationship(request)
+}
+
 func (i *pdfiumInstance) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (resp *responses.FPDFAttachment_GetDescription, err error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -3257,6 +3271,20 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	}()
 
 	return i.pdfium.FPDFPageObj_GetMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern) (resp *responses.FPDFPageObj_GetRenderedFillPattern, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDFPageObj_GetRenderedFillPattern", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDFPageObj_GetRenderedFillPattern(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (resp *responses.FPDFPageObj_GetRenderedStrokePattern, err error) {
@@ -6183,6 +6211,20 @@ func (i *pdfiumInstance) FPDF_StructElement_GetParent(request *requests.FPDF_Str
 	}()
 
 	return i.pdfium.FPDF_StructElement_GetParent(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (resp *responses.FPDF_StructElement_GetRawType, err error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	defer func() {
+		if panicError := recover(); panicError != nil {
+			err = fmt.Errorf("panic occurred in %s: %v", "FPDF_StructElement_GetRawType", panicError)
+		}
+	}()
+
+	return i.pdfium.FPDF_StructElement_GetRawType(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetStringAttribute(request *requests.FPDF_StructElement_GetStringAttribute) (resp *responses.FPDF_StructElement_GetStringAttribute, err error) {

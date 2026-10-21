@@ -106,3 +106,11 @@ func (p *PdfiumImplementation) FPDFAttachment_GetFile(request *requests.FPDFAtta
 func (p *PdfiumImplementation) FPDFAttachment_GetSubtype(request *requests.FPDFAttachment_GetSubtype) (*responses.FPDFAttachment_GetSubtype, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDFAttachment_GetAFRelationship gets the associated file relationship string (the /AFRelationship
+// entry in the file specification dictionary) of the embedded file attachment. Returns an empty value
+// when the entry is absent or is not a name.
+// Experimental API.
+func (p *PdfiumImplementation) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

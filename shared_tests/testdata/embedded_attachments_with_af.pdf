@@ -1,0 +1,87 @@
+%PDF-1.7
+% ò¤ô
+1 0 obj <<
+  /Type /Catalog
+  /Names 4 0 R
+  /Pages 2 0 R
+>>
+endobj
+2 0 obj <<
+  /Type /Pages
+  /Count 1
+  /Kids [3 0 R]
+>>
+endobj
+3 0 obj <<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 612 792]
+  /Resources <<
+    /ProcSet [/PDF]
+  >>
+>>
+endobj
+4 0 obj <<
+  /EmbeddedFiles 5 0 R
+>>
+endobj
+5 0 obj <<
+  /Names [(1.txt) 6 0 R (2.txt) 7 0 R (3.txt) 9 0 R]
+>>
+endobj
+6 0 obj <<
+  /Type /Filespec
+  /AFRelationship /Alternative % Present -> "Alternative".
+  /EF <<
+    /F 8 0 R
+  >>
+  /F (1.txt)
+  /UF (1.txt)
+>>
+endobj
+7 0 obj <<
+  /Type /Filespec
+  % No /AFRelationship -> empty string.
+  /EF <<
+    /F 8 0 R
+  >>
+  /F (2.txt)
+  /UF (2.txt)
+>>
+endobj
+8 0 obj <<
+  /Length 5
+>>
+stream
+hello
+endstream
+endobj
+9 0 obj <<
+  /Type /Filespec
+  /AFRelationship 5 % Number, not a name -> empty string.
+  /EF <<
+    /F 8 0 R
+  >>
+  /F (3.txt)
+  /UF (3.txt)
+>>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000146 00000 n 
+0000000264 00000 n 
+0000000308 00000 n 
+0000000382 00000 n 
+0000000534 00000 n 
+0000000667 00000 n 
+0000000723 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 10
+>>
+startxref
+874
+%%EOF

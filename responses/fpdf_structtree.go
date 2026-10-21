@@ -40,6 +40,10 @@ type FPDF_StructElement_GetMarkedContentID struct {
 	MarkedContentID int // The marked content ID of the element. If no ID exists, returns -1.
 }
 
+type FPDF_StructElement_GetRawType struct {
+	RawType string
+}
+
 type FPDF_StructElement_GetType struct {
 	Type string
 }

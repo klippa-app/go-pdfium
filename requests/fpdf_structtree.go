@@ -40,6 +40,10 @@ type FPDF_StructElement_GetMarkedContentID struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }
 
+type FPDF_StructElement_GetRawType struct {
+	StructElement references.FPDF_STRUCTELEMENT
+}
+
 type FPDF_StructElement_GetType struct {
 	StructElement references.FPDF_STRUCTELEMENT
 }

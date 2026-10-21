@@ -787,6 +787,14 @@ func (i *pdfiumInstance) FPDFAnnot_UpdateObject(request *requests.FPDFAnnot_Upda
 	return i.worker.plugin.FPDFAnnot_UpdateObject(request)
 }
 
+func (i *pdfiumInstance) FPDFAttachment_GetAFRelationship(request *requests.FPDFAttachment_GetAFRelationship) (*responses.FPDFAttachment_GetAFRelationship, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFAttachment_GetAFRelationship(request)
+}
+
 func (i *pdfiumInstance) FPDFAttachment_GetDescription(request *requests.FPDFAttachment_GetDescription) (*responses.FPDFAttachment_GetDescription, error) {
 	if i.closed {
 		return nil, errors.New("instance is closed")
@@ -1833,6 +1841,14 @@ func (i *pdfiumInstance) FPDFPageObj_GetMatrix(request *requests.FPDFPageObj_Get
 	}
 
 	return i.worker.plugin.FPDFPageObj_GetMatrix(request)
+}
+
+func (i *pdfiumInstance) FPDFPageObj_GetRenderedFillPattern(request *requests.FPDFPageObj_GetRenderedFillPattern) (*responses.FPDFPageObj_GetRenderedFillPattern, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDFPageObj_GetRenderedFillPattern(request)
 }
 
 func (i *pdfiumInstance) FPDFPageObj_GetRenderedStrokePattern(request *requests.FPDFPageObj_GetRenderedStrokePattern) (*responses.FPDFPageObj_GetRenderedStrokePattern, error) {
@@ -3501,6 +3517,14 @@ func (i *pdfiumInstance) FPDF_StructElement_GetParent(request *requests.FPDF_Str
 	}
 
 	return i.worker.plugin.FPDF_StructElement_GetParent(request)
+}
+
+func (i *pdfiumInstance) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error) {
+	if i.closed {
+		return nil, errors.New("instance is closed")
+	}
+
+	return i.worker.plugin.FPDF_StructElement_GetRawType(request)
 }
 
 func (i *pdfiumInstance) FPDF_StructElement_GetStringAttribute(request *requests.FPDF_StructElement_GetStringAttribute) (*responses.FPDF_StructElement_GetStringAttribute, error) {

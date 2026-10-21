@@ -157,3 +157,9 @@ func (p *PdfiumImplementation) FPDF_StructElement_GetMarkedContentIdAtIndex(requ
 func (p *PdfiumImplementation) FPDF_StructElement_GetChildMarkedContentID(request *requests.FPDF_StructElement_GetChildMarkedContentID) (*responses.FPDF_StructElement_GetChildMarkedContentID, error) {
 	return nil, pdfium_errors.ErrExperimentalUnsupported
 }
+
+// FPDF_StructElement_GetRawType returns the raw value of the /S entry for a given element.
+// Experimental API.
+func (p *PdfiumImplementation) FPDF_StructElement_GetRawType(request *requests.FPDF_StructElement_GetRawType) (*responses.FPDF_StructElement_GetRawType, error) {
+	return nil, pdfium_errors.ErrExperimentalUnsupported
+}

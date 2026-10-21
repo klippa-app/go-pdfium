@@ -156,6 +156,12 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 				Expect(err).To(MatchError("structElement not given"))
 				Expect(FPDF_StructElement_GetChildMarkedContentID).To(BeNil())
 			})
+
+			It("returns an error when calling FPDF_StructElement_GetRawType", func() {
+				FPDF_StructElement_GetRawType, err := PdfiumInstance.FPDF_StructElement_GetRawType(&requests.FPDF_StructElement_GetRawType{})
+				Expect(err).To(MatchError("structElement not given"))
+				Expect(FPDF_StructElement_GetRawType).To(BeNil())
+			})
 		})
 	})
 
@@ -1377,6 +1383,110 @@ var _ = Describe("fpdf_structtree_experimental", func() {
 					Expansion: "Expansion",
 				}))
 			})
+		})
+	})
+
+	Context("a PDF file with raw struct element types", func() {
+		var doc references.FPDF_DOCUMENT
+
+		BeforeEach(func() {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/raw_type_text.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+
+			doc = newDoc.Document
+		})
+
+		AfterEach(func() {
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("returns the correct raw type values", func() {
+			FPDF_StructTree_GetForPage, err := PdfiumInstance.FPDF_StructTree_GetForPage(&requests.FPDF_StructTree_GetForPage{
+				Page: requests.Page{
+					ByIndex: &requests.PageByIndex{
+						Document: doc,
+						Index:    0,
+					},
+				},
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_StructTree_GetForPage).To(Not(BeNil()))
+
+			structTree := FPDF_StructTree_GetForPage.StructTree
+			defer PdfiumInstance.FPDF_StructTree_Close(&requests.FPDF_StructTree_Close{StructTree: structTree})
+
+			FPDF_StructTree_CountChildren, err := PdfiumInstance.FPDF_StructTree_CountChildren(&requests.FPDF_StructTree_CountChildren{
+				StructTree: structTree,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_StructTree_CountChildren).To(Equal(&responses.FPDF_StructTree_CountChildren{
+				Count: 4,
+			}))
+
+			// The raw type (/S) value is valid.
+			element1, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+				StructTree: structTree,
+				Index:      0,
+			})
+			Expect(err).To(BeNil())
+
+			FPDF_StructElement_GetRawType, err := PdfiumInstance.FPDF_StructElement_GetRawType(&requests.FPDF_StructElement_GetRawType{
+				StructElement: element1.StructElement,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_StructElement_GetRawType).To(Equal(&responses.FPDF_StructElement_GetRawType{
+				RawType: "Workbook",
+			}))
+
+			// The type value is a number, so an error is returned.
+			element2, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+				StructTree: structTree,
+				Index:      1,
+			})
+			Expect(err).To(BeNil())
+
+			FPDF_StructElement_GetRawType, err = PdfiumInstance.FPDF_StructElement_GetRawType(&requests.FPDF_StructElement_GetRawType{
+				StructElement: element2.StructElement,
+			})
+			Expect(err).To(MatchError("could not get raw type"))
+			Expect(FPDF_StructElement_GetRawType).To(BeNil())
+
+			// There is no type value, so an error is returned.
+			element3, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+				StructTree: structTree,
+				Index:      2,
+			})
+			Expect(err).To(BeNil())
+
+			FPDF_StructElement_GetRawType, err = PdfiumInstance.FPDF_StructElement_GetRawType(&requests.FPDF_StructElement_GetRawType{
+				StructElement: element3.StructElement,
+			})
+			Expect(err).To(MatchError("could not get raw type"))
+			Expect(FPDF_StructElement_GetRawType).To(BeNil())
+
+			// The type value is the same as one of the types returned by GetType().
+			element4, err := PdfiumInstance.FPDF_StructTree_GetChildAtIndex(&requests.FPDF_StructTree_GetChildAtIndex{
+				StructTree: structTree,
+				Index:      3,
+			})
+			Expect(err).To(BeNil())
+
+			FPDF_StructElement_GetRawType, err = PdfiumInstance.FPDF_StructElement_GetRawType(&requests.FPDF_StructElement_GetRawType{
+				StructElement: element4.StructElement,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_StructElement_GetRawType).To(Equal(&responses.FPDF_StructElement_GetRawType{
+				RawType: "Part",
+			}))
 		})
 	})
 })

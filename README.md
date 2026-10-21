@@ -140,7 +140,7 @@ includedir={path}/include
 
 Name: PDFium
 Description: PDFium
-Version: 8057
+Version: 8111
 Requires:
 
 Libs: -L${libdir} -lpdfium
