@@ -70,6 +70,8 @@ github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/samyfodil/wazy v0.3.1-0.20260920105944-ed4381b86521 h1:P82387WtatuABekRkNTmjPXHAWFn953ty+DethiQpek=
 github.com/samyfodil/wazy v0.3.1-0.20260920105944-ed4381b86521/go.mod h1:jpXcoooWi9CQPnN1fzwt/A0w3AMRn/s6PQDunF55SIM=
+github.com/samyfodil/wazy v0.4.0 h1:dFauq4qO+XlWrszvBpG+3gFJsELjx0ZVqjMDClCaNNk=
+github.com/samyfodil/wazy v0.4.0/go.mod h1:jpXcoooWi9CQPnN1fzwt/A0w3AMRn/s6PQDunF55SIM=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
@@ -87,6 +89,8 @@ github.com/tidwall/sjson v1.2.5 h1:kLy8mja+1c9jlljvWTlSazM7cKDRfJuR/bOJhcY5NcY=
 github.com/tidwall/sjson v1.2.5/go.mod h1:Fvgq9kS/6ociJEDnK0Fk1cpYF4FIW6ZF7LAe+6jwd28=
 github.com/wago-org/wago v0.1.0-beta.9.0.20260923033105-fa26daaf4a4b h1:GKukbzNpBLiuS+azgmRXDyMECEnw6mjMA704q7jrZZA=
 github.com/wago-org/wago v0.1.0-beta.9.0.20260923033105-fa26daaf4a4b/go.mod h1:q0pPiPF6W6GZpTXbWwy+GT+r19KHSzB/gRcPUVHyntI=
+github.com/wago-org/wago v0.1.0-beta.13 h1:s+XoBfR6+JCJsXUEosNJKUdziXdl0ZJTmhMViwozmSw=
+github.com/wago-org/wago v0.1.0-beta.13/go.mod h1:q0pPiPF6W6GZpTXbWwy+GT+r19KHSzB/gRcPUVHyntI=
 github.com/wago-org/wasi v0.3.1 h1:hpbJaiy3/0RfFe6cIfJB8cSVTatNYeAHVbTeUuibzO0=
 github.com/wago-org/wasi v0.3.1/go.mod h1:wX4/mFwFG1iNSAkeES3WcGBpqY3y4XDjRQ6jLKXS8Ps=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
