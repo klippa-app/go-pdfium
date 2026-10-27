@@ -11,7 +11,7 @@ require (
 	github.com/jolestar/go-commons-pool/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
-	github.com/samyfodil/wazy v0.4.0
+	github.com/samyfodil/wazy v0.5.0
 	github.com/tetratelabs/wazero v1.12.0
 	github.com/wago-org/wago v0.1.0-beta.13
 	github.com/wago-org/wasi v0.3.1
