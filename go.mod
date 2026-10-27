@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/samyfodil/wazy v0.5.0
 	github.com/tetratelabs/wazero v1.12.0
-	github.com/wago-org/wago v0.1.0-beta.13
+	github.com/wago-org/wago v0.1.0-beta.13.0.20261024181356-4de27acba129
 	github.com/wago-org/wasi v0.3.1
 	golang.org/x/text v0.43.0
 )
