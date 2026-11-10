@@ -50,8 +50,11 @@ var specs = []runtimeSpec{
 			RuntimeConfig: wazero.NewRuntimeConfig().WithCoreFeatures(wazeroapi.CoreFeaturesV2 | experimental.CoreFeaturesExceptionHandling).WithCloseOnContextDone(interruptible)})
 	}},
 	{"wazy", func(interruptible bool) (pdfium.Pool, error) {
+		// wazy respects context cancellation during execution unconditionally
+		// as of v0.7.0; there is no RuntimeConfig option to opt in or out
+		// anymore, so interruptible has no effect here.
 		return wazy.Init(wazy.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: true,
-			RuntimeConfig: wazyrt.NewRuntimeConfig().WithCoreFeatures(wazyapi.CoreFeaturesV2 | wazyapi.CoreFeatureExceptionHandling).WithCloseOnContextDone(interruptible)})
+			RuntimeConfig: wazyrt.NewRuntimeConfig().WithCoreFeatures(wazyapi.CoreFeaturesV2 | wazyapi.CoreFeatureExceptionHandling)})
 	}},
 	{"wago", func(interruptible bool) (pdfium.Pool, error) {
 		return wago.Init(wago.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: true, InterruptibleCalls: interruptible,

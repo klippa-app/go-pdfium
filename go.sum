@@ -70,6 +70,8 @@ github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/samyfodil/wazy v0.5.0 h1:Kxm+0ysY33H1SMLH749ue5CNIYby/VlqdNcJRFXhm5I=
 github.com/samyfodil/wazy v0.5.0/go.mod h1:jpXcoooWi9CQPnN1fzwt/A0w3AMRn/s6PQDunF55SIM=
+github.com/samyfodil/wazy v0.7.0 h1:5Eaxv0OKcs+fZkRC3nwLjgCEvipCez+CfvvaxthwAPg=
+github.com/samyfodil/wazy v0.7.0/go.mod h1:jpXcoooWi9CQPnN1fzwt/A0w3AMRn/s6PQDunF55SIM=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
@@ -89,6 +91,8 @@ github.com/wago-org/wago v0.1.0-beta.13 h1:s+XoBfR6+JCJsXUEosNJKUdziXdl0ZJTmhMVi
 github.com/wago-org/wago v0.1.0-beta.13/go.mod h1:q0pPiPF6W6GZpTXbWwy+GT+r19KHSzB/gRcPUVHyntI=
 github.com/wago-org/wago v0.1.0-beta.13.0.20261024181356-4de27acba129 h1:WiTNu2rdWP2zNtme4f4SRuKZ3KZrxaylh1cAlD3IPVE=
 github.com/wago-org/wago v0.1.0-beta.13.0.20261024181356-4de27acba129/go.mod h1:q0pPiPF6W6GZpTXbWwy+GT+r19KHSzB/gRcPUVHyntI=
+github.com/wago-org/wago v0.1.0-beta.13.0.20261107063457-7e6a95708f67 h1:61bK/g3U6MCeMzIZmtWyyxbZVoOy+vhjOJBv/rXeZuw=
+github.com/wago-org/wago v0.1.0-beta.13.0.20261107063457-7e6a95708f67/go.mod h1:q0pPiPF6W6GZpTXbWwy+GT+r19KHSzB/gRcPUVHyntI=
 github.com/wago-org/wasi v0.3.1 h1:hpbJaiy3/0RfFe6cIfJB8cSVTatNYeAHVbTeUuibzO0=
 github.com/wago-org/wasi v0.3.1/go.mod h1:wX4/mFwFG1iNSAkeES3WcGBpqY3y4XDjRQ6jLKXS8Ps=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=

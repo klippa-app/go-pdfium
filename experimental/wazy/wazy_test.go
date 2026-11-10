@@ -99,7 +99,7 @@ var _ = Describe("Wazy", func() {
 				MinIdle:       0,
 				MaxIdle:       1,
 				MaxTotal:      1,
-				RuntimeConfig: runtimeConfig().WithCloseOnContextDone(true),
+				RuntimeConfig: runtimeConfig(),
 			})
 			Expect(err).To(BeNil())
 			DeferCleanup(func() {
@@ -187,16 +187,16 @@ var _ = Describe("Wazy", func() {
 
 		// bug_451265.pdf is a malformed PDF from the PDFium test corpus
 		// that causes pdfium to hang indefinitely during rendering.
-		// Kill() can interrupt stuck execution when the caller enables
-		// WithCloseOnContextDone on the RuntimeConfig. This works because
-		// Kill() cancels the worker's context, and WithCloseOnContextDone
-		// makes wazy respect that cancellation during execution.
+		// Kill() can interrupt stuck execution because it cancels the
+		// worker's context, and wazy respects context cancellation during
+		// execution unconditionally as of v0.7.0 (no RuntimeConfig option
+		// needed anymore).
 		It("interrupts a stuck WASM execution and recovers the pool", func() {
 			pool, err := wazy.Init(wazy.Config{
 				MinIdle:       0,
 				MaxIdle:       1,
 				MaxTotal:      1,
-				RuntimeConfig: runtimeConfig().WithCloseOnContextDone(true),
+				RuntimeConfig: runtimeConfig(),
 			})
 			Expect(err).To(BeNil())
 			defer pool.Close()

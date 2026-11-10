@@ -16,7 +16,9 @@
 package benchmark
 
 import (
+	goctx "context"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -26,9 +28,27 @@ import (
 	"github.com/klippa-app/go-pdfium/experimental/wazy"
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/webassembly"
+
+	wazyrt "github.com/samyfodil/wazy"
+	wazyapi "github.com/samyfodil/wazy/api"
+	wazerort "github.com/tetratelabs/wazero"
+	wazeroapi "github.com/tetratelabs/wazero/api"
+	wazeroexp "github.com/tetratelabs/wazero/experimental"
+	wagort "github.com/wago-org/wago"
 )
 
 const testdata = "../../shared_tests/testdata/"
+
+// compilationWorkers is the number of goroutines each runtime is told to use
+// to compile the module, so that BenchmarkInit compares them on equal
+// footing rather than each runtime's own default worker count.
+var compilationWorkers = runtime.NumCPU()
+
+// compilationContext carries compilationWorkers to wazero and wazy, which
+// take it through a context value rather than a RuntimeConfig option.
+func compilationContext() goctx.Context {
+	return wazeroexp.WithCompilationWorkers(wazyapi.WithCompilationWorkers(goctx.Background(), compilationWorkers), compilationWorkers)
+}
 
 type runtimeSpec struct {
 	name string
@@ -37,13 +57,20 @@ type runtimeSpec struct {
 
 var runtimes = []runtimeSpec{
 	{"wazero", func(reuse bool) (pdfium.Pool, error) {
-		return webassembly.Init(webassembly.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse})
+		return webassembly.Init(webassembly.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse,
+			Context: compilationContext(),
+			RuntimeConfig: wazerort.NewRuntimeConfig().WithCoreFeatures(
+				wazeroapi.CoreFeaturesV2 | wazeroexp.CoreFeaturesExceptionHandling)})
 	}},
 	{"wazy", func(reuse bool) (pdfium.Pool, error) {
-		return wazy.Init(wazy.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse})
+		return wazy.Init(wazy.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse,
+			Context: compilationContext(),
+			RuntimeConfig: wazyrt.NewRuntimeConfig().WithCoreFeatures(
+				wazyapi.CoreFeaturesV2 | wazyapi.CoreFeatureExceptionHandling)})
 	}},
 	{"wago", func(reuse bool) (pdfium.Pool, error) {
-		return wago.Init(wago.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse})
+		return wago.Init(wago.Config{MinIdle: 1, MaxIdle: 1, MaxTotal: 1, ReuseWorkers: reuse,
+			RuntimeConfig: wagort.NewRuntimeConfig().WithFunctionWorkers(compilationWorkers)})
 	}},
 }
 

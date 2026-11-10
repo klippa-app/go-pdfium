@@ -171,6 +171,15 @@ func initWithConfig(config Config) (pdfium.Pool, error) {
 				Cancel:  cancel,
 			}
 
+			// wazy no longer rejects instantiation on an already-done context by
+			// itself (as of v0.6.0, a done context only interrupts an in-flight
+			// call, not instantiation), so check explicitly to keep a pool
+			// configured with a cancelled Context failing fast.
+			if err := workerCtx.Err(); err != nil {
+				cancel()
+				return nil, err
+			}
+
 			moduleConfig := wazyrt.NewModuleConfig().
 				WithStartFunctions("_initialize").
 				WithStdout(config.Stdout).
