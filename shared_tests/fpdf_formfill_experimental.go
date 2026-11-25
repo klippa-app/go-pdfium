@@ -1569,6 +1569,128 @@ var _ = Describe("fpdf_formfill_experimental", func() {
 		})
 	})
 
+	Context("a PDF file with a scrolling listbox", func() {
+		var doc references.FPDF_DOCUMENT
+		var formHandle references.FPDF_FORMHANDLE
+
+		BeforeEach(func() {
+			pdfData, err := os.ReadFile(TestDataPath + "/testdata/listbox_form.pdf")
+			Expect(err).To(BeNil())
+
+			newDoc, err := PdfiumInstance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+				Data: &pdfData,
+			})
+			Expect(err).To(BeNil())
+			doc = newDoc.Document
+
+			FPDFDOC_InitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_InitFormFillEnvironment(&requests.FPDFDOC_InitFormFillEnvironment{
+				Document: doc,
+				FormFillInfo: structs.FPDF_FORMFILLINFO{
+					FFI_Invalidate: func(page references.FPDF_PAGE, left, top, right, bottom float64) {},
+					FFI_SetCursor:  func(cursorType enums.FXCT) {},
+					FFI_SetTimer: func(elapse int, timerFunc func(idEvent int)) int {
+						return 1
+					},
+					FFI_KillTimer: func(timerID int) {},
+					FFI_GetLocalTime: func() structs.FPDF_SYSTEMTIME {
+						return structs.FPDF_SYSTEMTIME{}
+					},
+					FFI_GetPage: func(document references.FPDF_DOCUMENT, index int) *references.FPDF_PAGE {
+						return nil
+					},
+					FFI_GetRotation: func(page references.FPDF_PAGE) enums.FPDF_PAGE_ROTATION {
+						return enums.FPDF_PAGE_ROTATION_NONE
+					},
+					FFI_ExecuteNamedAction: func(namedAction string) {},
+					FFI_OnChange:           func() {},
+				},
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_InitFormFillEnvironment).ToNot(BeNil())
+			formHandle = FPDFDOC_InitFormFillEnvironment.FormHandle
+		})
+
+		AfterEach(func() {
+			FPDFDOC_ExitFormFillEnvironment, err := PdfiumInstance.FPDFDOC_ExitFormFillEnvironment(&requests.FPDFDOC_ExitFormFillEnvironment{
+				FormHandle: formHandle,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDFDOC_ExitFormFillEnvironment).To(Not(BeNil()))
+
+			FPDF_CloseDocument, err := PdfiumInstance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+				Document: doc,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_CloseDocument).To(Not(BeNil()))
+		})
+
+		It("handles a mouse wheel event over the listbox", func() {
+			FPDF_LoadPage, err := PdfiumInstance.FPDF_LoadPage(&requests.FPDF_LoadPage{
+				Document: doc,
+				Index:    0,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_LoadPage).ToNot(BeNil())
+
+			FORM_OnAfterLoadPage, err := PdfiumInstance.FORM_OnAfterLoadPage(&requests.FORM_OnAfterLoadPage{
+				Page: requests.Page{
+					ByReference: &FPDF_LoadPage.Page,
+				},
+				FormHandle: formHandle,
+			})
+			Expect(err).To(BeNil())
+			Expect(FORM_OnAfterLoadPage).To(Equal(&responses.FORM_OnAfterLoadPage{}))
+
+			_, _ = PdfiumInstance.FORM_OnLButtonDown(&requests.FORM_OnLButtonDown{
+				Page: requests.Page{
+					ByReference: &FPDF_LoadPage.Page,
+				},
+				FormHandle: formHandle,
+				PageX:      150,
+				PageY:      410,
+			})
+			FORM_OnLButtonUp, err := PdfiumInstance.FORM_OnLButtonUp(&requests.FORM_OnLButtonUp{
+				Page: requests.Page{
+					ByReference: &FPDF_LoadPage.Page,
+				},
+				FormHandle: formHandle,
+				PageX:      150,
+				PageY:      410,
+			})
+			Expect(err).To(BeNil())
+			Expect(FORM_OnLButtonUp).To(Equal(&responses.FORM_OnLButtonUp{}))
+
+			FORM_OnMouseWheel, err := PdfiumInstance.FORM_OnMouseWheel(&requests.FORM_OnMouseWheel{
+				FormHandle: formHandle,
+				Page: requests.Page{
+					ByReference: &FPDF_LoadPage.Page,
+				},
+				PageCoord: structs.FPDF_FS_POINTF{
+					X: 150,
+					Y: 410,
+				},
+				DeltaY: -1,
+			})
+			Expect(err).To(BeNil())
+			Expect(FORM_OnMouseWheel).To(Equal(&responses.FORM_OnMouseWheel{}))
+
+			FORM_OnBeforeClosePage, err := PdfiumInstance.FORM_OnBeforeClosePage(&requests.FORM_OnBeforeClosePage{
+				Page: requests.Page{
+					ByReference: &FPDF_LoadPage.Page,
+				},
+				FormHandle: formHandle,
+			})
+			Expect(err).To(BeNil())
+			Expect(FORM_OnBeforeClosePage).To(Equal(&responses.FORM_OnBeforeClosePage{}))
+
+			FPDF_ClosePage, err := PdfiumInstance.FPDF_ClosePage(&requests.FPDF_ClosePage{
+				Page: FPDF_LoadPage.Page,
+			})
+			Expect(err).To(BeNil())
+			Expect(FPDF_ClosePage).To(Equal(&responses.FPDF_ClosePage{}))
+		})
+	})
+
 	Context("a PDF file with a form combobox", func() {
 		var doc references.FPDF_DOCUMENT
 		var formHandle references.FPDF_FORMHANDLE
