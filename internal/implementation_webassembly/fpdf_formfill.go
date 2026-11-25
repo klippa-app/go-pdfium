@@ -1245,7 +1245,7 @@ func (p *PdfiumImplementation) FORM_OnMouseWheel(request *requests.FORM_OnMouseW
 	}
 	defer pageCoordPointer.Free()
 
-	res, err := p.call("FPDF_LoadXFA", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), pageCoordPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.DeltaX)), *(*uint64)(unsafe.Pointer(&request.DeltaY)))
+	res, err := p.call("FORM_OnMouseWheel", *formHandleHandle.handle, *pageHandle.handle, *(*uint64)(unsafe.Pointer(&request.Modifier)), pageCoordPointer.Pointer, *(*uint64)(unsafe.Pointer(&request.DeltaX)), *(*uint64)(unsafe.Pointer(&request.DeltaY)))
 	if err != nil {
 		return nil, err
 	}
